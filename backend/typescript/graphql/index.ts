@@ -22,10 +22,6 @@ const query = gql`
   }
 `;
 
-
-
-
-
 const mutation = gql`
   type Mutation {
     _empty: String
