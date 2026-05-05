@@ -1,4 +1,4 @@
-FROM node:20.11.1-slim
+FROM node:20.19.0-slim
 
 WORKDIR /app
 
@@ -8,4 +8,4 @@ RUN yarn install
 COPY . ./
 
 EXPOSE 3000
-ENTRYPOINT ["yarn", "start"]
+ENTRYPOINT ["yarn", "dev"]
