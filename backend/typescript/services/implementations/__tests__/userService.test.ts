@@ -49,7 +49,7 @@ describe("pg userService", () => {
     const users = testUsers.map((user) => {
       const userSnakeCase: Record<string, string | boolean | null> = {};
       Object.entries(user).forEach(([key, value]) => {
-        userSnakeCase[snakeCase(key)] = value;
+        userSnakeCase[snakeCase(key)] = value ?? null;
       });
       return userSnakeCase;
     });
