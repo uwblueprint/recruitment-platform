@@ -11,6 +11,13 @@
     "migrate:create": "node migrate.js create --name",
     "migrate:up": "node migrate.js up",
     "migrate:down": "node migrate.js down",
+    "migrate:down:all": "node migrate.js down --to 0",
+    "seed:create": "node seed.js create --name",
+    "seed:up": "node seed.js up",
+    "seed:down": "node seed.js down",
+    "seed:down:all": "node seed.js down --to 0",
+    "db:up": "node migrate.js up && node seed.js up",
+    "db:down:all": "node seed.js down --to 0 && node migrate.js down --to 0",
     "postinstall": "tsc"
   },
   "keywords": [],

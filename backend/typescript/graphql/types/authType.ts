@@ -7,6 +7,8 @@ const authType = gql`
     lastName: String!
     email: String!
     role: Role!
+    position: String
+    isArchived: Boolean!
     accessToken: String!
   }
 

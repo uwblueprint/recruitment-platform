@@ -2,31 +2,19 @@ import { DataType } from "sequelize-typescript";
 
 import { Migration } from "../umzug";
 
-const TABLE_NAME = "users";
+const TABLE_NAME = "positions";
 
 export const up: Migration = async ({ context: sequelize }) => {
   await sequelize.getQueryInterface().createTable(TABLE_NAME, {
-    id: {
-      type: DataType.INTEGER,
+    title: {
+      type: DataType.STRING,
       allowNull: false,
       primaryKey: true,
-      autoIncrement: true,
     },
-    first_name: {
-      type: DataType.STRING,
+    is_archived: {
+      type: DataType.BOOLEAN,
       allowNull: false,
-    },
-    last_name: {
-      type: DataType.STRING,
-      allowNull: false,
-    },
-    auth_id: {
-      type: DataType.STRING,
-      allowNull: false,
-    },
-    role: {
-      type: DataType.ENUM("User", "Admin", "SuperAdmin"),
-      allowNull: false,
+      defaultValue: false,
     },
     createdAt: DataType.DATE,
     updatedAt: DataType.DATE,

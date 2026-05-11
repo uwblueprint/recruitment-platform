@@ -65,6 +65,7 @@ class AuthService implements IAuthService {
           email: googleUser.email,
           role: "User",
           password: "",
+          isArchived: false,
         },
         googleUser.localId,
         "GOOGLE",

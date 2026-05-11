@@ -13,29 +13,30 @@ const sequelize = new Sequelize(DATABASE_URL, {
   models: [path.join(__dirname, "/*.model.ts")],
 });
 
-const migrationTemplate = (filepath: string): [string, string][] => {
-  const content = `import type { Migration } from "../umzug";
+const seederTemplate = (filepath: string): [string, string][] => {
+  const content = `import type { Seeder } from "../umzug-seed";
 
-export const up: Migration = async ({ context: sequelize }) => {};
+export const up: Seeder = async ({ context: sequelize }) => {};
 
-export const down: Migration = async ({ context: sequelize }) => {};
+export const down: Seeder = async ({ context: sequelize }) => {};
 `;
   return [[filepath, content]];
 };
 
-export const migrator = new Umzug({
+export const seedMigrator = new Umzug({
   migrations: {
-    glob: ["migrations/*.ts", { cwd: __dirname }],
+    glob: ["seeders/*.ts", { cwd: __dirname }],
   },
   context: sequelize,
   storage: new SequelizeStorage({
     sequelize,
+    tableName: "SequelizeSeederMeta",
   }),
   logger: console,
   create: {
-    folder: path.join(__dirname, "migrations"),
-    template: migrationTemplate,
+    folder: path.join(__dirname, "seeders"),
+    template: seederTemplate,
   },
 });
 
-export type Migration = typeof migrator._types.migration;
+export type Seeder = typeof seedMigrator._types.migration;

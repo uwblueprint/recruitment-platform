@@ -39,8 +39,11 @@ const executableSchema = makeExecutableSchema({
 });
 
 const authorizedByAllRoles = () =>
-  isAuthorizedByRole(new Set(["User", "Admin"]));
-const authorizedByAdmin = () => isAuthorizedByRole(new Set(["Admin"]));
+  isAuthorizedByRole(new Set(["User", "Admin", "SuperAdmin"]));
+const authorizedByAdmin = () =>
+  isAuthorizedByRole(new Set(["Admin", "SuperAdmin"]));
+const authorizedBySuperAdmin = () =>
+  isAuthorizedByRole(new Set(["SuperAdmin"]));
 
 const graphQLMiddlewares = {
   Query: {
@@ -61,8 +64,8 @@ const graphQLMiddlewares = {
     deleteSimpleEntity: authorizedByAllRoles(),
     createUser: authorizedByAdmin(),
     updateUser: authorizedByAdmin(),
-    deleteUserById: authorizedByAdmin(),
-    deleteUserByEmail: authorizedByAdmin(),
+    deleteUserById: authorizedBySuperAdmin(),
+    deleteUserByEmail: authorizedBySuperAdmin(),
     logout: isAuthorizedByUserId("userId"),
     resetPassword: isAuthorizedByEmail("email"),
   },
