@@ -11,6 +11,9 @@
     "migrate:create": "node migrate.js create --name",
     "migrate:up": "node migrate.js up",
     "migrate:down": "node migrate.js down",
+    "seed:create": "node seed.js create --name",
+    "seed:up": "node seed.js up",
+    "seed:down": "node seed.js down",
     "postinstall": "tsc"
   },
   "keywords": [],
