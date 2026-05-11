@@ -57,10 +57,10 @@ export default class ApplicantRecord extends Model {
   status!: ApplicationStatus;
 
   @Column({ type: DataType.STRING, allowNull: true })
-  skill_category!: SkillCategory;
+  skill_category?: SkillCategory;
 
   @Column({ type: DataType.JSONB, allowNull: true })
-  extra_info!: ApplicantRecordExtraInfo;
+  extra_info?: ApplicantRecordExtraInfo;
 
   @Column({
     type: DataType.INTEGER,

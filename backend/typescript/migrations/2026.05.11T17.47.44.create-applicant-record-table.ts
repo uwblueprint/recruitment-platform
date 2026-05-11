@@ -18,6 +18,8 @@ export const up: Migration = async ({ context: sequelize }) => {
         model: "applicants",
         key: "id",
       },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     },
     position: {
       type: DataType.STRING,
@@ -26,6 +28,8 @@ export const up: Migration = async ({ context: sequelize }) => {
         model: "positions",
         key: "title",
       },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     },
     role_specific_questions: {
       type: DataType.ARRAY(DataType.JSONB),
@@ -51,7 +55,8 @@ export const up: Migration = async ({ context: sequelize }) => {
     },
     skill_category: {
       type: DataType.STRING,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: null,
     },
     is_shortlistsed_for_interview: {
       type: DataType.BOOLEAN,
@@ -65,7 +70,8 @@ export const up: Migration = async ({ context: sequelize }) => {
     },
     extra_info: {
       type: DataType.JSONB,
-      allowNull: false,
+      allowNull: true,
+      defaultValue: null,
     },
     createdAt: DataType.DATE,
     updatedAt: DataType.DATE,

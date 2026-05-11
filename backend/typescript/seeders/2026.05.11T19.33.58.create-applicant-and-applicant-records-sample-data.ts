@@ -1,8 +1,25 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { Op } from "sequelize";
+import { DataTypes, Op } from "sequelize";
+import { v4 } from "uuid";
 import type { Seeder } from "../umzug-seed";
+
+/** Tell Sequelize how to escape jsonb[] / jsonb columns when using queryInterface.bulkInsert.
+ * (Runtime accepts this map; Sequelize 6.5 typings only list string|string[] for the 4th argument.)
+ */
+const APPLICANT_BULK_INSERT_FIELD_TYPES = {
+  short_answer_questions: {
+    type: new DataTypes.ARRAY(DataTypes.JSONB),
+  },
+};
+
+const APPLICANT_RECORD_BULK_INSERT_FIELD_TYPES = {
+  role_specific_questions: {
+    type: new DataTypes.ARRAY(DataTypes.JSONB),
+  },
+  extra_info: { type: DataTypes.JSONB },
+};
 
 const TIMES_APPLIED_MAP = {
   "This is my first time!": 1,
@@ -12,6 +29,18 @@ const TIMES_APPLIED_MAP = {
 } as const;
 
 const TEST_SLUG = "real-data-test-applicant";
+
+/** Export labels in applications.json - `positions.title` from create-bp-positions seeder (FK target). */
+const POSITION_TITLE_BY_EXPORT_ROLE: Record<string, string> = {
+  "Product Designer": "Designer",
+  "Project Developer": "Developer",
+  "VP Finance & Operations": "VP Finance",
+  "VP Project Scoping": "VP Scoping",
+};
+
+function positionTitleForApplicantRecord(exportRoleTitle: string): string {
+  return POSITION_TITLE_BY_EXPORT_ROLE[exportRoleTitle] ?? exportRoleTitle;
+}
 
 type ShortAnswerQuestion = {
   question: string;
@@ -65,6 +94,7 @@ type CreateApplicantDTO = {
 };
 
 type CreateApplicantRecordDTO = {
+  id: string;
   applicant_id: string;
   position: string;
   role_specific_questions: ShortAnswerQuestion[];
@@ -80,7 +110,8 @@ const getRoleSpecificQuestions = (
   if (!roleQuestions) {
     throw new Error(`Role ${roleTitle} not found in data`);
   }
-  return roleQuestions.questions.map((q) => {
+  const questions = roleQuestions.questions ?? [];
+  return questions.map((q) => {
     if (!q.question) {
       throw new Error(`Question text is required for role ${roleTitle}`);
     }
@@ -105,6 +136,8 @@ type SeedData = {
   secondChoiceApplicantRecord?: CreateApplicantRecordDTO;
 };
 
+const TEST_APPLICANT_ID_PREFIX = "real-data-test-applicant";
+
 const getApplicantDTO = (
   app: JSONApplication,
   applicantId: string,
@@ -113,7 +146,7 @@ const getApplicantDTO = (
     id: applicantId,
     first_name: app.firstName,
     last_name: app.lastName,
-    email: app.email,
+    email: `${TEST_APPLICANT_ID_PREFIX}-${app.email}`,
     academic_or_coop: app.academicOrCoop,
     academic_year: app.academicYear,
     heard_from: app.heardFrom,
@@ -138,15 +171,17 @@ const getApplicantDTO = (
 const getApplicantRecordDTO = (
   app: JSONApplication,
   applicantId: string,
-  position: string,
+  choiceRoleFromExport: string,
   choice: number,
 ): CreateApplicantRecordDTO => {
+  const position = positionTitleForApplicantRecord(choiceRoleFromExport);
   return {
+    id: v4(),
     applicant_id: applicantId,
     position,
     role_specific_questions: getRoleSpecificQuestions(
       app.roleSpecificQuestions,
-      position,
+      choiceRoleFromExport,
     ),
     choice,
     status: "APPLIED",
@@ -155,7 +190,7 @@ const getApplicantRecordDTO = (
 
 function generateSeedData(applications: JSONApplication[]): SeedData[] {
   return applications.map((app) => {
-    const applicantId = `${TEST_SLUG}-${app.email}-${app.timestamp}`;
+    const applicantId = v4();
     return {
       applicant: getApplicantDTO(app, applicantId),
       firstChoiceApplicantRecord: getApplicantRecordDTO(
@@ -180,21 +215,46 @@ export const up: Seeder = async ({ context: sequelize }) => {
   const seedFirstChoiceApplicantRecords = seedData.map(
     (s) => s.firstChoiceApplicantRecord,
   );
+
   const seedSecondChoiceApplicantRecords = seedData
     .filter((s) => s.secondChoiceApplicantRecord)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     .map((s) => s.secondChoiceApplicantRecord!);
 
   const t = await sequelize.transaction();
   try {
+    await sequelize.getQueryInterface().bulkInsert("positions", [
+      {
+        title: "User Experience Researcher",
+        is_archived: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    ]);
+
+    await sequelize.getQueryInterface().bulkInsert(
+      "applicants",
+      seedApplicants,
+      { transaction: t },
+      // sequelize@6.5 .d.ts types arg 4 as string|string[]; runtime accepts field→attribute map (see lib query-interface.js).
+      APPLICANT_BULK_INSERT_FIELD_TYPES as never,
+    );
     await sequelize
       .getQueryInterface()
-      .bulkInsert("applicants", seedApplicants);
+      .bulkInsert(
+        "applicant_records",
+        seedFirstChoiceApplicantRecords,
+        { transaction: t },
+        APPLICANT_RECORD_BULK_INSERT_FIELD_TYPES as never,
+      );
     await sequelize
       .getQueryInterface()
-      .bulkInsert("applicant_records", seedFirstChoiceApplicantRecords);
-    await sequelize
-      .getQueryInterface()
-      .bulkInsert("applicant_records", seedSecondChoiceApplicantRecords);
+      .bulkInsert(
+        "applicant_records",
+        seedSecondChoiceApplicantRecords,
+        { transaction: t },
+        APPLICANT_RECORD_BULK_INSERT_FIELD_TYPES as never,
+      );
     await t.commit();
   } catch (e) {
     await t.rollback();
@@ -205,16 +265,22 @@ export const up: Seeder = async ({ context: sequelize }) => {
 export const down: Seeder = async ({ context: sequelize }) => {
   const t = await sequelize.transaction();
   try {
-    await sequelize.getQueryInterface().bulkDelete("applicants", {
-      id: {
-        [Op.like]: `${TEST_SLUG}%`,
+    await sequelize.getQueryInterface().bulkDelete(
+      "applicants",
+      {
+        email: {
+          [Op.like]: `${TEST_SLUG}%`,
+        },
       },
-    });
-    await sequelize.getQueryInterface().bulkDelete("applicant_records", {
-      applicant_id: {
-        [Op.like]: `${TEST_SLUG}%`,
+      { transaction: t },
+    );
+    await sequelize.getQueryInterface().bulkDelete(
+      "positions",
+      {
+        title: "User Experience Researcher",
       },
-    });
+      { transaction: t },
+    );
     await t.commit();
   } catch (e) {
     await t.rollback();
