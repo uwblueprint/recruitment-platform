@@ -32,6 +32,8 @@ class UserService implements IUserService {
       lastName: user.last_name,
       email: firebaseUser.email ?? "",
       role: user.role,
+      position: user.position,
+      isArchived: user.is_archived,
     };
   }
 
@@ -59,6 +61,8 @@ class UserService implements IUserService {
       lastName: user.last_name,
       email: firebaseUser.email ?? "",
       role: user.role,
+      position: user.position,
+      isArchived: user.is_archived,
     };
   }
 
@@ -131,6 +135,8 @@ class UserService implements IUserService {
             lastName: user.last_name,
             email: firebaseUser.email ?? "",
             role: user.role,
+            position: user.position,
+            isArchived: user.is_archived,
           };
         }),
       );
@@ -168,6 +174,8 @@ class UserService implements IUserService {
           last_name: user.lastName,
           auth_id: firebaseUser.uid,
           role: user.role,
+          position: user.position,
+          is_archived: user.isArchived,
         });
       } catch (postgresError) {
         try {
@@ -195,6 +203,8 @@ class UserService implements IUserService {
       lastName: newUser.last_name,
       email: firebaseUser.email ?? "",
       role: newUser.role,
+      position: newUser.position,
+      isArchived: newUser.is_archived,
     };
   }
 
@@ -207,6 +217,8 @@ class UserService implements IUserService {
           first_name: user.firstName,
           last_name: user.lastName,
           role: user.role,
+          position: user.position,
+          is_archived: user.isArchived,
         },
         {
           where: { id: userId },
@@ -236,6 +248,8 @@ class UserService implements IUserService {
               first_name: oldUser.first_name,
               last_name: oldUser.last_name,
               role: oldUser.role,
+              position: oldUser.position,
+              is_archived: oldUser.is_archived,
             },
             {
               where: { id: userId },
@@ -264,6 +278,8 @@ class UserService implements IUserService {
       lastName: user.lastName,
       email: updatedFirebaseUser.email ?? "",
       role: user.role,
+      position: user.position,
+      isArchived: user.isArchived,
     };
   }
 
@@ -294,6 +310,8 @@ class UserService implements IUserService {
             last_name: deletedUser.last_name,
             auth_id: deletedUser.auth_id,
             role: deletedUser.role,
+            position: deletedUser.position,
+            is_archived: deletedUser.is_archived,
           });
         } catch (postgresError: unknown) {
           const errorMessage = [
@@ -346,6 +364,8 @@ class UserService implements IUserService {
             last_name: deletedUser.last_name,
             auth_id: deletedUser.auth_id,
             role: deletedUser.role,
+            position: deletedUser.position,
+            is_archived: deletedUser.is_archived,
           });
         } catch (postgresError: unknown) {
           const errorMessage = [

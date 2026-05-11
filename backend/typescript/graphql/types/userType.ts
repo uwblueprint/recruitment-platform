@@ -4,6 +4,7 @@ const userType = gql`
   enum Role {
     User
     Admin
+    SuperAdmin
   }
 
   type UserDTO {
@@ -12,6 +13,8 @@ const userType = gql`
     lastName: String!
     email: String!
     role: Role!
+    position: String
+    isArchived: Boolean!
   }
 
   input CreateUserDTO {
@@ -20,6 +23,8 @@ const userType = gql`
     email: String!
     role: Role!
     password: String!
+    position: String
+    isArchived: Boolean!
   }
 
   input UpdateUserDTO {
@@ -27,6 +32,8 @@ const userType = gql`
     lastName: String!
     email: String!
     role: Role!
+    position: String
+    isArchived: Boolean!
   }
 
   extend type Query {
