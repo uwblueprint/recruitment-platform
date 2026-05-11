@@ -13,6 +13,16 @@ const sequelize = new Sequelize(DATABASE_URL, {
   models: [path.join(__dirname, "/*.model.ts")],
 });
 
+const migrationTemplate = (filepath: string): [string, string][] => {
+  const content = `import type { Migration } from "../umzug";
+
+export const up: Migration = async ({ context: sequelize }) => {};
+
+export const down: Migration = async ({ context: sequelize }) => {};
+`;
+  return [[filepath, content]];
+};
+
 export const migrator = new Umzug({
   migrations: {
     glob: ["migrations/*.ts", { cwd: __dirname }],
@@ -24,6 +34,7 @@ export const migrator = new Umzug({
   logger: console,
   create: {
     folder: path.join(__dirname, "migrations"),
+    template: migrationTemplate,
   },
 });
 

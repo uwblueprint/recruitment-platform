@@ -17,9 +17,9 @@ const sequelize = new Sequelize(DATABASE_URL, {
 const seederTemplate = (filepath: string): [string, string][] => {
   const content = `import type { Seeder } from "../umzug-seed";
 
-export const up: Seeder = async ({ context: _sequelize }) => {};
+export const up: Seeder = async ({ context: sequelize }) => {};
 
-export const down: Seeder = async ({ context: _sequelize }) => {};
+export const down: Seeder = async ({ context: sequelize }) => {};
 `;
   return [[filepath, content]];
 };
