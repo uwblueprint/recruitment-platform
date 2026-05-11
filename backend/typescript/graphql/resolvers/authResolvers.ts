@@ -78,9 +78,6 @@ const authResolvers = {
       await authService.resetPassword(email);
       return true;
     },
-
-
-    
   },
 };
 
