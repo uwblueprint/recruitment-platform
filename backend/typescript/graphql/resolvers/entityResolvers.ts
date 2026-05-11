@@ -6,7 +6,7 @@ import multer from "multer";
 import {
   validateFileType,
   getFileTypeValidationError,
-} from "../../middlewares/validators/util";
+} from "../../middlewares/util";
 import EntityService from "../../services/implementations/entityService";
 import FileStorageService from "../../services/implementations/fileStorageService";
 import {
