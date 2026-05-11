@@ -13,7 +13,6 @@ const sequelize = new Sequelize(DATABASE_URL, {
   models: [path.join(__dirname, "/*.model.ts")],
 });
 
-
 const seederTemplate = (filepath: string): [string, string][] => {
   const content = `import type { Seeder } from "../umzug-seed";
 

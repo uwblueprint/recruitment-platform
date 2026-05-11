@@ -1,4 +1,10 @@
-import { BelongsTo, Column, DataType, Model, Table } from "sequelize-typescript";
+import {
+  BelongsTo,
+  Column,
+  DataType,
+  Model,
+  Table,
+} from "sequelize-typescript";
 import { Role } from "../types";
 import Position from "./position.model";
 
