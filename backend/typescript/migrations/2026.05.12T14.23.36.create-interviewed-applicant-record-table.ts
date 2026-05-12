@@ -48,11 +48,6 @@ export const up: Migration = async ({ context: sequelize }) => {
       onDelete: "SET NULL",
       onUpdate: "CASCADE",
     },
-    scheduling_link: {
-      type: DataType.STRING,
-      allowNull: true,
-      defaultValue: null,
-    },
     interview_date: {
       type: DataType.DATE,
       allowNull: true,
