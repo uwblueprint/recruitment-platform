@@ -1,41 +1,17 @@
-import { makeExecutableSchema, gql } from "apollo-server-express";
+import { makeExecutableSchema } from "apollo-server-express";
 import { applyMiddleware } from "graphql-middleware";
-import { merge } from "lodash";
 
 import {
   isAuthorizedByEmail,
   isAuthorizedByRole,
   isAuthorizedByUserId,
 } from "../middlewares/auth";
-import authResolvers from "./resolvers/authResolvers";
-import authType from "./types/authType";
-import entityResolvers from "./resolvers/entityResolvers";
-import entityType from "./types/entityType";
-import simpleEntityResolvers from "./resolvers/simpleEntityResolvers";
-import simpleEntityType from "./types/simpleEntityType";
-import userResolvers from "./resolvers/userResolvers";
-import userType from "./types/userType";
-
-const query = gql`
-  type Query {
-    _empty: String
-  }
-`;
-
-const mutation = gql`
-  type Mutation {
-    _empty: String
-  }
-`;
+import resolvers from "./resolvers";
+import typeDefs from "./typeDefs";
 
 const executableSchema = makeExecutableSchema({
-  typeDefs: [query, mutation, authType, entityType, simpleEntityType, userType],
-  resolvers: merge(
-    authResolvers,
-    entityResolvers,
-    simpleEntityResolvers,
-    userResolvers,
-  ),
+  typeDefs,
+  resolvers,
 });
 
 const authorizedByAllRoles = () =>
@@ -54,11 +30,34 @@ const graphQLMiddlewares = {
     userById: authorizedByAdmin(),
     userByEmail: authorizedByAdmin(),
     users: authorizedByAdmin(),
+    adminCommentsByApplicantRecordId: authorizedByAdmin(),
+    adminCommentById: authorizedByAdmin(),
+    getInterviewDelegation: authorizedByAllRoles(),
+    getInterviewedApplicantsByUserId: authorizedByAllRoles(),
+    getInterviewedPairingsByUserId: authorizedByAllRoles(),
+    getInterviewersByGroupId: authorizedByAllRoles(),
+    getInterviewGroupById: authorizedByAllRoles(),
+    getReviewedApplicantRecord: authorizedByAllRoles(),
   },
   Mutation: {
+    bulkCreateInterviewDelegations: authorizedByAllRoles(),
+    bulkCreateInterviewGroups: authorizedByAllRoles(),
+    bulkCreateReviewedApplicantRecord: authorizedByAllRoles(),
+    bulkDeleteInterviewDelegations: authorizedByAllRoles(),
+    bulkDeleteInterviewGroupsByIds: authorizedByAllRoles(),
+    bulkDeleteReviewedApplicantRecord: authorizedByAllRoles(),
+    createAdminComment: authorizedByAdmin(),
     createEntity: authorizedByAllRoles(),
+    createInterviewDelegation: authorizedByAllRoles(),
+    createInterviewGroup: authorizedByAllRoles(),
+    createReviewedApplicantRecord: authorizedByAllRoles(),
     updateEntity: authorizedByAllRoles(),
     deleteEntity: authorizedByAllRoles(),
+    delegateInterviewers: authorizedByAllRoles(),
+    deleteAdminCommentById: authorizedByAdmin(),
+    deleteInterviewDelegation: authorizedByAllRoles(),
+    deleteInterviewGroupById: authorizedByAllRoles(),
+    deleteReviewedApplicantRecord: authorizedByAllRoles(),
     createSimpleEntity: authorizedByAllRoles(),
     updateSimpleEntity: authorizedByAllRoles(),
     deleteSimpleEntity: authorizedByAllRoles(),
@@ -68,6 +67,11 @@ const graphQLMiddlewares = {
     deleteUserByEmail: authorizedBySuperAdmin(),
     logout: isAuthorizedByUserId("userId"),
     resetPassword: isAuthorizedByEmail("email"),
+    sendSignInLink: authorizedByAllRoles(),
+    updateAdminComment: authorizedByAdmin(),
+    updateInterviewDelegation: authorizedByAllRoles(),
+    updateInterviewGroup: authorizedByAllRoles(),
+    updateReviewedApplicantRecord: authorizedByAllRoles(),
   },
 };
 
