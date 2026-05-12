@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .ts,.js",
     "fix": "eslint . --ext .ts,.js --fix",
     "schema:print": "ts-node scripts/printSchema.ts > graphql/schema.graphql",
+    "codegen": "yarn schema:print && graphql-codegen --config codegen.ts",
     "migrate:create": "node migrate.js create --name",
     "migrate:up": "node migrate.js up",
     "migrate:down": "node migrate.js down",
@@ -60,6 +61,9 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.16.5",
+    "@graphql-codegen/typescript": "2.8.8",
+    "@graphql-codegen/typescript-resolvers": "2.7.13",
     "@types/cookie-parser": "^1.4.2",
     "@types/cors": "^2.8.10",
     "@types/dotenv": "^8.2.0",
