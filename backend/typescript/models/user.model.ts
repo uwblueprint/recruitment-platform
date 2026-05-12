@@ -1,10 +1,4 @@
-import {
-  BelongsTo,
-  Column,
-  DataType,
-  Model,
-  Table,
-} from "sequelize-typescript";
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 import { Role } from "../types";
 import Position from "./position.model";
 
@@ -34,12 +28,6 @@ export default class User extends Model {
     onUpdate: "CASCADE",
   })
   position?: string;
-
-  @BelongsTo(() => Position, {
-    foreignKey: "position",
-    targetKey: "title",
-  })
-  userPosition?: Position;
 
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
   is_archived!: boolean;

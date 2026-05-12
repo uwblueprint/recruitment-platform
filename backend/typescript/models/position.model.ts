@@ -6,5 +6,5 @@ export default class Position extends Model {
   title!: string;
 
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
-  isArchived!: boolean;
+  is_archived!: boolean;
 }
