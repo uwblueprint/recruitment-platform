@@ -13,7 +13,6 @@ import {
   SkillCategory,
 } from "../types";
 import Applicant from "./applicant.model";
-import Position from "./position.model";
 
 @Table({ tableName: "applicant_records" })
 export default class ApplicantRecord extends Model {
