@@ -23,7 +23,7 @@ export const up: Migration = async ({ context: sequelize }) => {
       onUpdate: "CASCADE",
     },
     applicant_record_id: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
       references: {
         model: "applicant_records",
