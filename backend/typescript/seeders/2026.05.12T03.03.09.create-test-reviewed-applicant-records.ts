@@ -61,6 +61,17 @@ export const up: Seeder = async ({ context: sequelize }) => {
     ...secondChoiceApplicantRecords.map((s) => s.id),
   ];
 
+  const reviewedApplicantRecords = applicantRecordIds.map((id) => {
+    return {
+      applicant_record_id: id,
+      reviewer_id: [5, 6, 7, 8][Math.floor(Math.random() * 4)], // 5-8 are the reviewer user ids
+      /** bulkInsert cannot bind plain objects for jsonb; PG accepts a JSON text literal. */
+      review: JSON.stringify(getReviewDTO()),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  });
+
   const t = await sequelize.transaction();
   try {
     // bulk insert the reviewer users
@@ -73,6 +84,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
           last_name: "Reviewer 1",
           auth_id: `${SEED_EMAIL_PREFIX}1@example.com`,
           role: "User",
+          email: `${SEED_EMAIL_PREFIX}1@example.com`,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -82,6 +94,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
           last_name: "Reviewer 2",
           auth_id: `${SEED_EMAIL_PREFIX}2@example.com`,
           role: "User",
+          email: `${SEED_EMAIL_PREFIX}2@example.com`,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -91,6 +104,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
           last_name: "Reviewer 3",
           auth_id: `${SEED_EMAIL_PREFIX}3@example.com`,
           role: "User",
+          email: `${SEED_EMAIL_PREFIX}3@example.com`,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -100,6 +114,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
           last_name: "Reviewer 4",
           auth_id: `${SEED_EMAIL_PREFIX}4@example.com`,
           role: "User",
+          email: `${SEED_EMAIL_PREFIX}4@example.com`,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -132,17 +147,6 @@ export const up: Seeder = async ({ context: sequelize }) => {
         { transaction: t },
         APPLICANT_RECORD_BULK_INSERT_FIELD_TYPES as never,
       );
-
-    const reviewedApplicantRecords = applicantRecordIds.map((id) => {
-      return {
-        applicant_record_id: id,
-        reviewer_id: [5, 6, 7, 8][Math.floor(Math.random() * 4)], // 5-8 are the reviewer user ids
-        /** bulkInsert cannot bind plain objects for jsonb; PG accepts a JSON text literal. */
-        review: JSON.stringify(getReviewDTO()),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-    });
 
     await sequelize
       .getQueryInterface()
