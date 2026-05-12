@@ -18,6 +18,13 @@ export default class User extends Model {
   })
   id!: number;
 
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true,
+  })
+  email!: string;
+
   @Column({ type: DataType.STRING, allowNull: false })
   first_name!: string;
 
