@@ -1,4 +1,5 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { ShortAnswerQuestion } from "../types";
 
 @Table({ tableName: "applicants" })
 export default class Applicant extends Model {
@@ -44,7 +45,7 @@ export default class Applicant extends Model {
   times_applied!: number;
 
   @Column({ type: DataType.ARRAY(DataType.JSONB), allowNull: false })
-  short_answer_questions!: { question: string; answer: string }[];
+  short_answer_questions!: ShortAnswerQuestion[];
 
   @Column({ type: DataType.STRING, allowNull: false })
   term!: string;
