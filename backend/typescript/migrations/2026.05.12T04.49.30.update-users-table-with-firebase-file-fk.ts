@@ -3,7 +3,7 @@ import type { Migration } from "../umzug";
 
 const TABLE_NAME = "users";
 export const up: Migration = async ({ context: sequelize }) => {
-    await sequelize
+  await sequelize
     .getQueryInterface()
     .addColumn(TABLE_NAME, "profile_picture_file_id", {
       type: DataType.UUID,
@@ -19,7 +19,7 @@ export const up: Migration = async ({ context: sequelize }) => {
 };
 
 export const down: Migration = async ({ context: sequelize }) => {
-    await sequelize
+  await sequelize
     .getQueryInterface()
     .removeColumn(TABLE_NAME, "profile_picture_file_id");
 };
