@@ -18,17 +18,17 @@ import Position from "./position.model";
 @Table({ tableName: "applicant_records" })
 export default class ApplicantRecord extends Model {
   @Column({
-    type: DataType.STRING,
+    type: DataType.UUID,
+    allowNull: false,
     primaryKey: true,
-    unique: true,
-    autoIncrement: true,
+    defaultValue: DataType.UUIDV4,
   })
   id!: string;
 
   @Column({
     type: DataType.UUID,
     allowNull: false,
-    references: { model: Applicant, key: "id" },
+    references: { model: "applicants", key: "id" },
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })
@@ -37,7 +37,7 @@ export default class ApplicantRecord extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    references: { model: Position, key: "title" },
+    references: { model: "positions", key: "title" },
     onDelete: "CASCADE",
     onUpdate: "CASCADE",
   })

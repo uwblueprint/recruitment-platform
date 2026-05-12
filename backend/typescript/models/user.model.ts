@@ -1,6 +1,5 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
 import { Role } from "../types";
-import Position from "./position.model";
 
 @Table({ tableName: "users" })
 export default class User extends Model {
@@ -23,7 +22,7 @@ export default class User extends Model {
     type: DataType.STRING,
     allowNull: true,
     defaultValue: null,
-    references: { model: Position, key: "title" },
+    references: { model: "positions", key: "title" },
     onDelete: "SET NULL",
     onUpdate: "CASCADE",
   })
