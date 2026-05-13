@@ -1,0 +1,38 @@
+import { ReactNode, ReactElement, useEffect, useState } from "react";
+import { Loading } from "@/components/common/Loading";
+import { AuthStatus } from "@/types";
+
+export type Props = {
+  children: ReactNode;
+};
+
+export const ProtectedApplication = ({ children }: Props): ReactElement => {
+  const [authStatus, setAuthStatus] = useState<AuthStatus>({
+    loading: true,
+    isAuthorized: false,
+  });
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem("accessToken");
+    if (!accessToken) {
+      setAuthStatus({
+        loading: false,
+        isAuthorized: false,
+      });
+      return;
+    }
+
+    setAuthStatus({
+      loading: false,
+      isAuthorized: true,
+    });
+  }, []);
+
+  return authStatus.loading ? (
+    <Loading />
+  ) : authStatus.isAuthorized ? (
+    <>{children}</>
+  ) : (
+    <div>Unauthorized</div>
+  );
+};

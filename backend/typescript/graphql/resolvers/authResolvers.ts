@@ -7,7 +7,7 @@ import UserService from "../../services/implementations/userService";
 import IAuthService from "../../services/interfaces/authService";
 import IEmailService from "../../services/interfaces/emailService";
 import IUserService from "../../services/interfaces/userService";
-import { AuthDTO, RegisterUserDTO } from "../../types";
+import { AuthDTO, RegisterUserDTO, Role } from "../../types";
 
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
@@ -20,6 +20,18 @@ const cookieOptions: CookieOptions = {
 };
 
 const authResolvers = {
+  Query: {
+    isAuthorizedByRole: async (
+      _parent: undefined,
+      { accessToken, roles }: { accessToken: string; roles: Role[] },
+    ): Promise<boolean> => {
+      const isAuthorized = await authService.isAuthorizedByRole(
+        accessToken,
+        new Set(roles),
+      );
+      return isAuthorized;
+    },
+  },
   Mutation: {
     login: async (
       _parent: undefined,

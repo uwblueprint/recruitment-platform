@@ -10,7 +10,7 @@ type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 /** Button component */
-const Button: FC<Props> = ({
+export const Button: FC<Props> = ({
   children,
   className,
   size = "lg",
@@ -80,12 +80,10 @@ const Button: FC<Props> = ({
         </button>
       </a>
     ) : (
-      <Link href={href}>
-        <a className="hover:opacity-100">
+      <Link href={href} className="hover:opacity-100">
           <button className={buttonClasses} tabIndex={-1} {...props}>
             {children}
           </button>
-        </a>
       </Link>
     )
   ) : (
@@ -95,4 +93,3 @@ const Button: FC<Props> = ({
   );
 };
 
-export default Button;

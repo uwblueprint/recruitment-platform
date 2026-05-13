@@ -1,6 +1,6 @@
 import AuthAPIClient from "@/APIClients/AuthAPIClient";
-import Button from "@/common/Button";
-import { useAuthUserContext } from "@/contexts/AuthUserContext";
+import { Button } from "@/components/common/Button";
+import { useAuthUserContext } from "@/components/contexts/AuthUserContext";
 import { auth } from "@/utils/firebase";
 import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import type { NextPage } from "next";
