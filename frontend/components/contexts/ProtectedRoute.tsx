@@ -13,17 +13,16 @@ type Role = "Admin" | "User";
 
 export const ProtectedRoute = ({ children, allowedRoles }: Props): ReactElement => {
   const router = useRouter();
-  const [authStatus, setAuthStatus] = useState<AuthStatus>({
-    loading: true,
-    isAuthorized: false,
+  const [authStatus, setAuthStatus] = useState<AuthStatus>(() => {
+    const hasToken = typeof window !== "undefined" && localStorage.getItem("accessToken") != null;
+    return {
+      loading: hasToken,
+      isAuthorized: false,
+    };
   });
+
   useEffect(() => {
-    // check if we have an accessToken cached
     if (localStorage.getItem("accessToken") == null) {
-      setAuthStatus({
-        loading: false,
-        isAuthorized: false,
-      });
       return;
     }
     AuthAPIClient.isAuthorizedByRole(allowedRoles)
@@ -58,4 +57,3 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props): ReactElement 
     <></>
   );
 };
-

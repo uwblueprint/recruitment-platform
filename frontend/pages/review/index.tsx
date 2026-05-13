@@ -134,8 +134,12 @@ const ReviewsPages: NextPage = () => {
 
   useEffect(() => {
     if (applicantRecordId === null) return;
-    const appInfo = sampleApplication;
-    setApplication(appInfo);
+    // TODO: replace with actual API call to fetch application data
+    const fetchApplication = async () => {
+      const appInfo = sampleApplication;
+      setApplication(appInfo);
+    };
+    fetchApplication();
   }, [applicantRecordId]);
 
   if (!router.isReady) return null;
