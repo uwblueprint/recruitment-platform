@@ -1,26 +1,68 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  /* Typography */
+  h1 {
+    @apply text-[24px] leading-[28px] md:text-[58px] md:leading-[87px] font-medium font-poppins;
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  h2 {
+    @apply text-[22px] leading-[33px] md:text-[44px] md:leading-[66px] font-semibold font-poppins;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  h3 {
+    @apply text-[22px] leading-[28px] md:text-[30px] md:leading-[45px] font-medium font-poppins;
+  }
+
+  h4 {
+    @apply text-[22px] leading-[33px] font-source md:font-semibold md:font-poppins;
+  }
+
+  h5 {
+    @apply text-[16px] leading-[20px] font-source md:text-[18px] md:leading-[27px] font-medium md:font-poppins;
+  }
+
+  h6 {
+    @apply text-[16px] leading-[24px] font-semibold uppercase font-poppins;
+  }
+
+  p {
+    @apply text-[16px] leading-[20px] font-normal font-source;
+  }
+
+  a:hover {
+    @apply opacity-80;
+  }
+
+  /* TODO: Add Caption typography? */
+
+  /* Layout */
+  body {
+    /*
+      Use position: relative so that width: 100% on
+      absolutely positioned elements causes them to
+      span the viewport width
+    */
+    @apply relative font-source;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .content {
+    /*
+      Set a max-width with automatic centering on the page for sections
+      and content that do not have a background that spans the screen width
+    */
+    @apply w-full max-w-6xl mx-auto px-4 md:px-6;
+  }
+}
+
+select {
+  color: #0573E8;
+}
+
+select.form-control:focus {
+  box-shadow: none!important;
 }

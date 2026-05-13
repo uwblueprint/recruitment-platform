@@ -25,27 +25,25 @@ const authResolvers = {
       _parent: undefined,
       { email, password }: { email: string; password: string },
       { res }: { res: Response },
-    ): Promise<Omit<AuthDTO, "refreshToken">> => {
+    ): Promise<AuthDTO> => {
       const authDTO = await authService.generateToken(email, password);
-      const { refreshToken, ...rest } = authDTO;
-      res.cookie("refreshToken", refreshToken, cookieOptions);
-      return rest;
+      res.cookie("refreshToken", authDTO.refreshToken, cookieOptions);
+      return authDTO;
     },
     loginWithGoogle: async (
       _parent: undefined,
       { idToken }: { idToken: string },
       { res }: { res: Response },
-    ): Promise<Omit<AuthDTO, "refreshToken">> => {
+    ): Promise<AuthDTO> => {
       const authDTO = await authService.generateTokenOAuth(idToken);
-      const { refreshToken, ...rest } = authDTO;
-      res.cookie("refreshToken", refreshToken, cookieOptions);
-      return rest;
+      res.cookie("refreshToken", authDTO.refreshToken, cookieOptions);
+      return authDTO;
     },
     register: async (
       _parent: undefined,
       { user }: { user: RegisterUserDTO },
       { res }: { res: Response },
-    ): Promise<Omit<AuthDTO, "refreshToken">> => {
+    ): Promise<AuthDTO> => {
       await userService.createUser({
         ...user,
         role: "User",
@@ -55,10 +53,9 @@ const authResolvers = {
         user.email,
         user.password,
       );
-      const { refreshToken, ...rest } = authDTO;
       await authService.sendEmailVerificationLink(user.email);
-      res.cookie("refreshToken", refreshToken, cookieOptions);
-      return rest;
+      res.cookie("refreshToken", authDTO.refreshToken, cookieOptions);
+      return authDTO;
     },
     refresh: async (
       _parent: undefined,
