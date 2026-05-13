@@ -20,6 +20,7 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props): ReactElement 
 
   useEffect(() => {
     if (localStorage.getItem("accessToken") == null) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setAuthStatus({ loading: false, isAuthorized: false });
       return;
     }
