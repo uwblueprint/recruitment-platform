@@ -27,6 +27,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { ApplicationDTO, AuthStatus } from "@/types";
 import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
+import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
 
 const sampleApplication: ApplicationDTO = {
   id: 1,
@@ -228,10 +229,10 @@ const ReviewsPages: NextPage = () => {
       if (authenticatedUser == null) {
         throw new Error("Missing authenticated reviewer ID");
       }
-    //   await reportReviewConflict(
-    //     applicantRecordId,
-    //     Number(authenticatedUser.id)
-    //   );
+      await ReviewPageAPIClient.reportReviewConflict(
+        applicantRecordId,
+        Number(authenticatedUser.id)
+      );
       setReportConflictDialogueOpen(false);
       setReportConflictSuccessDialogueOpen(true);
     } catch (error) {
