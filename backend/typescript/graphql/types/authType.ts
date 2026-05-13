@@ -10,6 +10,7 @@ const authType = gql`
     position: String
     isArchived: Boolean!
     accessToken: String!
+    refreshToken: String!
   }
 
   input RegisterUserDTO {
@@ -23,7 +24,7 @@ const authType = gql`
     login(email: String!, password: String!): AuthDTO!
     loginWithGoogle(idToken: String!): AuthDTO!
     register(user: RegisterUserDTO!): AuthDTO!
-    refresh: String!
+    refresh(refreshToken: String!): String!
     logout(userId: ID!): ID
     resetPassword(email: String!): Boolean!
   }
