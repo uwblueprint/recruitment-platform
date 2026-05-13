@@ -110,7 +110,7 @@ export const ReviewProgressHeader = ({ currentStage }: Props) => {
     >
       <div className="flex items-center justify-between px-9 py-4 w-full">
         {/* Left side - Logo */}
-        <Link href="/admin">
+        <Link href="/review">
           <Image
             src="/common/logo-with-text.svg"
             alt="Blueprint Logo"
