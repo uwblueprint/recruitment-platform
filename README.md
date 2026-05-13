@@ -48,6 +48,10 @@ The provided frontend is a React application written in TypeScript.
 
 https://uwblueprint.github.io/starter-code-v2
 
+Project-specific developer docs:
+
+- [GraphQL type generation workflow](docs/graphql-type-generation.md)
+
 
 ## Reporting Issues
 

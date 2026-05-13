@@ -1,0 +1,8 @@
+{
+  "name": "recruitment-platform",
+  "private": true,
+  "scripts": {
+    "codegen": "yarn --cwd backend/typescript codegen && yarn --cwd frontend generate",
+    "generate": "yarn codegen"
+  }
+}
