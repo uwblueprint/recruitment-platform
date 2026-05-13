@@ -13,16 +13,14 @@ type Role = "Admin" | "User";
 
 export const ProtectedRoute = ({ children, allowedRoles }: Props): ReactElement => {
   const router = useRouter();
-  const [authStatus, setAuthStatus] = useState<AuthStatus>(() => {
-    const hasToken = typeof window !== "undefined" && localStorage.getItem("accessToken") != null;
-    return {
-      loading: hasToken,
-      isAuthorized: false,
-    };
+  const [authStatus, setAuthStatus] = useState<AuthStatus>({
+    loading: true,
+    isAuthorized: false,
   });
 
   useEffect(() => {
     if (localStorage.getItem("accessToken") == null) {
+      setAuthStatus({ loading: false, isAuthorized: false });
       return;
     }
     AuthAPIClient.isAuthorizedByRole(allowedRoles)
@@ -45,8 +43,11 @@ export const ProtectedRoute = ({ children, allowedRoles }: Props): ReactElement 
       });
   }, [allowedRoles]);
 
-  if (!authStatus.loading && !authStatus.isAuthorized)
-    router.push("/login");
+  useEffect(() => {
+    if (!authStatus.loading && !authStatus.isAuthorized) {
+      router.push("/login");
+    }
+  }, [authStatus, router]);
   // TODO: handle redirect to 404 here
 
   return authStatus.loading ? (
