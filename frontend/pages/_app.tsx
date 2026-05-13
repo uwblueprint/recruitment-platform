@@ -2,7 +2,7 @@ import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
 import { AppProps } from "next/app";
 import "@/styles/globals.css";
-import { AuthProvider } from "@/contexts/AuthUserContext";
+import { AuthProvider } from "@/components/contexts/AuthUserContext";
 import { ApolloProvider } from "@apollo/client/react";
 import { client } from "@/client";
 

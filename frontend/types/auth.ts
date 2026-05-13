@@ -6,3 +6,8 @@ export type TokenInfo = {
 };
 
 export type AuthResult = TokenInfo & UserDTO;
+
+export interface AuthStatus {
+  loading: boolean;
+  isAuthorized: boolean;
+}

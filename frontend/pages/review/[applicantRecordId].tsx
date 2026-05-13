@@ -1,0 +1,278 @@
+import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
+import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import { RecruitmentPlatformThemeProvider } from "@/components/contexts/RecruitmentPlatformThemeProvider";
+import { ReportConflictDialogue } from "./_components/dialogues/ReportConflictDialogue";
+import { ReportConflictSuccessDialogue } from "./_components/dialogues/ReportConflictSuccessDialogue";
+import {
+  BACK_TO_HOME_HREF,
+  ReviewStage,
+} from "./_components/constants";
+import { ReportConflictButton } from "./_components/common/ReportConflictButton";
+import {
+  ReviewSetScoresContext,
+  ReviewSetStageContext,
+} from "./_components/ReviewContext";
+import { ReviewStageHeader } from "./_components/common/ReviewStageHeader";
+import { getApplicantRecordId } from "./_components/utils";
+import { ReviewEndData, ReviewScores } from "./_components/types";
+import { ReviewDriveToLearnStage } from "./_components/stages/ReviewDriveToLearnStage";
+import { ReviewEndStage } from "./_components/stages/ReviewEndStage";
+import { ReviewEndSuccessStage } from "./_components/stages/ReviewEndSuccessStage";
+import { ReviewInfoStage } from "./_components/stages/ReviewInfoStage";
+import { ReviewPassionForSocialGoodStage } from "./_components/stages/ReviewPassionForSocialGoodStage";
+import { ReviewSkillStage } from "./_components/stages/ReviewSkillStage";
+import { ReviewTeamPlayerStage } from "./_components/stages/ReviewTeamPlayerStage";
+import { NextPage } from "next";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { ApplicationDTO, AuthStatus } from "@/types";
+import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
+
+const sampleApplication: ApplicationDTO = {
+  id: 1,
+  academicOrCoop: "Academic",
+  academicYear: "2A",
+  email: "kushalgoel786@gmail.com",
+  firstChoiceRole: "Project Developer",
+  firstName: "Kushal",
+  heardFrom: "Word of mouth",
+  lastName: "Goel",
+  locationPreference: "In-Person (Waterloo)",
+  program: "Computer Science",
+  timesApplied: "This is my first time!",
+  pronouns: "He/Him/His",
+  pronounsSpecified: "",
+  resumeUrl:
+    "https://firebasestorage.googleapis.com/v0/b/uw-blueprint.appspot.com/o/resumes%2F01b3e17a-73c3-477a-a84d-cbf6ef2d7bda?alt=media&token=d90e50ca-e221-4fb6-b3a0-05dec3bf06c8",
+  roleSpecificQuestions: [
+    '[{"id":"1","questions":[{"options":["Frontend","Backend","Fullstack","Mobile"],"other":true,"question":"Which areas of a project are you interested in working in?","response":["Frontend","Backend","Fullstack","Mobile"],"type":"multi-select"},{"maxLength":1000,"question":"Tell us about a challenging technical problem that you\'ve worked on in the past and how you solved it.","response":"In the face of limited data availability for mutual fund investing, I tackled the challenge by developing a project that leveraged Net Asset Values (NAVs) to calculate crucial performance metrics. Using Python and data analysis tools, I created an algorithm to process NAV data and derive metrics like historical performance, return on investment, volatility, etc. These metrics enabled me to assess fund performance, risk levels, and cost-effectiveness, aiding informed investment decisions. Additionally, I incorporated data visualization techniques to present the metrics visually, facilitating easy comparison and identification of investment opportunities. Overall, this project effectively addressed the challenge, providing valuable insights within the constraints of limited data, and empowering me to make informed investment choices.","uniqueId":1}],"role":"Project Developer"}]',
+  ],
+  secondChoiceRole: "",
+  shortQuestionAnswers: [
+    {
+      question: "What timezone will you be based out of next term?",
+      response:
+        "I will be based in Waterloo only, which means Eastern Time (ET)",
+    },
+    {
+      question: "Tell us about a cause that resonates with you.",
+      response:
+        "I am passionate about spreading financial knowledge, specifically in the area of personal finance. Financial literacy is crucial for individuals to lead secure and empowered lives. I believe that by promoting financial education, we can empower people to make informed decisions about budgeting, saving, investing, and debt management. This knowledge helps individuals build emergency funds, avoid predatory loans, and plan for their future. ",
+    },
+    {
+      question:
+        "Tell us about a community you're proud to be a part of and how you contributed to it.",
+      response:
+        "I am proud to be a part of the FlutterFever community, which I initiated. Through this community, I taught app development to over 200 students, providing workshops, curriculum, and ongoing support. The inclusive and supportive environment encouraged collaboration and learning. Students were able to apply their skills through coding challenges, receiving personalized feedback and mentorship. It has been incredibly rewarding to witness their progress and enthusiasm as they built their own apps.",
+    },
+    {
+      question:
+        "Tell us about a time you learned a new skill. What was your motivation to learn it and what was your approach?",
+      response:
+        "I learned personal budget management and finance. My motivation was to take control of my financial well-being. I approached it by watching YouTube tutorials and talking to knowledgeable people. Applying the concepts to my own finances helped solidify my understanding. It has empowered me to make informed decisions and work towards my financial goals.",
+    },
+  ],
+  status: "pending",
+  term: "Fall 2023",
+  secondChoiceStatus: "",
+  timestamp: BigInt(1728673405),
+};
+
+const initialScores: ReviewScores = {
+  [ReviewStage.INFO]: 0,
+  [ReviewStage.PFSG]: 0,
+  [ReviewStage.TP]: 0,
+  [ReviewStage.D2L]: 0,
+  [ReviewStage.SKL]: 0,
+  [ReviewStage.END]: 0,
+  [ReviewStage.END_SUCCESS]: 0,
+};
+
+const ReviewsPages: NextPage = () => {
+  const router = useRouter();
+  const [stage, setStage] = useState<ReviewStage>(ReviewStage.INFO);
+  const [application, setApplication] = useState<ApplicationDTO>();
+  const [authStatus, setAuthStatus] = useState<AuthStatus>({
+    loading: true,
+    isAuthorized: false,
+  });
+  const [endData, setEndData] = useState<ReviewEndData>({
+    comments: "",
+    skillsCategory: "",
+    secondChoiceRole: "",
+  });
+  const [scores, setScores] = useState<ReviewScores>(initialScores);
+  const [reportConflictDialogueOpen, setReportConflictDialogueOpen] =
+    useState(false);
+  const [
+    reportConflictSuccessDialogueOpen,
+    setReportConflictSuccessDialogueOpen,
+  ] = useState(false);
+  const [reportConflictHasErrored, setReportConflictHasErrored] =
+    useState(false);
+
+  const applicantRecordId = router.isReady
+    ? getApplicantRecordId(router.query)
+    : null;
+  const applicantName = application
+    ? `${application.firstName} ${application.lastName}`
+    : "Applicant";
+
+  const authenticatedUser = useAuthenticatedUser();
+  const reviewerName = authenticatedUser
+    ? authenticatedUser.firstName
+    : "Reviewer";
+
+  const updateScores = (key: ReviewStage, value: number) => {
+    setScores((prev) => {
+      if (isNaN(value) || value < 0 || value > 5) {
+        return prev;
+      }
+      return { ...prev, [key]: value };
+    });
+  };
+
+  useEffect(() => {
+    if (applicantRecordId === null) return;
+    // TODO: replace with actual API call to fetch application data
+    const fetchApplication = async () => {
+      const appInfo = sampleApplication;
+      setApplication(appInfo);
+    };
+    fetchApplication();
+  }, [applicantRecordId]);
+
+  if (!router.isReady) return null;
+
+  const getReviewStage = () => {
+    switch (stage) {
+      case ReviewStage.INFO:
+        return (
+          <ReviewInfoStage
+            name={applicantName}
+            application={application}
+            scores={scores}
+            onReportConflict={() => setReportConflictDialogueOpen(true)}
+          />
+        );
+      case ReviewStage.PFSG:
+        return (
+          <ReviewPassionForSocialGoodStage
+            name={applicantName}
+            application={application}
+            scores={scores}
+            onReportConflict={() => setReportConflictDialogueOpen(true)}
+          />
+        );
+      case ReviewStage.TP:
+        return (
+          <ReviewTeamPlayerStage
+            name={applicantName}
+            application={application}
+            scores={scores}
+            onReportConflict={() => setReportConflictDialogueOpen(true)}
+          />
+        );
+      case ReviewStage.D2L:
+        return (
+          <ReviewDriveToLearnStage
+            name={applicantName}
+            application={application}
+            scores={scores}
+            onReportConflict={() => setReportConflictDialogueOpen(true)}
+          />
+        );
+      case ReviewStage.SKL:
+        return (
+          <ReviewSkillStage
+            name={applicantName}
+            application={application}
+            scores={scores}
+            header={
+              <ReviewStageHeader
+                backHref={BACK_TO_HOME_HREF}
+                right={
+                  <ReportConflictButton
+                    name={applicantName}
+                    showQuestion
+                    onClick={() => setReportConflictDialogueOpen(true)}
+                  />
+                }
+              />
+            }
+          />
+        );
+      case ReviewStage.END:
+        return (
+          <ReviewEndStage
+            name={applicantName}
+            reviewerName={reviewerName}
+            scores={scores}
+            endData={endData}
+            setEndData={setEndData}
+            onReportConflict={() => setReportConflictDialogueOpen(true)}
+          />
+        );
+      case ReviewStage.END_SUCCESS:
+      default:
+        return <ReviewEndSuccessStage name={applicantName} />;
+    }
+  };
+
+  const reportConflict = async () => {
+    try {
+      setReportConflictHasErrored(false);
+      if (applicantRecordId == null) {
+        throw new Error("Missing applicantRecordId in URL");
+      }
+      if (authenticatedUser == null) {
+        throw new Error("Missing authenticated reviewer ID");
+      }
+    //   await reportReviewConflict(
+    //     applicantRecordId,
+    //     Number(authenticatedUser.id)
+    //   );
+      setReportConflictDialogueOpen(false);
+      setReportConflictSuccessDialogueOpen(true);
+    } catch (error) {
+      setReportConflictHasErrored(true);
+    }
+  };
+
+  const onReportConflictSuccessClose = () => {
+    setReportConflictSuccessDialogueOpen(false);
+    router.push(BACK_TO_HOME_HREF);
+  };
+
+  return (
+    <ReviewSetScoresContext.Provider value={updateScores}>
+      <ReviewSetStageContext.Provider value={setStage}>
+        {getReviewStage()}
+        <ReportConflictDialogue
+          open={reportConflictDialogueOpen}
+          hasError={reportConflictHasErrored}
+          onClose={() => setReportConflictDialogueOpen(false)}
+          onConfirm={reportConflict}
+        />
+        <ReportConflictSuccessDialogue
+          open={reportConflictSuccessDialogueOpen}
+          onClose={onReportConflictSuccessClose}
+        />
+      </ReviewSetStageContext.Provider>
+    </ReviewSetScoresContext.Provider>
+  );
+};
+
+const Reviews: NextPage = () => {
+  return (
+    <RecruitmentPlatformThemeProvider>
+        <ProtectedRoute allowedRoles={["Admin", "User"]}>
+          <ProtectedApplication>
+            <ReviewsPages />
+          </ProtectedApplication>
+        </ProtectedRoute>
+    </RecruitmentPlatformThemeProvider>
+  );
+};
+
+export default Reviews;
