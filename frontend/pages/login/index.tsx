@@ -46,8 +46,8 @@ const LoginPage: NextPage = () => {
           <Image
             src="/common/logo-blue.svg"
             alt="UW Blueprint logo"
-            width={280}
-            height={72}
+            width={27}
+            height={27}  
             priority
           />
           <div className="flex flex-col items-center">
@@ -57,8 +57,8 @@ const LoginPage: NextPage = () => {
                 <Image
                   src="/common/google-logo.svg"
                   alt="Google logo"
-                  width={20}
-                  height={20}
+                  width={24}
+                  height={24}
                 />
                 <div>Continue with Google</div>
               </div>

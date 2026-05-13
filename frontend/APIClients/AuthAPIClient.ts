@@ -1,9 +1,8 @@
 import { client } from "@/client";
-import { mutations, queries } from "@/graphql/queries";
 import type { AuthResult, Role } from "@/types";
-import { gql } from "@apollo/client";
 
 import BaseAPIClient from "./BaseAPIClient";
+import { IS_AUTHORIZED_BY_ROLE_QUERY, LOGIN_WITH_GOOGLE_MUTATION } from "@/queries/auth";
 
 type IsAuthorizedByRoleData = {
   isAuthorizedByRole: boolean;
@@ -26,7 +25,7 @@ class AuthAPIClient {
         IsAuthorizedByRoleData,
         { accessToken: string; roles: Role[] }
       >({
-        query: gql(queries.isAuthorizedByRole),
+        query: IS_AUTHORIZED_BY_ROLE_QUERY,
         variables: { accessToken, roles: allowedRoles },
         fetchPolicy: "network-only",
       });
@@ -43,7 +42,7 @@ class AuthAPIClient {
         LoginWithGoogleMutationData,
         { idToken: string }
       >({
-        mutation: gql(mutations.loginWithGoogle),
+        mutation: LOGIN_WITH_GOOGLE_MUTATION,
         variables: { idToken },
       });
 

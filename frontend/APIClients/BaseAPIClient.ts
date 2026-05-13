@@ -1,7 +1,6 @@
 import { client } from "@/client";
-import { mutations } from "@/graphql/queries";
 import jwt_decode from "jwt-decode";
-import { gql } from "@apollo/client";
+import { REFRESH_MUTATION } from "@/queries/base";
 
 type AccessToken = {
   readonly exp: number;
@@ -31,10 +30,9 @@ class BaseAPIClient {
         RefreshMutationData,
         { refreshToken: string }
       >({
-        mutation: gql(mutations.refresh),
+        mutation: REFRESH_MUTATION,
         variables: { refreshToken },
       });
-
       if (typeof data?.refresh === "string") {
         localStorage.setItem("accessToken", data.refresh);
       }
