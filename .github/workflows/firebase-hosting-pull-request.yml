@@ -14,6 +14,7 @@ defaults:
 
 jobs:
   build_and_preview:
+    if: false  # re-enable when you want Firebase deploys again
     if: "${{ github.event.pull_request.head.repo.full_name == github.repository && github.base_ref == 'main' }}"
     runs-on: ubuntu-latest
     steps:

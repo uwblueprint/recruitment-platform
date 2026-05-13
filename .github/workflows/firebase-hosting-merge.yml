@@ -16,6 +16,7 @@ defaults:
 
 jobs:
   build_and_deploy:
+    if: false  # re-enable when you want Firebase deploys again
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
