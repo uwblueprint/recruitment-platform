@@ -77,6 +77,7 @@ export type AuthDto = {
   isArchived: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position?: Maybe<Scalars['String']['output']>;
+  refreshToken: Scalars['String']['output'];
   role: Role;
 };
 
@@ -430,6 +431,11 @@ export type MutationLogoutArgs = {
 };
 
 
+export type MutationRefreshArgs = {
+  refreshToken: Scalars['String']['input'];
+};
+
+
 export type MutationRegisterArgs = {
   user: RegisterUserDto;
 };
@@ -528,6 +534,7 @@ export type Query = {
   getInterviewersByGroupId: Array<UserDto>;
   getReviewedApplicantRecord: ReviewedApplicantRecord;
   getReviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
+  isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewApplicantPage: ApplicationDto;
   reviewDashboard: Array<ReviewDashboardRowDto>;
@@ -601,6 +608,12 @@ export type QueryGetReviewedApplicantRecordArgs = {
 
 export type QueryGetReviewedApplicantsByUserIdArgs = {
   userId: Scalars['Int']['input'];
+};
+
+
+export type QueryIsAuthorizedByRoleArgs = {
+  accessToken: Scalars['String']['input'];
+  roles: Array<Role>;
 };
 
 

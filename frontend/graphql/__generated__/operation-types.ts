@@ -40,7 +40,9 @@ export type LoginWithGoogleMutationVariables = Exact<{
 
 export type LoginWithGoogleMutation = { loginWithGoogle: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean, accessToken: string } };
 
-export type RefreshMutationVariables = Exact<{ [key: string]: never; }>;
+export type RefreshMutationVariables = Exact<{
+  refreshToken: string;
+}>;
 
 
 export type RefreshMutation = { refresh: string };
