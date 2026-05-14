@@ -1,0 +1,12 @@
+mutation ReportReviewConflict($applicantRecordId: String!, $reviewerId: Int!) {
+  reportReviewConflict(
+    applicantRecordId: $applicantRecordId
+    reviewerId: $reviewerId
+  ) {
+    applicantRecordId
+    reviewerId
+    status
+    score
+    reviewerHasConflict
+  }
+}

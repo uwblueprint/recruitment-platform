@@ -8,12 +8,22 @@ import {
   isAuthorizedByUserId,
 } from "../middlewares/auth";
 import authResolvers from "./resolvers/authResolvers";
-import authType from "./types/authType";
 import entityResolvers from "./resolvers/entityResolvers";
-import entityType from "./types/entityType";
 import simpleEntityResolvers from "./resolvers/simpleEntityResolvers";
-import simpleEntityType from "./types/simpleEntityType";
 import userResolvers from "./resolvers/userResolvers";
+import adminCommentType from "./types/adminCommentsType";
+import applicantRecordType from "./types/applicantRecordType";
+import authType from "./types/authType";
+import entityType from "./types/entityType";
+import interviewDashboardTypes from "./types/interviewDashboardTypes";
+import interviewDelegationsTypes from "./types/interviewDelegationsTypes";
+import interviewedApplicantRecordsTypes from "./types/interviewedApplicantRecordsTypes";
+import interviewGroupTypes from "./types/interviewGroupTypes";
+import interviewPageType from "./types/interviewPageTypes";
+import reviewDashboardType from "./types/reviewDashboardType";
+import reviewedApplicantRecordTypes from "./types/reviewedApplicantRecordTypes";
+import reviewPageType from "./types/reviewPageType";
+import simpleEntityType from "./types/simpleEntityType";
 import userType from "./types/userType";
 
 const query = gql`
@@ -29,7 +39,24 @@ const mutation = gql`
 `;
 
 const executableSchema = makeExecutableSchema({
-  typeDefs: [query, mutation, authType, entityType, simpleEntityType, userType],
+  typeDefs: [
+    query,
+    mutation,
+    adminCommentType,
+    applicantRecordType,
+    authType,
+    entityType,
+    interviewDashboardTypes,
+    interviewDelegationsTypes,
+    interviewGroupTypes,
+    interviewPageType,
+    interviewedApplicantRecordsTypes,
+    reviewDashboardType,
+    reviewedApplicantRecordTypes,
+    reviewPageType,
+    simpleEntityType,
+    userType,
+  ],
   resolvers: merge(
     authResolvers,
     entityResolvers,

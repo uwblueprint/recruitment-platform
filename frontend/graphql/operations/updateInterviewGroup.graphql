@@ -1,0 +1,10 @@
+mutation UpdateInterviewGroup(
+  $id: ID!
+  $interviewGroup: UpdateInterviewGroupDTO!
+) {
+  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {
+    id
+    schedulingLink
+    status
+  }
+}
