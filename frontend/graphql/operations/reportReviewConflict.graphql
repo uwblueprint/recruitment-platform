@@ -1,7 +1,4 @@
-mutation ReportReviewConflict(
-  $applicantRecordId: String!
-  $reviewerId: Int!
-) {
+mutation ReportReviewConflict($applicantRecordId: String!, $reviewerId: Int!) {
   reportReviewConflict(
     applicantRecordId: $applicantRecordId
     reviewerId: $reviewerId

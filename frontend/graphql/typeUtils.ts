@@ -20,10 +20,9 @@ export {
 
 type WithoutTypename<T> = Omit<T, "__typename">;
 type ArrayElement<T> = T extends readonly (infer Item)[] ? Item : never;
-type OperationField<
-  TOperation,
-  TField extends keyof TOperation,
-> = NonNullable<TOperation[TField]>;
+type OperationField<TOperation, TField extends keyof TOperation> = NonNullable<
+  TOperation[TField]
+>;
 
 /**
  * Clean DTO aliases for generated GraphQL object types.
@@ -43,8 +42,7 @@ export type InterviewDTO = WithoutTypename<Schema.Interview>;
 export type InterviewDelegationDTO =
   WithoutTypename<Schema.InterviewDelegation>;
 export type InterviewGroupDTO = WithoutTypename<Schema.InterviewGroupDto>;
-export type InterviewPairingsDTO =
-  WithoutTypename<Schema.InterviewPairingsDto>;
+export type InterviewPairingsDTO = WithoutTypename<Schema.InterviewPairingsDto>;
 export type InterviewedApplicantRecordDTO =
   WithoutTypename<Schema.InterviewedApplicantRecord>;
 export type InterviewedApplicantsDTO =
