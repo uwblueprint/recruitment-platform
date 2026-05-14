@@ -1,7 +1,18 @@
 import type { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema: "../backend/typescript/graphql/schema.graphql",
+  schema: [
+    {
+      "../backend/typescript/graphql/index.ts": {
+        noRequire: true,
+      },
+    },
+    {
+      "../backend/typescript/graphql/types/**/*.ts": {
+        noRequire: true,
+      },
+    },
+  ],
   documents: [
     "./graphql/operations/**/*.graphql",
     "./pages/**/*.tsx",

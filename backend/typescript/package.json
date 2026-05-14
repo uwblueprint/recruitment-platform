@@ -8,8 +8,6 @@
     "dev": "nodemon -L",
     "lint": "eslint . --ext .ts,.js",
     "fix": "eslint . --ext .ts,.js --fix",
-    "schema:print": "ts-node scripts/printSchema.ts > graphql/schema.graphql",
-    "codegen": "yarn schema:print",
     "migrate:create": "node migrate.js create --name",
     "migrate:up": "node migrate.js up",
     "migrate:down": "node migrate.js down",

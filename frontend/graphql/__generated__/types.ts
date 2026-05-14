@@ -528,6 +528,7 @@ export type Query = {
   getInterviewersByGroupId: Array<UserDto>;
   getReviewedApplicantRecord: ReviewedApplicantRecord;
   getReviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
+  isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewApplicantPage: ApplicationDto;
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
@@ -600,6 +601,12 @@ export type QueryGetReviewedApplicantRecordArgs = {
 
 export type QueryGetReviewedApplicantsByUserIdArgs = {
   userId: Scalars['Int']['input'];
+};
+
+
+export type QueryIsAuthorizedToReviewArgs = {
+  applicationId: Scalars['Int']['input'];
+  reviewerUserId: Scalars['String']['input'];
 };
 
 
