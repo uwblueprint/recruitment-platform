@@ -1,0 +1,8 @@
+query GetInterviewedApplicantsByUserId($userId: Int!) {
+  getInterviewedApplicantsByUserId(userId: $userId) {
+    applicantRecordId
+    interviewStatus
+    applicantFirstName
+    applicantLastName
+  }
+}
