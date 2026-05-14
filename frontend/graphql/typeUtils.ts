@@ -18,32 +18,9 @@ export {
   SkillCategory,
 } from "./__generated__/types";
 
-/**
- * Nullable GraphQL output value.
- */
-export type Nullable<T> = T | null;
-
-/**
- * Optional GraphQL input or partial update value.
- */
-export type Optional<T> = T | null | undefined;
-
-/**
- * Removes GraphQL's optional `__typename` metadata from generated object types.
- */
-export type WithoutTypename<T> = Omit<T, "__typename">;
-
-/**
- * Extracts an item type from a generated array field.
- */
-export type ArrayElement<T> = T extends readonly (infer Item)[] ? Item : never;
-
-/**
- * Extracts a top-level field payload from a generated operation result.
- *
- * Example: `OperationField<LoginMutation, "login">`.
- */
-export type OperationField<
+type WithoutTypename<T> = Omit<T, "__typename">;
+type ArrayElement<T> = T extends readonly (infer Item)[] ? Item : never;
+type OperationField<
   TOperation,
   TField extends keyof TOperation,
 > = NonNullable<TOperation[TField]>;
