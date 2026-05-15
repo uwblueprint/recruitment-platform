@@ -66,7 +66,7 @@ export default class ApplicantRecord extends Model {
     allowNull: true,
     defaultValue: null,
   })
-  combined_score?: number;
+  combined_review_score?: number;
 
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
   is_applicant_flagged!: boolean;

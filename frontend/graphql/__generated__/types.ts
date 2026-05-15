@@ -12,24 +12,24 @@ export type Scalars = {
 
 export type AdminCommentDto = {
   __typename?: 'AdminCommentDTO';
-  applicantRecordId: Scalars['String']['output'];
+  applicantRecordId: Scalars['ID']['output'];
   comment: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
-  id: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
   updatedAt: Scalars['String']['output'];
-  userId: Scalars['Int']['output'];
+  userId: Scalars['ID']['output'];
 };
 
 export type ApplicantRecordDto = {
   __typename?: 'ApplicantRecordDTO';
-  applicantId: Scalars['String']['output'];
+  applicantId: Scalars['ID']['output'];
   choice: Scalars['Int']['output'];
-  combined_score?: Maybe<Scalars['Int']['output']>;
-  id: Scalars['String']['output'];
+  combinedReviewScore?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
   isApplicantFlagged: Scalars['Boolean']['output'];
   position: Scalars['String']['output'];
-  roleSpecificQuestions: Array<Scalars['String']['output']>;
-  skillCategory?: Maybe<Scalars['String']['output']>;
+  roleSpecificQuestions: Array<ShortAnswerQuestion>;
+  skillCategory?: Maybe<SkillCategory>;
   status: ApplicationStatus;
 };
 
@@ -59,13 +59,13 @@ export type ApplicationDto = {
 };
 
 export enum ApplicationStatus {
-  Applied = 'Applied',
-  InReview = 'InReview',
-  Interviewed = 'Interviewed',
-  Offer = 'Offer',
-  Rejected = 'Rejected',
-  Reviewed = 'Reviewed',
-  Selected = 'Selected'
+  Applied = 'APPLIED',
+  Interviewed = 'INTERVIEWED',
+  InReview = 'IN_REVIEW',
+  Offered = 'OFFERED',
+  Rejected = 'REJECTED',
+  Reviewed = 'REVIEWED',
+  Selected = 'SELECTED'
 }
 
 export type AuthDto = {
@@ -93,9 +93,9 @@ export type BulkDeleteInterviewDelegationInput = {
 };
 
 export type CreateAdminCommentDto = {
-  applicantRecordId: Scalars['String']['input'];
+  applicantRecordId: Scalars['ID']['input'];
   comment: Scalars['String']['input'];
-  userId: Scalars['Int']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 export type CreateInterviewGroupDto = {
@@ -235,7 +235,7 @@ export type Mutation = {
   bulkDeleteInterviewDelegations: Array<InterviewDelegation>;
   bulkDeleteInterviewGroupsByIds: Array<Maybe<InterviewGroupDto>>;
   bulkDeleteReviewedApplicantRecord: Array<ReviewedApplicantRecord>;
-  bulkUpdateApplicantStatus: Array<ApplicantRecordDto>;
+  bulkUpdateApplicantRecordsStatus: Array<ApplicantRecordDto>;
   createAdminComment: AdminCommentDto;
   createEntity: EntityResponseDto;
   createInterviewDelegation: InterviewDelegation;
@@ -262,9 +262,9 @@ export type Mutation = {
   register: AuthDto;
   reportReviewConflict: ReviewedApplicantRecordDto;
   resetPassword: Scalars['Boolean']['output'];
-  setApplicantRecordFlag: ApplicantRecordDto;
   updateAdminComment: AdminCommentDto;
-  updateApplicantStatus: ApplicantRecordDto;
+  updateApplicantRecordIsApplicantFlagged: ApplicantRecordDto;
+  updateApplicantRecordStatus: ApplicantRecordDto;
   updateEntity: EntityResponseDto;
   updateInterviewDelegation: InterviewDelegation;
   updateInterviewGroup: InterviewGroupDto;
@@ -305,8 +305,8 @@ export type MutationBulkDeleteReviewedApplicantRecordArgs = {
 };
 
 
-export type MutationBulkUpdateApplicantStatusArgs = {
-  applicantRecordIds: Array<Scalars['String']['input']>;
+export type MutationBulkUpdateApplicantRecordsStatusArgs = {
+  ids: Array<Scalars['ID']['input']>;
   status: ApplicationStatus;
 };
 
@@ -370,7 +370,7 @@ export type MutationDelegateReviewersArgs = {
 
 
 export type MutationDeleteAdminCommentByIdArgs = {
-  id: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -452,20 +452,20 @@ export type MutationResetPasswordArgs = {
 };
 
 
-export type MutationSetApplicantRecordFlagArgs = {
-  applicantRecordId: Scalars['String']['input'];
-  flagValue: Scalars['Boolean']['input'];
-};
-
-
 export type MutationUpdateAdminCommentArgs = {
-  content: CreateAdminCommentDto;
-  id: Scalars['String']['input'];
+  adminComment: UpdateAdminCommentDto;
+  id: Scalars['ID']['input'];
 };
 
 
-export type MutationUpdateApplicantStatusArgs = {
-  applicantRecordId: Scalars['String']['input'];
+export type MutationUpdateApplicantRecordIsApplicantFlaggedArgs = {
+  flagValue: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateApplicantRecordStatusArgs = {
+  id: Scalars['ID']['input'];
   status: ApplicationStatus;
 };
 
@@ -550,12 +550,12 @@ export type Query = {
 
 
 export type QueryAdminCommentByIdArgs = {
-  id: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryAdminCommentsByApplicantRecordIdArgs = {
-  applicantRecordId: Scalars['String']['input'];
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -749,6 +749,12 @@ export enum Role {
   User = 'User'
 }
 
+export type ShortAnswerQuestion = {
+  __typename?: 'ShortAnswerQuestion';
+  answer: Scalars['String']['output'];
+  question: Scalars['String']['output'];
+};
+
 export type ShortQuestionAnswer = {
   __typename?: 'ShortQuestionAnswer';
   question: Scalars['String']['output'];
@@ -785,6 +791,10 @@ export enum SkillCategory {
   Junior = 'JUNIOR',
   Senior = 'SENIOR'
 }
+
+export type UpdateAdminCommentDto = {
+  comment: Scalars['String']['input'];
+};
 
 export type UpdateInterviewGroupDto = {
   schedulingLink?: InputMaybe<Scalars['String']['input']>;

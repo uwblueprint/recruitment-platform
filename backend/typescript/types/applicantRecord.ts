@@ -28,3 +28,28 @@ export type ShortAnswerQuestion = {
   question: string;
   answer: string;
 };
+
+export type ApplicantRecordDTO = {
+  id: string;
+  applicantId: string;
+  position: string;
+  roleSpecificQuestions: ShortAnswerQuestion[];
+  choice: number;
+  status: ApplicationStatus;
+  skillCategory?: SkillCategory;
+  combinedReviewScore?: number | null;
+  isApplicantFlagged: boolean;
+};
+
+export type CreateApplicantRecordDTO = Omit<
+  ApplicantRecordDTO,
+  "id" | "createdAt" | "updatedAt"
+>;
+export type UpdateApplicantRecordDTO = Partial<
+  Pick<
+    ApplicantRecordDTO,
+    "status" | "skillCategory" | "combinedReviewScore" | "isApplicantFlagged"
+  >
+>;
+export type BulkUpdateApplicantRecordDTO = UpdateApplicantRecordDTO &
+  Pick<ApplicantRecordDTO, "id">;
