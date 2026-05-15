@@ -1,10 +1,10 @@
 import { CheckIcon } from "@/components/icons/check.icon";
+import { blue, green, neutral } from "@/constants/palette";
 import Image from "next/image";
 import Link from "next/link";
+import { CSSProperties, useContext } from "react";
 import { ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
-import { useContext } from "react";
-import { useTheme } from "@mui/material";
 
 interface Props {
   currentStage: ReviewStage;
@@ -41,27 +41,26 @@ interface StepIndicatorProps {
 
 const StepIndicator = ({ step, state }: StepIndicatorProps) => {
   const setStage = useContext(ReviewSetStageContext);
-  const theme = useTheme();
 
-  const circleStyleObjects: Record<StepState, React.CSSProperties> = {
+  const circleStyleObjects: Record<StepState, CSSProperties> = {
     completed: {
-      backgroundColor: theme.palette.success.main,
-      borderColor: theme.palette.success.main,
+      backgroundColor: green[500],
+      borderColor: green[500],
     },
     current: {
-      backgroundColor: theme.palette.background.default,
-      borderColor: theme.palette.primary.contrastText,
+      backgroundColor: neutral[50],
+      borderColor: neutral[50],
     },
     future: {
       backgroundColor: "transparent",
-      borderColor: theme.palette.primary.contrastText,
+      borderColor: neutral[50],
     },
   };
 
-  const numberStyleObjects: Record<StepState, React.CSSProperties> = {
-    completed: { color: theme.palette.primary.contrastText },
-    current: { color: theme.palette.primary.main, fontWeight: 700 },
-    future: { color: theme.palette.primary.contrastText },
+  const numberStyleObjects: Record<StepState, CSSProperties> = {
+    completed: { color: neutral[50] },
+    current: { color: blue[500], fontWeight: 700 },
+    future: { color: neutral[50] },
   };
 
   const content = (
@@ -71,10 +70,7 @@ const StepIndicator = ({ step, state }: StepIndicatorProps) => {
         style={circleStyleObjects[state]}
       >
         {state === "completed" ? (
-          <CheckIcon
-            className="w-5 h-5"
-            style={{ color: theme.palette.primary.contrastText }}
-          />
+          <CheckIcon className="w-5 h-5" style={{ color: neutral[50] }} />
         ) : (
           <span className={`text-sm`} style={numberStyleObjects[state]}>
             {step.index}
@@ -101,13 +97,9 @@ const StepIndicator = ({ step, state }: StepIndicatorProps) => {
 
 export const ReviewProgressHeader = ({ currentStage }: Props) => {
   const currentIndex = steps.findIndex((s) => s.stage === currentStage);
-  const theme = useTheme();
 
   return (
-    <header
-      className="w-full"
-      style={{ backgroundColor: theme.palette.primary.main }}
-    >
+    <header className="w-full" style={{ backgroundColor: blue[500] }}>
       <div className="flex items-center justify-between px-9 py-4 w-full">
         {/* Left side - Logo */}
         <Link href="/review">

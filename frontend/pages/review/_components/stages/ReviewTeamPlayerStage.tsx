@@ -1,13 +1,13 @@
-import { useTheme } from "@mui/material";
-import { useContext } from "react";
-import { ApplicationDTO } from "@/types";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
-import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { neutral, red } from "@/constants/palette";
+import { ApplicationDTO } from "@/types";
+import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
-import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
+import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
+import { ReviewSetScoresContext } from "../ReviewContext";
 import { REVIEW_TP_SCORING_CRITERIA } from "../rubricConstants";
 import { ReviewScores } from "../types";
 import { ReviewAnswers } from "../common/ReviewAnswers";
@@ -26,7 +26,6 @@ export const ReviewTeamPlayerStage = ({
   scores,
   onReportConflict,
 }: Props) => {
-  const theme = useTheme();
   const updateScore = useContext(ReviewSetScoresContext);
   const shortAnswers = application?.shortAnswerQuestions ?? [];
   const thirdShortAnswer = shortAnswers[2];
@@ -80,7 +79,7 @@ export const ReviewTeamPlayerStage = ({
           />
           <span
             className="text-xl leading-none"
-            style={{ color: theme.palette.error.main }}
+            style={{ color: red[500] }}
           >
             *
           </span>

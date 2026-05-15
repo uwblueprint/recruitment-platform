@@ -1,6 +1,5 @@
-
+import { blue } from "@/constants/palette";
 import { ReactElement } from "react";
-import { useTheme } from "@mui/material";
 import { WarningOutlineIcon } from "@/components/icons/warning-outline.icon";
 
 interface ReportConflictButtonProps {
@@ -16,7 +15,6 @@ export const ReportConflictButton = ({
   showQuestion = false,
   onClick,
 }: ReportConflictButtonProps): ReactElement => {
-  const theme = useTheme();
   const reportButton = (
     <button
       type="button"
@@ -25,8 +23,8 @@ export const ReportConflictButton = ({
       className="shrink-0 inline-flex items-center justify-center gap-2 rounded-[20px] border-2 bg-white px-3 py-1.5 font-source font-normal text-base hover:bg-sky-100 hover:border-blue hover:text-blue transition-opacity"
       style={{
         lineHeight: 1.4,
-        color: theme.palette.primary.main,
-        borderColor: theme.palette.primary.main,
+        color: blue[500],
+        borderColor: blue[500],
       }}
     >
       <WarningOutlineIcon className="h-6 w-6 shrink-0 text-[#0573E8]" />
@@ -40,7 +38,7 @@ export const ReportConflictButton = ({
         className="font-source italic text-normal"
         style={{
           lineHeight: "normal",
-          color: theme.palette.primary.main,
+          color: blue[500],
         }}
       >
         Is the applicant a conflict of interest?

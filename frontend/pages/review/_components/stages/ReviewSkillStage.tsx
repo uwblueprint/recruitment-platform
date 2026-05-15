@@ -1,8 +1,11 @@
 import { Button } from "@/components/common/Button";
+import { PanelLayout } from "@/components/layouts/PanelLayout";
+import { neutral, red } from "@/constants/palette";
 import { ReactNode, useContext } from "react";
-import { ReviewStage } from "../constants";
-import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
+import { ReviewStage } from "../constants";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
+import { ReviewSetScoresContext } from "../ReviewContext";
 import { REVIEW_SKL_SCORING_CRITERIA } from "../rubricConstants";
 import { ReviewAnswers } from "../common/ReviewAnswers";
 import { ReviewStageProps } from "./ReviewInfoStage";
@@ -39,7 +42,6 @@ export const ReviewSkillStage = ({
   scores,
   header,
 }: Props) => {
-  const theme = useTheme();
   const updateScore = useContext(ReviewSetScoresContext);
   const resumeLink = application?.resumeUrl;
 
@@ -100,7 +102,7 @@ export const ReviewSkillStage = ({
           />
           <span
             className="text-xl leading-none"
-            style={{ color: theme.palette.error.main }}
+            style={{ color: red[500] }}
           >
             *
           </span>

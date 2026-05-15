@@ -1,11 +1,9 @@
 import { Button } from "@/components/common/Button";
 import { LongLeftIcon } from "@/components/icons/long-left.icon";
-import { semanticColors } from "@/constants/palette";
-import { useTheme } from "@mui/material";
+import { neutral, semanticColors } from "@/constants/palette";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactElement } from "react";
-import { useContext, useState } from "react";
+import { ReactElement, useContext, useState } from "react";
 import { BACK_TO_HOME_HREF, REVIEW_STAGES, ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
 import { ReviewEndData, ReviewScores } from "../types";
@@ -32,7 +30,6 @@ export const ReviewStepper = ({
   endData,
   onValidate,
 }: Props): ReactElement | null => {
-  const theme = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const setStage = useContext(ReviewSetStageContext);
@@ -76,7 +73,7 @@ export const ReviewStepper = ({
       className="px-6 py-4"
       style={{
         borderTop: `1px solid ${semanticColors.border.light}`,
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: neutral[50],
       }}
     >
       <div className="flex justify-end items-center gap-3 flex-nowrap">

@@ -1,6 +1,5 @@
 import { UpCaret } from "@/components/icons/up-caret.icon";
-import { semanticColors } from "@/constants/palette";
-import { useTheme } from "@mui/material";
+import { neutral, semanticColors } from "@/constants/palette";
 import React, { ReactElement } from "react";
 
 interface Props {
@@ -25,7 +24,6 @@ export function ReviewScoreInput({
   const numericValue = value === "" ? NaN : value;
   const canIncrement = Number.isNaN(numericValue) || numericValue < max;
   const canDecrement = Number.isNaN(numericValue) || numericValue > min;
-  const theme = useTheme();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -58,7 +56,7 @@ export function ReviewScoreInput({
       className="flex items-center font-source overflow-hidden focus-within:ring-2 focus-within:ring-blue/20 shrink-0 w-[280px] h-12 rounded-[8px]"
       role="group"
       style={{
-        background: theme.palette.background.default,
+        background: neutral[50],
         border: `1px solid ${semanticColors.border.light}`,
       }}
     >
@@ -73,8 +71,8 @@ export function ReviewScoreInput({
         onChange={handleInputChange}
         className="h-full flex-1 min-w-0 border-0 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none self-stretch px-5 font-normal text-base"
         style={{
-          color: theme.palette.text.primary,
-          background: theme.palette.background.default,
+          color: neutral[800],
+          background: neutral[50],
         }}
       />
       <div
@@ -87,7 +85,7 @@ export function ReviewScoreInput({
       <div
         className="flex flex-col shrink-0 h-full w-6"
         style={{
-          background: theme.palette.background.default,
+          background: neutral[50],
         }}
       >
         <button
@@ -97,8 +95,8 @@ export function ReviewScoreInput({
           aria-label="Increase score"
           className="flex-1 flex items-center justify-center min-h-0 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{
-            background: theme.palette.background.default,
-            color: theme.palette.text.primary,
+            background: neutral[50],
+            color: neutral[800],
             borderBottom: `1px solid ${semanticColors.border.light}`,
           }}
         >
@@ -111,7 +109,7 @@ export function ReviewScoreInput({
           aria-label="Decrease score"
           className="flex-1 flex items-center justify-center min-h-0 disabled:opacity-40 disabled:cursor-not-allowed"
           style={{
-            background: theme.palette.background.default,
+            background: neutral[50],
           }}
         >
           <UpCaret direction="down" />

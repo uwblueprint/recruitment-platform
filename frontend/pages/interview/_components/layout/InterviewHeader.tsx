@@ -1,9 +1,9 @@
+import { BlueprintLogo } from "@/components/common/BlueprintLogo";
+import { blue, neutral } from "@/constants/palette";
 import Link from "next/link";
 import { useContext } from "react";
-import { useTheme } from "@mui/material/styles";
 import { PROFILE_HEADER_STEPS } from "../constants";
 import { InterviewProgressContext } from "../InterviewProgressContext";
-import { BlueprintLogo } from "@/components/common/BlueprintLogo";
 
 interface HeaderStep {
   step: string;
@@ -20,16 +20,14 @@ export const InterviewHeader = ({
   steps = PROFILE_HEADER_STEPS,
   currentStep = steps[0]?.step,
 }: InterviewHeaderProps) => {
-  const { palette } = useTheme();
-  const { primary, background } = palette;
   const progressContext = useContext(InterviewProgressContext);
   const activeStep = progressContext?.currentSubStep ?? currentStep;
 
   return (
-    <header className="w-full" style={{ backgroundColor: primary.main }}>
+    <header className="w-full" style={{ backgroundColor: blue[500] }}>
       <div className="flex items-center justify-between px-9 py-4">
         <Link href="/admin">
-            <BlueprintLogo />
+          <BlueprintLogo />
         </Link>
 
         <div className="flex items-center gap-9">
@@ -45,16 +43,14 @@ export const InterviewHeader = ({
                 <div
                   className="w-9 h-9 rounded-full border-2 flex items-center justify-center"
                   style={{
-                    backgroundColor: active
-                      ? background.default
-                      : "transparent",
-                    borderColor: primary.contrastText,
+                    backgroundColor: active ? neutral[50] : "transparent",
+                    borderColor: neutral[50],
                   }}
                 >
                   <span
                     className="text-sm font-medium"
                     style={{
-                      color: active ? primary.main : primary.contrastText,
+                      color: active ? blue[500] : neutral[50],
                     }}
                   >
                     {index}

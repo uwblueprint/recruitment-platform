@@ -1,10 +1,13 @@
-import { useContext } from "react";
+import { PanelLayout } from "@/components/layouts/PanelLayout";
+import { neutral, red } from "@/constants/palette";
 import { ApplicationDTO } from "@/types";
-import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
-import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
+import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
+import { ReviewSetScoresContext } from "../ReviewContext";
 import { REVIEW_D2L_SCORING_CRITERIA } from "../rubricConstants";
 import { ReviewScores } from "../types";
 import { ReviewAnswers } from "../common/ReviewAnswers";
@@ -31,7 +34,6 @@ export const ReviewDriveToLearnStage = ({
   const fourthShortAnswer = shortAnswers[3];
   const questions = fourthShortAnswer ? [fourthShortAnswer.question] : [];
   const answers = fourthShortAnswer ? [fourthShortAnswer.response] : [];
-  const theme = useTheme();
   return (
     <ReviewPageLayout currentStage={ReviewStage.D2L} scores={scores}>
       <PanelLayout
@@ -79,7 +81,7 @@ export const ReviewDriveToLearnStage = ({
           />
           <span
             className="text-xl leading-none"
-            style={{ color: theme.palette.error.main }}
+            style={{ color: red[500] }}
           >
             *
           </span>

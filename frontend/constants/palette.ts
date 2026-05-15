@@ -1,5 +1,3 @@
-import type { PaletteOptions } from "@mui/material";
-
 // COLOR SCALES (for reference)
 export const neutral = {
   50: "#FFFFFF",
@@ -12,14 +10,14 @@ export const neutral = {
   900: "#000000",
 };
 
-const red = {
+export const red = {
   50: "#FFF5F5",
   200: "#F7B9B9",
   500: "#CD5A5A",
   900: "#600002",
 };
 
-const orange = {
+export const orange = {
   50: "#FFFCF5",
   500: "#CE812E",
   900: "#603000",
@@ -32,7 +30,7 @@ const yellow = {
   900: "#A45200",
 };
 
-const green = {
+export const green = {
   50: "#F5FFF5",
   100: "#CEEBB8",
   500: "#7EAE5A",
@@ -53,42 +51,6 @@ const magenta = {
   100: "#F4DBFF",
   500: "#CE66FF",
   900: "#420060",
-};
-
-// MUI PALETTE
-export const muiPaletteOptions: PaletteOptions = {
-  primary: {
-    main: blue[500],
-    light: blue[100],
-    dark: blue[900],
-    contrastText: neutral[50],
-  },
-  error: {
-    main: red[500],
-    light: red[50],
-    dark: red[900],
-    contrastText: neutral[50],
-  },
-  warning: {
-    main: orange[500],
-    light: orange[50],
-    dark: orange[900],
-    contrastText: neutral[50],
-  },
-  success: {
-    main: green[500],
-    light: green[100],
-    dark: green[900],
-    contrastText: neutral[50],
-  },
-  text: {
-    primary: neutral[800], // default text color
-    secondary: neutral[500],
-  },
-  background: {
-    default: neutral[50],
-    paper: neutral[50],
-  },
 };
 
 // semantic color definitions for the recruitment platform, to be used in addition to the MUI palette colors
