@@ -1,14 +1,15 @@
 import { Button } from "@/components/common/Button";
+import { LongLeftIcon } from "@/components/icons/long-left.icon";
+import { semanticColors } from "@/constants/palette";
+import { useTheme } from "@mui/material";
+import Link from "next/link";
 import { useRouter } from "next/router";
+import { ReactElement } from "react";
 import { useContext, useState } from "react";
 import { BACK_TO_HOME_HREF, REVIEW_STAGES, ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
-import { getApplicantRecordId } from "../utils";
 import { ReviewEndData, ReviewScores } from "../types";
-import { useTheme } from "@mui/material";
-import { ReactElement } from "react";
-import Link from "next/link";
-import { LongLeftIcon } from "@/components/icons/long-left.icon";
+import { getApplicantRecordId } from "../utils";
 
 const STAGE_RATING_FIELDS: [ReviewStage, string][] = [
   [ReviewStage.PFSG, "passionFSG"],
@@ -74,7 +75,7 @@ export const ReviewStepper = ({
     <div
       className="px-6 py-4"
       style={{
-        borderTop: `1px solid ${theme.palette.semantics.border.light}`,
+        borderTop: `1px solid ${semanticColors.border.light}`,
         backgroundColor: theme.palette.background.default,
       }}
     >

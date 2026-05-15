@@ -4,7 +4,6 @@ import {
   import { PanelLayout } from "@/components/layouts/PanelLayout";
   import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
   import { InterviewHeader } from "@/pages/interview/_components/layout";
-  import { RecruitmentPlatformThemeProvider } from "@/components/contexts/RecruitmentPlatformThemeProvider";
   import { ReactElement } from "react";
   import { NextPageWithLayout } from "../_app";
   import InterviewGroupIllustrationPanel from "./_components/InterviewGroupIllustrationPanel";
@@ -25,14 +24,12 @@ import {
   };
   
   InterviewGroupsHomePage.getLayout = (page: ReactElement) => (
-    <RecruitmentPlatformThemeProvider>
       <ProtectedRoute allowedRoles={["Admin", "User"]}>
         <SplitPanelLayout header={<InterviewHeader steps={[]} />}>
           <InterviewGroupIllustrationPanel />
           {page}
         </SplitPanelLayout>
       </ProtectedRoute>
-    </RecruitmentPlatformThemeProvider>
   );
   
   export default InterviewGroupsHomePage;
