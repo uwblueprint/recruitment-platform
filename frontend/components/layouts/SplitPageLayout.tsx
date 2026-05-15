@@ -6,7 +6,6 @@ const SPLIT_GRID_CLASSES: Record<SplitRatio, string> = {
   equal: "lg:grid-cols-2",
 };
 
-/** Flexible grid track so the sibling column can shrink inside overflow layouts. */
 const SPLIT_FLEX_TRACK = "minmax(0, 1fr)";
 
 function splitGridTemplateColumns(
@@ -14,7 +13,8 @@ function splitGridTemplateColumns(
   rightWidth?: number,
 ): string | undefined {
   const hasLeft = !!leftWidth;
-  const hasRight = !!rightWidth
+  const hasRight = !!rightWidth;
+
   if (!hasLeft && !hasRight) {
     return undefined;
   }
@@ -27,7 +27,6 @@ function splitGridTemplateColumns(
   return `${SPLIT_FLEX_TRACK} ${rightWidth}px`;
 }
 
-/** Preset fixed widths; pass only `leftWidth` or `rightWidth` on `SplitPanelLayout` so the other column fills the rest. */
 export const SPLIT_PANEL_WIDTHS = {
   interview: {
     left: 698,
@@ -56,12 +55,12 @@ export const SplitPanelLayout = ({
   const gridStyle = hasWidthOverride ? { gridTemplateColumns } : undefined;
 
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex h-screen flex-col bg-white">
       {header}
       <div
-        className={`flex-1 grid min-h-0 grid-cols-1 [&>*]:min-h-0 ${
+        className={`grid min-h-0 flex-1 grid-cols-1 overflow-hidden border border-semantic-border-light [&>*]:min-h-0 ${
           !hasWidthOverride ? SPLIT_GRID_CLASSES[split] : ""
-        } overflow-hidden border border-[#C4C4C4]`}
+        }`}
         style={gridStyle}
       >
         {children}
@@ -70,4 +69,3 @@ export const SplitPanelLayout = ({
     </div>
   );
 };
-

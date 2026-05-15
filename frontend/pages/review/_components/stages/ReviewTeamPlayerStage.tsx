@@ -1,14 +1,13 @@
-import { useTheme } from "@mui/material";
-import { useContext } from "react";
-import { ApplicationDTO } from "@/types";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
-import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ApplicationDTO } from "@/types";
+import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
-import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
+import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { REVIEW_TP_SCORING_CRITERIA } from "../rubricConstants";
+import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScores } from "../types";
 import { ReviewAnswers } from "./ReviewAnswers";
 import { ReviewRubric } from "./ReviewRubric";
@@ -26,13 +25,13 @@ export const ReviewTeamPlayerStage = ({
   scores,
   onReportConflict,
 }: Props) => {
-  const theme = useTheme();
   const updateScore = useContext(ReviewSetScoresContext);
   const shortAnswers = application?.shortQuestionAnswers ?? [];
   const thirdShortAnswer = shortAnswers[2];
   const questions = thirdShortAnswer ? [thirdShortAnswer.question] : [];
   const answers = thirdShortAnswer ? [thirdShortAnswer.response] : [];
   const { TP } = ReviewStage;
+
   return (
     <ReviewPageLayout currentStage={TP} scores={scores}>
       <PanelLayout
@@ -64,13 +63,7 @@ export const ReviewTeamPlayerStage = ({
           scores={scores}
           currentStage={TP}
         />
-        <div
-          className="w-full shrink-0"
-          style={{
-            height: "1px",
-            background: theme.palette.background.default,
-          }}
-        />
+        <div className="h-px w-full shrink-0 bg-white" />
         <div className="flex items-center gap-3">
           <ReviewScoreInput
             id="tp-score"
@@ -81,12 +74,7 @@ export const ReviewTeamPlayerStage = ({
             ariaLabel="Team player score"
             onChange={(v) => updateScore?.(TP, v)}
           />
-          <span
-            className="text-xl leading-none"
-            style={{ color: theme.palette.error.main }}
-          >
-            *
-          </span>
+          <span className="text-xl leading-none text-semantic-state-error">*</span>
         </div>
       </PanelLayout>
     </ReviewPageLayout>

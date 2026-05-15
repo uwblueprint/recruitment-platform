@@ -1,11 +1,8 @@
 import { Button } from "@/components/common/Button";
 import { LongLeftIcon } from "@/components/icons/long-left.icon";
-import { semanticColors } from "@/constants/palette";
-import { useTheme } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactElement } from "react";
-import { useContext, useState } from "react";
+import { ReactElement, useContext, useState } from "react";
 import { BACK_TO_HOME_HREF, REVIEW_STAGES, ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
 import { ReviewEndData, ReviewScores } from "../types";
@@ -17,7 +14,6 @@ const STAGE_RATING_FIELDS: [ReviewStage, string][] = [
   [ReviewStage.D2L, "desireToLearn"],
   [ReviewStage.SKL, "skill"],
 ];
-
 
 interface Props {
   currentStage: ReviewStage;
@@ -32,7 +28,6 @@ export const ReviewStepper = ({
   endData,
   onValidate,
 }: Props): ReactElement | null => {
-  const theme = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const setStage = useContext(ReviewSetStageContext);
@@ -65,42 +60,36 @@ export const ReviewStepper = ({
       secondChoiceRole = "",
     } = endData ?? {};
 
-    return Promise.all([
-      ...ratingPromises,
-      {},
-    ]);
+    return Promise.all([...ratingPromises, {}]);
   };
 
   return (
-    <div
-      className="px-6 py-4"
-      style={{
-        borderTop: `1px solid ${semanticColors.border.light}`,
-        backgroundColor: theme.palette.background.default,
-      }}
-    >
-      <div className="flex justify-end items-center gap-3 flex-nowrap">
-        {currentStageIndex === 0 && (
-          <Link href={BACK_TO_HOME_HREF} className="font-source no-underline inline-flex justify-center items-center gap-2 w-fit cursor-pointer shrink-0 hover:opacity-90 rounded-full py-2 px-4 border-2 border-blue bg-white text-blue text-base font-normal leading-[1.4] hover:bg-sky-100 hover:border-blue hover:text-blue">
-              <LongLeftIcon />
-              Back to home
+    <div className="border-t border-semantic-border-light bg-white px-6 py-4">
+      <div className="flex flex-nowrap items-center justify-end gap-3">
+        {currentStageIndex === 0 ? (
+          <Link
+            href={BACK_TO_HOME_HREF}
+            className="inline-flex w-fit shrink-0 cursor-pointer items-center justify-center gap-2 rounded-full border-2 border-blue bg-white px-4 py-2 font-source text-base font-normal leading-[1.4] text-blue no-underline hover:border-blue hover:bg-sky-100 hover:text-blue hover:opacity-90"
+          >
+            <LongLeftIcon />
+            Back to home
           </Link>
-        )}
-        {currentStageIndex > 0 && (
+        ) : null}
+        {currentStageIndex > 0 ? (
           <Button
             size="sm"
             variant="secondary"
             onClick={() => setStage?.(previousStage)}
-            className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-100 hover:border-blue hover:text-blue"
+            className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:border-blue hover:bg-sky-100 hover:text-blue"
           >
             Previous section
           </Button>
-        )}
+        ) : null}
         {currentStage === ReviewStage.END ? (
           <Button
             size="sm"
             disabled={isSubmitting || !endData?.skillsCategory}
-            className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-400 hover:border-transparent disabled:opacity-60"
+            className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:border-transparent hover:bg-sky-400 disabled:opacity-60"
             onClick={async () => {
               if (onValidate && !onValidate()) {
                 return;
@@ -125,7 +114,7 @@ export const ReviewStepper = ({
             size="sm"
             disabled={isButtonDisabled}
             onClick={() => setStage?.(nextStage)}
-            className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-400 hover:border-transparent disabled:opacity-60"
+            className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:border-transparent hover:bg-sky-400 disabled:opacity-60"
           >
             Save & Continue
           </Button>

@@ -1,15 +1,14 @@
 import { Button } from "@/components/common/Button";
+import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ReactNode, useContext } from "react";
-import { ReviewStage } from "../constants";
-import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { REVIEW_SKL_SCORING_CRITERIA } from "../rubricConstants";
+import { ReviewSetScoresContext } from "../ReviewContext";
+import { ReviewStage } from "../constants";
 import { ReviewAnswers } from "./ReviewAnswers";
 import { ReviewStageProps } from "./ReviewInfoStage";
 import { ReviewRubric } from "./ReviewRubric";
-import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
-import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { useTheme } from "@mui/material";
 
 const ResumeLink = ({ resumeLink }: { resumeLink: string }) => {
   return (
@@ -20,8 +19,8 @@ const ResumeLink = ({ resumeLink }: { resumeLink: string }) => {
         variant="secondary"
         href={resumeLink}
       >
-        <div className="flex justify-center items-center gap-2">
-          <img className="stroke-3" src={"common/resume.svg"} alt="" /> View
+        <div className="flex items-center justify-center gap-2">
+          <img className="stroke-3" src="common/resume.svg" alt="" /> View
           Candidate Resume
         </div>
       </Button>
@@ -37,14 +36,11 @@ export const ReviewSkillStage = ({
   scores,
   header,
 }: Props) => {
-  const theme = useTheme();
   const updateScore = useContext(ReviewSetScoresContext);
   const resumeLink = application?.resumeUrl;
 
   const roleSpecificStr = application?.roleSpecificQuestions[0];
-  const roleSpecificStrJSON = roleSpecificStr
-    ? JSON.parse(roleSpecificStr)
-    : [];
+  const roleSpecificStrJSON = roleSpecificStr ? JSON.parse(roleSpecificStr) : [];
   const questionsData = roleSpecificStrJSON[0]?.questions || [];
 
   const questions = questionsData.map(
@@ -55,9 +51,8 @@ export const ReviewSkillStage = ({
     (item: { question?: string; response?: string | string[] }) => {
       if (Array.isArray(item.response)) {
         return [item.response.join(", ")];
-      } else {
-        return item.response;
       }
+      return item.response;
     },
   );
 
@@ -82,13 +77,7 @@ export const ReviewSkillStage = ({
           scores={scores}
           currentStage={ReviewStage.SKL}
         />
-        <div
-          className="w-full shrink-0"
-          style={{
-            height: "1px",
-            background: theme.palette.background.default,
-          }}
-        />
+        <div className="h-px w-full shrink-0 bg-white" />
         <div className="flex items-center gap-3">
           <ReviewScoreInput
             id="skl-score"
@@ -99,12 +88,7 @@ export const ReviewSkillStage = ({
             ariaLabel="Skill score"
             onChange={(v) => updateScore?.(ReviewStage.SKL, v)}
           />
-          <span
-            className="text-xl leading-none"
-            style={{ color: theme.palette.error.main }}
-          >
-            *
-          </span>
+          <span className="text-xl leading-none text-semantic-state-error">*</span>
         </div>
       </PanelLayout>
     </ReviewPageLayout>

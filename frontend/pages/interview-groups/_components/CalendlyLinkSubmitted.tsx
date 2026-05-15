@@ -1,5 +1,5 @@
-import { EditIcon } from "@/components/icons/edit.icon";
 import { CheckCircleIcon } from "@/components/icons/check-circle.icon";
+import { EditIcon } from "@/components/icons/edit.icon";
 
 type CalendlyLinkSubmittedProps = {
   linkInput: string;
@@ -16,17 +16,17 @@ const CalendlyLinkSubmitted = ({
   onEdit,
   onResubmit,
 }: CalendlyLinkSubmittedProps) => (
-  <div className="flex gap-4 border border-[#C4C4C4] rounded-lg py-6 pr-6 pl-4">
-    <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#00A403] text-white shrink-0">
+  <div className="flex gap-4 rounded-lg border border-semantic-border-light py-6 pr-6 pl-4">
+    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-semantic-state-success text-white">
       <CheckCircleIcon />
     </div>
-    <div className="flex flex-col gap-8 flex-1">
+    <div className="flex flex-1 flex-col gap-8">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <p className="font-poppins font-medium text-xl text-[#00A403] leading-[1.4]">
+          <p className="font-poppins text-xl font-medium leading-[1.4] text-semantic-text-success">
             Link submitted!
           </p>
-          <p className="font-source text-base text-black/75 leading-[1.4]">
+          <p className="font-source text-base leading-[1.4] text-black/75">
             If you would like to re-submit your Calendly link press the edit
             icon below.
           </p>
@@ -36,11 +36,11 @@ const CalendlyLinkSubmitted = ({
             type="text"
             value={linkInput}
             onChange={(e) => onLinkChange(e.target.value)}
-            className="w-full border border-[#7D7D7D] rounded-[5px] py-[10px] px-5 text-sm text-charcoal-400 font-normal leading-[1.43] outline-none focus:border-blue"
+            className="w-full rounded-[5px] border border-semantic-border-input px-5 py-[10px] text-sm font-normal leading-[1.43] text-charcoal-400 outline-none focus:border-blue"
           />
         ) : (
-          <div className="flex items-center gap-[10px] border border-[#7D7D7D] rounded-[5px] py-[10px] px-5">
-            <span className="flex-1 text-sm text-[#3279B7] font-normal leading-[1.43] truncate">
+          <div className="flex items-center gap-[10px] rounded-[5px] border border-semantic-border-input px-5 py-[10px]">
+            <span className="flex-1 truncate text-sm font-normal leading-[1.43] text-semantic-text-link">
               {linkInput}
             </span>
             <button
@@ -57,9 +57,9 @@ const CalendlyLinkSubmitted = ({
         <button
           disabled={!isEditing || !linkInput}
           onClick={onResubmit}
-          className={`rounded-full py-2 px-4 bg-blue text-white font-source text-base font-normal leading-[1.4] ${
+          className={`rounded-full bg-blue px-4 py-2 font-source text-base font-normal leading-[1.4] text-white ${
             !isEditing || !linkInput
-              ? "opacity-50 cursor-not-allowed"
+              ? "cursor-not-allowed opacity-50"
               : "hover:opacity-90"
           }`}
         >

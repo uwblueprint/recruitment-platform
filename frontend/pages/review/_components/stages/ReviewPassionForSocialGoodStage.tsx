@@ -1,14 +1,13 @@
-import { useTheme } from "@mui/material";
-import { useContext } from "react";
-import { ApplicationDTO } from "@/types";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
-import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ApplicationDTO } from "@/types";
+import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
-import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
+import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { REVIEW_PFSG_SCORING_CRITERIA } from "../rubricConstants";
+import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScores } from "../types";
 import { ReviewAnswers } from "./ReviewAnswers";
 import { ReviewRubric } from "./ReviewRubric";
@@ -31,7 +30,7 @@ export const ReviewPassionForSocialGoodStage = ({
   const secondShortAnswer = shortAnswers[1];
   const questions = secondShortAnswer ? [secondShortAnswer.question] : [];
   const answers = secondShortAnswer ? [secondShortAnswer.response] : [];
-  const theme = useTheme();
+
   return (
     <ReviewPageLayout currentStage={ReviewStage.PFSG} scores={scores}>
       <PanelLayout
@@ -63,13 +62,7 @@ export const ReviewPassionForSocialGoodStage = ({
           scores={scores}
           currentStage={ReviewStage.PFSG}
         />
-        <div
-          className="w-full shrink-0"
-          style={{
-            height: "1px",
-            background: theme.palette.background.default,
-          }}
-        />
+        <div className="h-px w-full shrink-0 bg-white" />
         <div className="flex items-center gap-3">
           <ReviewScoreInput
             id="pfsg-score"
@@ -80,12 +73,7 @@ export const ReviewPassionForSocialGoodStage = ({
             ariaLabel="Passion for social good score"
             onChange={(v) => updateScore?.(ReviewStage.PFSG, v)}
           />
-          <span
-            className="text-xl leading-none"
-            style={{ color: theme.palette.error.main }}
-          >
-            *
-          </span>
+          <span className="text-xl leading-none text-semantic-state-error">*</span>
         </div>
       </PanelLayout>
     </ReviewPageLayout>

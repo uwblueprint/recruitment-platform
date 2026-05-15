@@ -1,11 +1,11 @@
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
-import { ReviewStage } from "../constants";
-import { ReviewEndData, ReviewScores } from "../types";
-import { ReportConflictButton } from "../common/ReportConflictButton";
 import { ArrowLeftIcon } from "@/components/icons/arrow-left.icon";
-import Link from "next/link";
-import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
+import Link from "next/link";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import { ReportConflictButton } from "../common/ReportConflictButton";
+import { ReviewStage } from "../constants";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
+import { ReviewEndData, ReviewScores } from "../types";
 
 interface Props {
   name: string;
@@ -27,24 +27,27 @@ const LeftPanelContent = ({
   scores: ReviewScores;
   onReportConflict?: () => void;
 }) => {
-  const SCORE_ROWS: { label: string; stage: ReviewStage }[] = [
+  const scoreRows: { label: string; stage: ReviewStage }[] = [
     { label: "Passion for Social Good", stage: ReviewStage.PFSG },
     { label: "Team Player", stage: ReviewStage.TP },
     { label: "Desire to Learn", stage: ReviewStage.D2L },
     { label: "Skill", stage: ReviewStage.SKL },
   ];
 
-  const totalScore = SCORE_ROWS.reduce(
+  const totalScore = scoreRows.reduce(
     (sum, { stage }) => sum + scores[stage],
     0,
   );
 
   return (
-    <div className="flex flex-col gap-6 p-3 w-full">
-      <div className="flex justify-between items-center w-full gap-4 shrink-0">
-        <Link href="/admin" className="w-fit shrink-0 flex items-center gap-2 py-2 px-4 rounded-full border-2 border-blue bg-white hover:bg-gray-50 transition-colors text-blue text-base font-normal leading-snug no-underline">
-            <ArrowLeftIcon className="w-6 h-6 text-blue" />
-            Back to home
+    <div className="flex w-full flex-col gap-6 p-3">
+      <div className="flex w-full shrink-0 items-center justify-between gap-4">
+        <Link
+          href="/admin"
+          className="flex w-fit shrink-0 items-center gap-2 rounded-full border-2 border-blue bg-white px-4 py-2 font-source text-base font-normal leading-snug text-blue no-underline transition-colors hover:bg-gray-50"
+        >
+          <ArrowLeftIcon className="h-6 w-6 text-blue" />
+          Back to home
         </Link>
         <ReportConflictButton
           name={name}
@@ -53,53 +56,51 @@ const LeftPanelContent = ({
         />
       </div>
 
-      {/* Scoring section */}
       <div className="flex flex-col gap-8">
         <div className="flex flex-col gap-3">
-          <p className="text-[#252525]/75 font-normal text-base leading-snug">
+          <p className="text-base font-normal leading-snug text-semantic-text-subtle">
             Scoring
           </p>
-          <h2 className="text-[#252525] text-3xl leading-snug">
+          <h2 className="text-3xl leading-snug text-semantic-text-primary">
             {name}&apos;s final scores
           </h2>
         </div>
 
-        {/* Score card */}
-        <div className="rounded-lg border border-[#C4C4C4] bg-white p-6 flex flex-col gap-8">
-          <div className="flex justify-between items-center">
-            <div className="flex flex-col gap-6 w-[235px]">
-              <span className="text-blue font-medium text-xl leading-7 font-poppins">
+        <div className="flex flex-col gap-8 rounded-lg border border-semantic-border-light bg-white p-6">
+          <div className="flex items-center justify-between">
+            <div className="flex w-[235px] flex-col gap-6">
+              <span className="font-poppins text-xl font-medium leading-7 text-blue">
                 Topic
               </span>
-              {SCORE_ROWS.map(({ label }) => (
+              {scoreRows.map(({ label }) => (
                 <span
                   key={label}
-                  className="text-black font-normal text-base leading-snug"
+                  className="text-base font-normal leading-snug text-black"
                 >
                   {label}
                 </span>
               ))}
             </div>
-            <div className="flex flex-col gap-6 items-end">
-              <span className="text-blue font-normal text-xl leading-7 font-poppins">
+            <div className="flex flex-col items-end gap-6">
+              <span className="font-poppins text-xl font-normal leading-7 text-blue">
                 {reviewerName}&apos;s rating
               </span>
-              {SCORE_ROWS.map(({ label, stage }) => (
+              {scoreRows.map(({ label, stage }) => (
                 <span
                   key={label}
-                  className="text-black font-normal text-base leading-snug"
+                  className="text-base font-normal leading-snug text-black"
                 >
                   {scores[stage]}/5
                 </span>
               ))}
             </div>
           </div>
-          <hr className="border-[#C4C4C4]" />
-          <div className="flex justify-between items-center">
-            <span className="text-black font-medium text-xl leading-7 font-poppins">
+          <hr className="border-semantic-border-light" />
+          <div className="flex items-center justify-between">
+            <span className="font-poppins text-xl font-medium leading-7 text-black">
               Total Score
             </span>
-            <span className="text-blue font-normal text-xl leading-7 font-poppins">
+            <span className="font-poppins text-xl font-normal leading-7 text-blue">
               {totalScore}/20
             </span>
           </div>
@@ -129,20 +130,22 @@ const EndForm = ({
   };
 
   return (
-    <div className="flex flex-col gap-8 w-full lg:max-w-[541px] lg:mx-auto">
+    <div className="flex w-full flex-col gap-8 lg:mx-auto lg:max-w-[541px]">
       <div className="flex flex-col gap-6">
-        <h3 className="text-[#252525] text-xl leading-7">Skill Category</h3>
+        <h3 className="text-xl leading-7 text-semantic-text-primary">
+          Skill Category
+        </h3>
         <select
           value={skillsCategory}
           onChange={handleOptionChange}
           required
-          className={`h-14 w-full rounded-md border bg-white px-4 py-4 text-base font-normal leading-6
-            ${
-              validationError && skillsCategory === ""
-                ? "border-red-500"
-                : "border-[#C4C4C4]"
-            }
-            ${skillsCategory === "" ? "text-[#C4C4C4]" : "text-black"}`}
+          className={`h-14 w-full rounded-md border bg-white px-4 py-4 text-base font-normal leading-6 ${
+            validationError && skillsCategory === ""
+              ? "border-red-500"
+              : "border-semantic-border-light"
+          } ${
+            skillsCategory === "" ? "text-semantic-border-light" : "text-black"
+          }`}
         >
           <option value="">Skill Category</option>
           <option value="junior">Junior</option>
@@ -151,12 +154,14 @@ const EndForm = ({
         </select>
       </div>
       <div className="flex flex-col gap-6">
-        <h3 className="text-[#252525] text-xl leading-7">Comments</h3>
+        <h3 className="text-xl leading-7 text-semantic-text-primary">
+          Comments
+        </h3>
         <textarea
           value={comments}
           onChange={handleCommentChange}
           placeholder="Leave Comments here"
-          className="w-full h-[250px] rounded-md border border-[#C4C4C4] bg-white px-3 py-4 text-base font-normal leading-6 placeholder:text-sm placeholder:font-normal placeholder:leading-5 placeholder:text-black/[0.36]"
+          className="h-[250px] w-full rounded-md border border-semantic-border-light bg-white px-3 py-4 text-base font-normal leading-6 placeholder:text-sm placeholder:font-normal placeholder:leading-5 placeholder:text-semantic-text-placeholder"
         />
       </div>
     </div>

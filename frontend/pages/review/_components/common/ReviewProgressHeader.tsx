@@ -1,10 +1,9 @@
 import { CheckIcon } from "@/components/icons/check.icon";
 import Image from "next/image";
 import Link from "next/link";
+import { useContext } from "react";
 import { ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
-import { useContext } from "react";
-import { useTheme } from "@mui/material";
 
 interface Props {
   currentStage: ReviewStage;
@@ -39,77 +38,52 @@ interface StepIndicatorProps {
   state: StepState;
 }
 
+const circleClassNames: Record<StepState, string> = {
+  completed: "border-green bg-green text-white",
+  current: "border-white bg-white text-blue",
+  future: "border-white bg-transparent text-white",
+};
+
+const numberClassNames: Record<StepState, string> = {
+  completed: "text-white",
+  current: "font-bold text-blue",
+  future: "text-white",
+};
+
 const StepIndicator = ({ step, state }: StepIndicatorProps) => {
   const setStage = useContext(ReviewSetStageContext);
-  const theme = useTheme();
-
-  const circleStyleObjects: Record<StepState, React.CSSProperties> = {
-    completed: {
-      backgroundColor: theme.palette.success.main,
-      borderColor: theme.palette.success.main,
-    },
-    current: {
-      backgroundColor: theme.palette.background.default,
-      borderColor: theme.palette.primary.contrastText,
-    },
-    future: {
-      backgroundColor: "transparent",
-      borderColor: theme.palette.primary.contrastText,
-    },
-  };
-
-  const numberStyleObjects: Record<StepState, React.CSSProperties> = {
-    completed: { color: theme.palette.primary.contrastText },
-    current: { color: theme.palette.primary.main, fontWeight: 700 },
-    future: { color: theme.palette.primary.contrastText },
-  };
-
-  const content = (
-    <>
-      <div
-        className="w-9 h-9 rounded-full border-2 flex items-center justify-center"
-        style={circleStyleObjects[state]}
-      >
-        {state === "completed" ? (
-          <CheckIcon
-            className="w-5 h-5"
-            style={{ color: theme.palette.primary.contrastText }}
-          />
-        ) : (
-          <span className={`text-sm`} style={numberStyleObjects[state]}>
-            {step.index}
-          </span>
-        )}
-      </div>
-      <span className="text-white text-xs font-medium uppercase tracking-wide">
-        {step.label}
-      </span>
-    </>
-  );
 
   return (
     <button
       type="button"
       onClick={() => setStage?.(step.stage)}
-      className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
+      className="flex flex-col items-center gap-1 transition-opacity hover:opacity-80"
       aria-label={`Navigate to ${step.label} step`}
     >
-      {content}
+      <div
+        className={`flex h-9 w-9 items-center justify-center rounded-full border-2 ${circleClassNames[state]}`}
+      >
+        {state === "completed" ? (
+          <CheckIcon className="h-5 w-5 text-white" />
+        ) : (
+          <span className={`text-sm ${numberClassNames[state]}`}>
+            {step.index}
+          </span>
+        )}
+      </div>
+      <span className="text-xs font-medium uppercase tracking-wide text-white">
+        {step.label}
+      </span>
     </button>
   );
 };
 
 export const ReviewProgressHeader = ({ currentStage }: Props) => {
   const currentIndex = steps.findIndex((s) => s.stage === currentStage);
-  const theme = useTheme();
 
   return (
-    <header
-      className="w-full"
-      style={{ backgroundColor: theme.palette.primary.main }}
-    >
-      <div className="flex items-center justify-between px-9 py-4 w-full">
-        {/* Left side - Logo */}
+    <header className="w-full bg-blue">
+      <div className="flex w-full items-center justify-between px-9 py-4">
         <Link href="/review">
           <Image
             src="/common/logo-with-text.svg"
@@ -120,8 +94,7 @@ export const ReviewProgressHeader = ({ currentStage }: Props) => {
           />
         </Link>
 
-        {/* Right side - Progress Stepper */}
-        <div className="hidden md:flex items-center gap-9">
+        <div className="hidden items-center gap-9 md:flex">
           {steps.map((step) => (
             <StepIndicator
               key={step.index}

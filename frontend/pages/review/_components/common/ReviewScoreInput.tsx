@@ -1,6 +1,4 @@
 import { UpCaret } from "@/components/icons/up-caret.icon";
-import { semanticColors } from "@/constants/palette";
-import { useTheme } from "@mui/material";
 import React, { ReactElement } from "react";
 
 interface Props {
@@ -25,7 +23,6 @@ export function ReviewScoreInput({
   const numericValue = value === "" ? NaN : value;
   const canIncrement = Number.isNaN(numericValue) || numericValue < max;
   const canDecrement = Number.isNaN(numericValue) || numericValue > min;
-  const theme = useTheme();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -55,12 +52,8 @@ export function ReviewScoreInput({
 
   return (
     <div
-      className="flex items-center font-source overflow-hidden focus-within:ring-2 focus-within:ring-blue/20 shrink-0 w-[280px] h-12 rounded-[8px]"
+      className="flex h-12 w-[280px] shrink-0 items-center overflow-hidden rounded-[8px] border border-semantic-border-light bg-white font-source focus-within:ring-2 focus-within:ring-blue/20"
       role="group"
-      style={{
-        background: theme.palette.background.default,
-        border: `1px solid ${semanticColors.border.light}`,
-      }}
     >
       <input
         id={id}
@@ -71,36 +64,19 @@ export function ReviewScoreInput({
         aria-label={ariaLabel}
         value={value}
         onChange={handleInputChange}
-        className="h-full flex-1 min-w-0 border-0 focus:outline-none [&::-webkit-inner-spin-button]:appearance-none self-stretch px-5 font-normal text-base"
-        style={{
-          color: theme.palette.text.primary,
-          background: theme.palette.background.default,
-        }}
+        className="h-full min-w-0 flex-1 self-stretch border-0 bg-white px-5 font-normal text-base text-semantic-text-primary focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
       />
       <div
-        className="flex shrink-0 self-stretch w-[1px]"
-        style={{
-          background: semanticColors.border.light,
-        }}
+        className="flex h-full w-[1px] shrink-0 self-stretch bg-semantic-border-light"
         aria-hidden
       />
-      <div
-        className="flex flex-col shrink-0 h-full w-6"
-        style={{
-          background: theme.palette.background.default,
-        }}
-      >
+      <div className="flex h-full w-6 shrink-0 flex-col bg-white">
         <button
           type="button"
           onClick={handleIncrement}
           disabled={!canIncrement}
           aria-label="Increase score"
-          className="flex-1 flex items-center justify-center min-h-0 disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{
-            background: theme.palette.background.default,
-            color: theme.palette.text.primary,
-            borderBottom: `1px solid ${semanticColors.border.light}`,
-          }}
+          className="flex min-h-0 flex-1 items-center justify-center border-b border-semantic-border-light bg-white text-semantic-text-primary disabled:cursor-not-allowed disabled:opacity-40"
         >
           <UpCaret />
         </button>
@@ -109,10 +85,7 @@ export function ReviewScoreInput({
           onClick={handleDecrement}
           disabled={!canDecrement}
           aria-label="Decrease score"
-          className="flex-1 flex items-center justify-center min-h-0 disabled:opacity-40 disabled:cursor-not-allowed"
-          style={{
-            background: theme.palette.background.default,
-          }}
+          className="flex min-h-0 flex-1 items-center justify-center bg-white disabled:cursor-not-allowed disabled:opacity-40"
         >
           <UpCaret direction="down" />
         </button>
