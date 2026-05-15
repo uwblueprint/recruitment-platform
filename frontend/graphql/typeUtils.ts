@@ -60,6 +60,7 @@ export type ReviewedApplicantRecord =
 export type ReviewedApplicantsDTO =
   WithoutTypename<Schema.ReviewedApplicantsDto>;
 export type ReviewerDTO = WithoutTypename<Schema.ReviewerDto>;
+export type ShortAnswerQuestionDTO = WithoutTypename<Schema.ShortAnswerQuestion>;
 export type ShortQuestionAnswerDTO =
   WithoutTypename<Schema.ShortQuestionAnswer>;
 export type SimpleEntityRequestDTO = Schema.SimpleEntityRequestDto;

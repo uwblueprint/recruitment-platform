@@ -8,6 +8,7 @@ import {
   isAuthorizedByUserId,
 } from "../middlewares/auth";
 import adminCommentResolvers from "./resolvers/adminCommentResolvers";
+import applicantRecordResolvers from "./resolvers/applicantRecordResolvers";
 import authResolvers from "./resolvers/authResolvers";
 import entityResolvers from "./resolvers/entityResolvers";
 import simpleEntityResolvers from "./resolvers/simpleEntityResolvers";
@@ -60,6 +61,7 @@ const executableSchema = makeExecutableSchema({
   ],
   resolvers: merge(
     adminCommentResolvers,
+    applicantRecordResolvers,
     authResolvers,
     entityResolvers,
     simpleEntityResolvers,
@@ -102,6 +104,9 @@ const graphQLMiddlewares = {
     createAdminComment: authorizedByAdmin(),
     updateAdminComment: authorizedByAdmin(),
     deleteAdminCommentById: authorizedByAdmin(),
+    updateApplicantRecordStatus: authorizedByAdmin(),
+    bulkUpdateApplicantRecordsStatus: authorizedByAdmin(),
+    updateApplicantRecordIsApplicantFlagged: authorizedByAdmin(),
   },
 };
 

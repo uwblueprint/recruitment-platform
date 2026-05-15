@@ -10,6 +10,17 @@ import IAdminCommentService from "../interfaces/IAdminCommentService";
 
 const Logger = logger(__filename);
 
+function toDTO(adminComment: AdminComment): AdminCommentDTO {
+  return {
+    id: adminComment.id,
+    userId: adminComment.user_id,
+    applicantRecordId: adminComment.applicant_record_id,
+    comment: adminComment.comment,
+    createdAt: adminComment.createdAt.toISOString(),
+    updatedAt: adminComment.updatedAt.toISOString(),
+  };
+}
+
 class AdminCommentService implements IAdminCommentService {
   /* eslint-disable class-methods-use-this */
 
@@ -20,14 +31,7 @@ class AdminCommentService implements IAdminCommentService {
       const adminComments = await AdminComment.findAll({
         where: { applicant_record_id: applicantRecordId },
       });
-      return adminComments.map((adminComment) => ({
-        id: adminComment.id,
-        userId: adminComment.user_id,
-        applicantRecordId: adminComment.applicant_record_id,
-        comment: adminComment.comment,
-        createdAt: adminComment.createdAt.toISOString(),
-        updatedAt: adminComment.updatedAt.toISOString(),
-      }));
+      return adminComments.map(toDTO);
     } catch (error: unknown) {
       Logger.error(
         `Failed to get admin comments by applicantRecordId = ${applicantRecordId}. Reason = ${getErrorMessage(
@@ -44,14 +48,7 @@ class AdminCommentService implements IAdminCommentService {
       if (!adminComment) {
         throw new Error(`adminCommentId ${id} not found.`);
       }
-      return {
-        id: adminComment.id,
-        userId: adminComment.user_id,
-        applicantRecordId: adminComment.applicant_record_id,
-        comment: adminComment.comment,
-        createdAt: adminComment.createdAt.toISOString(),
-        updatedAt: adminComment.updatedAt.toISOString(),
-      };
+      return toDTO(adminComment);
     } catch (error: unknown) {
       Logger.error(
         `Failed to get admin comment by id = ${id}. Reason = ${getErrorMessage(
@@ -71,14 +68,7 @@ class AdminCommentService implements IAdminCommentService {
         applicant_record_id: adminComment.applicantRecordId,
         comment: adminComment.comment,
       });
-      return {
-        id: newAdminComment.id,
-        userId: newAdminComment.user_id,
-        applicantRecordId: newAdminComment.applicant_record_id,
-        comment: newAdminComment.comment,
-        createdAt: newAdminComment.createdAt.toISOString(),
-        updatedAt: newAdminComment.updatedAt.toISOString(),
-      };
+      return toDTO(newAdminComment);
     } catch (error: unknown) {
       Logger.error(
         `Failed to create admin comment. Reason = ${getErrorMessage(error)}`,
@@ -100,14 +90,7 @@ class AdminCommentService implements IAdminCommentService {
       const updatedAdminComment = await adminCommentToUpdate.update({
         comment: adminComment.comment,
       });
-      return {
-        id: updatedAdminComment.id,
-        userId: updatedAdminComment.user_id,
-        applicantRecordId: updatedAdminComment.applicant_record_id,
-        comment: updatedAdminComment.comment,
-        createdAt: updatedAdminComment.createdAt.toISOString(),
-        updatedAt: updatedAdminComment.updatedAt.toISOString(),
-      };
+      return toDTO(updatedAdminComment);
     } catch (error: unknown) {
       Logger.error(
         `Failed to update admin comment. Reason = ${getErrorMessage(error)}`,
@@ -123,14 +106,7 @@ class AdminCommentService implements IAdminCommentService {
         throw new Error(`adminCommentId ${id} not found.`);
       }
       await adminComment.destroy();
-      return {
-        id: adminComment.id,
-        userId: adminComment.user_id,
-        applicantRecordId: adminComment.applicant_record_id,
-        comment: adminComment.comment,
-        createdAt: adminComment.createdAt.toISOString(),
-        updatedAt: adminComment.updatedAt.toISOString(),
-      };
+      return toDTO(adminComment);
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete admin comment. Reason = ${getErrorMessage(error)}`,
