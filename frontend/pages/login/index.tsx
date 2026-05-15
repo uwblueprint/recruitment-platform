@@ -2,38 +2,57 @@ import AuthAPIClient from "@/APIClients/AuthAPIClient";
 import { Button } from "@/components/common/Button";
 import { useAuthUserContext } from "@/components/contexts/AuthUserContext";
 import { auth } from "@/utils/firebase";
-import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  GoogleAuthProvider,
+  getRedirectResult,
+  signInWithRedirect,
+} from "firebase/auth";
 import type { NextPage } from "next";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 const LoginPage: NextPage = () => {
   const router = useRouter();
   const { setAuthenticatedUser } = useAuthUserContext();
 
+  // Handle the auth result after returning from Google's redirect.
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const res = await getRedirectResult(auth);
+        if (!res) return;
+
+        const credential = GoogleAuthProvider.credentialFromResult(res);
+        const oauthIdToken = credential?.idToken;
+        if (!oauthIdToken) return;
+
+        const result = await AuthAPIClient.loginWithGoogle(oauthIdToken);
+        localStorage.setItem("accessToken", result.accessToken);
+        localStorage.setItem("refreshToken", result.refreshToken);
+        setAuthenticatedUser({
+          id: result.id,
+          firstName: result.firstName,
+          lastName: result.lastName,
+          email: result.email,
+          role: result.role,
+          position: result.position,
+        });
+        await router.push("/admin");
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    handleRedirectResult();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const signInWithGoogle = async () => {
     try {
       const provider = new GoogleAuthProvider();
       provider.setCustomParameters({ hd: "uwblueprint.org" }); // only allow uwblueprint.org emails to sign in
-      const res = await signInWithPopup(auth, provider);
-      const credential = GoogleAuthProvider.credentialFromResult(res);
-      const oauthIdToken = credential?.idToken;
-      if (!oauthIdToken) {
-        return;
-      }
-
-      const result = await AuthAPIClient.loginWithGoogle(oauthIdToken);
-      localStorage.setItem("accessToken", result.accessToken);
-      localStorage.setItem("refreshToken", result.refreshToken);
-      setAuthenticatedUser({
-        id: result.id,
-        firstName: result.firstName,
-        lastName: result.lastName,
-        email: result.email,
-        role: result.role,
-        position: result.position,
-      });
-      await router.push("/admin");
+      await signInWithRedirect(auth, provider);
     } catch (e) {
       console.error(e);
     }
