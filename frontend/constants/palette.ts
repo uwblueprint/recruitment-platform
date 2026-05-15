@@ -53,7 +53,7 @@ const magenta = {
   900: "#420060",
 };
 
-// semantic color definitions for the recruitment platform, to be used in addition to the MUI palette colors
+// semantic color definitions for the recruitment platform
 export const semanticColors = {
   reviewStatus: {
     reviewed: {
