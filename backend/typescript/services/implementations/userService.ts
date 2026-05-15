@@ -171,7 +171,7 @@ class UserService implements IUserService {
           throw Error("Firebase username and password not available");
         const nameParts = firebaseUser.displayName.split(" ");
         firstName = nameParts[0] ?? "";
-        lastName = nameParts.slice(1).join(" ") || nameParts[0] ?? "";
+        lastName = nameParts.slice(1).join(" ") || (nameParts[0] ?? "");
       }
 
       try {
