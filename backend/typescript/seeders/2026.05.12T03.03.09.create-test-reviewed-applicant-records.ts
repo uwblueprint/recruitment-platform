@@ -64,7 +64,9 @@ export const up: Seeder = async ({ context: sequelize }) => {
   const reviewedApplicantRecords = applicantRecordIds.map((id) => {
     return {
       applicant_record_id: id,
-      reviewer_id: [9999995, 9999996, 9999997, 9999998][Math.floor(Math.random() * 4)], // 9999995-9999998 are the reviewer user ids
+      reviewer_id: [9999995, 9999996, 9999997, 9999998][
+        Math.floor(Math.random() * 4)
+      ], // 9999995-9999998 are the reviewer user ids
       /** bulkInsert cannot bind plain objects for jsonb; PG accepts a JSON text literal. */
       review: JSON.stringify(getReviewDTO()),
       createdAt: new Date(),
