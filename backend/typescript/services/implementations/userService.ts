@@ -1,6 +1,12 @@
 import * as firebaseAdmin from "firebase-admin";
 import IUserService from "../interfaces/userService";
-import { CreateUserDTO, Role, SignUpMethod, UpdateUserDTO, UserDTO } from "../../types";
+import {
+  CreateUserDTO,
+  Role,
+  SignUpMethod,
+  UpdateUserDTO,
+  UserDTO,
+} from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import User from "../../models/user.model";
