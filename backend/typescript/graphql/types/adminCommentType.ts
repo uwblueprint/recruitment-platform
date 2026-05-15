@@ -2,34 +2,38 @@ import { gql } from "apollo-server-express";
 
 const adminCommentsType = gql`
   type AdminCommentDTO {
-    id: String!
-    userId: Int!
-    applicantRecordId: String!
+    id: ID!
+    userId: ID!
+    applicantRecordId: ID!
     comment: String!
     createdAt: String!
     updatedAt: String!
   }
 
   input CreateAdminCommentDTO {
-    userId: Int!
-    applicantRecordId: String!
+    userId: ID!
+    applicantRecordId: ID!
+    comment: String!
+  }
+
+  input UpdateAdminCommentDTO {
     comment: String!
   }
 
   extend type Query {
     adminCommentsByApplicantRecordId(
-      applicantRecordId: String!
+      applicantRecordId: ID!
     ): [AdminCommentDTO!]!
-    adminCommentById(id: String!): AdminCommentDTO!
+    adminCommentById(id: ID!): AdminCommentDTO!
   }
 
   extend type Mutation {
     createAdminComment(adminComment: CreateAdminCommentDTO!): AdminCommentDTO!
     updateAdminComment(
-      id: String!
-      content: CreateAdminCommentDTO!
+      id: ID!
+      adminComment: UpdateAdminCommentDTO!
     ): AdminCommentDTO!
-    deleteAdminCommentById(id: String!): AdminCommentDTO!
+    deleteAdminCommentById(id: ID!): AdminCommentDTO!
   }
 `;
 

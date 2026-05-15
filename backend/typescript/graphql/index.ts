@@ -7,11 +7,12 @@ import {
   isAuthorizedByRole,
   isAuthorizedByUserId,
 } from "../middlewares/auth";
+import adminCommentResolvers from "./resolvers/adminCommentResolvers";
 import authResolvers from "./resolvers/authResolvers";
 import entityResolvers from "./resolvers/entityResolvers";
 import simpleEntityResolvers from "./resolvers/simpleEntityResolvers";
 import userResolvers from "./resolvers/userResolvers";
-import adminCommentType from "./types/adminCommentsType";
+import adminCommentType from "./types/adminCommentType";
 import applicantRecordType from "./types/applicantRecordType";
 import authType from "./types/authType";
 import entityType from "./types/entityType";
@@ -58,6 +59,7 @@ const executableSchema = makeExecutableSchema({
     userType,
   ],
   resolvers: merge(
+    adminCommentResolvers,
     authResolvers,
     entityResolvers,
     simpleEntityResolvers,
@@ -81,6 +83,8 @@ const graphQLMiddlewares = {
     userById: authorizedByAdmin(),
     userByEmail: authorizedByAdmin(),
     users: authorizedByAdmin(),
+    adminCommentsByApplicantRecordId: authorizedByAdmin(),
+    adminCommentById: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),
@@ -95,6 +99,9 @@ const graphQLMiddlewares = {
     deleteUserByEmail: authorizedBySuperAdmin(),
     logout: isAuthorizedByUserId("userId"),
     resetPassword: isAuthorizedByEmail("email"),
+    createAdminComment: authorizedByAdmin(),
+    updateAdminComment: authorizedByAdmin(),
+    deleteAdminCommentById: authorizedByAdmin(),
   },
 };
 

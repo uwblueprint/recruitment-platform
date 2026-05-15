@@ -12,12 +12,12 @@ export type Scalars = {
 
 export type AdminCommentDto = {
   __typename?: 'AdminCommentDTO';
-  applicantRecordId: Scalars['String']['output'];
+  applicantRecordId: Scalars['ID']['output'];
   comment: Scalars['String']['output'];
   createdAt: Scalars['String']['output'];
-  id: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
   updatedAt: Scalars['String']['output'];
-  userId: Scalars['Int']['output'];
+  userId: Scalars['ID']['output'];
 };
 
 export type ApplicantRecordDto = {
@@ -93,9 +93,9 @@ export type BulkDeleteInterviewDelegationInput = {
 };
 
 export type CreateAdminCommentDto = {
-  applicantRecordId: Scalars['String']['input'];
+  applicantRecordId: Scalars['ID']['input'];
   comment: Scalars['String']['input'];
-  userId: Scalars['Int']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 export type CreateInterviewGroupDto = {
@@ -370,7 +370,7 @@ export type MutationDelegateReviewersArgs = {
 
 
 export type MutationDeleteAdminCommentByIdArgs = {
-  id: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
@@ -459,8 +459,8 @@ export type MutationSetApplicantRecordFlagArgs = {
 
 
 export type MutationUpdateAdminCommentArgs = {
-  content: CreateAdminCommentDto;
-  id: Scalars['String']['input'];
+  adminComment: UpdateAdminCommentDto;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -550,12 +550,12 @@ export type Query = {
 
 
 export type QueryAdminCommentByIdArgs = {
-  id: Scalars['String']['input'];
+  id: Scalars['ID']['input'];
 };
 
 
 export type QueryAdminCommentsByApplicantRecordIdArgs = {
-  applicantRecordId: Scalars['String']['input'];
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -785,6 +785,10 @@ export enum SkillCategory {
   Junior = 'JUNIOR',
   Senior = 'SENIOR'
 }
+
+export type UpdateAdminCommentDto = {
+  comment: Scalars['String']['input'];
+};
 
 export type UpdateInterviewGroupDto = {
   schedulingLink?: InputMaybe<Scalars['String']['input']>;
