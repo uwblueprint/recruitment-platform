@@ -64,7 +64,9 @@ export const up: Seeder = async ({ context: sequelize }) => {
   const reviewedApplicantRecords = applicantRecordIds.map((id) => {
     return {
       applicant_record_id: id,
-      reviewer_id: [5, 6, 7, 8][Math.floor(Math.random() * 4)], // 5-8 are the reviewer user ids
+      reviewer_id: [9999995, 9999996, 9999997, 9999998][
+        Math.floor(Math.random() * 4)
+      ], // 9999995-9999998 are the reviewer user ids
       /** bulkInsert cannot bind plain objects for jsonb; PG accepts a JSON text literal. */
       review: JSON.stringify(getReviewDTO()),
       createdAt: new Date(),
@@ -79,7 +81,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
       "users",
       [
         {
-          id: 5,
+          id: 9999995,
           first_name: "Reviewer 1",
           last_name: "Reviewer 1",
           auth_id: `${SEED_EMAIL_PREFIX}1@example.com`,
@@ -89,7 +91,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
           updatedAt: new Date(),
         },
         {
-          id: 6,
+          id: 9999996,
           first_name: "Reviewer 2",
           last_name: "Reviewer 2",
           auth_id: `${SEED_EMAIL_PREFIX}2@example.com`,
@@ -99,7 +101,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
           updatedAt: new Date(),
         },
         {
-          id: 7,
+          id: 9999997,
           first_name: "Reviewer 3",
           last_name: "Reviewer 3",
           auth_id: `${SEED_EMAIL_PREFIX}3@example.com`,
@@ -109,7 +111,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
           updatedAt: new Date(),
         },
         {
-          id: 8,
+          id: 9999998,
           first_name: "Reviewer 4",
           last_name: "Reviewer 4",
           auth_id: `${SEED_EMAIL_PREFIX}4@example.com`,

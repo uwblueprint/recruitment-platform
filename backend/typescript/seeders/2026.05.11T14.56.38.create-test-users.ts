@@ -3,7 +3,7 @@ import type { Seeder } from "../umzug-seed";
 export const up: Seeder = async ({ context: sequelize }) => {
   await sequelize.getQueryInterface().bulkInsert("users", [
     {
-      id: 1,
+      id: 9999991,
       first_name: "John",
       last_name: "Doe",
       auth_id: "123",
@@ -13,7 +13,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
       updatedAt: new Date(),
     },
     {
-      id: 2,
+      id: 9999992,
       first_name: "Jane",
       last_name: "Doe",
       auth_id: "456",
