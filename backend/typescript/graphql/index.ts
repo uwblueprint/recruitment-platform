@@ -7,6 +7,7 @@ import {
   isAuthorizedByRole,
   isAuthorizedByUserId,
 } from "../middlewares/auth";
+import adminCommentResolvers from "./resolvers/adminCommentResolvers";
 import authResolvers from "./resolvers/authResolvers";
 import entityResolvers from "./resolvers/entityResolvers";
 import simpleEntityResolvers from "./resolvers/simpleEntityResolvers";
@@ -58,6 +59,7 @@ const executableSchema = makeExecutableSchema({
     userType,
   ],
   resolvers: merge(
+    adminCommentResolvers,
     authResolvers,
     entityResolvers,
     simpleEntityResolvers,
