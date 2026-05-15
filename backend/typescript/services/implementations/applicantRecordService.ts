@@ -78,14 +78,12 @@ class ApplicantRecordService implements IApplicantRecordService {
       if (!applicantRecordToUpdate) {
         throw new Error(`ApplicantRecord with id ${id} not found.`);
       }
-      const updatedApplicantRecord = await applicantRecordToUpdate.update(
-        {
-            status: applicantRecord.status,
-            skill_category: applicantRecord.skillCategory,
-            combined_review_score: applicantRecord.combinedReviewScore,
-            is_applicant_flagged: applicantRecord.isApplicantFlagged,
-        }
-      );
+      const updatedApplicantRecord = await applicantRecordToUpdate.update({
+        status: applicantRecord.status,
+        skill_category: applicantRecord.skillCategory,
+        combined_review_score: applicantRecord.combinedReviewScore,
+        is_applicant_flagged: applicantRecord.isApplicantFlagged,
+      });
       return toDTO(updatedApplicantRecord);
     } catch (error: unknown) {
       Logger.error(
@@ -116,22 +114,26 @@ class ApplicantRecordService implements IApplicantRecordService {
   ): Promise<ApplicantRecordDTO[]> {
     const transaction = await sequelize.transaction();
     try {
+      const applicantRecordsToCreate = applicantRecords.map(
+        (applicantRecord) => ({
+          applicant_id: applicantRecord.applicantId,
+          position: applicantRecord.position,
+          role_specific_questions: applicantRecord.roleSpecificQuestions,
+          choice: applicantRecord.choice,
+          status: applicantRecord.status,
+          skill_category: applicantRecord.skillCategory,
+          combined_review_score: applicantRecord.combinedReviewScore,
+          is_applicant_flagged: applicantRecord.isApplicantFlagged,
+        }),
+      );
 
-      const applicantRecordsToCreate = applicantRecords.map((applicantRecord) => ({
-        applicant_id: applicantRecord.applicantId,
-        position: applicantRecord.position,
-        role_specific_questions: applicantRecord.roleSpecificQuestions,
-        choice: applicantRecord.choice,
-        status: applicantRecord.status,
-        skill_category: applicantRecord.skillCategory,
-        combined_review_score: applicantRecord.combinedReviewScore,
-        is_applicant_flagged: applicantRecord.isApplicantFlagged,
-      }));
-
-      const results = await ApplicantRecord.bulkCreate(applicantRecordsToCreate, {
-        returning: true,
-        transaction,
-      });
+      const results = await ApplicantRecord.bulkCreate(
+        applicantRecordsToCreate,
+        {
+          returning: true,
+          transaction,
+        },
+      );
       await transaction.commit();
       return results.map(toDTO);
     } catch (error: unknown) {
@@ -157,12 +159,15 @@ class ApplicantRecordService implements IApplicantRecordService {
           if (!row) {
             throw new Error(`ApplicantRecord with id ${id} not found.`);
           }
-          return row.update({
-            status: updates.status,
-            skill_category: updates.skillCategory,
-            combined_review_score: updates.combinedReviewScore,
-            is_applicant_flagged: updates.isApplicantFlagged,
-          }, { transaction });
+          return row.update(
+            {
+              status: updates.status,
+              skill_category: updates.skillCategory,
+              combined_review_score: updates.combinedReviewScore,
+              is_applicant_flagged: updates.isApplicantFlagged,
+            },
+            { transaction },
+          );
         }),
       );
 

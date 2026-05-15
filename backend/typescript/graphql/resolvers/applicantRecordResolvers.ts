@@ -2,45 +2,31 @@ import ApplicantRecordService from "../../services/implementations/applicantReco
 import IApplicantRecordService from "../../services/interfaces/IApplicantRecordService";
 import { ApplicantRecordDTO, ApplicationStatus } from "../../types";
 
-const applicantRecordService: IApplicantRecordService =
-  new ApplicantRecordService();
+const applicantRecordService: IApplicantRecordService = new ApplicantRecordService();
 
 const applicantRecordResolvers = {
   Mutation: {
     updateApplicantRecordStatus: async (
       _parent: undefined,
-      {
-        id,
-        status,
-      }: { id: string; status: ApplicationStatus },
+      { id, status }: { id: string; status: ApplicationStatus },
     ): Promise<ApplicantRecordDTO> => {
-      return await applicantRecordService.updateApplicantRecord(
-          id,
-          { status },
-        );
+      return applicantRecordService.updateApplicantRecord(id, { status });
     },
     bulkUpdateApplicantRecordsStatus: async (
       _parent: undefined,
-      {
-        ids,
-        status,
-      }: { ids: string[]; status: ApplicationStatus },
+      { ids, status }: { ids: string[]; status: ApplicationStatus },
     ): Promise<ApplicantRecordDTO[]> => {
-      return await applicantRecordService.bulkUpdateApplicantRecords(
+      return applicantRecordService.bulkUpdateApplicantRecords(
         ids.map((id) => ({ id, status })),
       );
     },
     updateApplicantRecordIsApplicantFlagged: async (
       _parent: undefined,
-      {
-        id,
-        flagValue,
-      }: { id: string; flagValue: boolean },
+      { id, flagValue }: { id: string; flagValue: boolean },
     ): Promise<ApplicantRecordDTO> => {
-      return await applicantRecordService.updateApplicantRecord(
-        id,
-        { isApplicantFlagged: flagValue },
-      );
+      return applicantRecordService.updateApplicantRecord(id, {
+        isApplicantFlagged: flagValue,
+      });
     },
   },
 };
