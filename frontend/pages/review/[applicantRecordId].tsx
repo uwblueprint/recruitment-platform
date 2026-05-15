@@ -1,20 +1,23 @@
+import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
+import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import { RecruitmentPlatformThemeProvider } from "@/components/contexts/RecruitmentPlatformThemeProvider";
-import { ReportConflictDialogue } from "./_components/dialogues/ReportConflictDialogue";
-import { ReportConflictSuccessDialogue } from "./_components/dialogues/ReportConflictSuccessDialogue";
+import { ApplicationDTO, AuthStatus } from "@/types";
+import { NextPage } from "next";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { ReportConflictButton } from "./_components/common/ReportConflictButton";
+import { ReviewStageHeader } from "./_components/common/ReviewStageHeader";
 import {
   BACK_TO_HOME_HREF,
   ReviewStage,
 } from "./_components/constants";
-import { ReportConflictButton } from "./_components/common/ReportConflictButton";
+import { ReportConflictDialogue } from "./_components/dialogues/ReportConflictDialogue";
+import { ReportConflictSuccessDialogue } from "./_components/dialogues/ReportConflictSuccessDialogue";
 import {
   ReviewSetScoresContext,
   ReviewSetStageContext,
 } from "./_components/ReviewContext";
-import { ReviewStageHeader } from "./_components/common/ReviewStageHeader";
-import { getApplicantRecordId } from "./_components/utils";
-import { ReviewEndData, ReviewScores } from "./_components/types";
 import { ReviewDriveToLearnStage } from "./_components/stages/ReviewDriveToLearnStage";
 import { ReviewEndStage } from "./_components/stages/ReviewEndStage";
 import { ReviewEndSuccessStage } from "./_components/stages/ReviewEndSuccessStage";
@@ -22,12 +25,8 @@ import { ReviewInfoStage } from "./_components/stages/ReviewInfoStage";
 import { ReviewPassionForSocialGoodStage } from "./_components/stages/ReviewPassionForSocialGoodStage";
 import { ReviewSkillStage } from "./_components/stages/ReviewSkillStage";
 import { ReviewTeamPlayerStage } from "./_components/stages/ReviewTeamPlayerStage";
-import { NextPage } from "next";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { ApplicationDTO, AuthStatus } from "@/types";
-import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
-import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
+import { ReviewEndData, ReviewScores } from "./_components/types";
+import { getApplicantRecordId } from "./_components/utils";
 
 const sampleApplication: ApplicationDTO = {
   id: 1,
@@ -266,13 +265,11 @@ const ReviewsPages: NextPage = () => {
 
 const Reviews: NextPage = () => {
   return (
-    <RecruitmentPlatformThemeProvider>
         <ProtectedRoute allowedRoles={["Admin", "User"]}>
           <ProtectedApplication>
             <ReviewsPages />
           </ProtectedApplication>
         </ProtectedRoute>
-    </RecruitmentPlatformThemeProvider>
   );
 };
 

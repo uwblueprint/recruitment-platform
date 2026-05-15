@@ -1,3 +1,4 @@
+import { semanticColors } from "@/constants/palette";
 import { useTheme } from "@mui/material";
 import { ReactNode } from "react";
 
@@ -119,7 +120,7 @@ export const PanelLayout = ({
         style={{
           borderColor:
             borderRight || borderLeft
-              ? theme.palette.semantics.border.light
+              ? semanticColors.border.light
               : undefined,
         }}
       >

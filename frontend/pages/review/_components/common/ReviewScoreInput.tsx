@@ -1,4 +1,5 @@
 import { UpCaret } from "@/components/icons/up-caret.icon";
+import { semanticColors } from "@/constants/palette";
 import { useTheme } from "@mui/material";
 import React, { ReactElement } from "react";
 
@@ -58,7 +59,7 @@ export function ReviewScoreInput({
       role="group"
       style={{
         background: theme.palette.background.default,
-        border: `1px solid ${theme.palette.semantics.border.light}`,
+        border: `1px solid ${semanticColors.border.light}`,
       }}
     >
       <input
@@ -79,7 +80,7 @@ export function ReviewScoreInput({
       <div
         className="flex shrink-0 self-stretch w-[1px]"
         style={{
-          background: theme.palette.semantics.border.light,
+          background: semanticColors.border.light,
         }}
         aria-hidden
       />
@@ -98,7 +99,7 @@ export function ReviewScoreInput({
           style={{
             background: theme.palette.background.default,
             color: theme.palette.text.primary,
-            borderBottom: `1px solid ${theme.palette.semantics.border.light}`,
+            borderBottom: `1px solid ${semanticColors.border.light}`,
           }}
         >
           <UpCaret />

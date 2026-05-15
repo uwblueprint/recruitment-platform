@@ -1,24 +1,23 @@
+import InterviewGroupAPIClient from "@/APIClients/InterviewGroupAPIClient";
+import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
+import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import { PanelLayout } from "@/components/layouts/PanelLayout";
 import {
-    SPLIT_PANEL_WIDTHS,
-    SplitPanelLayout,
-  } from "@/components/layouts/SplitPageLayout";
-  import { PanelLayout } from "@/components/layouts/PanelLayout";
-  import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
-  import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-  import { InterviewHeader } from "@/pages/interview/_components/layout";
-  import { RecruitmentPlatformThemeProvider } from "@/components/contexts/RecruitmentPlatformThemeProvider";
-  import InterviewGroupAPIClient from "@/APIClients/InterviewGroupAPIClient";
-  import { useRouter } from "next/router";
-  import { ReactElement, useState } from "react";
-  import type { InterviewGroupStatus } from "@/types";
-  import useInterviewGroupData from "@/hooks/useInterviewGroupData";
-  import { NextPageWithLayout } from "../_app";
-  import CalendlyLinkForm from "./_components/CalendlyLinkForm";
-  import CalendlyLinkSubmitted from "./_components/CalendlyLinkSubmitted";
-  import CalendlySection from "./_components/CalendlySection";
-  import InterviewGroupIllustrationPanel from "./_components/InterviewGroupIllustrationPanel";
-  import InterviewPageHeader from "./_components/InterviewPageHeader";
-  import PartnerSection from "./_components/PartnerSection";
+  SPLIT_PANEL_WIDTHS,
+  SplitPanelLayout,
+} from "@/components/layouts/SplitPageLayout";
+import useInterviewGroupData from "@/hooks/useInterviewGroupData";
+import { InterviewHeader } from "@/pages/interview/_components/layout";
+import type { InterviewGroupStatus } from "@/types";
+import { useRouter } from "next/router";
+import { ReactElement, useState } from "react";
+import { NextPageWithLayout } from "../_app";
+import CalendlyLinkForm from "./_components/CalendlyLinkForm";
+import CalendlyLinkSubmitted from "./_components/CalendlyLinkSubmitted";
+import CalendlySection from "./_components/CalendlySection";
+import InterviewGroupIllustrationPanel from "./_components/InterviewGroupIllustrationPanel";
+import InterviewPageHeader from "./_components/InterviewPageHeader";
+import PartnerSection from "./_components/PartnerSection";
   
   const InterviewGroupContent = ({
     interviewGroupId,
@@ -154,7 +153,6 @@ import {
   };
   
   InterviewGroupPage.getLayout = (page: ReactElement) => (
-    <RecruitmentPlatformThemeProvider>
       <ProtectedRoute allowedRoles={["Admin", "User"]}>
         <SplitPanelLayout
           leftWidth={SPLIT_PANEL_WIDTHS.interview.left}
@@ -164,7 +162,6 @@ import {
           {page}
         </SplitPanelLayout>
       </ProtectedRoute>
-    </RecruitmentPlatformThemeProvider>
   );
   
   export default InterviewGroupPage;
