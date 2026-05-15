@@ -1,6 +1,6 @@
 import * as firebaseAdmin from "firebase-admin";
 import IUserService from "../interfaces/userService";
-import { CreateUserDTO, Role, UpdateUserDTO, UserDTO } from "../../types";
+import { CreateUserDTO, Role, SignUpMethod, UpdateUserDTO, UserDTO } from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import User from "../../models/user.model";
@@ -148,23 +148,38 @@ class UserService implements IUserService {
     return userDtos;
   }
 
-  async createUser(user: CreateUserDTO, authId?: string): Promise<UserDTO> {
+  async createUser(
+    user: CreateUserDTO,
+    authId?: string,
+    signUpMethod?: SignUpMethod,
+  ): Promise<UserDTO> {
     let newUser: User;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 
     try {
       /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
       firebaseUser = await firebaseAdmin.auth().getUser(authId!);
-      if (!firebaseUser.displayName)
-        throw Error("Firebase username and password not available");
-      const [firstName, lastName] = firebaseUser.displayName?.split(" ");
+
+      let firstName: string;
+      let lastName: string;
+
+      if (signUpMethod === "GOOGLE") {
+        firstName = user.firstName;
+        lastName = user.lastName;
+      } else {
+        if (!firebaseUser.displayName)
+          throw Error("Firebase username and password not available");
+        const nameParts = firebaseUser.displayName.split(" ");
+        firstName = nameParts[0] ?? "";
+        lastName = nameParts.slice(1).join(" ") || nameParts[0] ?? "";
+      }
 
       try {
         newUser = await User.create({
           first_name: firstName,
           last_name: lastName,
           auth_id: firebaseUser.uid,
-          email: firebaseUser.email,
+          email: firebaseUser.email ?? user.email,
           role: user.role,
           position: user.position ?? undefined,
         });
