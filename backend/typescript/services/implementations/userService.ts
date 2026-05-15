@@ -1,11 +1,29 @@
 import * as firebaseAdmin from "firebase-admin";
 import IUserService from "../interfaces/userService";
-import { CreateUserDTO, Role, UpdateUserDTO, UserDTO } from "../../types";
+import {
+  CreateUserDTO,
+  Role,
+  SignUpMethod,
+  UpdateUserDTO,
+  UserDTO,
+} from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import User from "../../models/user.model";
 
 const Logger = logger(__filename);
+
+export const splitDisplayName = (
+  displayName: string | undefined,
+  fallbackEmail: string,
+): { firstName: string; lastName: string } => {
+  const emailName = fallbackEmail.split("@")[0] || "User";
+  const nameParts = (displayName ?? emailName).trim().split(/\s+/);
+  const firstName = nameParts[0] || emailName;
+  const lastName = nameParts.slice(1).join(" ");
+
+  return { firstName, lastName };
+};
 
 class UserService implements IUserService {
   /* eslint-disable class-methods-use-this */
@@ -148,23 +166,46 @@ class UserService implements IUserService {
     return userDtos;
   }
 
-  async createUser(user: CreateUserDTO, authId?: string): Promise<UserDTO> {
+  async createUser(
+    user: CreateUserDTO,
+    authId?: string,
+    signUpMethod?: SignUpMethod,
+  ): Promise<UserDTO> {
     let newUser: User;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 
     try {
       /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
       firebaseUser = await firebaseAdmin.auth().getUser(authId!);
-      if (!firebaseUser.displayName)
-        throw Error("Firebase username and password not available");
-      const [firstName, lastName] = firebaseUser.displayName?.split(" ");
+
+      let firstName: string;
+      let lastName: string;
+      const firebaseEmail = firebaseUser.email ?? user.email;
+
+      if (signUpMethod === "GOOGLE") {
+        const fallbackName = splitDisplayName(
+          firebaseUser.displayName,
+          firebaseEmail,
+        );
+        firstName = user.firstName?.trim() || fallbackName.firstName;
+        lastName = user.lastName?.trim() || fallbackName.lastName;
+      } else {
+        if (!firebaseUser.displayName)
+          throw Error("Firebase username and password not available");
+        const fallbackName = splitDisplayName(
+          firebaseUser.displayName,
+          firebaseEmail,
+        );
+        firstName = fallbackName.firstName;
+        lastName = fallbackName.lastName;
+      }
 
       try {
         newUser = await User.create({
           first_name: firstName,
           last_name: lastName,
           auth_id: firebaseUser.uid,
-          email: firebaseUser.email,
+          email: firebaseUser.email ?? user.email,
           role: user.role,
           position: user.position ?? undefined,
         });
