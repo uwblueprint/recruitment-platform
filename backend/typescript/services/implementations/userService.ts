@@ -13,16 +13,19 @@ import User from "../../models/user.model";
 
 const Logger = logger(__filename);
 
+type DisplayNameResult = { firstName: string; lastName: string };
+
 export const splitDisplayName = (
   displayName: string | undefined,
   fallbackEmail: string,
-): { firstName: string; lastName: string } => {
-  const emailName = fallbackEmail.split("@")[0] || "User";
-  const nameParts = (displayName ?? emailName).trim().split(/\s+/);
-  const firstName = nameParts[0] || emailName;
-  const lastName = nameParts.slice(1).join(" ");
-
-  return { firstName, lastName };
+): DisplayNameResult => {
+  const fallbackName = fallbackEmail.split("@")[0] || "User";
+  const fullName = displayName?.trim() || fallbackName;
+  const [firstName = fallbackName, ...lastNameParts] = fullName.split(/\s+/);
+  return {
+    firstName,
+    lastName: lastNameParts.join(" "),
+  };
 };
 
 class UserService implements IUserService {
@@ -175,30 +178,29 @@ class UserService implements IUserService {
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 
     try {
-      /* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */
-      firebaseUser = await firebaseAdmin.auth().getUser(authId!);
+      if (!authId) throw new Error("authId is required");
+      firebaseUser = await firebaseAdmin.auth().getUser(authId);
 
-      let firstName: string;
-      let lastName: string;
       const firebaseEmail = firebaseUser.email ?? user.email;
 
-      if (signUpMethod === "GOOGLE") {
-        const fallbackName = splitDisplayName(
-          firebaseUser.displayName,
-          firebaseEmail,
-        );
-        firstName = user.firstName?.trim() || fallbackName.firstName;
-        lastName = user.lastName?.trim() || fallbackName.lastName;
-      } else {
-        if (!firebaseUser.displayName)
-          throw Error("Firebase username and password not available");
-        const fallbackName = splitDisplayName(
-          firebaseUser.displayName,
-          firebaseEmail,
-        );
-        firstName = fallbackName.firstName;
-        lastName = fallbackName.lastName;
+      if (signUpMethod !== "GOOGLE" && !firebaseUser.displayName) {
+        throw new Error("Firebase username and password not available");
       }
+
+      const fallbackName = splitDisplayName(
+        firebaseUser.displayName,
+        firebaseEmail,
+      );
+
+      const firstName =
+        signUpMethod === "GOOGLE"
+          ? user.firstName?.trim() || fallbackName.firstName
+          : fallbackName.firstName;
+
+      const lastName =
+        signUpMethod === "GOOGLE"
+          ? user.lastName?.trim() || fallbackName.lastName
+          : fallbackName.lastName;
 
       try {
         newUser = await User.create({
