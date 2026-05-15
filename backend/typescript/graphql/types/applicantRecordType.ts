@@ -2,38 +2,43 @@ import { gql } from "apollo-server-express";
 
 const applicantRecordType = gql`
   enum ApplicationStatus {
-    Applied
-    InReview
-    Reviewed
-    Selected
-    Interviewed
-    Offer
-    Rejected
+    APPLIED
+    IN_REVIEW
+    REVIEWED
+    SELECTED
+    INTERVIEWED
+    OFFERED
+    REJECTED
+  }
+
+  type ShortAnswerQuestion {
+    question: String!
+    answer: String!
   }
 
   type ApplicantRecordDTO {
-    id: String!
-    applicantId: String!
+    id: ID!
+    applicantId: ID!
     position: String!
-    roleSpecificQuestions: [String!]!
+    roleSpecificQuestions: [ShortAnswerQuestion!]!
     choice: Int!
     status: ApplicationStatus!
-    skillCategory: String
-    combined_score: Int
+    skillCategory: SkillCategory
+    combinedReviewScore: Int
     isApplicantFlagged: Boolean!
   }
 
   extend type Mutation {
-    updateApplicantStatus(
-      applicantRecordId: String!
+    updateApplicantRecordStatus(
+      id: ID!
       status: ApplicationStatus!
     ): ApplicantRecordDTO!
-    bulkUpdateApplicantStatus(
-      applicantRecordIds: [String!]!
+    bulkUpdateApplicantRecordsStatus(
+      ids: [ID!]!
       status: ApplicationStatus!
     ): [ApplicantRecordDTO!]!
-    setApplicantRecordFlag(
-      applicantRecordId: String!
+    updateApplicantRecordIsApplicantFlagged(
+      id: ID!
       flagValue: Boolean!
     ): ApplicantRecordDTO!
   }

@@ -58,7 +58,7 @@ export const up: Migration = async ({ context: sequelize }) => {
       allowNull: true,
       defaultValue: null,
     },
-    is_shortlistsed_for_interview: {
+    is_shortlisted_for_interview: {
       type: DataType.BOOLEAN,
       allowNull: false,
       defaultValue: false,
