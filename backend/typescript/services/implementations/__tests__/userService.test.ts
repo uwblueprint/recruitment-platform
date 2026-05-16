@@ -34,10 +34,22 @@ jest.mock("firebase-admin", () => {
 
 describe("splitDisplayName", () => {
   it.each([
-    ["John Doe", "fallback@example.com", { firstName: "John", lastName: "Doe" }],
+    [
+      "John Doe",
+      "fallback@example.com",
+      { firstName: "John", lastName: "Doe" },
+    ],
     ["John", "fallback@example.com", { firstName: "John", lastName: "" }],
-    ["  John   Ronald   Reuel  ", "fallback@example.com", { firstName: "John", lastName: "Ronald Reuel" }],
-    [undefined, "fallback@example.com", { firstName: "fallback", lastName: "" }],
+    [
+      "  John   Ronald   Reuel  ",
+      "fallback@example.com",
+      { firstName: "John", lastName: "Ronald Reuel" },
+    ],
+    [
+      undefined,
+      "fallback@example.com",
+      { firstName: "fallback", lastName: "" },
+    ],
     ["   ", "fallback@example.com", { firstName: "fallback", lastName: "" }],
   ])(
     "splits %p with fallback email %p",
