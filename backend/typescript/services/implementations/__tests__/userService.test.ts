@@ -1,7 +1,7 @@
 import { snakeCase } from "lodash";
 
 import UserModel from "../../../models/user.model";
-import UserService from "../userService";
+import UserService, { splitDisplayName } from "../userService";
 
 import { UserDTO } from "../../../types";
 
@@ -30,6 +30,21 @@ jest.mock("firebase-admin", () => {
     getUser: jest.fn().mockReturnValue({ email: "test@test.com" }),
   });
   return { auth };
+});
+
+describe("splitDisplayName", () => {
+  it.each([
+    ["John Doe", "fallback@example.com", { firstName: "John", lastName: "Doe" }],
+    ["John", "fallback@example.com", { firstName: "John", lastName: "" }],
+    ["  John   Ronald   Reuel  ", "fallback@example.com", { firstName: "John", lastName: "Ronald Reuel" }],
+    [undefined, "fallback@example.com", { firstName: "fallback", lastName: "" }],
+    ["   ", "fallback@example.com", { firstName: "fallback", lastName: "" }],
+  ])(
+    "splits %p with fallback email %p",
+    (displayName, fallbackEmail, expected) => {
+      expect(splitDisplayName(displayName, fallbackEmail)).toEqual(expected);
+    },
+  );
 });
 
 describe("pg userService", () => {
