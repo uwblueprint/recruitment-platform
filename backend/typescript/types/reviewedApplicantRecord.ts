@@ -18,3 +18,20 @@ export type Review = {
   skillCategory?: SkillCategory;
   comments?: string;
 };
+
+export type ReviewedApplicantRecordDTO = {
+  applicantRecordId: string;
+  reviewerId: number;
+  review: Review;
+  status: ReviewStatus;
+  score?: number | null;
+  reviewerHasConflict: boolean;
+};
+
+export type CreateReviewedApplicantRecordDTO = Omit<ReviewedApplicantRecordDTO, "score">;
+export type UpdateReviewedApplicantRecordDTO = Partial<
+  Pick<
+    ReviewedApplicantRecordDTO,
+    "review" | "status" | "reviewerHasConflict"
+  >
+>;

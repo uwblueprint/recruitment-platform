@@ -7,6 +7,13 @@ const reviewedApplicantRecordTypes = gql`
     SENIOR
   }
 
+  enum ReviewStatus {
+    TODO
+    IN_PROGRESS
+    DONE
+    CONFLICT
+  }
+
   type Review {
     passionFSG: Int
     teamPlayer: Int
@@ -22,63 +29,49 @@ const reviewedApplicantRecordTypes = gql`
     desireToLearn: Int
     skill: Int
     skillCategory: SkillCategory
+    comments: String
   }
 
-  type ReviewedApplicantRecord {
+  input CreateReviewedApplicantRecordDTO {
     applicantRecordId: ID!
     reviewerId: Int!
-    review: Review
-    status: String
-    score: Int
+    review: ReviewInput!
+    status: ReviewStatus!
+    reviewerHasConflict: Boolean!
+  }
+
+  input UpdateReviewedApplicantRecordDTO {
+    review: ReviewInput
+    status: ReviewStatus
     reviewerHasConflict: Boolean
-  }
-
-  input CreateReviewedApplicantRecordInput {
-    applicantRecordId: ID!
-    reviewerId: Int!
-    review: ReviewInput
-    status: String
-  }
-
-  input DeleteReviewedApplicantRecord {
-    applicantRecordId: ID!
-    reviewerId: Int!
-  }
-
-  input UpdateReviewedApplicantRecordInput {
-    applicantRecordId: ID!
-    reviewerId: Int!
-    review: ReviewInput
-    status: String
   }
 
   extend type Query {
     getReviewedApplicantRecord(
       applicantRecordId: ID!
       reviewerId: Int!
-    ): ReviewedApplicantRecord!
+    ): ReviewedApplicantRecordDTO!
   }
 
   extend type Mutation {
     createReviewedApplicantRecord(
-      input: CreateReviewedApplicantRecordInput!
-    ): ReviewedApplicantRecord!
+      reviewedApplicantRecord: CreateReviewedApplicantRecordDTO!
+    ): ReviewedApplicantRecordDTO!
 
     bulkCreateReviewedApplicantRecord(
-      inputs: [CreateReviewedApplicantRecordInput!]!
-    ): [ReviewedApplicantRecord!]!
+      reviewedApplicantRecords: [CreateReviewedApplicantRecordDTO!]!
+    ): [ReviewedApplicantRecordDTO!]!
 
     deleteReviewedApplicantRecord(
-      input: DeleteReviewedApplicantRecord!
-    ): ReviewedApplicantRecord!
-
-    bulkDeleteReviewedApplicantRecord(
-      inputs: [DeleteReviewedApplicantRecord!]!
-    ): [ReviewedApplicantRecord!]!
+      applicantRecordId: ID!
+      reviewerId: Int!
+    ): ReviewedApplicantRecordDTO!
 
     updateReviewedApplicantRecord(
-      input: UpdateReviewedApplicantRecordInput!
-    ): ReviewedApplicantRecord!
+      applicantRecordId: ID!
+      reviewerId: Int!
+      reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!
+    ): ReviewedApplicantRecordDTO!
   }
 `;
 
