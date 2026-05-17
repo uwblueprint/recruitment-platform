@@ -28,10 +28,10 @@ export type ReviewedApplicantRecordDTO = {
   reviewerHasConflict: boolean;
 };
 
-export type CreateReviewedApplicantRecordDTO = Omit<ReviewedApplicantRecordDTO, "score">;
+export type CreateReviewedApplicantRecordDTO = Omit<
+  ReviewedApplicantRecordDTO,
+  "score"
+>;
 export type UpdateReviewedApplicantRecordDTO = Partial<
-  Pick<
-    ReviewedApplicantRecordDTO,
-    "review" | "status" | "reviewerHasConflict"
-  >
+  Pick<ReviewedApplicantRecordDTO, "review" | "status" | "reviewerHasConflict">
 >;

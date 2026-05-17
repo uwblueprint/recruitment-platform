@@ -67,7 +67,11 @@ const reviewedApplicantRecordResolvers = {
 
     updateReviewedApplicantRecord: async (
       _parent: undefined,
-      args: { applicantRecordId: string; reviewerId: number; reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO },
+      args: {
+        applicantRecordId: string;
+        reviewerId: number;
+        reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO;
+      },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.updateReviewedApplicantRecord(
@@ -76,7 +80,8 @@ const reviewedApplicantRecordResolvers = {
           {
             review: args.reviewedApplicantRecord.review,
             status: args.reviewedApplicantRecord.status,
-            reviewerHasConflict: args.reviewedApplicantRecord.reviewerHasConflict,
+            reviewerHasConflict:
+              args.reviewedApplicantRecord.reviewerHasConflict,
           },
         );
       } catch (error) {

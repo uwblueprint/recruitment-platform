@@ -72,10 +72,13 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
     reviewedApplicantRecord: CreateReviewedApplicantRecordDTO,
   ): Promise<ReviewedApplicantRecordDTO> {
     try {
-        if (reviewedApplicantRecord.review && !isValidReviewScores(reviewedApplicantRecord.review)) {
-            throw new Error("Invalid review scores");
-        }
-        
+      if (
+        reviewedApplicantRecord.review &&
+        !isValidReviewScores(reviewedApplicantRecord.review)
+      ) {
+        throw new Error("Invalid review scores");
+      }
+
       const createdReviewedApplicantRecord = await ReviewedApplicantRecord.create(
         {
           applicant_record_id: reviewedApplicantRecord.applicantRecordId,
@@ -102,7 +105,10 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
     const transaction = await sequelize.transaction();
     try {
       reviewedApplicantRecords.forEach((reviewedApplicantRecord) => {
-        if (reviewedApplicantRecord.review && !isValidReviewScores(reviewedApplicantRecord.review)) {
+        if (
+          reviewedApplicantRecord.review &&
+          !isValidReviewScores(reviewedApplicantRecord.review)
+        ) {
           throw new Error("Invalid review scores");
         }
       });
@@ -164,11 +170,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
   ): Promise<ReviewedApplicantRecordDTO> {
     const transaction = await sequelize.transaction();
     try {
-      const {
-        review,
-        status,
-        reviewerHasConflict
-      } = reviewedApplicantRecord;
+      const { review, status, reviewerHasConflict } = reviewedApplicantRecord;
 
       const reviewedRecord = await ReviewedApplicantRecord.findOne({
         where: {
@@ -246,7 +248,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
         where: { applicant_record_id: applicantRecordId },
         transaction,
       });
-      
+
       const combinedReviewScore = reviewedRecords.reduce(
         (sum, record) => sum + (record.score ?? 0),
         0,
