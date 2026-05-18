@@ -12,7 +12,10 @@ const reviewedApplicantRecordResolvers = {
   Query: {
     reviewedApplicantRecord: async (
       _parent: undefined,
-      { applicantRecordId, reviewerId }: { applicantRecordId: string; reviewerId: string },
+      {
+        applicantRecordId,
+        reviewerId,
+      }: { applicantRecordId: string; reviewerId: string },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.getReviewedApplicantRecordByPk(
@@ -27,7 +30,9 @@ const reviewedApplicantRecordResolvers = {
   Mutation: {
     createReviewedApplicantRecord: async (
       _parent: undefined,
-      { reviewedApplicantRecord }: { reviewedApplicantRecord: CreateReviewedApplicantRecordDTO },
+      {
+        reviewedApplicantRecord,
+      }: { reviewedApplicantRecord: CreateReviewedApplicantRecordDTO },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.createReviewedApplicantRecord(
@@ -40,7 +45,9 @@ const reviewedApplicantRecordResolvers = {
 
     bulkCreateReviewedApplicantRecord: async (
       _parent: undefined,
-      { reviewedApplicantRecords }: { reviewedApplicantRecords: CreateReviewedApplicantRecordDTO[] },
+      {
+        reviewedApplicantRecords,
+      }: { reviewedApplicantRecords: CreateReviewedApplicantRecordDTO[] },
     ): Promise<ReviewedApplicantRecordDTO[]> => {
       try {
         return await reviewedApplicantRecordService.bulkCreateReviewedApplicantRecord(
@@ -53,7 +60,10 @@ const reviewedApplicantRecordResolvers = {
 
     deleteReviewedApplicantRecord: async (
       _parent: undefined,
-      { applicantRecordId, reviewerId }: { applicantRecordId: string; reviewerId: string },
+      {
+        applicantRecordId,
+        reviewerId,
+      }: { applicantRecordId: string; reviewerId: string },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.deleteReviewedApplicantRecordByPk(
@@ -67,7 +77,11 @@ const reviewedApplicantRecordResolvers = {
 
     updateReviewedApplicantRecord: async (
       _parent: undefined,
-      { applicantRecordId, reviewerId, reviewedApplicantRecord }: {
+      {
+        applicantRecordId,
+        reviewerId,
+        reviewedApplicantRecord,
+      }: {
         applicantRecordId: string;
         reviewerId: string;
         reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO;
@@ -80,8 +94,7 @@ const reviewedApplicantRecordResolvers = {
           {
             review: reviewedApplicantRecord.review,
             status: reviewedApplicantRecord.status,
-            reviewerHasConflict:
-              reviewedApplicantRecord.reviewerHasConflict,
+            reviewerHasConflict: reviewedApplicantRecord.reviewerHasConflict,
           },
         );
       } catch (error) {

@@ -231,7 +231,7 @@ const ReviewsPages: NextPage = () => {
       }
       await ReviewPageAPIClient.reportReviewConflict(
         applicantRecordId,
-        Number(authenticatedUser.id)
+        authenticatedUser.id,
       );
       setReportConflictDialogueOpen(false);
       setReportConflictSuccessDialogueOpen(true);

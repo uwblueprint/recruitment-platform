@@ -1,6 +1,4 @@
-import {
-  ApplicantDTO,
-} from "../../types";
+import { ApplicantDTO } from "../../types";
 
 interface IApplicantService {
   /**
@@ -10,7 +8,6 @@ interface IApplicantService {
    * @throws Error if applicant retrieval fails
    */
   getApplicantById(id: string): Promise<ApplicantDTO>;
-
 }
 
 export default IApplicantService;

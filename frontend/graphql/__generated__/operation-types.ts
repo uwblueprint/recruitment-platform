@@ -48,8 +48,8 @@ export type RefreshMutationVariables = Exact<{
 export type RefreshMutation = { refresh: string };
 
 export type ReportReviewConflictMutationVariables = Exact<{
-  applicantRecordId: string;
-  reviewerId: number;
+  applicantRecordId: string | number;
+  reviewerId: string | number;
 }>;
 
 

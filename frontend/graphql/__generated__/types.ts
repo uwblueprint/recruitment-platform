@@ -38,24 +38,20 @@ export type ApplicationDto = {
   academicOrCoop: Scalars['String']['output'];
   academicYear: Scalars['String']['output'];
   email: Scalars['String']['output'];
-  firstChoiceRole: Scalars['String']['output'];
   firstName: Scalars['String']['output'];
   heardFrom: Scalars['String']['output'];
-  id: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
   lastName: Scalars['String']['output'];
   locationPreference: Scalars['String']['output'];
   program: Scalars['String']['output'];
   pronouns: Scalars['String']['output'];
   pronounsSpecified: Scalars['String']['output'];
   resumeUrl: Scalars['String']['output'];
-  roleSpecificQuestions: Array<Scalars['String']['output']>;
-  secondChoiceRole: Scalars['String']['output'];
-  secondChoiceStatus: Scalars['String']['output'];
-  shortAnswerQuestions: Array<ShortQuestionAnswer>;
-  status: Scalars['String']['output'];
+  roleSpecificQuestions: Array<ShortAnswerQuestion>;
+  shortAnswerQuestions: Array<ShortAnswerQuestion>;
+  status: ApplicationStatus;
   term: Scalars['String']['output'];
   timesApplied: Scalars['String']['output'];
-  timestamp?: Maybe<Scalars['Int']['output']>;
 };
 
 export enum ApplicationStatus {
@@ -431,8 +427,8 @@ export type MutationRegisterArgs = {
 
 
 export type MutationReportReviewConflictArgs = {
-  applicantRecordId: Scalars['String']['input'];
-  reviewerId: Scalars['Int']['input'];
+  applicantRecordId: Scalars['ID']['input'];
+  reviewerId: Scalars['ID']['input'];
 };
 
 
@@ -513,6 +509,7 @@ export type Query = {
   _empty?: Maybe<Scalars['String']['output']>;
   adminCommentById: AdminCommentDto;
   adminCommentsByApplicantRecordId: Array<AdminCommentDto>;
+  application: ApplicationDto;
   entities: Array<EntityResponseDto>;
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
@@ -523,13 +520,12 @@ export type Query = {
   getInterviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
   getInterviewedPairingsByUserId: Array<InterviewPairingsDto>;
   getInterviewersByGroupId: Array<UserDto>;
-  getReviewedApplicantRecord: ReviewedApplicantRecordDto;
-  getReviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
-  reviewApplicantPage: ApplicationDto;
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
+  reviewedApplicantRecord: ReviewedApplicantRecordDto;
+  reviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
   simpleEntities: Array<SimpleEntityResponseDto>;
   simpleEntitiesCSV: Scalars['String']['output'];
   simpleEntity: SimpleEntityResponseDto;
@@ -546,6 +542,11 @@ export type QueryAdminCommentByIdArgs = {
 
 
 export type QueryAdminCommentsByApplicantRecordIdArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
+export type QueryApplicationArgs = {
   applicantRecordId: Scalars['ID']['input'];
 };
 
@@ -591,17 +592,6 @@ export type QueryGetInterviewersByGroupIdArgs = {
 };
 
 
-export type QueryGetReviewedApplicantRecordArgs = {
-  applicantRecordId: Scalars['ID']['input'];
-  reviewerId: Scalars['ID']['input'];
-};
-
-
-export type QueryGetReviewedApplicantsByUserIdArgs = {
-  userId: Scalars['Int']['input'];
-};
-
-
 export type QueryIsAuthorizedByRoleArgs = {
   accessToken: Scalars['String']['input'];
   roles: Array<Role>;
@@ -614,11 +604,6 @@ export type QueryIsAuthorizedToReviewArgs = {
 };
 
 
-export type QueryReviewApplicantPageArgs = {
-  applicantRecordId: Scalars['String']['input'];
-};
-
-
 export type QueryReviewDashboardArgs = {
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
@@ -627,6 +612,17 @@ export type QueryReviewDashboardArgs = {
 
 export type QueryReviewDashboardSidePanelArgs = {
   applicantId: Scalars['String']['input'];
+};
+
+
+export type QueryReviewedApplicantRecordArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+  reviewerId: Scalars['ID']['input'];
+};
+
+
+export type QueryReviewedApplicantsByUserIdArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 
@@ -722,8 +718,8 @@ export type ReviewedApplicantsDto = {
   __typename?: 'ReviewedApplicantsDTO';
   applicantFirstName: Scalars['String']['output'];
   applicantLastName: Scalars['String']['output'];
-  applicantRecordId: Scalars['String']['output'];
-  reviewStatus: Scalars['String']['output'];
+  applicantRecordId: Scalars['ID']['output'];
+  reviewStatus: ReviewStatus;
 };
 
 export type ReviewerDto = {
@@ -742,12 +738,6 @@ export type ShortAnswerQuestion = {
   __typename?: 'ShortAnswerQuestion';
   answer: Scalars['String']['output'];
   question: Scalars['String']['output'];
-};
-
-export type ShortQuestionAnswer = {
-  __typename?: 'ShortQuestionAnswer';
-  question: Scalars['String']['output'];
-  response: Scalars['String']['output'];
 };
 
 export enum SimpleEntityEnum {
