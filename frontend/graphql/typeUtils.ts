@@ -60,8 +60,6 @@ export type ReviewedApplicantsDTO =
   WithoutTypename<Schema.ReviewedApplicantsDto>;
 export type ReviewerDTO = WithoutTypename<Schema.ReviewerDto>;
 export type ShortAnswerQuestionDTO = WithoutTypename<Schema.ShortAnswerQuestion>;
-export type ShortQuestionAnswerDTO =
-  WithoutTypename<Schema.ShortQuestionAnswer>;
 export type SimpleEntityRequestDTO = Schema.SimpleEntityRequestDto;
 export type SimpleEntityResponseDTO =
   WithoutTypename<Schema.SimpleEntityResponseDto>;
@@ -91,6 +89,13 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
 /**
  * Re-export generated operation result and variable types from one stable place.
  */
+/**
+ * Re-export typed GraphQL documents from the client preset artifact.
+ *
+ * Import documents from this file instead of `__generated__/graphql` directly.
+ */
+export { ReportReviewConflictDocument } from "./__generated__/graphql";
+
 export type {
   GetInterviewGroupByIdQuery,
   GetInterviewGroupByIdQueryVariables,

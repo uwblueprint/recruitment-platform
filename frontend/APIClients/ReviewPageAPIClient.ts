@@ -1,26 +1,26 @@
 import { client } from "@/client";
-import type { ReviewedApplicantRecordDTO } from "@/types";
+import {
+  ReportReviewConflictDocument,
+  type ReportReviewConflictMutation,
+  type ReportReviewConflictMutationVariables,
+  type ReviewConflictReportResult,
+} from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
-import { REPORT_REVIEW_CONFLICT_MUTATION } from "@/queries/reviewPage";
-
-type ReportReviewConflictData = {
-  reportReviewConflict: ReviewedApplicantRecordDTO;
-};
 
 class ReviewPageAPIClient {
   static async reportReviewConflict(
     applicantRecordId: string,
-    reviewerId: number,
-  ): Promise<ReviewedApplicantRecordDTO> {
+    reviewerId: string,
+  ): Promise<ReviewConflictReportResult> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
       const { data } = await client.mutate<
-        ReportReviewConflictData,
-        { applicantRecordId: string; reviewerId: number }
+        ReportReviewConflictMutation,
+        ReportReviewConflictMutationVariables
       >({
-        mutation: REPORT_REVIEW_CONFLICT_MUTATION,
+        mutation: ReportReviewConflictDocument,
         variables: { applicantRecordId, reviewerId },
       });
 

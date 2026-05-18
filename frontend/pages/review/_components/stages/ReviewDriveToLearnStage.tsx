@@ -27,7 +27,7 @@ export const ReviewDriveToLearnStage = ({
   onReportConflict,
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
-  const shortAnswers = application?.shortQuestionAnswers ?? [];
+  const shortAnswers = application?.shortAnswerQuestions ?? [];
   const fourthShortAnswer = shortAnswers[3];
   const questions = fourthShortAnswer ? [fourthShortAnswer.question] : [];
   const answers = fourthShortAnswer ? [fourthShortAnswer.response] : [];

@@ -10,14 +10,17 @@ const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
 
 const reviewedApplicantRecordResolvers = {
   Query: {
-    getReviewedApplicantRecord: async (
+    reviewedApplicantRecord: async (
       _parent: undefined,
-      args: { applicantRecordId: string; reviewerId: string },
+      {
+        applicantRecordId,
+        reviewerId,
+      }: { applicantRecordId: string; reviewerId: string },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.getReviewedApplicantRecordByPk(
-          args.applicantRecordId,
-          args.reviewerId,
+          applicantRecordId,
+          reviewerId,
         );
       } catch (error) {
         throw new Error(getErrorMessage(error));
@@ -27,11 +30,13 @@ const reviewedApplicantRecordResolvers = {
   Mutation: {
     createReviewedApplicantRecord: async (
       _parent: undefined,
-      args: { reviewedApplicantRecord: CreateReviewedApplicantRecordDTO },
+      {
+        reviewedApplicantRecord,
+      }: { reviewedApplicantRecord: CreateReviewedApplicantRecordDTO },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.createReviewedApplicantRecord(
-          args.reviewedApplicantRecord,
+          reviewedApplicantRecord,
         );
       } catch (error) {
         throw new Error(getErrorMessage(error));
@@ -40,11 +45,13 @@ const reviewedApplicantRecordResolvers = {
 
     bulkCreateReviewedApplicantRecord: async (
       _parent: undefined,
-      args: { reviewedApplicantRecords: CreateReviewedApplicantRecordDTO[] },
+      {
+        reviewedApplicantRecords,
+      }: { reviewedApplicantRecords: CreateReviewedApplicantRecordDTO[] },
     ): Promise<ReviewedApplicantRecordDTO[]> => {
       try {
         return await reviewedApplicantRecordService.bulkCreateReviewedApplicantRecord(
-          args.reviewedApplicantRecords,
+          reviewedApplicantRecords,
         );
       } catch (error) {
         throw new Error(getErrorMessage(error));
@@ -53,12 +60,15 @@ const reviewedApplicantRecordResolvers = {
 
     deleteReviewedApplicantRecord: async (
       _parent: undefined,
-      args: { applicantRecordId: string; reviewerId: string },
+      {
+        applicantRecordId,
+        reviewerId,
+      }: { applicantRecordId: string; reviewerId: string },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.deleteReviewedApplicantRecordByPk(
-          args.applicantRecordId,
-          args.reviewerId,
+          applicantRecordId,
+          reviewerId,
         );
       } catch (error) {
         throw new Error(getErrorMessage(error));
@@ -67,7 +77,11 @@ const reviewedApplicantRecordResolvers = {
 
     updateReviewedApplicantRecord: async (
       _parent: undefined,
-      args: {
+      {
+        applicantRecordId,
+        reviewerId,
+        reviewedApplicantRecord,
+      }: {
         applicantRecordId: string;
         reviewerId: string;
         reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO;
@@ -75,13 +89,12 @@ const reviewedApplicantRecordResolvers = {
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.updateReviewedApplicantRecord(
-          args.applicantRecordId,
-          args.reviewerId,
+          applicantRecordId,
+          reviewerId,
           {
-            review: args.reviewedApplicantRecord.review,
-            status: args.reviewedApplicantRecord.status,
-            reviewerHasConflict:
-              args.reviewedApplicantRecord.reviewerHasConflict,
+            review: reviewedApplicantRecord.review,
+            status: reviewedApplicantRecord.status,
+            reviewerHasConflict: reviewedApplicantRecord.reviewerHasConflict,
           },
         );
       } catch (error) {

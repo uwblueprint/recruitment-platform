@@ -27,7 +27,7 @@ export const ReviewPassionForSocialGoodStage = ({
   onReportConflict,
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
-  const shortAnswers = application?.shortQuestionAnswers ?? [];
+  const shortAnswers = application?.shortAnswerQuestions ?? [];
   const secondShortAnswer = shortAnswers[1];
   const questions = secondShortAnswer ? [secondShortAnswer.question] : [];
   const answers = secondShortAnswer ? [secondShortAnswer.response] : [];

@@ -6,3 +6,5 @@ export * from "./applicantRecord";
 export * from "./reviewedApplicantRecord";
 export * from "./interviewedApplicantRecord";
 export * from "./adminComment";
+export * from "./reviewPage";
+export * from "./applicant";
