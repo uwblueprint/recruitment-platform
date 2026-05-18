@@ -1,13 +1,10 @@
 import {
   AcademicOrCoop,
   ApplicantDTO,
-  CreateApplicantDTO,
-  UpdateApplicantDTO,
 } from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import Applicant from "../../models/applicant.model";
-import { sequelize } from "../../models";
 import IApplicantService from "../interfaces/IApplicantService";
 
 const Logger = logger(__filename);
@@ -47,33 +44,6 @@ class ApplicantService implements IApplicantService {
         `Failed to get applicant by id = ${id}. Reason = ${getErrorMessage(
           error,
         )}`,
-      );
-      throw error;
-    }
-  }
-
-  async createApplicant(applicant: CreateApplicantDTO): Promise<ApplicantDTO> {
-    try {
-      const newApplicant = await Applicant.create({
-        first_name: applicant.firstName,
-        last_name: applicant.lastName,
-        email: applicant.email,
-        academic_or_coop: applicant.academicOrCoop,
-        academic_year: applicant.academicYear,
-        heard_from: applicant.heardFrom,
-        location_preference: applicant.locationPreference,
-        program: applicant.program,
-        pronouns: applicant.pronouns,
-        resume_url: applicant.resumeUrl,
-        times_applied: applicant.timesApplied,
-        short_answer_questions: applicant.shortAnswerQuestions,
-        term: applicant.term,
-        submitted_at: applicant.submittedAt,
-      });
-      return toDTO(newApplicant);
-    } catch (error: unknown) {
-      Logger.error(
-        `Failed to create applicant. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     }
