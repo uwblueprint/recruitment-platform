@@ -1,7 +1,4 @@
-import {
-  AcademicOrCoop,
-  ApplicantDTO,
-} from "../../types";
+import { AcademicOrCoop, ApplicantDTO } from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import Applicant from "../../models/applicant.model";
