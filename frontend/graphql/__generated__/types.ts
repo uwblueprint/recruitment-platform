@@ -103,11 +103,10 @@ export type CreateInterviewGroupDto = {
   status: Scalars['String']['input'];
 };
 
-export type CreateReviewedApplicantRecordInput = {
+export type CreateReviewedApplicantRecordDto = {
   applicantRecordId: Scalars['ID']['input'];
-  review?: InputMaybe<ReviewInput>;
-  reviewerId: Scalars['Int']['input'];
-  status?: InputMaybe<Scalars['String']['input']>;
+  reviewerId: Scalars['ID']['input'];
+  status: ReviewStatus;
 };
 
 export type CreateUserDto = {
@@ -118,11 +117,6 @@ export type CreateUserDto = {
   password: Scalars['String']['input'];
   position?: InputMaybe<Scalars['String']['input']>;
   role: Role;
-};
-
-export type DeleteReviewedApplicantRecord = {
-  applicantRecordId: Scalars['ID']['input'];
-  reviewerId: Scalars['Int']['input'];
 };
 
 export type EntityRequestDto = {
@@ -231,17 +225,16 @@ export type Mutation = {
   _empty?: Maybe<Scalars['String']['output']>;
   bulkCreateInterviewDelegations: Array<InterviewDelegation>;
   bulkCreateInterviewGroups: Array<Maybe<InterviewGroupDto>>;
-  bulkCreateReviewedApplicantRecord: Array<ReviewedApplicantRecord>;
+  bulkCreateReviewedApplicantRecord: Array<ReviewedApplicantRecordDto>;
   bulkDeleteInterviewDelegations: Array<InterviewDelegation>;
   bulkDeleteInterviewGroupsByIds: Array<Maybe<InterviewGroupDto>>;
-  bulkDeleteReviewedApplicantRecord: Array<ReviewedApplicantRecord>;
   bulkUpdateApplicantRecordsStatus: Array<ApplicantRecordDto>;
   createAdminComment: AdminCommentDto;
   createEntity: EntityResponseDto;
   createInterviewDelegation: InterviewDelegation;
   createInterviewGroup: InterviewGroupDto;
   createInterviewedApplicantRecord: InterviewedApplicantRecord;
-  createReviewedApplicantRecord: ReviewedApplicantRecord;
+  createReviewedApplicantRecord: ReviewedApplicantRecordDto;
   createSimpleEntity: SimpleEntityResponseDto;
   createUser: UserDto;
   delegateInterviewers: Array<InterviewDelegation>;
@@ -251,7 +244,7 @@ export type Mutation = {
   deleteInterviewDelegation: InterviewDelegation;
   deleteInterviewGroupById: InterviewGroupDto;
   deleteInterviewedApplicantRecordById: InterviewedApplicantRecord;
-  deleteReviewedApplicantRecord: ReviewedApplicantRecord;
+  deleteReviewedApplicantRecord: ReviewedApplicantRecordDto;
   deleteSimpleEntity?: Maybe<Scalars['ID']['output']>;
   deleteUserByEmail?: Maybe<Scalars['ID']['output']>;
   deleteUserById?: Maybe<Scalars['ID']['output']>;
@@ -269,7 +262,7 @@ export type Mutation = {
   updateInterviewDelegation: InterviewDelegation;
   updateInterviewGroup: InterviewGroupDto;
   updateInterviewedApplicantRecord: InterviewedApplicantRecord;
-  updateReviewedApplicantRecord: ReviewedApplicantRecord;
+  updateReviewedApplicantRecord: ReviewedApplicantRecordDto;
   updateSimpleEntity: SimpleEntityResponseDto;
   updateUser: UserDto;
 };
@@ -286,7 +279,7 @@ export type MutationBulkCreateInterviewGroupsArgs = {
 
 
 export type MutationBulkCreateReviewedApplicantRecordArgs = {
-  inputs: Array<CreateReviewedApplicantRecordInput>;
+  reviewedApplicantRecords: Array<CreateReviewedApplicantRecordDto>;
 };
 
 
@@ -297,11 +290,6 @@ export type MutationBulkDeleteInterviewDelegationsArgs = {
 
 export type MutationBulkDeleteInterviewGroupsByIdsArgs = {
   interviewGroupIds: Array<InputMaybe<Scalars['ID']['input']>>;
-};
-
-
-export type MutationBulkDeleteReviewedApplicantRecordArgs = {
-  inputs: Array<DeleteReviewedApplicantRecord>;
 };
 
 
@@ -345,7 +333,7 @@ export type MutationCreateInterviewedApplicantRecordArgs = {
 
 
 export type MutationCreateReviewedApplicantRecordArgs = {
-  input: CreateReviewedApplicantRecordInput;
+  reviewedApplicantRecord: CreateReviewedApplicantRecordDto;
 };
 
 
@@ -396,7 +384,8 @@ export type MutationDeleteInterviewedApplicantRecordByIdArgs = {
 
 
 export type MutationDeleteReviewedApplicantRecordArgs = {
-  input: DeleteReviewedApplicantRecord;
+  applicantRecordId: Scalars['ID']['input'];
+  reviewerId: Scalars['ID']['input'];
 };
 
 
@@ -502,7 +491,9 @@ export type MutationUpdateInterviewedApplicantRecordArgs = {
 
 
 export type MutationUpdateReviewedApplicantRecordArgs = {
-  input: UpdateReviewedApplicantRecordInput;
+  applicantRecordId: Scalars['ID']['input'];
+  reviewedApplicantRecord: UpdateReviewedApplicantRecordDto;
+  reviewerId: Scalars['ID']['input'];
 };
 
 
@@ -532,7 +523,7 @@ export type Query = {
   getInterviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
   getInterviewedPairingsByUserId: Array<InterviewPairingsDto>;
   getInterviewersByGroupId: Array<UserDto>;
-  getReviewedApplicantRecord: ReviewedApplicantRecord;
+  getReviewedApplicantRecord: ReviewedApplicantRecordDto;
   getReviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
@@ -602,7 +593,7 @@ export type QueryGetInterviewersByGroupIdArgs = {
 
 export type QueryGetReviewedApplicantRecordArgs = {
   applicantRecordId: Scalars['ID']['input'];
-  reviewerId: Scalars['Int']['input'];
+  reviewerId: Scalars['ID']['input'];
 };
 
 
@@ -702,6 +693,7 @@ export type ReviewDetails = {
 };
 
 export type ReviewInput = {
+  comments?: InputMaybe<Scalars['String']['input']>;
   desireToLearn?: InputMaybe<Scalars['Int']['input']>;
   passionFSG?: InputMaybe<Scalars['Int']['input']>;
   skill?: InputMaybe<Scalars['Int']['input']>;
@@ -709,22 +701,19 @@ export type ReviewInput = {
   teamPlayer?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type ReviewedApplicantRecord = {
-  __typename?: 'ReviewedApplicantRecord';
-  applicantRecordId: Scalars['ID']['output'];
-  review?: Maybe<Review>;
-  reviewerHasConflict?: Maybe<Scalars['Boolean']['output']>;
-  reviewerId: Scalars['Int']['output'];
-  score?: Maybe<Scalars['Int']['output']>;
-  status?: Maybe<Scalars['String']['output']>;
-};
+export enum ReviewStatus {
+  Conflict = 'CONFLICT',
+  Done = 'DONE',
+  InProgress = 'IN_PROGRESS',
+  Todo = 'TODO'
+}
 
 export type ReviewedApplicantRecordDto = {
   __typename?: 'ReviewedApplicantRecordDTO';
-  applicantRecordId: Scalars['String']['output'];
-  review: Review;
+  applicantRecordId: Scalars['ID']['output'];
+  review?: Maybe<Review>;
   reviewerHasConflict: Scalars['Boolean']['output'];
-  reviewerId: Scalars['Int']['output'];
+  reviewerId: Scalars['ID']['output'];
   score?: Maybe<Scalars['Int']['output']>;
   status: Scalars['String']['output'];
 };
@@ -801,11 +790,10 @@ export type UpdateInterviewGroupDto = {
   status: Scalars['String']['input'];
 };
 
-export type UpdateReviewedApplicantRecordInput = {
-  applicantRecordId: Scalars['ID']['input'];
+export type UpdateReviewedApplicantRecordDto = {
   review?: InputMaybe<ReviewInput>;
-  reviewerId: Scalars['Int']['input'];
-  status?: InputMaybe<Scalars['String']['input']>;
+  reviewerHasConflict?: InputMaybe<Scalars['Boolean']['input']>;
+  status?: InputMaybe<ReviewStatus>;
 };
 
 export type UpdateUserDto = {

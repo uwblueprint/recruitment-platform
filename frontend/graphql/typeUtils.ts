@@ -13,6 +13,7 @@ export {
   Enum,
   InterviewConflict,
   InterviewStatus,
+  ReviewStatus,
   Role,
   SimpleEntityEnum,
   SkillCategory,
@@ -55,8 +56,6 @@ export type ReviewDashboardSidePanelDTO =
 export type ReviewDetailsDTO = WithoutTypename<Schema.ReviewDetails>;
 export type ReviewedApplicantRecordDTO =
   WithoutTypename<Schema.ReviewedApplicantRecordDto>;
-export type ReviewedApplicantRecord =
-  WithoutTypename<Schema.ReviewedApplicantRecord>;
 export type ReviewedApplicantsDTO =
   WithoutTypename<Schema.ReviewedApplicantsDto>;
 export type ReviewerDTO = WithoutTypename<Schema.ReviewerDto>;
@@ -77,17 +76,16 @@ export type BulkDeleteInterviewDelegationInput =
   Schema.BulkDeleteInterviewDelegationInput;
 export type CreateAdminCommentDTO = Schema.CreateAdminCommentDto;
 export type CreateInterviewGroupDTO = Schema.CreateInterviewGroupDto;
-export type CreateReviewedApplicantRecordInput =
-  Schema.CreateReviewedApplicantRecordInput;
+export type CreateReviewedApplicantRecordDTO =
+  Schema.CreateReviewedApplicantRecordDto;
 export type CreateUserDTO = Schema.CreateUserDto;
-export type DeleteReviewedApplicantRecordInput =
-  Schema.DeleteReviewedApplicantRecord;
 export type InterviewInput = Schema.InterviewInput;
 export type RegisterUserDTO = Schema.RegisterUserDto;
 export type ReviewInput = Schema.ReviewInput;
+export type UpdateAdminCommentDTO = Schema.UpdateAdminCommentDto;
 export type UpdateInterviewGroupDTO = Schema.UpdateInterviewGroupDto;
-export type UpdateReviewedApplicantRecordInput =
-  Schema.UpdateReviewedApplicantRecordInput;
+export type UpdateReviewedApplicantRecordDTO =
+  Schema.UpdateReviewedApplicantRecordDto;
 export type UpdateUserDTO = Schema.UpdateUserDto;
 
 /**

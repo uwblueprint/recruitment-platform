@@ -63,7 +63,7 @@ export type ReportReviewConflictMutationVariables = Exact<{
 }>;
 
 
-export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRecordId: string, reviewerId: number, status: string, score: number | null, reviewerHasConflict: boolean } };
+export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRecordId: string, reviewerId: string, status: string, score: number | null, reviewerHasConflict: boolean } };
 
 export type UpdateInterviewGroupMutationVariables = Exact<{
   id: string | number;
