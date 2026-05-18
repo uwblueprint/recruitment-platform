@@ -54,9 +54,7 @@ const reviewPageResolvers = {
         const applicant = await applicantService.getApplicantById(
           applicantRecord.applicantId,
         );
-        return {
-          ...toDTO(applicant, applicantRecord),
-        };
+        return toDTO(applicant, applicantRecord);
       } catch (error) {
         throw new Error(getErrorMessage(error));
       }
