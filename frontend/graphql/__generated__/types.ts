@@ -105,8 +105,6 @@ export type CreateInterviewGroupDto = {
 
 export type CreateReviewedApplicantRecordDto = {
   applicantRecordId: Scalars['ID']['input'];
-  review: ReviewInput;
-  reviewerHasConflict: Scalars['Boolean']['input'];
   reviewerId: Scalars['ID']['input'];
   status: ReviewStatus;
 };
@@ -713,7 +711,7 @@ export enum ReviewStatus {
 export type ReviewedApplicantRecordDto = {
   __typename?: 'ReviewedApplicantRecordDTO';
   applicantRecordId: Scalars['ID']['output'];
-  review: Review;
+  review?: Maybe<Review>;
   reviewerHasConflict: Scalars['Boolean']['output'];
   reviewerId: Scalars['ID']['output'];
   score?: Maybe<Scalars['Int']['output']>;

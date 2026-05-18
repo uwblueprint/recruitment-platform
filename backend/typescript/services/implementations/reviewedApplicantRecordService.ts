@@ -95,7 +95,6 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
   ): Promise<ReviewedApplicantRecordDTO[]> {
     const transaction = await sequelize.transaction();
     try {
-
       const createdReviewedApplicantRecords = await ReviewedApplicantRecord.bulkCreate(
         reviewedApplicantRecords.map((reviewedApplicantRecord) => ({
           applicant_record_id: reviewedApplicantRecord.applicantRecordId,
