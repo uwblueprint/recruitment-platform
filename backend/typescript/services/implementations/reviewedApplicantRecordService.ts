@@ -31,7 +31,7 @@ function isValidReviewScores(review: Review): boolean {
 function toDTO(model: ReviewedApplicantRecord): ReviewedApplicantRecordDTO {
   return {
     applicantRecordId: model.applicant_record_id,
-    reviewerId: model.reviewer_id,
+    reviewerId: String(model.reviewer_id),
     review: model.review as Review,
     status: model.status,
     score: model.score,
@@ -43,13 +43,13 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
   /* eslint-disable class-methods-use-this */
   async getReviewedApplicantRecordByPk(
     applicantRecordId: string,
-    reviewerId: number,
+    reviewerId: string,
   ): Promise<ReviewedApplicantRecordDTO> {
     try {
       const reviewedApplicantRecord = await ReviewedApplicantRecord.findOne({
         where: {
           applicant_record_id: applicantRecordId,
-          reviewer_id: reviewerId,
+          reviewer_id: Number(reviewerId),
         },
       });
 
@@ -82,7 +82,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
       const createdReviewedApplicantRecord = await ReviewedApplicantRecord.create(
         {
           applicant_record_id: reviewedApplicantRecord.applicantRecordId,
-          reviewer_id: reviewedApplicantRecord.reviewerId,
+          reviewer_id: Number(reviewedApplicantRecord.reviewerId),
           review: reviewedApplicantRecord.review,
           status: reviewedApplicantRecord.status,
           reviewer_has_conflict: reviewedApplicantRecord.reviewerHasConflict,
@@ -116,7 +116,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
       const createdReviewedApplicantRecords = await ReviewedApplicantRecord.bulkCreate(
         reviewedApplicantRecords.map((reviewedApplicantRecord) => ({
           applicant_record_id: reviewedApplicantRecord.applicantRecordId,
-          reviewer_id: reviewedApplicantRecord.reviewerId,
+          reviewer_id: Number(reviewedApplicantRecord.reviewerId),
           review: reviewedApplicantRecord.review,
           status: reviewedApplicantRecord.status,
           reviewer_has_conflict: reviewedApplicantRecord.reviewerHasConflict,
@@ -140,11 +140,14 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
 
   async deleteReviewedApplicantRecordByPk(
     applicantRecordId: string,
-    reviewerId: number,
+    reviewerId: string,
   ): Promise<ReviewedApplicantRecordDTO> {
     try {
       const record = await ReviewedApplicantRecord.findOne({
-        where: { applicantRecordId, reviewerId },
+        where: {
+          applicant_record_id: applicantRecordId,
+          reviewer_id: Number(reviewerId),
+        },
       });
 
       if (!record) {
@@ -165,7 +168,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
 
   async updateReviewedApplicantRecord(
     applicantRecordId: string,
-    reviewerId: number,
+    reviewerId: string,
     reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO,
   ): Promise<ReviewedApplicantRecordDTO> {
     const transaction = await sequelize.transaction();
@@ -175,7 +178,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
       const reviewedRecord = await ReviewedApplicantRecord.findOne({
         where: {
           applicant_record_id: applicantRecordId,
-          reviewer_id: reviewerId,
+          reviewer_id: Number(reviewerId),
         },
         transaction,
       });

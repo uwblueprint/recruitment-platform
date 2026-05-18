@@ -21,7 +21,7 @@ export type Review = {
 
 export type ReviewedApplicantRecordDTO = {
   applicantRecordId: string;
-  reviewerId: number;
+  reviewerId: string;
   review: Review;
   status: ReviewStatus;
   score?: number | null;

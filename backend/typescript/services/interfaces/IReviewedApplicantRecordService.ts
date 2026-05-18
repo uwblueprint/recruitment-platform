@@ -12,7 +12,7 @@ interface IReviewApplicantRecordService {
    */
   getReviewedApplicantRecordByPk(
     applicantRecordId: string,
-    reviewerId: number,
+    reviewerId: string,
   ): Promise<ReviewedApplicantRecordDTO>;
 
   /**
@@ -38,7 +38,7 @@ interface IReviewApplicantRecordService {
    */
   deleteReviewedApplicantRecordByPk(
     applicantRecordId: string,
-    reviewerId: number,
+    reviewerId: string,
   ): Promise<ReviewedApplicantRecordDTO>;
 
   /**
@@ -48,7 +48,7 @@ interface IReviewApplicantRecordService {
    */
   updateReviewedApplicantRecord(
     applicantRecordId: string,
-    reviewerId: number,
+    reviewerId: string,
     reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO,
   ): Promise<ReviewedApplicantRecordDTO>;
 }

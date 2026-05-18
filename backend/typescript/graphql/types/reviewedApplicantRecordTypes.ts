@@ -32,9 +32,18 @@ const reviewedApplicantRecordTypes = gql`
     comments: String
   }
 
+  type ReviewedApplicantRecordDTO {
+    applicantRecordId: ID!
+    reviewerId: ID!
+    review: Review!
+    status: String!
+    score: Int
+    reviewerHasConflict: Boolean!
+  }
+
   input CreateReviewedApplicantRecordDTO {
     applicantRecordId: ID!
-    reviewerId: Int!
+    reviewerId: ID!
     review: ReviewInput!
     status: ReviewStatus!
     reviewerHasConflict: Boolean!
@@ -49,7 +58,7 @@ const reviewedApplicantRecordTypes = gql`
   extend type Query {
     getReviewedApplicantRecord(
       applicantRecordId: ID!
-      reviewerId: Int!
+      reviewerId: ID!
     ): ReviewedApplicantRecordDTO!
   }
 
@@ -64,12 +73,12 @@ const reviewedApplicantRecordTypes = gql`
 
     deleteReviewedApplicantRecord(
       applicantRecordId: ID!
-      reviewerId: Int!
+      reviewerId: ID!
     ): ReviewedApplicantRecordDTO!
 
     updateReviewedApplicantRecord(
       applicantRecordId: ID!
-      reviewerId: Int!
+      reviewerId: ID!
       reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!
     ): ReviewedApplicantRecordDTO!
   }

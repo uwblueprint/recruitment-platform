@@ -12,7 +12,7 @@ const reviewedApplicantRecordResolvers = {
   Query: {
     getReviewedApplicantRecord: async (
       _parent: undefined,
-      args: { applicantRecordId: string; reviewerId: number },
+      args: { applicantRecordId: string; reviewerId: string },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.getReviewedApplicantRecordByPk(
@@ -53,7 +53,7 @@ const reviewedApplicantRecordResolvers = {
 
     deleteReviewedApplicantRecord: async (
       _parent: undefined,
-      args: { applicantRecordId: string; reviewerId: number },
+      args: { applicantRecordId: string; reviewerId: string },
     ): Promise<ReviewedApplicantRecordDTO> => {
       try {
         return await reviewedApplicantRecordService.deleteReviewedApplicantRecordByPk(
@@ -69,7 +69,7 @@ const reviewedApplicantRecordResolvers = {
       _parent: undefined,
       args: {
         applicantRecordId: string;
-        reviewerId: number;
+        reviewerId: string;
         reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO;
       },
     ): Promise<ReviewedApplicantRecordDTO> => {

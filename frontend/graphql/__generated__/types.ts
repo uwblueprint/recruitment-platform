@@ -107,7 +107,7 @@ export type CreateReviewedApplicantRecordDto = {
   applicantRecordId: Scalars['ID']['input'];
   review: ReviewInput;
   reviewerHasConflict: Scalars['Boolean']['input'];
-  reviewerId: Scalars['Int']['input'];
+  reviewerId: Scalars['ID']['input'];
   status: ReviewStatus;
 };
 
@@ -387,7 +387,7 @@ export type MutationDeleteInterviewedApplicantRecordByIdArgs = {
 
 export type MutationDeleteReviewedApplicantRecordArgs = {
   applicantRecordId: Scalars['ID']['input'];
-  reviewerId: Scalars['Int']['input'];
+  reviewerId: Scalars['ID']['input'];
 };
 
 
@@ -495,7 +495,7 @@ export type MutationUpdateInterviewedApplicantRecordArgs = {
 export type MutationUpdateReviewedApplicantRecordArgs = {
   applicantRecordId: Scalars['ID']['input'];
   reviewedApplicantRecord: UpdateReviewedApplicantRecordDto;
-  reviewerId: Scalars['Int']['input'];
+  reviewerId: Scalars['ID']['input'];
 };
 
 
@@ -595,7 +595,7 @@ export type QueryGetInterviewersByGroupIdArgs = {
 
 export type QueryGetReviewedApplicantRecordArgs = {
   applicantRecordId: Scalars['ID']['input'];
-  reviewerId: Scalars['Int']['input'];
+  reviewerId: Scalars['ID']['input'];
 };
 
 
@@ -712,10 +712,10 @@ export enum ReviewStatus {
 
 export type ReviewedApplicantRecordDto = {
   __typename?: 'ReviewedApplicantRecordDTO';
-  applicantRecordId: Scalars['String']['output'];
+  applicantRecordId: Scalars['ID']['output'];
   review: Review;
   reviewerHasConflict: Scalars['Boolean']['output'];
-  reviewerId: Scalars['Int']['output'];
+  reviewerId: Scalars['ID']['output'];
   score?: Maybe<Scalars['Int']['output']>;
   status: Scalars['String']['output'];
 };
