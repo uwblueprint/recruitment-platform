@@ -13,6 +13,7 @@ import authResolvers from "./resolvers/authResolvers";
 import entityResolvers from "./resolvers/entityResolvers";
 import simpleEntityResolvers from "./resolvers/simpleEntityResolvers";
 import reviewedApplicantRecordResolvers from "./resolvers/reviewedApplicantRecordResolvers";
+import reviewPageResolvers from "./resolvers/reviewPageResolvers";
 import userResolvers from "./resolvers/userResolvers";
 import adminCommentType from "./types/adminCommentType";
 import applicantRecordType from "./types/applicantRecordType";
@@ -67,6 +68,7 @@ const executableSchema = makeExecutableSchema({
     entityResolvers,
     simpleEntityResolvers,
     reviewedApplicantRecordResolvers,
+    reviewPageResolvers,
     userResolvers,
   ),
 });
@@ -89,7 +91,9 @@ const graphQLMiddlewares = {
     users: authorizedByAdmin(),
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
-    getReviewedApplicantRecord: authorizedByAdmin(),
+    reviewedApplicantRecord: authorizedByAdmin(),
+    reviewedApplicantsByUserId: authorizedByAllRoles(),
+    application: authorizedByAllRoles(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),
@@ -107,13 +111,14 @@ const graphQLMiddlewares = {
     createAdminComment: authorizedByAdmin(),
     updateAdminComment: authorizedByAdmin(),
     deleteAdminCommentById: authorizedByAdmin(),
-    updateApplicantRecordStatus: authorizedByAdmin(),
+    updateApplicantRecordStatus: authorizedByAllRoles(),
     bulkUpdateApplicantRecordsStatus: authorizedByAdmin(),
     updateApplicantRecordIsApplicantFlagged: authorizedByAdmin(),
     createReviewedApplicantRecord: authorizedByAdmin(),
-    updateReviewedApplicantRecord: authorizedByAdmin(),
+    updateReviewedApplicantRecord: authorizedByAllRoles(),
     deleteReviewedApplicantRecord: authorizedByAdmin(),
     bulkCreateReviewedApplicantRecord: authorizedByAdmin(),
+    reportReviewConflict: authorizedByAllRoles(),
   },
 };
 

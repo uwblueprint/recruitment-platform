@@ -21,7 +21,7 @@ export type ApplicationDTO = {
   resumeUrl: string;
   roleSpecificQuestions: string[];
   secondChoiceRole: string;
-  shortQuestionAnswers: ShortQuestionAnswer[];
+  shortAnswerQuestions: ShortQuestionAnswer[];
   status: string;
   secondChoiceStatus: string;
   term: string;

@@ -54,7 +54,7 @@ const reviewedApplicantRecordTypes = gql`
   }
 
   extend type Query {
-    getReviewedApplicantRecord(
+    reviewedApplicantRecord(
       applicantRecordId: ID!
       reviewerId: ID!
     ): ReviewedApplicantRecordDTO!

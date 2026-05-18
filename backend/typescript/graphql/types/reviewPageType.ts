@@ -1,52 +1,43 @@
 import { gql } from "apollo-server-express";
 
 const reviewPageType = gql`
-  type ShortQuestionAnswer {
-    question: String!
-    response: String!
-  }
-
   type ApplicationDTO {
-    id: String!
+    id: ID!
     academicOrCoop: String!
     academicYear: String!
     email: String!
-    firstChoiceRole: String!
     firstName: String!
-    heardFrom: String!
     lastName: String!
+    heardFrom: String!
     locationPreference: String!
     program: String!
     pronouns: String!
     pronounsSpecified: String!
     resumeUrl: String!
-    roleSpecificQuestions: [String!]!
-    secondChoiceRole: String!
-    shortQuestionAnswers: [ShortQuestionAnswer!]!
-    status: String!
-    secondChoiceStatus: String!
+    roleSpecificQuestions: [ShortAnswerQuestion!]!
+    shortAnswerQuestions: [ShortAnswerQuestion!]!
+    status: ApplicationStatus!
     term: String!
     timesApplied: String!
-    timestamp: Int
   }
 
   type ReviewedApplicantsDTO {
-    applicantRecordId: String!
-    reviewStatus: String!
+    applicantRecordId: ID!
+    reviewStatus: ReviewStatus!
     applicantFirstName: String!
     applicantLastName: String!
   }
 
   extend type Mutation {
     reportReviewConflict(
-      applicantRecordId: String!
-      reviewerId: Int!
+      applicantRecordId: ID!
+      reviewerId: ID!
     ): ReviewedApplicantRecordDTO!
   }
 
   extend type Query {
-    reviewApplicantPage(applicantRecordId: String!): ApplicationDTO!
-    getReviewedApplicantsByUserId(userId: Int!): [ReviewedApplicantsDTO!]!
+    application(applicantRecordId: ID!): ApplicationDTO!
+    reviewedApplicantsByUserId(userId: ID!): [ReviewedApplicantsDTO!]!
   }
 `;
 

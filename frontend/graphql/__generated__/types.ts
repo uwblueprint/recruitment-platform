@@ -51,7 +51,7 @@ export type ApplicationDto = {
   roleSpecificQuestions: Array<Scalars['String']['output']>;
   secondChoiceRole: Scalars['String']['output'];
   secondChoiceStatus: Scalars['String']['output'];
-  shortQuestionAnswers: Array<ShortQuestionAnswer>;
+  shortAnswerQuestions: Array<ShortQuestionAnswer>;
   status: Scalars['String']['output'];
   term: Scalars['String']['output'];
   timesApplied: Scalars['String']['output'];

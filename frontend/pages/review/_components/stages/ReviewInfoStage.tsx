@@ -55,7 +55,7 @@ export const ReviewInfoStage = ({
   scores,
   onReportConflict,
 }: ReviewStageProps) => {
-  const firstShortAnswer = application?.shortQuestionAnswers[0];
+  const firstShortAnswer = application?.shortAnswerQuestions[0];
   const questions = [
     ...INFO_QUESTIONS,
     ...(firstShortAnswer ? [firstShortAnswer.question] : []),
