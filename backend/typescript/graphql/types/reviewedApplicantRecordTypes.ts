@@ -35,7 +35,7 @@ const reviewedApplicantRecordTypes = gql`
   type ReviewedApplicantRecordDTO {
     applicantRecordId: ID!
     reviewerId: ID!
-    review: Review!
+    review: Review
     status: String!
     score: Int
     reviewerHasConflict: Boolean!
@@ -44,9 +44,7 @@ const reviewedApplicantRecordTypes = gql`
   input CreateReviewedApplicantRecordDTO {
     applicantRecordId: ID!
     reviewerId: ID!
-    review: ReviewInput!
     status: ReviewStatus!
-    reviewerHasConflict: Boolean!
   }
 
   input UpdateReviewedApplicantRecordDTO {

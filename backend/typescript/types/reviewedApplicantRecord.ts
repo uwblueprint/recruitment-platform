@@ -22,16 +22,13 @@ export type Review = {
 export type ReviewedApplicantRecordDTO = {
   applicantRecordId: string;
   reviewerId: string;
-  review: Review;
+  review?: Review;
   status: ReviewStatus;
-  score?: number | null;
+  score?: number;
   reviewerHasConflict: boolean;
 };
 
-export type CreateReviewedApplicantRecordDTO = Omit<
-  ReviewedApplicantRecordDTO,
-  "score"
->;
+export type CreateReviewedApplicantRecordDTO = Pick<ReviewedApplicantRecordDTO, "applicantRecordId" | "reviewerId" | "status">;
 export type UpdateReviewedApplicantRecordDTO = Partial<
   Pick<ReviewedApplicantRecordDTO, "review" | "status" | "reviewerHasConflict">
 >;

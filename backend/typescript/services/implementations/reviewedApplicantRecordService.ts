@@ -72,20 +72,11 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
     reviewedApplicantRecord: CreateReviewedApplicantRecordDTO,
   ): Promise<ReviewedApplicantRecordDTO> {
     try {
-      if (
-        reviewedApplicantRecord.review &&
-        !isValidReviewScores(reviewedApplicantRecord.review)
-      ) {
-        throw new Error("Invalid review scores");
-      }
-
       const createdReviewedApplicantRecord = await ReviewedApplicantRecord.create(
         {
           applicant_record_id: reviewedApplicantRecord.applicantRecordId,
           reviewer_id: Number(reviewedApplicantRecord.reviewerId),
-          review: reviewedApplicantRecord.review,
           status: reviewedApplicantRecord.status,
-          reviewer_has_conflict: reviewedApplicantRecord.reviewerHasConflict,
         },
       );
       return toDTO(createdReviewedApplicantRecord);
@@ -104,22 +95,12 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
   ): Promise<ReviewedApplicantRecordDTO[]> {
     const transaction = await sequelize.transaction();
     try {
-      reviewedApplicantRecords.forEach((reviewedApplicantRecord) => {
-        if (
-          reviewedApplicantRecord.review &&
-          !isValidReviewScores(reviewedApplicantRecord.review)
-        ) {
-          throw new Error("Invalid review scores");
-        }
-      });
 
       const createdReviewedApplicantRecords = await ReviewedApplicantRecord.bulkCreate(
         reviewedApplicantRecords.map((reviewedApplicantRecord) => ({
           applicant_record_id: reviewedApplicantRecord.applicantRecordId,
           reviewer_id: Number(reviewedApplicantRecord.reviewerId),
-          review: reviewedApplicantRecord.review,
           status: reviewedApplicantRecord.status,
-          reviewer_has_conflict: reviewedApplicantRecord.reviewerHasConflict,
         })),
         { transaction },
       );
@@ -208,7 +189,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
       }
 
       const updatedReview = {
-        ...reviewedRecord.review,
+        ...(reviewedRecord.review ?? {}),
         ...review,
       };
 
@@ -259,7 +240,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
 
       await applicantRecord.update(
         {
-          combined_review_score: combinedReviewScore + newReviewedScore,
+          combined_review_score: combinedReviewScore,
         },
         { where: { id: applicantRecordId }, transaction },
       );
