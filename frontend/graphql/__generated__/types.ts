@@ -611,7 +611,7 @@ export type QueryReviewDashboardArgs = {
 
 
 export type QueryReviewDashboardSidePanelArgs = {
-  applicantId: Scalars['String']['input'];
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -657,35 +657,35 @@ export type Review = {
   teamPlayer?: Maybe<Scalars['Int']['output']>;
 };
 
+export type ReviewDashboardReviewDetails = {
+  __typename?: 'ReviewDashboardReviewDetails';
+  review?: Maybe<Review>;
+  reviewStatus: ReviewStatus;
+  reviewer: UserDto;
+};
+
 export type ReviewDashboardRowDto = {
   __typename?: 'ReviewDashboardRowDTO';
-  applicationStatus: Scalars['String']['output'];
+  applicationStatus: ApplicationStatus;
   choice: Scalars['Int']['output'];
   firstName: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
-  reviewers: Array<ReviewerDto>;
+  reviewers: Array<UserDto>;
   timesApplied: Scalars['String']['output'];
   totalScore?: Maybe<Scalars['Int']['output']>;
 };
 
 export type ReviewDashboardSidePanelDto = {
   __typename?: 'ReviewDashboardSidePanelDTO';
-  applicationStatus: Scalars['String']['output'];
+  applicationStatus: ApplicationStatus;
   firstName: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
-  positionTitle: Scalars['String']['output'];
+  position: Scalars['String']['output'];
   program: Scalars['String']['output'];
   resumeUrl: Scalars['String']['output'];
-  reviewDetails: Array<ReviewDetails>;
-  skillCategory?: Maybe<Scalars['String']['output']>;
-};
-
-export type ReviewDetails = {
-  __typename?: 'ReviewDetails';
-  review: Review;
-  reviewerFirstName: Scalars['String']['output'];
-  reviewerLastName: Scalars['String']['output'];
+  reviewDetails: Array<ReviewDashboardReviewDetails>;
+  skillCategory?: Maybe<SkillCategory>;
 };
 
 export type ReviewInput = {
@@ -720,12 +720,6 @@ export type ReviewedApplicantsDto = {
   applicantLastName: Scalars['String']['output'];
   applicantRecordId: Scalars['ID']['output'];
   reviewStatus: ReviewStatus;
-};
-
-export type ReviewerDto = {
-  __typename?: 'ReviewerDTO';
-  firstName: Scalars['String']['output'];
-  lastName: Scalars['String']['output'];
 };
 
 export enum Role {
