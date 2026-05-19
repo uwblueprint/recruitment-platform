@@ -12,3 +12,5 @@ else
     sed -i $default_branch_replacement_str ./hooks/post-merge
 fi
 cp ./hooks/post-merge ./.git/hooks/post-merge
+cp ./hooks/pre-commit ./.git/hooks/pre-commit
+chmod +x ./.git/hooks/pre-commit

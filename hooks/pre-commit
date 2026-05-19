@@ -1,0 +1,57 @@
+#!/bin/sh
+
+FRONTEND_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -c "^frontend/")
+BACKEND_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -c "^backend/typescript/")
+
+FAILED=0
+
+if [ "$FRONTEND_CHANGED" -gt 0 ]; then
+    echo "Frontend files staged. Running checks..."
+
+    echo "  Lint..."
+    yarn --cwd ./frontend lint
+    if [ $? -ne 0 ]; then
+        echo "  FAILED: frontend lint"
+        FAILED=1
+    fi
+
+    echo "  Type check..."
+    yarn --cwd ./frontend type-check
+    if [ $? -ne 0 ]; then
+        echo "  FAILED: frontend type check"
+        FAILED=1
+    fi
+fi
+
+if [ "$BACKEND_CHANGED" -gt 0 ]; then
+    echo "Backend files staged. Running checks..."
+
+    echo "  Lint..."
+    yarn --cwd ./backend/typescript lint
+    if [ $? -ne 0 ]; then
+        echo "  FAILED: backend lint"
+        FAILED=1
+    fi
+
+    echo "  Type check..."
+    yarn --cwd ./backend/typescript type-check
+    if [ $? -ne 0 ]; then
+        echo "  FAILED: backend type check"
+        FAILED=1
+    fi
+
+    echo "  Tests..."
+    yarn --cwd ./backend/typescript test
+    if [ $? -ne 0 ]; then
+        echo "  FAILED: backend tests"
+        FAILED=1
+    fi
+fi
+
+if [ "$FAILED" -ne 0 ]; then
+    echo ""
+    echo "Pre-commit checks failed. Fix the issues above before committing."
+    exit 1
+fi
+
+exit 0
