@@ -17,3 +17,22 @@ export type Interview = {
   skillCategory?: SkillCategory;
   comments?: string;
 };
+
+export type InterviewedApplicantRecordDTO = {
+  id: string;
+  applicantRecordId: string;
+  score?: number;
+  interviewJson?: Interview;
+  status: InterviewStatus;
+  interviewNotesId?: string;
+  interviewDate?: Date;
+};
+
+export type CreateInterviewedApplicantRecordDTO = Pick<
+  InterviewedApplicantRecordDTO,
+  "applicantRecordId"
+>;
+
+export type UpdateInterviewedApplicantRecordDTO = Partial<
+  Omit<InterviewedApplicantRecordDTO, "id" | "applicantRecordId" | "score">
+>;

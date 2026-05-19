@@ -2,9 +2,9 @@ import { gql } from "apollo-server-express";
 
 const interviewedApplicantRecordsTypes = gql`
   enum InterviewStatus {
-    NeedsReview
-    InProgress
-    Complete
+    NEEDS_REVIEW
+    IN_PROGRESS
+    COMPLETE
   }
 
   type Interview {
@@ -27,7 +27,7 @@ const interviewedApplicantRecordsTypes = gql`
 
   type InterviewedApplicantRecord {
     id: ID!
-    applicantRecordId: String!
+    applicantRecordId: ID!
     score: Int
     interviewJson: Interview
     status: InterviewStatus!
@@ -35,27 +35,30 @@ const interviewedApplicantRecordsTypes = gql`
     interviewDate: String
   }
 
+  input CreateInterviewedApplicantRecordDTO {
+    applicantRecordId: ID!
+  }
+
+  input UpdateInterviewedApplicantRecordDTO {
+    score: Int
+    interviewJson: InterviewInput
+    status: InterviewStatus
+    interviewNotesId: String
+    interviewDate: String
+  }
+
   extend type Query {
-    getInterviewedApplicantRecordById(id: ID!): InterviewedApplicantRecord!
+    interviewedApplicantRecord(id: ID!): InterviewedApplicantRecord!
   }
 
   extend type Mutation {
     createInterviewedApplicantRecord(
-      applicantRecordId: String!
-      score: Int
-      interviewJSON: InterviewInput
-      status: InterviewStatus
-      interviewNotesId: String
-      interviewDate: String
+      interviewedApplicantRecord: CreateInterviewedApplicantRecordDTO!
     ): InterviewedApplicantRecord!
 
     updateInterviewedApplicantRecord(
       id: ID!
-      score: Int
-      interviewJSON: InterviewInput
-      status: InterviewStatus
-      interviewNotesId: String
-      interviewDate: String
+      interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO!
     ): InterviewedApplicantRecord!
 
     deleteInterviewedApplicantRecordById(id: ID!): InterviewedApplicantRecord!

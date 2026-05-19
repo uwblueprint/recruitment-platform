@@ -21,11 +21,9 @@ function isValidReviewScores(review: Review): boolean {
     skill: review.skill,
   };
 
-  Object.entries(scores).forEach(
-    ([_field, value]) => !(value && (value < 1 || value > 5)),
+  return !Object.entries(scores).some(
+    ([_field, value]) => value && (value < 1 || value > 5),
   );
-
-  return true;
 }
 
 function toDTO(model: ReviewedApplicantRecord): ReviewedApplicantRecordDTO {
