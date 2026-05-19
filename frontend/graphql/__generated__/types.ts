@@ -196,9 +196,9 @@ export type InterviewPairingsDto = {
 };
 
 export enum InterviewStatus {
-  Complete = 'Complete',
-  InProgress = 'InProgress',
-  NeedsReview = 'NeedsReview'
+  Complete = 'COMPLETE',
+  InProgress = 'IN_PROGRESS',
+  NeedsReview = 'NEEDS_REVIEW'
 }
 
 export type InterviewedApplicantRecord = {
@@ -511,10 +511,10 @@ export type Query = {
   file: Scalars['String']['output'];
   getInterviewDelegation: InterviewDelegation;
   getInterviewGroupById: InterviewGroupDto;
-  getInterviewedApplicantRecordById: InterviewedApplicantRecord;
   getInterviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
   getInterviewedPairingsByUserId: Array<InterviewPairingsDto>;
   getInterviewersByGroupId: Array<UserDto>;
+  interviewedApplicantRecord: InterviewedApplicantRecord;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewDashboard: Array<ReviewDashboardRowDto>;
@@ -567,11 +567,6 @@ export type QueryGetInterviewGroupByIdArgs = {
 };
 
 
-export type QueryGetInterviewedApplicantRecordByIdArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type QueryGetInterviewedApplicantsByUserIdArgs = {
   userId: Scalars['Int']['input'];
 };
@@ -584,6 +579,11 @@ export type QueryGetInterviewedPairingsByUserIdArgs = {
 
 export type QueryGetInterviewersByGroupIdArgs = {
   groupId: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewedApplicantRecordArgs = {
+  id: Scalars['ID']['input'];
 };
 
 

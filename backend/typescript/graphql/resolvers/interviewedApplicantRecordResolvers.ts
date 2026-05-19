@@ -11,13 +11,13 @@ const interviewedApplicantRecordsService: IInterviewedApplicantRecordsService = 
 
 const interviewedApplicantRecordsResolvers = {
   Query: {
-    getInterviewedApplicantRecordById: async (
+    interviewedApplicantRecord: async (
       _parent: undefined,
-      args: { id: string },
+      { id }: { id: string },
     ): Promise<InterviewedApplicantRecordDTO> => {
       try {
         return await interviewedApplicantRecordsService.getInterviewedApplicantRecordById(
-          args.id,
+          id,
         );
       } catch (error) {
         throw new Error(getErrorMessage(error));

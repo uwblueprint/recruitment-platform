@@ -30,6 +30,7 @@ import reviewedApplicantRecordTypes from "./types/reviewedApplicantRecordTypes";
 import reviewPageType from "./types/reviewPageType";
 import simpleEntityType from "./types/simpleEntityType";
 import userType from "./types/userType";
+import interviewedApplicantRecordResolvers from "./resolvers/interviewedApplicantRecordResolvers";
 
 const query = gql`
   type Query {
@@ -67,6 +68,7 @@ const executableSchema = makeExecutableSchema({
     applicantRecordResolvers,
     authResolvers,
     entityResolvers,
+    interviewedApplicantRecordResolvers,
     simpleEntityResolvers,
     reviewedApplicantRecordResolvers,
     reviewDashboardResolvers,

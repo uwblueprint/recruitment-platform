@@ -2,9 +2,9 @@ import { gql } from "apollo-server-express";
 
 const interviewedApplicantRecordsTypes = gql`
   enum InterviewStatus {
-    NeedsReview
-    InProgress
-    Complete
+    NEEDS_REVIEW
+    IN_PROGRESS
+    COMPLETE
   }
 
   type Interview {
@@ -48,7 +48,7 @@ const interviewedApplicantRecordsTypes = gql`
   }
 
   extend type Query {
-    getInterviewedApplicantRecordById(id: ID!): InterviewedApplicantRecord!
+    interviewedApplicantRecord(id: ID!): InterviewedApplicantRecord!
   }
 
   extend type Mutation {

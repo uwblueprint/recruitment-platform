@@ -1,5 +1,6 @@
 import {
   CreateInterviewedApplicantRecordDTO,
+  Interview,
   InterviewedApplicantRecordDTO,
   InterviewStatusEnum,
   UpdateInterviewedApplicantRecordDTO,
@@ -10,6 +11,19 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
 const Logger = logger(__filename);
+
+function isValidInterviewScores(interviewJson: Interview): boolean {
+  const scores = {
+    passionFSG: interviewJson.passionFSG,
+    teamPlayer: interviewJson.teamPlayer,
+    desireToLearn: interviewJson.desireToLearn,
+    skill: interviewJson.skill,
+  };
+
+  return !Object.entries(scores).some(
+    ([_field, value]) => value && (value < 1 || value > 5),
+  );
+}
 
 function toDTO(
   model: InterviewedApplicantRecord,
@@ -82,9 +96,37 @@ class InterviewedApplicantRecordsService
         throw new Error(`No interviewed applicant record with id ${id} found.`);
       }
 
+      if (
+        interviewedApplicantRecord.interviewJson &&
+        !isValidInterviewScores(interviewedApplicantRecord.interviewJson)
+      ) {
+        throw new Error(
+          "Invalid interview scores. Scores must be between 1 and 5.",
+        );
+      }
+
+      const updatedInterviewJson = {
+        ...(record.interview_json ?? {}),
+        ...interviewedApplicantRecord.interviewJson,
+      };
+
+      const {
+        passionFSG,
+        teamPlayer,
+        desireToLearn,
+        skill,
+      } = updatedInterviewJson;
+
+      let calculatedScore = 0;
+      if (passionFSG) calculatedScore += passionFSG;
+      if (teamPlayer) calculatedScore += teamPlayer;
+      if (desireToLearn) calculatedScore += desireToLearn;
+      if (skill) calculatedScore += skill;
+      const updatedScore = calculatedScore > 0 ? calculatedScore : null;
+
       await record.update({
-        score: interviewedApplicantRecord.score,
-        interview_json: interviewedApplicantRecord.interviewJson,
+        score: updatedScore,
+        interview_json: updatedInterviewJson,
         status: interviewedApplicantRecord.status,
         interview_notes_id: interviewedApplicantRecord.interviewNotesId,
         interview_date: interviewedApplicantRecord.interviewDate,

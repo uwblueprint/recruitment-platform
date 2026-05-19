@@ -34,5 +34,5 @@ export type CreateInterviewedApplicantRecordDTO = Pick<
 >;
 
 export type UpdateInterviewedApplicantRecordDTO = Partial<
-  Omit<InterviewedApplicantRecordDTO, "id" | "applicantRecordId">
+  Omit<InterviewedApplicantRecordDTO, "id" | "applicantRecordId" | "score">
 >;
