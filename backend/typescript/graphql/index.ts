@@ -98,6 +98,9 @@ const graphQLMiddlewares = {
     reviewedApplicantRecord: authorizedByAdmin(),
     reviewedApplicantsByUserId: authorizedByAllRoles(),
     application: authorizedByAllRoles(),
+    interviewedApplicantRecord: authorizedByAllRoles(),
+    reviewDashboard: authorizedByAdmin(),
+    reviewDashboardSidePanel: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),
@@ -123,6 +126,10 @@ const graphQLMiddlewares = {
     deleteReviewedApplicantRecord: authorizedByAdmin(),
     bulkCreateReviewedApplicantRecord: authorizedByAdmin(),
     reportReviewConflict: authorizedByAllRoles(),
+    createInterviewedApplicantRecord: authorizedByAdmin(),
+    updateInterviewedApplicantRecord: authorizedByAllRoles(),
+    deleteInterviewedApplicantRecord: authorizedByAdmin(),
+    delegateReviewers: authorizedBySuperAdmin(),
   },
 };
 
