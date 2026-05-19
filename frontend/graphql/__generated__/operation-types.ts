@@ -4,13 +4,6 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type * as Types from './types';
 
-export type GetInterviewGroupByIdQueryVariables = Exact<{
-  id: string | number;
-}>;
-
-
-export type GetInterviewGroupByIdQuery = { getInterviewGroupById: { id: string, schedulingLink: string | null, status: string } };
-
 export type GetInterviewedApplicantsByUserIdQueryVariables = Exact<{
   userId: number;
 }>;
@@ -24,6 +17,13 @@ export type GetInterviewersByGroupIdQueryVariables = Exact<{
 
 
 export type GetInterviewersByGroupIdQuery = { getInterviewersByGroupId: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }> };
+
+export type InterviewGroupQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type InterviewGroupQuery = { interviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
 
 export type LoginMutationVariables = Exact<{
   email: string;
@@ -61,4 +61,4 @@ export type UpdateInterviewGroupMutationVariables = Exact<{
 }>;
 
 
-export type UpdateInterviewGroupMutation = { updateInterviewGroup: { id: string, schedulingLink: string | null, status: string } };
+export type UpdateInterviewGroupMutation = { updateInterviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };

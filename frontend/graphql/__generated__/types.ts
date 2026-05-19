@@ -77,26 +77,21 @@ export type AuthDto = {
   role: Role;
 };
 
-export type BulkCreateInterviewDelegationInput = {
-  groupId: Scalars['ID']['input'];
-  interviewedApplicantRecordId: Scalars['ID']['input'];
-  interviewerId: Scalars['Int']['input'];
-};
-
-export type BulkDeleteInterviewDelegationInput = {
-  interviewedApplicantRecordId: Scalars['ID']['input'];
-  interviewerId: Scalars['Int']['input'];
-};
-
 export type CreateAdminCommentDto = {
   applicantRecordId: Scalars['ID']['input'];
   comment: Scalars['String']['input'];
   userId: Scalars['ID']['input'];
 };
 
+export type CreateInterviewDelegationDto = {
+  groupId: Scalars['ID']['input'];
+  interviewedApplicantRecordId: Scalars['ID']['input'];
+  interviewerId: Scalars['ID']['input'];
+};
+
 export type CreateInterviewGroupDto = {
   schedulingLink?: InputMaybe<Scalars['String']['input']>;
-  status: Scalars['String']['input'];
+  status?: InputMaybe<InterviewGroupStatus>;
 };
 
 export type CreateInterviewedApplicantRecordDto = {
@@ -164,20 +159,26 @@ export enum InterviewConflict {
   PartnerNoResponse = 'PARTNER_NO_RESPONSE'
 }
 
-export type InterviewDelegation = {
-  __typename?: 'InterviewDelegation';
+export type InterviewDelegationDto = {
+  __typename?: 'InterviewDelegationDTO';
   groupId: Scalars['ID']['output'];
   interviewHasConflict?: Maybe<InterviewConflict>;
   interviewedApplicantRecordId: Scalars['ID']['output'];
-  interviewerId: Scalars['Int']['output'];
+  interviewerId: Scalars['ID']['output'];
 };
 
 export type InterviewGroupDto = {
   __typename?: 'InterviewGroupDTO';
   id: Scalars['ID']['output'];
   schedulingLink?: Maybe<Scalars['String']['output']>;
-  status: Scalars['String']['output'];
+  status: InterviewGroupStatus;
 };
+
+export enum InterviewGroupStatus {
+  AvailabilityPending = 'AVAILABILITY_PENDING',
+  InvitesSent = 'INVITES_SENT',
+  ReadyToInterview = 'READY_TO_INTERVIEW'
+}
 
 export type InterviewInput = {
   comments?: InputMaybe<Scalars['String']['input']>;
@@ -223,25 +224,24 @@ export type InterviewedApplicantsDto = {
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
-  bulkCreateInterviewDelegations: Array<InterviewDelegation>;
+  bulkCreateInterviewDelegations: Array<InterviewDelegationDto>;
   bulkCreateInterviewGroups: Array<Maybe<InterviewGroupDto>>;
   bulkCreateReviewedApplicantRecord: Array<ReviewedApplicantRecordDto>;
-  bulkDeleteInterviewDelegations: Array<InterviewDelegation>;
   bulkDeleteInterviewGroupsByIds: Array<Maybe<InterviewGroupDto>>;
   bulkUpdateApplicantRecordsStatus: Array<ApplicantRecordDto>;
   createAdminComment: AdminCommentDto;
   createEntity: EntityResponseDto;
-  createInterviewDelegation: InterviewDelegation;
+  createInterviewDelegation: InterviewDelegationDto;
   createInterviewGroup: InterviewGroupDto;
   createInterviewedApplicantRecord: InterviewedApplicantRecord;
   createReviewedApplicantRecord: ReviewedApplicantRecordDto;
   createSimpleEntity: SimpleEntityResponseDto;
   createUser: UserDto;
-  delegateInterviewers: Array<InterviewDelegation>;
+  delegateInterviewers: Array<InterviewDelegationDto>;
   delegateReviewers: Array<ReviewedApplicantRecordDto>;
   deleteAdminCommentById: AdminCommentDto;
   deleteEntity?: Maybe<Scalars['ID']['output']>;
-  deleteInterviewDelegation: InterviewDelegation;
+  deleteInterviewDelegation: InterviewDelegationDto;
   deleteInterviewGroupById: InterviewGroupDto;
   deleteInterviewedApplicantRecordById: InterviewedApplicantRecord;
   deleteReviewedApplicantRecord: ReviewedApplicantRecordDto;
@@ -259,7 +259,7 @@ export type Mutation = {
   updateApplicantRecordIsApplicantFlagged: ApplicantRecordDto;
   updateApplicantRecordStatus: ApplicantRecordDto;
   updateEntity: EntityResponseDto;
-  updateInterviewDelegation: InterviewDelegation;
+  updateInterviewDelegation: InterviewDelegationDto;
   updateInterviewGroup: InterviewGroupDto;
   updateInterviewedApplicantRecord: InterviewedApplicantRecord;
   updateReviewedApplicantRecord: ReviewedApplicantRecordDto;
@@ -269,7 +269,7 @@ export type Mutation = {
 
 
 export type MutationBulkCreateInterviewDelegationsArgs = {
-  delegations: Array<BulkCreateInterviewDelegationInput>;
+  delegations: Array<CreateInterviewDelegationDto>;
 };
 
 
@@ -280,11 +280,6 @@ export type MutationBulkCreateInterviewGroupsArgs = {
 
 export type MutationBulkCreateReviewedApplicantRecordArgs = {
   reviewedApplicantRecords: Array<CreateReviewedApplicantRecordDto>;
-};
-
-
-export type MutationBulkDeleteInterviewDelegationsArgs = {
-  delegations: Array<BulkDeleteInterviewDelegationInput>;
 };
 
 
@@ -311,9 +306,7 @@ export type MutationCreateEntityArgs = {
 
 
 export type MutationCreateInterviewDelegationArgs = {
-  groupId: Scalars['ID']['input'];
-  interviewedApplicantRecordId: Scalars['ID']['input'];
-  interviewerId: Scalars['Int']['input'];
+  interviewDelegation: CreateInterviewDelegationDto;
 };
 
 
@@ -364,7 +357,7 @@ export type MutationDeleteEntityArgs = {
 
 export type MutationDeleteInterviewDelegationArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
-  interviewerId: Scalars['Int']['input'];
+  interviewerId: Scalars['ID']['input'];
 };
 
 
@@ -462,10 +455,9 @@ export type MutationUpdateEntityArgs = {
 
 
 export type MutationUpdateInterviewDelegationArgs = {
-  groupId: Scalars['ID']['input'];
+  interviewDelegation: UpdateInterviewDelegationDto;
   interviewedApplicantRecordId: Scalars['ID']['input'];
-  newInterviewerId: Scalars['Int']['input'];
-  prevInterviewerId: Scalars['Int']['input'];
+  interviewerId: Scalars['ID']['input'];
 };
 
 
@@ -509,11 +501,11 @@ export type Query = {
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
   file: Scalars['String']['output'];
-  getInterviewDelegation: InterviewDelegation;
-  getInterviewGroupById: InterviewGroupDto;
   getInterviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
   getInterviewedPairingsByUserId: Array<InterviewPairingsDto>;
   getInterviewersByGroupId: Array<UserDto>;
+  interviewDelegation: InterviewDelegationDto;
+  interviewGroup: InterviewGroupDto;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
@@ -556,17 +548,6 @@ export type QueryFileArgs = {
 };
 
 
-export type QueryGetInterviewDelegationArgs = {
-  interviewedApplicantRecordId: Scalars['ID']['input'];
-  interviewerId: Scalars['Int']['input'];
-};
-
-
-export type QueryGetInterviewGroupByIdArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
 export type QueryGetInterviewedApplicantsByUserIdArgs = {
   userId: Scalars['Int']['input'];
 };
@@ -579,6 +560,17 @@ export type QueryGetInterviewedPairingsByUserIdArgs = {
 
 export type QueryGetInterviewersByGroupIdArgs = {
   groupId: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewDelegationArgs = {
+  interviewedApplicantRecordId: Scalars['ID']['input'];
+  interviewerId: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewGroupArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -764,9 +756,13 @@ export type UpdateAdminCommentDto = {
   comment: Scalars['String']['input'];
 };
 
+export type UpdateInterviewDelegationDto = {
+  interviewHasConflict?: InputMaybe<InterviewConflict>;
+};
+
 export type UpdateInterviewGroupDto = {
   schedulingLink?: InputMaybe<Scalars['String']['input']>;
-  status: Scalars['String']['input'];
+  status?: InputMaybe<InterviewGroupStatus>;
 };
 
 export type UpdateInterviewedApplicantRecordDto = {

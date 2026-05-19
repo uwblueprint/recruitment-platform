@@ -1,0 +1,7 @@
+query InterviewGroup($id: ID!) {
+  interviewGroup(id: $id) {
+    id
+    schedulingLink
+    status
+  }
+}

@@ -2,7 +2,7 @@ import { gql } from "apollo-server-express";
 
 const interviewDashboardTypes = gql`
   extend type Mutation {
-    delegateInterviewers(positions: [String!]!): [InterviewDelegation!]!
+    delegateInterviewers(positions: [String!]!): [InterviewDelegationDTO!]!
   }
 `;
 

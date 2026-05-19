@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import InterviewGroupAPIClient from "@/APIClients/InterviewGroupAPIClient";
 import InterviewPageAPIClient from "@/APIClients/InterviewPageAPIClient";
-import { InterviewGroupDTO, UserDTO, InterviewedApplicantsDTO  } from "@/types";
+import { InterviewedApplicantsDTO, InterviewGroupDTO, UserDTO } from "@/graphql/typeUtils";
 
 type UseInterviewGroupDataResult = {
   group: InterviewGroupDTO | null;

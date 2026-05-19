@@ -8,3 +8,19 @@ export const InterviewConflictEnum = {
 } as const;
 
 export type InterviewConflict = ValueOf<typeof InterviewConflictEnum>;
+
+export type InterviewDelegationDTO = {
+  interviewedApplicantRecordId: string;
+  interviewerId: string;
+  interviewHasConflict?: InterviewConflict;
+  groupId: string;
+};
+
+export type CreateInterviewDelegationDTO = Omit<
+  InterviewDelegationDTO,
+  "interviewHasConflict"
+>;
+
+export type UpdateInterviewDelegationDTO = Partial<
+  Pick<InterviewDelegationDTO, "interviewHasConflict">
+>;
