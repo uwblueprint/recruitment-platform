@@ -1,8 +1,10 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
 import {
   InterviewGroupStatus,
   InterviewGroupStatusEnum,
 } from "../types/interviewGroup";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
+import InterviewDelegation from "./interviewDelegation.model";
 
 @Table({ tableName: "interview_groups" })
 export default class InterviewGroup extends Model {
@@ -36,4 +38,7 @@ export default class InterviewGroup extends Model {
     defaultValue: DataType.NOW,
   })
   updatedAt!: Date;
+
+  @HasMany(() => InterviewDelegation, { foreignKey: "group_id" })
+  interview_delegations?: InterviewDelegation[];
 }

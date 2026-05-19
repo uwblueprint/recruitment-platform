@@ -8,5 +8,6 @@ mutation LoginWithGoogle($idToken: String!) {
     position
     isArchived
     accessToken
+    refreshToken
   }
 }

@@ -10,7 +10,6 @@ import {
   import InterviewGroupAPIClient from "@/APIClients/InterviewGroupAPIClient";
   import { useRouter } from "next/router";
   import { ReactElement, useState } from "react";
-  import type { InterviewGroupStatus } from "@/types";
   import useInterviewGroupData from "@/hooks/useInterviewGroupData";
   import { NextPageWithLayout } from "../_app";
   import CalendlyLinkForm from "./_components/CalendlyLinkForm";
@@ -19,6 +18,7 @@ import {
   import InterviewGroupIllustrationPanel from "./_components/InterviewGroupIllustrationPanel";
   import InterviewPageHeader from "./_components/InterviewPageHeader";
   import PartnerSection from "./_components/PartnerSection";
+import { InterviewGroupStatus } from "@/graphql/typeUtils";
   
   const InterviewGroupContent = ({
     interviewGroupId,
@@ -35,7 +35,7 @@ import {
     const [isEditing, setIsEditing] = useState(false);
   
     const { group, interviewedApplicants, interviewers, isLoading, error } =
-      useInterviewGroupData(interviewGroupId, Number(currentUser?.id ?? null));
+      useInterviewGroupData(interviewGroupId, currentUser?.id ?? null);
   
     const partner = interviewers.find((i) => i.id !== currentUser?.id) ?? null;
   

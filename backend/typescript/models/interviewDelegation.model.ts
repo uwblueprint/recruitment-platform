@@ -5,6 +5,7 @@ import {
   Model,
   Table,
 } from "sequelize-typescript";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import InterviewGroup from "./interviewGroup.model";
 import User from "./user.model";
 import { InterviewConflict } from "../types/interviewDelegation";

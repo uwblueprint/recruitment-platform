@@ -4,26 +4,26 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type * as Types from './types';
 
-export type GetInterviewedApplicantsByUserIdQueryVariables = Exact<{
-  userId: number;
-}>;
-
-
-export type GetInterviewedApplicantsByUserIdQuery = { getInterviewedApplicantsByUserId: Array<{ applicantRecordId: string, interviewStatus: string, applicantFirstName: string, applicantLastName: string }> };
-
-export type GetInterviewersByGroupIdQueryVariables = Exact<{
-  groupId: string | number;
-}>;
-
-
-export type GetInterviewersByGroupIdQuery = { getInterviewersByGroupId: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }> };
-
 export type InterviewGroupQueryVariables = Exact<{
   id: string | number;
 }>;
 
 
 export type InterviewGroupQuery = { interviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
+
+export type InterviewedApplicantsByUserIdQueryVariables = Exact<{
+  userId: string | number;
+}>;
+
+
+export type InterviewedApplicantsByUserIdQuery = { interviewedApplicantsByUserId: Array<{ applicantRecordId: string, interviewStatus: Types.InterviewStatus, applicantFirstName: string, applicantLastName: string }> };
+
+export type InterviewersByGroupIdQueryVariables = Exact<{
+  groupId: string | number;
+}>;
+
+
+export type InterviewersByGroupIdQuery = { interviewersByGroupId: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }> };
 
 export type LoginMutationVariables = Exact<{
   email: string;
@@ -38,7 +38,7 @@ export type LoginWithGoogleMutationVariables = Exact<{
 }>;
 
 
-export type LoginWithGoogleMutation = { loginWithGoogle: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean, accessToken: string } };
+export type LoginWithGoogleMutation = { loginWithGoogle: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean, accessToken: string, refreshToken: string } };
 
 export type RefreshMutationVariables = Exact<{
   refreshToken: string;

@@ -2,37 +2,37 @@ import { client } from "@/client";
 
 import BaseAPIClient from "./BaseAPIClient";
 import {
-  GetInterviewedApplicantsByUserIdDocument,
-  GetInterviewersByGroupIdDocument,
-  type GetInterviewedApplicantsByUserIdQuery,
-  type GetInterviewedApplicantsByUserIdQueryVariables,
-  type GetInterviewersByGroupIdQuery,
-  type GetInterviewersByGroupIdQueryVariables,
+  InterviewedApplicantsByUserIdDocument,
+  InterviewersByGroupIdDocument,
+  type InterviewedApplicantsByUserIdQuery,
+  type InterviewedApplicantsByUserIdQueryVariables,
+  type InterviewersByGroupIdQuery,
+  type InterviewersByGroupIdQueryVariables,
   type InterviewedApplicantsDTO,
   type UserDTO,
 } from "@/graphql/typeUtils";
 
 class InterviewPageAPIClient {
   static async getInterviewedApplicantsByUserId(
-    userId: number,
+    userId: string,
   ): Promise<InterviewedApplicantsDTO[]> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
       const { data } = await client.query<
-        GetInterviewedApplicantsByUserIdQuery,
-        GetInterviewedApplicantsByUserIdQueryVariables
+        InterviewedApplicantsByUserIdQuery,
+        InterviewedApplicantsByUserIdQueryVariables
       >({
-        query: GetInterviewedApplicantsByUserIdDocument,
+        query: InterviewedApplicantsByUserIdDocument,
         variables: { userId },
         fetchPolicy: "network-only",
       });
 
-      if (!data?.getInterviewedApplicantsByUserId) {
+      if (!data?.interviewedApplicantsByUserId) {
         throw new Error("No data returned");
       }
 
-      return data.getInterviewedApplicantsByUserId;
+      return data.interviewedApplicantsByUserId;
     } catch {
       throw new Error("Failed to get interviewed applicants");
     }
@@ -45,19 +45,19 @@ class InterviewPageAPIClient {
 
     try {
       const { data } = await client.query<
-        GetInterviewersByGroupIdQuery,
-        GetInterviewersByGroupIdQueryVariables
+        InterviewersByGroupIdQuery,
+        InterviewersByGroupIdQueryVariables
       >({
-        query: GetInterviewersByGroupIdDocument,
+        query: InterviewersByGroupIdDocument,
         variables: { groupId },
         fetchPolicy: "network-only",
       });
 
-      if (!data?.getInterviewersByGroupId) {
+      if (!data?.interviewersByGroupId) {
         throw new Error("No data returned");
       }
 
-      return data.getInterviewersByGroupId;
+      return data.interviewersByGroupId;
     } catch {
       throw new Error("Failed to get interviewers by group id");
     }

@@ -14,7 +14,7 @@ type UseInterviewGroupDataResult = {
 // we can clean this up after we migrate to react query
 const useInterviewGroupData = (
   interviewGroupId: string | null,
-  userId: number | null,
+  userId: string | null,
 ): UseInterviewGroupDataResult => {
   const [state, setState] = useState<UseInterviewGroupDataResult>({
     group: null,

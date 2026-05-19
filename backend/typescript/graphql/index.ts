@@ -33,6 +33,8 @@ import userType from "./types/userType";
 import interviewedApplicantRecordResolvers from "./resolvers/interviewedApplicantRecordResolvers";
 import interviewDelegationResolvers from "./resolvers/interviewDelegationResolvers";
 import interviewGroupResolvers from "./resolvers/interviewGroupResolvers";
+import interviewPageResolvers from "./resolvers/interviewPageResolvers";
+import interviewDashboardResolvers from "./resolvers/interviewDashboardResolvers";
 
 const query = gql`
   type Query {
@@ -78,6 +80,8 @@ const executableSchema = makeExecutableSchema({
     userResolvers,
     interviewDelegationResolvers,
     interviewGroupResolvers,
+    interviewPageResolvers,
+    interviewDashboardResolvers,
   ),
 });
 
@@ -105,6 +109,9 @@ const graphQLMiddlewares = {
     interviewedApplicantRecord: authorizedByAllRoles(),
     interviewDelegation: authorizedByAllRoles(),
     interviewGroup: authorizedByAllRoles(),
+    interviewedApplicantsByUserId: authorizedByAllRoles(),
+    interviewedPairingsByUserId: authorizedByAllRoles(),
+    interviewersByGroupId: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
   },
@@ -145,6 +152,7 @@ const graphQLMiddlewares = {
     bulkCreateInterviewGroups: authorizedByAdmin(),
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
+    delegateInterviewers: authorizedBySuperAdmin(),
   },
 };
 

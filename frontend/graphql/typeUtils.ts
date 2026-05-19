@@ -100,8 +100,8 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
 export {
-  GetInterviewedApplicantsByUserIdDocument,
-  GetInterviewersByGroupIdDocument,
+  InterviewedApplicantsByUserIdDocument,
+  InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   ReportReviewConflictDocument,
   UpdateInterviewGroupDocument,
@@ -110,10 +110,10 @@ export {
 export type {
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
-  GetInterviewedApplicantsByUserIdQuery,
-  GetInterviewedApplicantsByUserIdQueryVariables,
-  GetInterviewersByGroupIdQuery,
-  GetInterviewersByGroupIdQueryVariables,
+  InterviewedApplicantsByUserIdQuery,
+  InterviewedApplicantsByUserIdQueryVariables,
+  InterviewersByGroupIdQuery,
+  InterviewersByGroupIdQueryVariables,
   LoginMutation,
   LoginMutationVariables,
   LoginWithGoogleMutation,
@@ -147,14 +147,14 @@ export type InterviewGroupResult = OperationField<
 >;
 export type InterviewedApplicantResult = ArrayElement<
   OperationField<
-    Operations.GetInterviewedApplicantsByUserIdQuery,
-    "getInterviewedApplicantsByUserId"
+    Operations.InterviewedApplicantsByUserIdQuery,
+    "interviewedApplicantsByUserId"
   >
 >;
 export type InterviewerResult = ArrayElement<
   OperationField<
-    Operations.GetInterviewersByGroupIdQuery,
-    "getInterviewersByGroupId"
+    Operations.InterviewersByGroupIdQuery,
+    "interviewersByGroupId"
   >
 >;
 export type UpdateInterviewGroupResult = OperationField<
