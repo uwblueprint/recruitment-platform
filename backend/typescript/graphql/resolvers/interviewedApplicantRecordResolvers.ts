@@ -5,7 +5,6 @@ import {
   InterviewedApplicantRecordDTO,
   UpdateInterviewedApplicantRecordDTO,
 } from "../../types";
-import { getErrorMessage } from "../../utilities/errorUtils";
 
 const interviewedApplicantRecordsService: IInterviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
 
@@ -15,13 +14,9 @@ const interviewedApplicantRecordsResolvers = {
       _parent: undefined,
       { id }: { id: string },
     ): Promise<InterviewedApplicantRecordDTO> => {
-      try {
-        return await interviewedApplicantRecordsService.getInterviewedApplicantRecordById(
-          id,
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return interviewedApplicantRecordsService.getInterviewedApplicantRecordById(
+        id,
+      );
     },
   },
   Mutation: {
@@ -31,13 +26,9 @@ const interviewedApplicantRecordsResolvers = {
         interviewedApplicantRecord,
       }: { interviewedApplicantRecord: CreateInterviewedApplicantRecordDTO },
     ): Promise<InterviewedApplicantRecordDTO> => {
-      try {
-        return await interviewedApplicantRecordsService.createInterviewedApplicantRecord(
-          interviewedApplicantRecord,
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return interviewedApplicantRecordsService.createInterviewedApplicantRecord(
+        interviewedApplicantRecord,
+      );
     },
 
     updateInterviewedApplicantRecord: async (
@@ -50,27 +41,19 @@ const interviewedApplicantRecordsResolvers = {
         interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO;
       },
     ): Promise<InterviewedApplicantRecordDTO> => {
-      try {
-        return await interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
-          id,
-          interviewedApplicantRecord,
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
+        id,
+        interviewedApplicantRecord,
+      );
     },
 
     deleteInterviewedApplicantRecordById: async (
       _parent: undefined,
-      args: { id: string },
+      { id }: { id: string },
     ): Promise<InterviewedApplicantRecordDTO> => {
-      try {
-        return await interviewedApplicantRecordsService.deleteInterviewedApplicantRecordById(
-          args.id,
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return interviewedApplicantRecordsService.deleteInterviewedApplicantRecordById(
+        id,
+      );
     },
   },
 };

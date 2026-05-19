@@ -5,15 +5,17 @@ import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model"
 import User from "../../models/user.model";
 import {
   CreateReviewedApplicantRecordDTO,
-  Review,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
-  ReviewStatus,
   ReviewStatusEnum,
-  SkillCategory,
 } from "../../types";
+import {
+  toReviewDashboardRowDTO,
+  toReviewDashboardSidePanelDTO,
+  toReviewedApplicantDTO,
+} from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IReviewCompositeService from "../interfaces/IReviewCompositeService";
@@ -22,72 +24,6 @@ import ReviewedApplicantRecordService from "./reviewedApplicantRecordService";
 const Logger = logger(__filename);
 
 const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
-
-function toReviewedApplicantDTO(
-  reviewedApplicantRecord: ReviewedApplicantRecord,
-): ReviewedApplicantsDTO {
-  return {
-    applicantRecordId: reviewedApplicantRecord.applicant_record_id,
-    reviewStatus: reviewedApplicantRecord.status,
-    applicantFirstName:
-      reviewedApplicantRecord.applicant_record.applicant.first_name,
-    applicantLastName:
-      reviewedApplicantRecord.applicant_record.applicant.last_name,
-  };
-}
-
-function toReviewDashboardSidePanelDTO(
-  applicantRecord: ApplicantRecord,
-  reviewedApplicantRecords: ReviewedApplicantRecord[],
-): ReviewDashboardSidePanelDTO {
-  const reviewDetails = reviewedApplicantRecords?.map((reviewRecord) => ({
-    reviewer: {
-      id: reviewRecord.reviewer.id.toString(),
-      firstName: reviewRecord.reviewer.first_name,
-      lastName: reviewRecord.reviewer.last_name,
-      email: reviewRecord.reviewer.email,
-      role: reviewRecord.reviewer.role,
-      position: reviewRecord.reviewer.position,
-      isArchived: reviewRecord.reviewer.is_archived,
-    },
-    review: reviewRecord.review as Review,
-    reviewStatus: reviewRecord.status as ReviewStatus,
-  }));
-
-  return {
-    firstName: applicantRecord.applicant.first_name,
-    lastName: applicantRecord.applicant.last_name,
-    position: applicantRecord.position,
-    program: applicantRecord.applicant.program,
-    resumeUrl: applicantRecord.applicant.resume_url,
-    applicationStatus: applicantRecord.status,
-    skillCategory: applicantRecord.skill_category as SkillCategory,
-    reviewDetails,
-  };
-}
-
-function toReviewDashboardRowDTO(
-  applicantRecord: ApplicantRecord,
-): ReviewDashboardRowDTO {
-  return {
-    firstName: applicantRecord.applicant.first_name,
-    lastName: applicantRecord.applicant.last_name,
-    position: applicantRecord.position,
-    timesApplied: applicantRecord.applicant.times_applied.toString(),
-    applicationStatus: applicantRecord.status,
-    choice: applicantRecord.choice,
-    reviewers: (applicantRecord.reviewed_applicant_records ?? []).map((r) => ({
-      id: r.reviewer.id.toString(),
-      firstName: r.reviewer.first_name,
-      lastName: r.reviewer.last_name,
-      email: r.reviewer.email,
-      role: r.reviewer.role,
-      position: r.reviewer.position,
-      isArchived: r.reviewer.is_archived,
-    })),
-    totalScore: applicantRecord.combined_review_score ?? null,
-  };
-}
 
 class ReviewCompositeService implements IReviewCompositeService {
   /* eslint-disable class-methods-use-this */

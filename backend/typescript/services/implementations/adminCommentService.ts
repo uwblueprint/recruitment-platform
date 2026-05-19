@@ -3,23 +3,13 @@ import {
   CreateAdminCommentDTO,
   UpdateAdminCommentDTO,
 } from "../../types";
+import { toAdminCommentDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import AdminComment from "../../models/adminComment.model";
 import IAdminCommentService from "../interfaces/IAdminCommentService";
 
 const Logger = logger(__filename);
-
-function toDTO(adminComment: AdminComment): AdminCommentDTO {
-  return {
-    id: adminComment.id,
-    userId: adminComment.user_id,
-    applicantRecordId: adminComment.applicant_record_id,
-    comment: adminComment.comment,
-    createdAt: adminComment.createdAt.toISOString(),
-    updatedAt: adminComment.updatedAt.toISOString(),
-  };
-}
 
 class AdminCommentService implements IAdminCommentService {
   /* eslint-disable class-methods-use-this */
@@ -31,7 +21,7 @@ class AdminCommentService implements IAdminCommentService {
       const adminComments = await AdminComment.findAll({
         where: { applicant_record_id: applicantRecordId },
       });
-      return adminComments.map(toDTO);
+      return adminComments.map(toAdminCommentDTO);
     } catch (error: unknown) {
       Logger.error(
         `Failed to get admin comments by applicantRecordId = ${applicantRecordId}. Reason = ${getErrorMessage(
@@ -48,7 +38,7 @@ class AdminCommentService implements IAdminCommentService {
       if (!adminComment) {
         throw new Error(`adminCommentId ${id} not found.`);
       }
-      return toDTO(adminComment);
+      return toAdminCommentDTO(adminComment);
     } catch (error: unknown) {
       Logger.error(
         `Failed to get admin comment by id = ${id}. Reason = ${getErrorMessage(
@@ -68,7 +58,7 @@ class AdminCommentService implements IAdminCommentService {
         applicant_record_id: adminComment.applicantRecordId,
         comment: adminComment.comment,
       });
-      return toDTO(newAdminComment);
+      return toAdminCommentDTO(newAdminComment);
     } catch (error: unknown) {
       Logger.error(
         `Failed to create admin comment. Reason = ${getErrorMessage(error)}`,
@@ -90,7 +80,7 @@ class AdminCommentService implements IAdminCommentService {
       const updatedAdminComment = await adminCommentToUpdate.update({
         comment: adminComment.comment,
       });
-      return toDTO(updatedAdminComment);
+      return toAdminCommentDTO(updatedAdminComment);
     } catch (error: unknown) {
       Logger.error(
         `Failed to update admin comment. Reason = ${getErrorMessage(error)}`,
@@ -106,7 +96,7 @@ class AdminCommentService implements IAdminCommentService {
         throw new Error(`adminCommentId ${id} not found.`);
       }
       await adminComment.destroy();
-      return toDTO(adminComment);
+      return toAdminCommentDTO(adminComment);
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete admin comment. Reason = ${getErrorMessage(error)}`,

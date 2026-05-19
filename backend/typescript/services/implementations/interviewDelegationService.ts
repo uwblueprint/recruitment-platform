@@ -5,20 +5,12 @@ import {
   InterviewDelegationDTO,
   UpdateInterviewDelegationDTO,
 } from "../../types";
+import { toInterviewDelegationDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewDelegationsService from "../interfaces/IInterviewDelegationService";
 
 const Logger = logger(__filename);
-
-function toDTO(delegation: InterviewDelegation): InterviewDelegationDTO {
-  return {
-    interviewedApplicantRecordId: delegation.interviewed_applicant_record_id,
-    interviewerId: String(delegation.interviewer_id),
-    groupId: delegation.group_id,
-    interviewHasConflict: delegation.interview_has_conflict,
-  };
-}
 
 class InterviewDelegationsService implements IInterviewDelegationsService {
   /* eslint-disable class-methods-use-this */
@@ -32,7 +24,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
         interviewer_id: Number(interviewDelegation.interviewerId),
         group_id: interviewDelegation.groupId,
       });
-      return toDTO(newDelegation);
+      return toInterviewDelegationDTO(newDelegation);
     } catch (error: unknown) {
       Logger.error(
         `Failed to create interview delegation. Reason = ${getErrorMessage(
@@ -64,7 +56,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
       const updatedDelegation = await existingDelegation.update({
         interview_has_conflict: interviewDelegation.interviewHasConflict,
       });
-      return toDTO(updatedDelegation);
+      return toInterviewDelegationDTO(updatedDelegation);
     } catch (error: unknown) {
       Logger.error(
         `Failed to update interview delegation. Reason = ${getErrorMessage(
@@ -91,7 +83,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
           `No interview delegation found for interviewedApplicantRecordId: ${interviewedApplicantRecordId} and interviewerId: ${interviewerId}`,
         );
       }
-      return toDTO(delegation);
+      return toInterviewDelegationDTO(delegation);
     } catch (error: unknown) {
       Logger.error(
         `Failed to fetch interview delegation. Reason = ${getErrorMessage(
@@ -119,7 +111,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
         );
       }
       await delegation.destroy();
-      return toDTO(delegation);
+      return toInterviewDelegationDTO(delegation);
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete interview delegation. Reason = ${getErrorMessage(
@@ -146,7 +138,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
       );
 
       await t.commit();
-      return createdDelegations.map(toDTO);
+      return createdDelegations.map(toInterviewDelegationDTO);
     } catch (error: unknown) {
       Logger.error(
         `Failed to bulk create interview delegations. Reason = ${getErrorMessage(

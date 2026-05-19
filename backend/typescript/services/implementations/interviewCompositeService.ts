@@ -9,6 +9,7 @@ import {
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
+import { toInterviewedApplicantDTO, toUserDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";
@@ -52,18 +53,6 @@ function interviewerTeamKey(a: InterviewerAssignment): string {
   return `pair:${x}|${y}`;
 }
 
-function toUserDTO(model: User): UserDTO {
-  return {
-    id: String(model.id),
-    firstName: model.first_name,
-    lastName: model.last_name,
-    email: model.email,
-    position: model.position,
-    role: model.role,
-    isArchived: model.is_archived,
-  };
-}
-
 function dedupeUsersById(users: User[]): User[] {
   const seen = new Set<number>();
   return users.filter((user) => {
@@ -73,17 +62,6 @@ function dedupeUsersById(users: User[]): User[] {
     seen.add(user.id);
     return true;
   });
-}
-
-function toInterviewedApplicantDTO(
-  record: InterviewedApplicantRecord,
-): InterviewedApplicantsDTO {
-  return {
-    applicantRecordId: record.applicant_record_id,
-    interviewStatus: record.status,
-    applicantFirstName: record.applicant_record.applicant.first_name,
-    applicantLastName: record.applicant_record.applicant.last_name,
-  };
 }
 
 class InterviewCompositeService implements IInterviewCompositeService {
@@ -157,7 +135,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
         interviewGroupStatus: group.status,
         groupMembers: dedupeUsersById(
           (group.interview_delegations ?? []).map((d) => d.interviewer),
-        ).map(toUserDTO),
+        ).map((user) => toUserDTO(user)),
       }));
     } catch (error: unknown) {
       Logger.error(`Failed to fetch. Reason = ${getErrorMessage(error)}`);
@@ -182,7 +160,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
         return [];
       }
 
-      return dedupeUsersById(interviewers).map(toUserDTO);
+      return dedupeUsersById(interviewers).map((user) => toUserDTO(user));
     } catch (error: unknown) {
       Logger.error(
         `Failed to get interview delegations by groupId. Reason = ${getErrorMessage(

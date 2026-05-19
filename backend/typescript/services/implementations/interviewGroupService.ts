@@ -6,19 +6,12 @@ import {
   InterviewGroupDTO,
   UpdateInterviewGroupDTO,
 } from "../../types";
+import { toInterviewGroupDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
 
 const Logger = logger(__filename);
-
-function toDTO(interviewGroup: InterviewGroup): InterviewGroupDTO {
-  return {
-    id: interviewGroup.id,
-    schedulingLink: interviewGroup.scheduling_link,
-    status: interviewGroup.status,
-  };
-}
 
 class InterviewGroupService implements IInterviewGroupService {
   /* eslint-disable class-methods-use-this */
@@ -28,7 +21,7 @@ class InterviewGroupService implements IInterviewGroupService {
       if (!interviewGroup) {
         throw new Error(`No interview group found for id: ${id}`);
       }
-      return toDTO(interviewGroup);
+      return toInterviewGroupDTO(interviewGroup);
     } catch (error: unknown) {
       Logger.error(
         `Failed to fetch interview group. Reason = ${getErrorMessage(error)}`,
@@ -45,7 +38,7 @@ class InterviewGroupService implements IInterviewGroupService {
         scheduling_link: interviewGroup.schedulingLink,
         status: interviewGroup.status,
       });
-      return toDTO(newInterviewGroup);
+      return toInterviewGroupDTO(newInterviewGroup);
     } catch (error: unknown) {
       Logger.error(
         `Failed to create interview group. Reason = ${getErrorMessage(error)}`,
@@ -68,7 +61,7 @@ class InterviewGroupService implements IInterviewGroupService {
         scheduling_link: interviewGroup.schedulingLink,
         status: interviewGroup.status,
       });
-      return toDTO(updatedGroup);
+      return toInterviewGroupDTO(updatedGroup);
     } catch (error: unknown) {
       Logger.error(
         `Failed to update interview group. Reason = ${getErrorMessage(error)}`,
@@ -84,7 +77,7 @@ class InterviewGroupService implements IInterviewGroupService {
         throw new Error(`No interview group found for id: ${id}`);
       }
       await interviewGroup.destroy();
-      return toDTO(interviewGroup);
+      return toInterviewGroupDTO(interviewGroup);
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete interview group. Reason = ${getErrorMessage(error)}`,
@@ -109,7 +102,7 @@ class InterviewGroupService implements IInterviewGroupService {
       );
 
       await t.commit();
-      return createdGroups.map((group) => toDTO(group));
+      return createdGroups.map((group) => toInterviewGroupDTO(group));
     } catch (error: unknown) {
       Logger.error(
         `Failed to bulk create interview groups. Reason = ${getErrorMessage(
@@ -147,7 +140,7 @@ class InterviewGroupService implements IInterviewGroupService {
       });
 
       await t.commit();
-      return foundGroups.map((group) => toDTO(group));
+      return foundGroups.map((group) => toInterviewGroupDTO(group));
     } catch (error: unknown) {
       Logger.error(
         `Failed to bulk delete interview groups. Reason = ${getErrorMessage(
