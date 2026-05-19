@@ -13,6 +13,7 @@ import authResolvers from "./resolvers/authResolvers";
 import entityResolvers from "./resolvers/entityResolvers";
 import simpleEntityResolvers from "./resolvers/simpleEntityResolvers";
 import reviewedApplicantRecordResolvers from "./resolvers/reviewedApplicantRecordResolvers";
+import reviewDashboardResolvers from "./resolvers/reviewDashboardResolvers";
 import reviewPageResolvers from "./resolvers/reviewPageResolvers";
 import userResolvers from "./resolvers/userResolvers";
 import adminCommentType from "./types/adminCommentType";
@@ -68,6 +69,7 @@ const executableSchema = makeExecutableSchema({
     entityResolvers,
     simpleEntityResolvers,
     reviewedApplicantRecordResolvers,
+    reviewDashboardResolvers,
     reviewPageResolvers,
     userResolvers,
   ),

@@ -2,6 +2,7 @@ import {
   BelongsTo,
   Column,
   DataType,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
@@ -13,6 +14,8 @@ import {
   SkillCategory,
 } from "../types";
 import Applicant from "./applicant.model";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
+import ReviewedApplicantRecord from "./reviewedApplicantRecord.model";
 
 @Table({ tableName: "applicant_records" })
 export default class ApplicantRecord extends Model {
@@ -79,4 +82,9 @@ export default class ApplicantRecord extends Model {
 
   @BelongsTo(() => Applicant, { foreignKey: "applicant_id", targetKey: "id" })
   applicant!: Applicant;
+
+  @HasMany(() => ReviewedApplicantRecord, {
+    foreignKey: "applicant_record_id",
+  })
+  reviewed_applicant_records!: ReviewedApplicantRecord[];
 }

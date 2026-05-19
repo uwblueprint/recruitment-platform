@@ -53,17 +53,19 @@ export type ReviewDashboardRowDTO =
   WithoutTypename<Schema.ReviewDashboardRowDto>;
 export type ReviewDashboardSidePanelDTO =
   WithoutTypename<Schema.ReviewDashboardSidePanelDto>;
-export type ReviewDetailsDTO = WithoutTypename<Schema.ReviewDetails>;
+export type ReviewDashboardReviewDetailsDTO =
+  WithoutTypename<Schema.ReviewDashboardReviewDetails>;
+export type ReviewDetailsDTO = ReviewDashboardReviewDetailsDTO;
 export type ReviewedApplicantRecordDTO =
   WithoutTypename<Schema.ReviewedApplicantRecordDto>;
 export type ReviewedApplicantsDTO =
   WithoutTypename<Schema.ReviewedApplicantsDto>;
-export type ReviewerDTO = WithoutTypename<Schema.ReviewerDto>;
 export type ShortAnswerQuestionDTO = WithoutTypename<Schema.ShortAnswerQuestion>;
 export type SimpleEntityRequestDTO = Schema.SimpleEntityRequestDto;
 export type SimpleEntityResponseDTO =
   WithoutTypename<Schema.SimpleEntityResponseDto>;
 export type UserDTO = WithoutTypename<Schema.UserDto>;
+export type ReviewDashboardReviewDetails = WithoutTypename<Schema.ReviewDashboardReviewDetails>;
 
 /**
  * Clean aliases for generated GraphQL input types.

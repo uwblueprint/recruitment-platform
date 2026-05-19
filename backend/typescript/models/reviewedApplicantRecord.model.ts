@@ -6,6 +6,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import { Review, ReviewStatus } from "../types";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import ApplicantRecord from "./applicantRecord.model";
 import User from "./user.model";
 
