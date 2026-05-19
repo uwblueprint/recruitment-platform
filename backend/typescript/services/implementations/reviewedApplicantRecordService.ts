@@ -7,6 +7,7 @@ import {
   UpdateReviewedApplicantRecordDTO,
   Review,
 } from "../../types";
+import { toReviewedApplicantRecordDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IReviewApplicantRecordService from "../interfaces/IReviewedApplicantRecordService";
@@ -24,17 +25,6 @@ function isValidReviewScores(review: Review): boolean {
   return !Object.entries(scores).some(
     ([_field, value]) => value && (value < 1 || value > 5),
   );
-}
-
-function toDTO(model: ReviewedApplicantRecord): ReviewedApplicantRecordDTO {
-  return {
-    applicantRecordId: model.applicant_record_id,
-    reviewerId: String(model.reviewer_id),
-    review: model.review as Review,
-    status: model.status,
-    score: model.score,
-    reviewerHasConflict: model.reviewer_has_conflict,
-  };
 }
 
 class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
@@ -55,7 +45,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
         throw new Error("ReviewedApplicantRecord not found");
       }
 
-      return toDTO(reviewedApplicantRecord);
+      return toReviewedApplicantRecordDTO(reviewedApplicantRecord);
     } catch (error: unknown) {
       Logger.error(
         `Failed to get reviewed applicant record. Reason = ${getErrorMessage(
@@ -77,7 +67,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
           status: reviewedApplicantRecord.status,
         },
       );
-      return toDTO(createdReviewedApplicantRecord);
+      return toReviewedApplicantRecordDTO(createdReviewedApplicantRecord);
     } catch (error: unknown) {
       Logger.error(
         `Failed to create reviewed applicant record. Reason = ${getErrorMessage(
@@ -104,7 +94,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
 
       await transaction.commit();
 
-      return createdReviewedApplicantRecords.map(toDTO);
+      return createdReviewedApplicantRecords.map(toReviewedApplicantRecordDTO);
     } catch (error: unknown) {
       Logger.error(
         `Failed to bulk create reviewed applicant records. Reason = ${getErrorMessage(
@@ -133,7 +123,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
       }
 
       await record.destroy();
-      return toDTO(record);
+      return toReviewedApplicantRecordDTO(record);
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete reviewed applicant records. Reason = ${getErrorMessage(
@@ -178,7 +168,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
       // update reviews
       if (!review) {
         await transaction.commit();
-        return toDTO(reviewedRecord);
+        return toReviewedApplicantRecordDTO(reviewedRecord);
       }
 
       if (!isValidReviewScores(review)) {
@@ -209,10 +199,9 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
 
       if (!updatedScore) {
         await transaction.commit();
-        return toDTO(reviewedRecord);
+        return toReviewedApplicantRecordDTO(reviewedRecord);
       }
 
-      const newReviewedScore = updatedScore;
 
       const applicantRecord = await ApplicantRecord.findOne({
         where: { id: applicantRecordId },
@@ -244,7 +233,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
 
       await transaction.commit();
 
-      return toDTO(reviewedRecord);
+      return toReviewedApplicantRecordDTO(reviewedRecord);
     } catch (error: unknown) {
       await transaction.rollback();
       Logger.error(

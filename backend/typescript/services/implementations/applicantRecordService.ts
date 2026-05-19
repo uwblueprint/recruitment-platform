@@ -4,6 +4,7 @@ import {
   CreateApplicantRecordDTO,
   UpdateApplicantRecordDTO,
 } from "../../types";
+import { toApplicantRecordDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import ApplicantRecord from "../../models/applicantRecord.model";
@@ -11,20 +12,6 @@ import IApplicantRecordService from "../interfaces/IApplicantRecordService";
 import { sequelize } from "../../models";
 
 const Logger = logger(__filename);
-
-function toDTO(applicantRecord: ApplicantRecord): ApplicantRecordDTO {
-  return {
-    id: applicantRecord.id,
-    applicantId: applicantRecord.applicant_id,
-    position: applicantRecord.position,
-    roleSpecificQuestions: applicantRecord.role_specific_questions,
-    choice: applicantRecord.choice,
-    status: applicantRecord.status,
-    skillCategory: applicantRecord.skill_category,
-    combinedReviewScore: applicantRecord.combined_review_score,
-    isApplicantFlagged: applicantRecord.is_applicant_flagged,
-  };
-}
 
 class ApplicantRecordService implements IApplicantRecordService {
   /* eslint-disable class-methods-use-this */
@@ -35,7 +22,7 @@ class ApplicantRecordService implements IApplicantRecordService {
       if (!applicantRecord) {
         throw new Error(`ApplicantRecord with id ${id} not found.`);
       }
-      return toDTO(applicantRecord);
+      return toApplicantRecordDTO(applicantRecord);
     } catch (error: unknown) {
       Logger.error(
         `Failed to get applicant record by id = ${id}. Reason = ${getErrorMessage(
@@ -60,7 +47,7 @@ class ApplicantRecordService implements IApplicantRecordService {
         combined_review_score: applicantRecord.combinedReviewScore,
         is_applicant_flagged: applicantRecord.isApplicantFlagged,
       });
-      return toDTO(newApplicantRecord);
+      return toApplicantRecordDTO(newApplicantRecord);
     } catch (error: unknown) {
       Logger.error(
         `Failed to create applicant record. Reason = ${getErrorMessage(error)}`,
@@ -84,7 +71,7 @@ class ApplicantRecordService implements IApplicantRecordService {
         combined_review_score: applicantRecord.combinedReviewScore,
         is_applicant_flagged: applicantRecord.isApplicantFlagged,
       });
-      return toDTO(updatedApplicantRecord);
+      return toApplicantRecordDTO(updatedApplicantRecord);
     } catch (error: unknown) {
       Logger.error(
         `Failed to update applicant record. Reason = ${getErrorMessage(error)}`,
@@ -100,7 +87,7 @@ class ApplicantRecordService implements IApplicantRecordService {
         throw new Error(`ApplicantRecord with id ${id} not found.`);
       }
       await applicantRecord.destroy();
-      return toDTO(applicantRecord);
+      return toApplicantRecordDTO(applicantRecord);
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete applicant record. Reason = ${getErrorMessage(error)}`,
@@ -135,7 +122,7 @@ class ApplicantRecordService implements IApplicantRecordService {
         },
       );
       await transaction.commit();
-      return results.map(toDTO);
+      return results.map(toApplicantRecordDTO);
     } catch (error: unknown) {
       await transaction.rollback();
       Logger.error(
@@ -173,7 +160,7 @@ class ApplicantRecordService implements IApplicantRecordService {
 
       await transaction.commit();
 
-      return results.map(toDTO);
+      return results.map(toApplicantRecordDTO);
     } catch (error: unknown) {
       await transaction.rollback();
       Logger.error(

@@ -4,7 +4,6 @@ import {
   CreateReviewedApplicantRecordDTO,
   UpdateReviewedApplicantRecordDTO,
 } from "../../types";
-import { getErrorMessage } from "../../utilities/errorUtils";
 
 const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
 
@@ -17,14 +16,10 @@ const reviewedApplicantRecordResolvers = {
         reviewerId,
       }: { applicantRecordId: string; reviewerId: string },
     ): Promise<ReviewedApplicantRecordDTO> => {
-      try {
-        return await reviewedApplicantRecordService.getReviewedApplicantRecordByPk(
-          applicantRecordId,
-          reviewerId,
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return reviewedApplicantRecordService.getReviewedApplicantRecordByPk(
+        applicantRecordId,
+        reviewerId,
+      );
     },
   },
   Mutation: {
@@ -34,13 +29,9 @@ const reviewedApplicantRecordResolvers = {
         reviewedApplicantRecord,
       }: { reviewedApplicantRecord: CreateReviewedApplicantRecordDTO },
     ): Promise<ReviewedApplicantRecordDTO> => {
-      try {
-        return await reviewedApplicantRecordService.createReviewedApplicantRecord(
-          reviewedApplicantRecord,
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return reviewedApplicantRecordService.createReviewedApplicantRecord(
+        reviewedApplicantRecord,
+      );
     },
 
     bulkCreateReviewedApplicantRecord: async (
@@ -49,13 +40,9 @@ const reviewedApplicantRecordResolvers = {
         reviewedApplicantRecords,
       }: { reviewedApplicantRecords: CreateReviewedApplicantRecordDTO[] },
     ): Promise<ReviewedApplicantRecordDTO[]> => {
-      try {
-        return await reviewedApplicantRecordService.bulkCreateReviewedApplicantRecord(
-          reviewedApplicantRecords,
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return reviewedApplicantRecordService.bulkCreateReviewedApplicantRecord(
+        reviewedApplicantRecords,
+      );
     },
 
     deleteReviewedApplicantRecord: async (
@@ -65,14 +52,10 @@ const reviewedApplicantRecordResolvers = {
         reviewerId,
       }: { applicantRecordId: string; reviewerId: string },
     ): Promise<ReviewedApplicantRecordDTO> => {
-      try {
-        return await reviewedApplicantRecordService.deleteReviewedApplicantRecordByPk(
-          applicantRecordId,
-          reviewerId,
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return reviewedApplicantRecordService.deleteReviewedApplicantRecordByPk(
+        applicantRecordId,
+        reviewerId,
+      );
     },
 
     updateReviewedApplicantRecord: async (
@@ -87,19 +70,15 @@ const reviewedApplicantRecordResolvers = {
         reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO;
       },
     ): Promise<ReviewedApplicantRecordDTO> => {
-      try {
-        return await reviewedApplicantRecordService.updateReviewedApplicantRecord(
-          applicantRecordId,
-          reviewerId,
-          {
-            review: reviewedApplicantRecord.review,
-            status: reviewedApplicantRecord.status,
-            reviewerHasConflict: reviewedApplicantRecord.reviewerHasConflict,
-          },
-        );
-      } catch (error) {
-        throw new Error(getErrorMessage(error));
-      }
+      return reviewedApplicantRecordService.updateReviewedApplicantRecord(
+        applicantRecordId,
+        reviewerId,
+        {
+          review: reviewedApplicantRecord.review,
+          status: reviewedApplicantRecord.status,
+          reviewerHasConflict: reviewedApplicantRecord.reviewerHasConflict,
+        },
+      );
     },
   },
 };

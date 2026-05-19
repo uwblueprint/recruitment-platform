@@ -7,6 +7,7 @@ import {
 } from "../../types";
 import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedApplicantRecordService";
 import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.model";
+import { toInterviewedApplicantRecordDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
@@ -25,20 +26,6 @@ function isValidInterviewScores(interviewJson: Interview): boolean {
   );
 }
 
-function toDTO(
-  model: InterviewedApplicantRecord,
-): InterviewedApplicantRecordDTO {
-  return {
-    id: model.id,
-    applicantRecordId: model.applicant_record_id,
-    score: model.score,
-    interviewJson: model.interview_json,
-    status: model.status,
-    interviewNotesId: model.interview_notes_id,
-    interviewDate: model.interview_date,
-  };
-}
-
 class InterviewedApplicantRecordsService
   implements IInterviewedApplicantRecordsService {
   /* eslint-disable class-methods-use-this */
@@ -52,7 +39,7 @@ class InterviewedApplicantRecordsService
       if (!record) {
         throw new Error(`No interviewed applicant record with id ${id} found.`);
       }
-      return toDTO(record);
+      return toInterviewedApplicantRecordDTO(record);
     } catch (error: unknown) {
       Logger.error(
         `Failed to fetch interviewed applicant record. Reason = ${getErrorMessage(
@@ -73,7 +60,7 @@ class InterviewedApplicantRecordsService
           status: InterviewStatusEnum.NEEDS_REVIEW,
         },
       );
-      return toDTO(record);
+      return toInterviewedApplicantRecordDTO(record);
     } catch (error: unknown) {
       Logger.error(
         `Failed to create interviewed applicant record. Reason = ${getErrorMessage(
@@ -131,7 +118,7 @@ class InterviewedApplicantRecordsService
         interview_notes_id: interviewedApplicantRecord.interviewNotesId,
         interview_date: interviewedApplicantRecord.interviewDate,
       });
-      return toDTO(record);
+      return toInterviewedApplicantRecordDTO(record);
     } catch (error: unknown) {
       Logger.error(
         `Failed to update interviewed applicant record. Reason = ${getErrorMessage(
@@ -151,7 +138,7 @@ class InterviewedApplicantRecordsService
         throw new Error(`No interviewed applicant record with id ${id} found.`);
       }
       await record.destroy();
-      return toDTO(record);
+      return toInterviewedApplicantRecordDTO(record);
     } catch (error: unknown) {
       Logger.error(
         `Failed to delete interviewed applicant record. Reason = ${getErrorMessage(
