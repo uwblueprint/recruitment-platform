@@ -99,6 +99,10 @@ export type CreateInterviewGroupDto = {
   status: Scalars['String']['input'];
 };
 
+export type CreateInterviewedApplicantRecordDto = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
 export type CreateReviewedApplicantRecordDto = {
   applicantRecordId: Scalars['ID']['input'];
   reviewerId: Scalars['ID']['input'];
@@ -199,7 +203,7 @@ export enum InterviewStatus {
 
 export type InterviewedApplicantRecord = {
   __typename?: 'InterviewedApplicantRecord';
-  applicantRecordId: Scalars['String']['output'];
+  applicantRecordId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
   interviewDate?: Maybe<Scalars['String']['output']>;
   interviewJson?: Maybe<Interview>;
@@ -319,12 +323,7 @@ export type MutationCreateInterviewGroupArgs = {
 
 
 export type MutationCreateInterviewedApplicantRecordArgs = {
-  applicantRecordId: Scalars['String']['input'];
-  interviewDate?: InputMaybe<Scalars['String']['input']>;
-  interviewJSON?: InputMaybe<InterviewInput>;
-  interviewNotesId?: InputMaybe<Scalars['String']['input']>;
-  score?: InputMaybe<Scalars['Int']['input']>;
-  status?: InputMaybe<InterviewStatus>;
+  interviewedApplicantRecord: CreateInterviewedApplicantRecordDto;
 };
 
 
@@ -478,11 +477,7 @@ export type MutationUpdateInterviewGroupArgs = {
 
 export type MutationUpdateInterviewedApplicantRecordArgs = {
   id: Scalars['ID']['input'];
-  interviewDate?: InputMaybe<Scalars['String']['input']>;
-  interviewJSON?: InputMaybe<InterviewInput>;
-  interviewNotesId?: InputMaybe<Scalars['String']['input']>;
-  score?: InputMaybe<Scalars['Int']['input']>;
-  status?: InputMaybe<InterviewStatus>;
+  interviewedApplicantRecord: UpdateInterviewedApplicantRecordDto;
 };
 
 
@@ -772,6 +767,14 @@ export type UpdateAdminCommentDto = {
 export type UpdateInterviewGroupDto = {
   schedulingLink?: InputMaybe<Scalars['String']['input']>;
   status: Scalars['String']['input'];
+};
+
+export type UpdateInterviewedApplicantRecordDto = {
+  interviewDate?: InputMaybe<Scalars['String']['input']>;
+  interviewJson?: InputMaybe<InterviewInput>;
+  interviewNotesId?: InputMaybe<Scalars['String']['input']>;
+  score?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<InterviewStatus>;
 };
 
 export type UpdateReviewedApplicantRecordDto = {

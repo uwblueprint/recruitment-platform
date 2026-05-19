@@ -76,6 +76,8 @@ export type BulkDeleteInterviewDelegationInput =
   Schema.BulkDeleteInterviewDelegationInput;
 export type CreateAdminCommentDTO = Schema.CreateAdminCommentDto;
 export type CreateInterviewGroupDTO = Schema.CreateInterviewGroupDto;
+export type CreateInterviewedApplicantRecordDTO =
+  Schema.CreateInterviewedApplicantRecordDto;
 export type CreateReviewedApplicantRecordDTO =
   Schema.CreateReviewedApplicantRecordDto;
 export type CreateUserDTO = Schema.CreateUserDto;
@@ -84,6 +86,8 @@ export type RegisterUserDTO = Schema.RegisterUserDto;
 export type ReviewInput = Schema.ReviewInput;
 export type UpdateAdminCommentDTO = Schema.UpdateAdminCommentDto;
 export type UpdateInterviewGroupDTO = Schema.UpdateInterviewGroupDto;
+export type UpdateInterviewedApplicantRecordDTO =
+  Schema.UpdateInterviewedApplicantRecordDto;
 export type UpdateReviewedApplicantRecordDTO =
   Schema.UpdateReviewedApplicantRecordDto;
 export type UpdateUserDTO = Schema.UpdateUserDto;

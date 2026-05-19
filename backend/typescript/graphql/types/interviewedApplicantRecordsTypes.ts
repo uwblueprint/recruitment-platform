@@ -27,10 +27,22 @@ const interviewedApplicantRecordsTypes = gql`
 
   type InterviewedApplicantRecord {
     id: ID!
-    applicantRecordId: String!
+    applicantRecordId: ID!
     score: Int
     interviewJson: Interview
     status: InterviewStatus!
+    interviewNotesId: String
+    interviewDate: String
+  }
+
+  input CreateInterviewedApplicantRecordDTO {
+    applicantRecordId: ID!
+  }
+
+  input UpdateInterviewedApplicantRecordDTO {
+    score: Int
+    interviewJson: InterviewInput
+    status: InterviewStatus
     interviewNotesId: String
     interviewDate: String
   }
@@ -41,21 +53,12 @@ const interviewedApplicantRecordsTypes = gql`
 
   extend type Mutation {
     createInterviewedApplicantRecord(
-      applicantRecordId: String!
-      score: Int
-      interviewJSON: InterviewInput
-      status: InterviewStatus
-      interviewNotesId: String
-      interviewDate: String
+      interviewedApplicantRecord: CreateInterviewedApplicantRecordDTO!
     ): InterviewedApplicantRecord!
 
     updateInterviewedApplicantRecord(
       id: ID!
-      score: Int
-      interviewJSON: InterviewInput
-      status: InterviewStatus
-      interviewNotesId: String
-      interviewDate: String
+      interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO!
     ): InterviewedApplicantRecord!
 
     deleteInterviewedApplicantRecordById(id: ID!): InterviewedApplicantRecord!
