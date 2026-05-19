@@ -51,18 +51,16 @@ import { InterviewGroupStatus } from "@/graphql/typeUtils";
       nextLink: string,
       afterUpdate: () => void,
     ) => {
-      if (!interviewGroupId || !interviewGroupStatus) {
+      if (!interviewGroupId) {
         return;
       }
-  
-      const updatedGroup = await InterviewGroupAPIClient.updateInterviewGroup(
-        interviewGroupId,
-        {
-          schedulingLink: nextLink,
-          status: interviewGroupStatus,
-        },
-      );
-  
+
+      const updatedGroup =
+        await InterviewGroupAPIClient.updateInterviewGroupSchedulingLink(
+          interviewGroupId,
+          nextLink,
+        );
+
       setLinkDraft(updatedGroup.schedulingLink ?? null);
       setStatusOverride(updatedGroup.status);
       setIsSubmittedOverride(Boolean(updatedGroup.schedulingLink));

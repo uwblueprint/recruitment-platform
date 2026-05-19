@@ -37,6 +37,11 @@ const interviewGroupTypes = gql`
       interviewGroup: UpdateInterviewGroupDTO!
     ): InterviewGroupDTO!
 
+    updateInterviewGroupSchedulingLink(
+      id: ID!
+      schedulingLink: String!
+    ): InterviewGroupDTO!
+
     deleteInterviewGroupById(id: ID!): InterviewGroupDTO!
 
     bulkCreateInterviewGroups(

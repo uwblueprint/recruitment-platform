@@ -62,3 +62,11 @@ export type UpdateInterviewGroupMutationVariables = Exact<{
 
 
 export type UpdateInterviewGroupMutation = { updateInterviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
+
+export type UpdateInterviewGroupSchedulingLinkMutationVariables = Exact<{
+  id: string | number;
+  schedulingLink: string;
+}>;
+
+
+export type UpdateInterviewGroupSchedulingLinkMutation = { updateInterviewGroupSchedulingLink: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };

@@ -148,6 +148,7 @@ const graphQLMiddlewares = {
     bulkCreateInterviewDelegations: authorizedByAdmin(),
     createInterviewGroup: authorizedByAdmin(),
     updateInterviewGroup: authorizedByAdmin(),
+    updateInterviewGroupSchedulingLink: authorizedByAllRoles(),
     deleteInterviewGroupById: authorizedByAdmin(),
     bulkCreateInterviewGroups: authorizedByAdmin(),
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),

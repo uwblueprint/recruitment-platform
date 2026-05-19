@@ -261,6 +261,7 @@ export type Mutation = {
   updateEntity: EntityResponseDto;
   updateInterviewDelegation: InterviewDelegationDto;
   updateInterviewGroup: InterviewGroupDto;
+  updateInterviewGroupSchedulingLink: InterviewGroupDto;
   updateInterviewedApplicantRecord: InterviewedApplicantRecord;
   updateReviewedApplicantRecord: ReviewedApplicantRecordDto;
   updateSimpleEntity: SimpleEntityResponseDto;
@@ -464,6 +465,12 @@ export type MutationUpdateInterviewDelegationArgs = {
 export type MutationUpdateInterviewGroupArgs = {
   id: Scalars['ID']['input'];
   interviewGroup: UpdateInterviewGroupDto;
+};
+
+
+export type MutationUpdateInterviewGroupSchedulingLinkArgs = {
+  id: Scalars['ID']['input'];
+  schedulingLink: Scalars['String']['input'];
 };
 
 

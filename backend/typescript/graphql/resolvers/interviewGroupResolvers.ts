@@ -3,6 +3,7 @@ import IInterviewGroupService from "../../services/interfaces/IInterviewGroupSer
 import {
   CreateInterviewGroupDTO,
   InterviewGroupDTO,
+  InterviewGroupStatusEnum,
   UpdateInterviewGroupDTO,
 } from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
@@ -47,6 +48,23 @@ const interviewGroupResolvers = {
           id,
           interviewGroup,
         );
+      } catch (error) {
+        throw new Error(getErrorMessage(error));
+      }
+    },
+
+    updateInterviewGroupSchedulingLink: async (
+      _parent: undefined,
+      {
+        id,
+        schedulingLink,
+      }: { id: string; schedulingLink: string },
+    ): Promise<InterviewGroupDTO> => {
+      try {
+        return await interviewGroupService.updateInterviewGroup(id, {
+          schedulingLink,
+          status: InterviewGroupStatusEnum.READY_TO_INTERVIEW,
+        });
       } catch (error) {
         throw new Error(getErrorMessage(error));
       }

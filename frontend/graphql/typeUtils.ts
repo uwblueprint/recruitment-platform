@@ -105,6 +105,7 @@ export {
   InterviewGroupDocument,
   ReportReviewConflictDocument,
   UpdateInterviewGroupDocument,
+  UpdateInterviewGroupSchedulingLinkDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -124,6 +125,8 @@ export type {
   ReportReviewConflictMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
+  UpdateInterviewGroupSchedulingLinkMutation,
+  UpdateInterviewGroupSchedulingLinkMutationVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -160,6 +163,10 @@ export type InterviewerResult = ArrayElement<
 export type UpdateInterviewGroupResult = OperationField<
   Operations.UpdateInterviewGroupMutation,
   "updateInterviewGroup"
+>;
+export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
+  Operations.UpdateInterviewGroupSchedulingLinkMutation,
+  "updateInterviewGroupSchedulingLink"
 >;
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
