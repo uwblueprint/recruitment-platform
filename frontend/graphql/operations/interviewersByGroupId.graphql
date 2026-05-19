@@ -1,0 +1,11 @@
+query InterviewersByGroupId($groupId: ID!) {
+  interviewersByGroupId(groupId: $groupId) {
+    id
+    firstName
+    lastName
+    email
+    role
+    position
+    isArchived
+  }
+}

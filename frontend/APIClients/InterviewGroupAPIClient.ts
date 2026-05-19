@@ -4,37 +4,36 @@ import BaseAPIClient from "./BaseAPIClient";
 import {
   InterviewGroupDocument,
   InterviewGroupDTO,
-  UpdateInterviewGroupDocument,
-  UpdateInterviewGroupDTO,
+  UpdateInterviewGroupSchedulingLinkDocument,
   type InterviewGroupQuery,
   type InterviewGroupQueryVariables,
-  type UpdateInterviewGroupMutation,
-  type UpdateInterviewGroupMutationVariables,
+  type UpdateInterviewGroupSchedulingLinkMutation,
+  type UpdateInterviewGroupSchedulingLinkMutationVariables,
 } from "@/graphql/typeUtils";
 
 class InterviewGroupAPIClient {
-  static async updateInterviewGroup(
+  static async updateInterviewGroupSchedulingLink(
     id: string,
-    interviewGroup: UpdateInterviewGroupDTO,
+    schedulingLink: string,
   ): Promise<InterviewGroupDTO> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
       const { data } = await client.mutate<
-        UpdateInterviewGroupMutation,
-        UpdateInterviewGroupMutationVariables
+        UpdateInterviewGroupSchedulingLinkMutation,
+        UpdateInterviewGroupSchedulingLinkMutationVariables
       >({
-        mutation: UpdateInterviewGroupDocument,
-        variables: { id, interviewGroup },
+        mutation: UpdateInterviewGroupSchedulingLinkDocument,
+        variables: { id, schedulingLink },
       });
 
-      if (!data?.updateInterviewGroup) {
+      if (!data?.updateInterviewGroupSchedulingLink) {
         throw new Error("No data returned");
       }
 
-      return data.updateInterviewGroup;
+      return data.updateInterviewGroupSchedulingLink;
     } catch {
-      throw new Error("Failed to update interview group");
+      throw new Error("Failed to update interview group scheduling link");
     }
   }
 

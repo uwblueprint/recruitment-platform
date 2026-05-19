@@ -2,12 +2,15 @@ import {
   BelongsTo,
   Column,
   DataType,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
 import { Interview, InterviewStatus, InterviewStatusEnum } from "../types";
 import ApplicantRecord from "./applicantRecord.model";
 import FirebaseFile from "./firebaseFile.model";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
+import InterviewDelegation from "./interviewDelegation.model";
 
 @Table({ tableName: "interviewed_applicant_records" })
 export default class InterviewedApplicantRecord extends Model {
@@ -96,4 +99,9 @@ export default class InterviewedApplicantRecord extends Model {
     targetKey: "id",
   })
   interview_notes?: FirebaseFile;
+
+  @HasMany(() => InterviewDelegation, {
+    foreignKey: "interviewed_applicant_record_id",
+  })
+  interview_delegations?: InterviewDelegation[];
 }

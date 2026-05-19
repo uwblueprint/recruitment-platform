@@ -100,20 +100,21 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
 export {
-  GetInterviewedApplicantsByUserIdDocument,
-  GetInterviewersByGroupIdDocument,
+  InterviewedApplicantsByUserIdDocument,
+  InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   ReportReviewConflictDocument,
   UpdateInterviewGroupDocument,
+  UpdateInterviewGroupSchedulingLinkDocument,
 } from "./__generated__/graphql";
 
 export type {
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
-  GetInterviewedApplicantsByUserIdQuery,
-  GetInterviewedApplicantsByUserIdQueryVariables,
-  GetInterviewersByGroupIdQuery,
-  GetInterviewersByGroupIdQueryVariables,
+  InterviewedApplicantsByUserIdQuery,
+  InterviewedApplicantsByUserIdQueryVariables,
+  InterviewersByGroupIdQuery,
+  InterviewersByGroupIdQueryVariables,
   LoginMutation,
   LoginMutationVariables,
   LoginWithGoogleMutation,
@@ -124,6 +125,8 @@ export type {
   ReportReviewConflictMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
+  UpdateInterviewGroupSchedulingLinkMutation,
+  UpdateInterviewGroupSchedulingLinkMutationVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -147,19 +150,23 @@ export type InterviewGroupResult = OperationField<
 >;
 export type InterviewedApplicantResult = ArrayElement<
   OperationField<
-    Operations.GetInterviewedApplicantsByUserIdQuery,
-    "getInterviewedApplicantsByUserId"
+    Operations.InterviewedApplicantsByUserIdQuery,
+    "interviewedApplicantsByUserId"
   >
 >;
 export type InterviewerResult = ArrayElement<
   OperationField<
-    Operations.GetInterviewersByGroupIdQuery,
-    "getInterviewersByGroupId"
+    Operations.InterviewersByGroupIdQuery,
+    "interviewersByGroupId"
   >
 >;
 export type UpdateInterviewGroupResult = OperationField<
   Operations.UpdateInterviewGroupMutation,
   "updateInterviewGroup"
+>;
+export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
+  Operations.UpdateInterviewGroupSchedulingLinkMutation,
+  "updateInterviewGroupSchedulingLink"
 >;
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,

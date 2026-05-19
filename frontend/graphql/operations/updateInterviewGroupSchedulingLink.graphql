@@ -1,0 +1,7 @@
+mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {
+  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {
+    id
+    schedulingLink
+    status
+  }
+}

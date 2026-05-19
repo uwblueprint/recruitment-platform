@@ -14,24 +14,26 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "query GetInterviewedApplicantsByUserId($userId: Int!) {\n  getInterviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": typeof types.GetInterviewedApplicantsByUserIdDocument,
-    "query GetInterviewersByGroupId($groupId: ID!) {\n  getInterviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": typeof types.GetInterviewersByGroupIdDocument,
     "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.InterviewGroupDocument,
+    "query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": typeof types.InterviewedApplicantsByUserIdDocument,
+    "query InterviewersByGroupId($groupId: ID!) {\n  interviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": typeof types.InterviewersByGroupIdDocument,
     "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": typeof types.LoginDocument,
-    "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": typeof types.LoginWithGoogleDocument,
+    "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": typeof types.LoginWithGoogleDocument,
     "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}": typeof types.RefreshDocument,
     "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": typeof types.ReportReviewConflictDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupDocument,
+    "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupSchedulingLinkDocument,
 };
 const documents: Documents = {
-    "query GetInterviewedApplicantsByUserId($userId: Int!) {\n  getInterviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": types.GetInterviewedApplicantsByUserIdDocument,
-    "query GetInterviewersByGroupId($groupId: ID!) {\n  getInterviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": types.GetInterviewersByGroupIdDocument,
     "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}": types.InterviewGroupDocument,
+    "query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": types.InterviewedApplicantsByUserIdDocument,
+    "query InterviewersByGroupId($groupId: ID!) {\n  interviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": types.InterviewersByGroupIdDocument,
     "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": types.LoginDocument,
-    "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": types.LoginWithGoogleDocument,
+    "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": types.LoginWithGoogleDocument,
     "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}": types.RefreshDocument,
     "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": types.ReportReviewConflictDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupDocument,
+    "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupSchedulingLinkDocument,
 };
 
 /**
@@ -51,15 +53,15 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query GetInterviewedApplicantsByUserId($userId: Int!) {\n  getInterviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}"): (typeof documents)["query GetInterviewedApplicantsByUserId($userId: Int!) {\n  getInterviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "query GetInterviewersByGroupId($groupId: ID!) {\n  getInterviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}"): (typeof documents)["query GetInterviewersByGroupId($groupId: ID!) {\n  getInterviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}"): (typeof documents)["query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}"): (typeof documents)["query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query InterviewersByGroupId($groupId: ID!) {\n  interviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}"): (typeof documents)["query InterviewersByGroupId($groupId: ID!) {\n  interviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -67,7 +69,7 @@ export function gql(source: "mutation Login($email: String!, $password: String!)
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}"): (typeof documents)["mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}"];
+export function gql(source: "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}"): (typeof documents)["mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -80,6 +82,10 @@ export function gql(source: "mutation ReportReviewConflict($applicantRecordId: I
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}"): (typeof documents)["mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}"): (typeof documents)["mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

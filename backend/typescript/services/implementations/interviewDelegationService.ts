@@ -1,5 +1,5 @@
 import { sequelize } from "../../models";
-import InterviewDelegation from "../../models/inteviewDelegation.model";
+import InterviewDelegation from "../../models/interviewDelegation.model";
 import {
   CreateInterviewDelegationDTO,
   InterviewDelegationDTO,

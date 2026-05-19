@@ -2,22 +2,22 @@ import { gql } from "apollo-server-express";
 
 const interviewPageType = gql`
   type InterviewedApplicantsDTO {
-    applicantRecordId: String!
-    interviewStatus: String!
+    applicantRecordId: ID!
+    interviewStatus: InterviewStatus!
     applicantFirstName: String!
     applicantLastName: String!
   }
 
   type InterviewPairingsDTO {
     interviewedGroupId: ID!
-    interviewGroupStatus: String!
+    interviewGroupStatus: InterviewGroupStatus!
     groupMembers: [UserDTO!]!
   }
 
   extend type Query {
-    getInterviewedApplicantsByUserId(userId: Int!): [InterviewedApplicantsDTO!]!
-    getInterviewedPairingsByUserId(userId: Int!): [InterviewPairingsDTO!]!
-    getInterviewersByGroupId(groupId: ID!): [UserDTO!]!
+    interviewedApplicantsByUserId(userId: ID!): [InterviewedApplicantsDTO!]!
+    interviewedPairingsByUserId(userId: ID!): [InterviewPairingsDTO!]!
+    interviewersByGroupId(groupId: ID!): [UserDTO!]!
   }
 `;
 
