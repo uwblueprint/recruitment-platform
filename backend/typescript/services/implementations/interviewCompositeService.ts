@@ -9,10 +9,7 @@ import {
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
-import {
-  toInterviewedApplicantDTO,
-  toUserDTO,
-} from "../../utilities/dtoUtils";
+import { toInterviewedApplicantDTO, toUserDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";

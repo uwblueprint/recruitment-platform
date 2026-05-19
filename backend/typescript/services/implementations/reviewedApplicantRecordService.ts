@@ -202,7 +202,6 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
         return toReviewedApplicantRecordDTO(reviewedRecord);
       }
 
-
       const applicantRecord = await ApplicantRecord.findOne({
         where: { id: applicantRecordId },
         transaction,

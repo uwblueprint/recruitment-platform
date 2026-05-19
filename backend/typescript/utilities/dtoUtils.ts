@@ -1,13 +1,5 @@
-import { AcademicOrCoop } from "../types";
-import AdminComment from "../models/adminComment.model";
-import Applicant from "../models/applicant.model";
-import ApplicantRecord from "../models/applicantRecord.model";
-import InterviewDelegation from "../models/interviewDelegation.model";
-import InterviewGroup from "../models/interviewGroup.model";
-import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
-import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
-import User from "../models/user.model";
 import {
+  AcademicOrCoop,
   AdminCommentDTO,
   ApplicantDTO,
   ApplicantRecordDTO,
@@ -25,6 +17,14 @@ import {
   SkillCategory,
   UserDTO,
 } from "../types";
+import AdminComment from "../models/adminComment.model";
+import Applicant from "../models/applicant.model";
+import ApplicantRecord from "../models/applicantRecord.model";
+import InterviewDelegation from "../models/interviewDelegation.model";
+import InterviewGroup from "../models/interviewGroup.model";
+import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
+import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
+import User from "../models/user.model";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -74,9 +74,7 @@ export function toApplicantDTO(model: Applicant): ApplicantDTO {
   };
 }
 
-export function toInterviewGroupDTO(
-  model: InterviewGroup,
-): InterviewGroupDTO {
+export function toInterviewGroupDTO(model: InterviewGroup): InterviewGroupDTO {
   return {
     id: model.id,
     schedulingLink: model.scheduling_link,
@@ -204,8 +202,10 @@ export function toReviewDashboardRowDTO(
     timesApplied: applicantRecord.applicant.times_applied.toString(),
     applicationStatus: applicantRecord.status,
     choice: applicantRecord.choice,
-    reviewers: (applicantRecord.reviewed_applicant_records ?? []).map(
-      (reviewedApplicantRecord) => toUserDTO(reviewedApplicantRecord.reviewer),
+    reviewers: (
+      applicantRecord.reviewed_applicant_records ?? []
+    ).map((reviewedApplicantRecord) =>
+      toUserDTO(reviewedApplicantRecord.reviewer),
     ),
     totalScore: applicantRecord.combined_review_score ?? null,
   };
