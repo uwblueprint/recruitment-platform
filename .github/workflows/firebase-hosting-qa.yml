@@ -1,0 +1,32 @@
+name: Deploy frontend to Firebase Hosting QA environment
+
+on:
+  push:
+    branches:
+      - qa
+    paths:
+      - "frontend/**"
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set environment variables
+        run: |
+          echo "NEXT_PUBLIC_GRAPHQL_URL=${{ secrets.QA_BACKEND_URL }}" > .env
+          echo "REACT_APP_OAUTH_CLIENT_ID=${{ secrets.QA_OAUTH_CLIENT_ID }}" >> .env
+      - name: Install and build
+        run: rm -rf node_modules && yarn install --frozen-lockfile && yarn build
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: "${{ secrets.GITHUB_TOKEN }}"
+          firebaseServiceAccount: "${{ secrets.QA_FIREBASE_SERVICE_ACCOUNT }}"
+          channelId: live
+          projectId: "${{ secrets.QA_PROJECT_ID }}"
+          entryPoint: ./frontend
