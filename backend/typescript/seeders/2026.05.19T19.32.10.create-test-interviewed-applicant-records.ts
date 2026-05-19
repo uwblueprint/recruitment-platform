@@ -112,8 +112,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
   });
 
   const interviewedApplicantRecords = applicantRecordIds.map((id, index) => {
-    const status =
-      INTERVIEW_STATUSES[index % INTERVIEW_STATUSES.length];
+    const status = INTERVIEW_STATUSES[index % INTERVIEW_STATUSES.length];
     const hasInterviewData = status !== InterviewStatusEnum.NEEDS_REVIEW;
 
     return {
@@ -181,9 +180,13 @@ export const up: Seeder = async ({ context: sequelize }) => {
 
     await sequelize
       .getQueryInterface()
-      .bulkInsert("interviewed_applicant_records", interviewedApplicantRecords, {
-        transaction: t,
-      });
+      .bulkInsert(
+        "interviewed_applicant_records",
+        interviewedApplicantRecords,
+        {
+          transaction: t,
+        },
+      );
 
     await t.commit();
   } catch (error) {

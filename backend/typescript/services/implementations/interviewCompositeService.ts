@@ -152,8 +152,6 @@ class InterviewCompositeService implements IInterviewCompositeService {
         ],
       });
 
-
-
       return interviewGroups.map((group) => ({
         interviewedGroupId: group.id,
         interviewGroupStatus: group.status,

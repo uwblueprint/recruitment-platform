@@ -9,6 +9,7 @@ import {
 import InterviewGroup from "./interviewGroup.model";
 import User from "./user.model";
 import { InterviewConflict } from "../types/interviewDelegation";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import InterviewedApplicantRecord from "./interviewedApplicantRecord.model";
 
 @Table({ tableName: "interview_delegations" })

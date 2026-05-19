@@ -55,10 +55,7 @@ const interviewGroupResolvers = {
 
     updateInterviewGroupSchedulingLink: async (
       _parent: undefined,
-      {
-        id,
-        schedulingLink,
-      }: { id: string; schedulingLink: string },
+      { id, schedulingLink }: { id: string; schedulingLink: string },
     ): Promise<InterviewGroupDTO> => {
       try {
         return await interviewGroupService.updateInterviewGroup(id, {

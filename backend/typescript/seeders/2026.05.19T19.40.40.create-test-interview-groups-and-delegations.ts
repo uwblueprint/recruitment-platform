@@ -76,11 +76,13 @@ const buildGroupAssignments = (
     [INTERVIEWER_USER_IDS[3]],
   ];
 
-  return interviewedApplicantRecordIds.slice(0, pairings.length).map((recordId, index) => ({
-    groupId: v4(),
-    interviewedApplicantRecordId: recordId,
-    interviewerIds: pairings[index],
-  }));
+  return interviewedApplicantRecordIds
+    .slice(0, pairings.length)
+    .map((recordId, index) => ({
+      groupId: v4(),
+      interviewedApplicantRecordId: recordId,
+      interviewerIds: pairings[index],
+    }));
 };
 
 export const up: Seeder = async ({ context: sequelize }) => {
@@ -102,22 +104,26 @@ export const up: Seeder = async ({ context: sequelize }) => {
   const reviewedApplicantRecords = applicantRecordIds.map((id) => ({
     applicant_record_id: id,
     reviewer_id:
-      INTERVIEWER_USER_IDS[Math.floor(Math.random() * INTERVIEWER_USER_IDS.length)],
+      INTERVIEWER_USER_IDS[
+        Math.floor(Math.random() * INTERVIEWER_USER_IDS.length)
+      ],
     review: JSON.stringify(getReviewDTO()),
     createdAt: new Date(),
     updatedAt: new Date(),
   }));
 
-  const interviewedApplicantRecords = firstChoiceApplicantRecords.map((record) => ({
-    id: v4(),
-    applicant_record_id: record.id,
-    score: null,
-    interview_json: null,
-    status: InterviewStatusEnum.NEEDS_REVIEW,
-    interview_date: null,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }));
+  const interviewedApplicantRecords = firstChoiceApplicantRecords.map(
+    (record) => ({
+      id: v4(),
+      applicant_record_id: record.id,
+      score: null,
+      interview_json: null,
+      status: InterviewStatusEnum.NEEDS_REVIEW,
+      interview_date: null,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }),
+  );
 
   const groupAssignments = buildGroupAssignments(
     interviewedApplicantRecords.map((record) => record.id),
@@ -191,9 +197,13 @@ export const up: Seeder = async ({ context: sequelize }) => {
 
     await sequelize
       .getQueryInterface()
-      .bulkInsert("interviewed_applicant_records", interviewedApplicantRecords, {
-        transaction: t,
-      });
+      .bulkInsert(
+        "interviewed_applicant_records",
+        interviewedApplicantRecords,
+        {
+          transaction: t,
+        },
+      );
 
     await sequelize
       .getQueryInterface()
