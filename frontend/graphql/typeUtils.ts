@@ -12,6 +12,7 @@ export {
   ApplicationStatus,
   Enum,
   InterviewConflict,
+  InterviewGroupStatus,
   InterviewStatus,
   ReviewStatus,
   Role,
@@ -41,7 +42,7 @@ export type EntityRequestDTO = Schema.EntityRequestDto;
 export type EntityResponseDTO = WithoutTypename<Schema.EntityResponseDto>;
 export type InterviewDTO = WithoutTypename<Schema.Interview>;
 export type InterviewDelegationDTO =
-  WithoutTypename<Schema.InterviewDelegation>;
+  WithoutTypename<Schema.InterviewDelegationDto>;
 export type InterviewGroupDTO = WithoutTypename<Schema.InterviewGroupDto>;
 export type InterviewPairingsDTO = WithoutTypename<Schema.InterviewPairingsDto>;
 export type InterviewedApplicantRecordDTO =
@@ -70,10 +71,8 @@ export type ReviewDashboardReviewDetails = WithoutTypename<Schema.ReviewDashboar
 /**
  * Clean aliases for generated GraphQL input types.
  */
-export type BulkCreateInterviewDelegationInput =
-  Schema.BulkCreateInterviewDelegationInput;
-export type BulkDeleteInterviewDelegationInput =
-  Schema.BulkDeleteInterviewDelegationInput;
+export type CreateInterviewDelegationDTO = Schema.CreateInterviewDelegationDto;
+export type UpdateInterviewDelegationDTO = Schema.UpdateInterviewDelegationDto;
 export type CreateAdminCommentDTO = Schema.CreateAdminCommentDto;
 export type CreateInterviewGroupDTO = Schema.CreateInterviewGroupDto;
 export type CreateInterviewedApplicantRecordDTO =
@@ -100,11 +99,17 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  *
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
-export { ReportReviewConflictDocument } from "./__generated__/graphql";
+export {
+  GetInterviewedApplicantsByUserIdDocument,
+  GetInterviewersByGroupIdDocument,
+  InterviewGroupDocument,
+  ReportReviewConflictDocument,
+  UpdateInterviewGroupDocument,
+} from "./__generated__/graphql";
 
 export type {
-  GetInterviewGroupByIdQuery,
-  GetInterviewGroupByIdQueryVariables,
+  InterviewGroupQuery,
+  InterviewGroupQueryVariables,
   GetInterviewedApplicantsByUserIdQuery,
   GetInterviewedApplicantsByUserIdQueryVariables,
   GetInterviewersByGroupIdQuery,
@@ -137,8 +142,8 @@ export type RefreshResult = OperationField<
   "refresh"
 >;
 export type InterviewGroupResult = OperationField<
-  Operations.GetInterviewGroupByIdQuery,
-  "getInterviewGroupById"
+  Operations.InterviewGroupQuery,
+  "interviewGroup"
 >;
 export type InterviewedApplicantResult = ArrayElement<
   OperationField<

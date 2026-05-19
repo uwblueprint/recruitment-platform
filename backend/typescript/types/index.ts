@@ -9,3 +9,5 @@ export * from "./adminComment";
 export * from "./reviewPage";
 export * from "./applicant";
 export * from "./reviewDashboard";
+export * from "./interviewGroup";
+export * from "./interviewDelegation";

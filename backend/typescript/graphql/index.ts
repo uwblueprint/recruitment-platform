@@ -21,7 +21,7 @@ import applicantRecordType from "./types/applicantRecordType";
 import authType from "./types/authType";
 import entityType from "./types/entityType";
 import interviewDashboardTypes from "./types/interviewDashboardTypes";
-import interviewDelegationsTypes from "./types/interviewDelegationsTypes";
+import interviewDelegationsTypes from "./types/interviewDelegationTypes";
 import interviewedApplicantRecordsTypes from "./types/interviewedApplicantRecordsTypes";
 import interviewGroupTypes from "./types/interviewGroupTypes";
 import interviewPageType from "./types/interviewPageTypes";
@@ -31,6 +31,8 @@ import reviewPageType from "./types/reviewPageType";
 import simpleEntityType from "./types/simpleEntityType";
 import userType from "./types/userType";
 import interviewedApplicantRecordResolvers from "./resolvers/interviewedApplicantRecordResolvers";
+import interviewDelegationResolvers from "./resolvers/interviewDelegationResolvers";
+import interviewGroupResolvers from "./resolvers/interviewGroupResolvers";
 
 const query = gql`
   type Query {
@@ -74,6 +76,8 @@ const executableSchema = makeExecutableSchema({
     reviewDashboardResolvers,
     reviewPageResolvers,
     userResolvers,
+    interviewDelegationResolvers,
+    interviewGroupResolvers,
   ),
 });
 
@@ -99,6 +103,8 @@ const graphQLMiddlewares = {
     reviewedApplicantsByUserId: authorizedByAllRoles(),
     application: authorizedByAllRoles(),
     interviewedApplicantRecord: authorizedByAllRoles(),
+    interviewDelegation: authorizedByAllRoles(),
+    interviewGroup: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
   },
@@ -128,7 +134,16 @@ const graphQLMiddlewares = {
     reportReviewConflict: authorizedByAllRoles(),
     createInterviewedApplicantRecord: authorizedByAdmin(),
     updateInterviewedApplicantRecord: authorizedByAllRoles(),
-    deleteInterviewedApplicantRecord: authorizedByAdmin(),
+    deleteInterviewedApplicantRecordById: authorizedByAdmin(),
+    createInterviewDelegation: authorizedByAdmin(),
+    updateInterviewDelegation: authorizedByAdmin(),
+    deleteInterviewDelegation: authorizedByAdmin(),
+    bulkCreateInterviewDelegations: authorizedByAdmin(),
+    createInterviewGroup: authorizedByAdmin(),
+    updateInterviewGroup: authorizedByAdmin(),
+    deleteInterviewGroupById: authorizedByAdmin(),
+    bulkCreateInterviewGroups: authorizedByAdmin(),
+    bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
   },
 };

@@ -1,19 +1,16 @@
 import { client } from "@/client";
-import type { UserDTO, InterviewedApplicantsDTO } from "@/types";
 
 import BaseAPIClient from "./BaseAPIClient";
 import {
-  GET_INTERVIEWED_APPLICANTS_BY_USER_ID,
-  GET_INTERVIEWERS_BY_GROUP_ID,
-} from "@/queries/interviewPage";
-
-type GetInterviewedApplicantsByUserIdData = {
-  getInterviewedApplicantsByUserId: InterviewedApplicantsDTO[];
-};
-
-type GetInterviewersByGroupIdData = {
-  getInterviewersByGroupId: UserDTO[];
-};
+  GetInterviewedApplicantsByUserIdDocument,
+  GetInterviewersByGroupIdDocument,
+  type GetInterviewedApplicantsByUserIdQuery,
+  type GetInterviewedApplicantsByUserIdQueryVariables,
+  type GetInterviewersByGroupIdQuery,
+  type GetInterviewersByGroupIdQueryVariables,
+  type InterviewedApplicantsDTO,
+  type UserDTO,
+} from "@/graphql/typeUtils";
 
 class InterviewPageAPIClient {
   static async getInterviewedApplicantsByUserId(
@@ -23,10 +20,10 @@ class InterviewPageAPIClient {
 
     try {
       const { data } = await client.query<
-        GetInterviewedApplicantsByUserIdData,
-        { userId: number }
+        GetInterviewedApplicantsByUserIdQuery,
+        GetInterviewedApplicantsByUserIdQueryVariables
       >({
-        query: GET_INTERVIEWED_APPLICANTS_BY_USER_ID,
+        query: GetInterviewedApplicantsByUserIdDocument,
         variables: { userId },
         fetchPolicy: "network-only",
       });
@@ -48,10 +45,10 @@ class InterviewPageAPIClient {
 
     try {
       const { data } = await client.query<
-        GetInterviewersByGroupIdData,
-        { groupId: string }
+        GetInterviewersByGroupIdQuery,
+        GetInterviewersByGroupIdQueryVariables
       >({
-        query: GET_INTERVIEWERS_BY_GROUP_ID,
+        query: GetInterviewersByGroupIdDocument,
         variables: { groupId },
         fetchPolicy: "network-only",
       });

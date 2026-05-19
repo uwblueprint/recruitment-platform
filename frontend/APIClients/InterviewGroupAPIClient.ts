@@ -1,19 +1,16 @@
-import { client } from "@/client";
-import type { InterviewGroupDTO, UpdateInterviewGroupDTO } from "@/types";
+import { client } from "@/client";  
 
 import BaseAPIClient from "./BaseAPIClient";
 import {
-  UPDATE_INTERVIEW_GROUP_MUTATION,
-  GET_INTERVIEW_GROUP_BY_ID_QUERY,
-} from "@/queries/interviewGroup";
-
-type UpdateInterviewGroupData = {
-  updateInterviewGroup: InterviewGroupDTO;
-};
-
-type GetInterviewGroupByIdData = {
-  getInterviewGroupById: InterviewGroupDTO;
-};
+  InterviewGroupDocument,
+  InterviewGroupDTO,
+  UpdateInterviewGroupDocument,
+  UpdateInterviewGroupDTO,
+  type InterviewGroupQuery,
+  type InterviewGroupQueryVariables,
+  type UpdateInterviewGroupMutation,
+  type UpdateInterviewGroupMutationVariables,
+} from "@/graphql/typeUtils";
 
 class InterviewGroupAPIClient {
   static async updateInterviewGroup(
@@ -24,10 +21,10 @@ class InterviewGroupAPIClient {
 
     try {
       const { data } = await client.mutate<
-        UpdateInterviewGroupData,
-        { id: string; interviewGroup: UpdateInterviewGroupDTO }
+        UpdateInterviewGroupMutation,
+        UpdateInterviewGroupMutationVariables
       >({
-        mutation: UPDATE_INTERVIEW_GROUP_MUTATION,
+        mutation: UpdateInterviewGroupDocument,
         variables: { id, interviewGroup },
       });
 
@@ -48,19 +45,19 @@ class InterviewGroupAPIClient {
 
     try {
       const { data } = await client.query<
-        GetInterviewGroupByIdData,
-        { id: string }
+        InterviewGroupQuery,
+        InterviewGroupQueryVariables
       >({
-        query: GET_INTERVIEW_GROUP_BY_ID_QUERY,
+        query: InterviewGroupDocument,
         variables: { id },
         fetchPolicy: "network-only",
       });
 
-      if (!data?.getInterviewGroupById) {
+      if (!data?.interviewGroup) {
         throw new Error("No data returned");
       }
 
-      return data.getInterviewGroupById;
+      return data.interviewGroup;
     } catch {
       throw new Error("Failed to get interview group");
     }

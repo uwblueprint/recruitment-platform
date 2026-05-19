@@ -1,7 +1,0 @@
-query GetInterviewGroupById($id: ID!) {
-  getInterviewGroupById(id: $id) {
-    id
-    schedulingLink
-    status
-  }
-}
