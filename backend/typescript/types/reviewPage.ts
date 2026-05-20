@@ -11,6 +11,7 @@ export type ApplicationDTO = {
   lastName: string;
   locationPreference: string;
   program: string;
+  position: string;
   pronouns: string;
   pronounsSpecified: string;
   resumeUrl: string;

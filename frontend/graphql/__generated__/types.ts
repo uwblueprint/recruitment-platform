@@ -43,6 +43,7 @@ export type ApplicationDto = {
   id: Scalars['ID']['output'];
   lastName: Scalars['String']['output'];
   locationPreference: Scalars['String']['output'];
+  position: Scalars['String']['output'];
   program: Scalars['String']['output'];
   pronouns: Scalars['String']['output'];
   pronounsSpecified: Scalars['String']['output'];
@@ -724,8 +725,8 @@ export enum Role {
 
 export type ShortAnswerQuestion = {
   __typename?: 'ShortAnswerQuestion';
-  answer: Scalars['String']['output'];
   question: Scalars['String']['output'];
+  response: Scalars['String']['output'];
 };
 
 export enum SimpleEntityEnum {

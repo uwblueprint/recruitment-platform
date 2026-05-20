@@ -11,6 +11,7 @@ const reviewPageType = gql`
     heardFrom: String!
     locationPreference: String!
     program: String!
+    position: String!
     pronouns: String!
     pronounsSpecified: String!
     resumeUrl: String!

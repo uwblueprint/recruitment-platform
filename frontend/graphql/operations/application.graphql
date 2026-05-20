@@ -1,0 +1,28 @@
+query Application($applicantRecordId: ID!) {
+  application(applicantRecordId: $applicantRecordId) {
+    id
+    academicOrCoop
+    academicYear
+    email
+    firstName
+    heardFrom
+    lastName
+    locationPreference
+    program
+    position
+    pronouns
+    pronounsSpecified
+    resumeUrl
+    roleSpecificQuestions {
+      question
+      response
+    }
+    shortAnswerQuestions {
+      question
+      response
+    }
+    status
+    term
+    timesApplied
+  }
+}

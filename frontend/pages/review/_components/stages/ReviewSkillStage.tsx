@@ -41,25 +41,9 @@ export const ReviewSkillStage = ({
   const updateScore = useContext(ReviewSetScoresContext);
   const resumeLink = application?.resumeUrl;
 
-  const roleSpecificStr = application?.roleSpecificQuestions[0];
-  const roleSpecificStrJSON = roleSpecificStr
-    ? JSON.parse(roleSpecificStr)
-    : [];
-  const questionsData = roleSpecificStrJSON[0]?.questions || [];
-
-  const questions = questionsData.map(
-    (item: { question?: string; response?: string | string[] }) =>
-      item.question || "",
-  );
-  const answers = questionsData.flatMap(
-    (item: { question?: string; response?: string | string[] }) => {
-      if (Array.isArray(item.response)) {
-        return [item.response.join(", ")];
-      } else {
-        return item.response;
-      }
-    },
-  );
+  const roleSpecificQuestions = application?.roleSpecificQuestions ?? [];
+  const questions = roleSpecificQuestions.map((item) => item.question);
+  const answers = roleSpecificQuestions.map((item) => item.response);
 
   return (
     <ReviewPageLayout currentStage={ReviewStage.SKL} scores={scores}>

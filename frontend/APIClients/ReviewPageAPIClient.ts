@@ -1,6 +1,10 @@
 import { client } from "@/client";
 import {
+  ApplicationDocument,
   ReportReviewConflictDocument,
+  type ApplicationQuery,
+  type ApplicationQueryVariables,
+  type ApplicationDTO,
   type ReportReviewConflictMutation,
   type ReportReviewConflictMutationVariables,
   type ReviewConflictReportResult,
@@ -9,6 +13,31 @@ import {
 import BaseAPIClient from "./BaseAPIClient";
 
 class ReviewPageAPIClient {
+  static async getApplicationByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<ApplicationDTO> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ApplicationQuery,
+        ApplicationQueryVariables
+      >({
+        query: ApplicationDocument,
+        variables: { applicantRecordId },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.application) {
+        throw new Error("No data returned");
+      }
+
+      return data.application;
+    } catch {
+      throw new Error("Failed to get application");
+    }
+  }
+
   static async reportReviewConflict(
     applicantRecordId: string,
     reviewerId: string,
