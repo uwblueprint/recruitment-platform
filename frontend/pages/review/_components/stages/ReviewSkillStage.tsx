@@ -68,7 +68,7 @@ export const ReviewSkillStage = ({
         title="Skill"
         subtitle={`${name}'s Application`}
       >
-        <div className="mt-6 h-px w-full shrink-0 bg-[#C4C4C4]" />
+        <div className="mt-6 h-px w-full shrink-0 bg-neutral-200" />
         {resumeLink ? <ResumeLink resumeLink={resumeLink} /> : null}
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>

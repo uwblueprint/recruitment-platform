@@ -9,7 +9,7 @@ type CalendlyLinkFormProps = {
     onLinkChange,
     onSubmit,
   }: CalendlyLinkFormProps) => (
-    <div className="flex flex-col gap-8 border border-[#C4C4C4] rounded-lg p-6">
+    <div className="flex flex-col gap-8 border border-neutral-200 rounded-lg p-6">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <p className="font-poppins font-medium text-xl text-blue leading-[1.4]">
@@ -25,7 +25,7 @@ type CalendlyLinkFormProps = {
           placeholder="Paste link here"
           value={linkInput}
           onChange={(e) => onLinkChange(e.target.value)}
-          className="w-full border border-[#7D7D7D] rounded-[5px] py-[10px] px-5 text-sm text-charcoal-400 font-normal leading-[1.43] outline-none focus:border-blue"
+          className="w-full border border-input rounded-[5px] py-[10px] px-5 text-sm text-charcoal-400 font-normal leading-[1.43] outline-none focus:border-blue"
         />
       </div>
       <div className="flex justify-end">

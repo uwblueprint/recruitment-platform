@@ -37,7 +37,7 @@ export const Dialogue = ({
             {header}
           </h2>
           <div className="text-center font-source text-[14px] font-normal leading-[140%]">
-            <div className="text-[#252525]"> {text} </div>
+            <div className="text-neutral-800"> {text} </div>
             {errorText && <div className="text-red-500">{errorText}</div>}
           </div>
         </div>

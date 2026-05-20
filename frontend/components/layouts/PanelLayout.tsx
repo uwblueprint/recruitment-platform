@@ -19,9 +19,9 @@ interface PanelLayoutProps {
 
 const titleClasses: Record<"xlarge" | "medium", string> = {
   xlarge:
-    "font-poppins text-[28px] font-semibold leading-[140%] text-[#252525]",
+    "font-poppins text-[28px] font-semibold leading-[140%] text-neutral-800",
   medium:
-    "self-stretch font-poppins text-xl font-medium leading-[140%] text-[#252525]",
+    "self-stretch font-poppins text-xl font-medium leading-[140%] text-neutral-800",
 };
 
 export const PanelLayout = ({
@@ -41,7 +41,7 @@ export const PanelLayout = ({
     variant === "sky"
       ? "bg-sky"
       : variant === "grey"
-        ? "bg-[#F3F4F6]"
+        ? "bg-surface-grey"
         : "bg-white";
   const hasHeader = !!(title || subtitle || header);
 
@@ -94,8 +94,8 @@ export const PanelLayout = ({
   return (
     <div
       className={`relative flex h-full flex-col overflow-hidden ${bg} ${
-        borderRight ? "lg:border-r lg:border-[#C4C4C4]" : ""
-      } ${borderLeft ? "lg:border-l lg:border-[#C4C4C4]" : ""}`}
+        borderRight ? "lg:border-r lg:border-neutral-200" : ""
+      } ${borderLeft ? "lg:border-l lg:border-neutral-200" : ""}`}
     >
       <div className="flex h-full flex-col overflow-hidden py-8">
         {showHeaderStack ? (

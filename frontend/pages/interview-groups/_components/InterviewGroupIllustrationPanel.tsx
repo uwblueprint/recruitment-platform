@@ -1,5 +1,5 @@
 const InterviewGroupIllustrationPanel = () => (
-  <div className="flex h-full items-center justify-center overflow-hidden border-r border-[#C4C4C4] bg-[#FAFAFA]">
+  <div className="flex h-full items-center justify-center overflow-hidden border-r border-neutral-200 bg-surface-muted">
     <div className="relative aspect-[441/537] w-[63%] [container-type:inline-size]">
       <img
         src="/common/review-page-banner.svg"

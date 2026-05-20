@@ -34,7 +34,7 @@ const getStepState = (step: StepConfig, currentIndex: number): StepState => {
 };
 
 const circleClasses: Record<StepState, string> = {
-  completed: "border-[#7EAE5A] bg-[#7EAE5A]",
+  completed: "border-green-500 bg-green-500",
   current: "border-white bg-white",
   future: "border-white bg-transparent",
 };

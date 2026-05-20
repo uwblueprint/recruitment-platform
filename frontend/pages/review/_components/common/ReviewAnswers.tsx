@@ -11,12 +11,12 @@ export const ReviewAnswers = ({ questions, answers }: Props) => {
           key={`${question}-${idx}`}
           className="flex flex-col items-start gap-4"
         >
-          <h5 className="font-poppins text-base font-medium leading-[1.4] text-[#252525]">
+          <h5 className="font-poppins text-base font-medium leading-[1.4] text-neutral-800">
             {question}
           </h5>
           <div className="flex w-full">
-            <div className="rounded-r border-l-4 border-l-[#C4C4C4] px-4 py-3 w-full font-source">
-              <p className="text-base font-normal leading-[1.4] text-[#252525]">
+            <div className="rounded-r border-l-4 border-l-neutral-200 px-4 py-3 w-full font-source">
+              <p className="text-base font-normal leading-[1.4] text-neutral-800">
                 {answers[idx]}
               </p>
             </div>

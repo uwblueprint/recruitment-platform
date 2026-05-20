@@ -28,11 +28,11 @@ export const InterviewNavPanel = ({
         </span>
       </Link>
 
-      <h2 className="mt-5 font-poppins text-[28px] font-semibold leading-[140%] text-[#252525]">
+      <h2 className="mt-5 font-poppins text-[28px] font-semibold leading-[140%] text-neutral-800">
         {candidateName}&apos;s Interview Review
       </h2>
 
-      <hr className="my-8 border-[#C4C4C4]" />
+      <hr className="my-8 border-neutral-200" />
 
       <ul className="flex flex-col gap-[36px]">
         {INTERVIEW_NAV_ITEMS.map((item) => {
@@ -45,16 +45,16 @@ export const InterviewNavPanel = ({
                     ? `${item.path}?interviewedApplicantRecordId=${interviewedApplicantRecordId}`
                     : item.path
                 }
-                className={`flex items-center justify-between self-stretch rounded-lg px-5 py-2.5 hover:bg-[#F1F1F1] ${
+                className={`flex items-center justify-between self-stretch rounded-lg px-5 py-2.5 hover:bg-surface-highlight ${
                   active
-                    ? "bg-[#F1F1F1] font-semibold text-blue"
-                    : "font-normal text-[#252525]"
+                    ? "bg-surface-highlight font-semibold text-blue"
+                    : "font-normal text-neutral-800"
                 }`}
               >
                 <span className="font-poppins text-xl font-normal leading-[140%]">
                   {item.label}
                 </span>
-                <ArrowRightIcon className="text-[#2E3A59]" />
+                <ArrowRightIcon className="text-icon" />
               </Link>
             </li>
           );

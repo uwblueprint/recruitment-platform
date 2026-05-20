@@ -48,7 +48,7 @@ export const ReviewDriveToLearnStage = ({
         title="Drive to Learn"
         subtitle={`${name}'s Application`}
       >
-        <div className="mt-6 h-px w-full shrink-0 bg-[#C4C4C4]" />
+        <div className="mt-6 h-px w-full shrink-0 bg-neutral-200" />
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>
       <PanelLayout

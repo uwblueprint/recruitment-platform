@@ -61,7 +61,7 @@ export const SplitPanelLayout = ({
       <div
         className={`flex-1 grid min-h-0 grid-cols-1 [&>*]:min-h-0 ${
           !hasWidthOverride ? SPLIT_GRID_CLASSES[split] : ""
-        } overflow-hidden border border-[#C4C4C4]`}
+        } overflow-hidden border border-neutral-200`}
         style={gridStyle}
       >
         {children}
