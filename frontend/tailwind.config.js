@@ -11,107 +11,100 @@ module.exports = {
       colors: {
         transparent: "transparent",
         current: "currentColor",
-  
-        // Defined here: https://www.figma.com/file/xOu73pWJgkrezff9FKrD5E/Small-Projects?node-id=345%3A43
-        // Colour variants are postfixed with an extra "0"
-  
-        // PRIMARY COLOURS
-        black: "#000000", // alias for charcoal-700
-        white: "#FFFFFF", // alias for charcoal-0
-  
-        // PRIMARY VARIANTS
-        charcoal: {
-          DEFAULT: "#000000",
-          0: "#FFFFFF",
-          100: "#FAFAFA",
-          200: "#EAEAEA",
-          300: "#CECECE",
-          350: "#BFBFBF",
-          400: "#9F9F9F",
-          500: "#707070",
-          600: "#333333",
-          700: "#000000",
+
+        // Recruitment platform palette
+        black: "#000000",
+        white: "#FFFFFF",
+
+        neutral: {
+          50: "#FFFFFF",
+          100: "#EEEEEE",
+          200: "#C4C4C4",
+          500: "#737373",
+          600: "#2D3748",
+          700: "#444444",
+          800: "#252525",
+          900: "#000000",
         },
         blue: {
           DEFAULT: "#0573E8",
-          100: "#0573E8",
-          200: "#135FC5",
-          300: "#003884",
-          400: "#1F3C5F",
+          50: "#F4F9FF",
+          100: "#E0F0FF",
+          500: "#0573E8",
+          600: "#135FC5",
+          900: "#003884",
         },
         sky: {
           DEFAULT: "#E0F0FF",
           100: "#E0F0FF",
-          200: "#BDDEFF",
-          300: "#99CEFF",
-          400: "#7EB9F0",
-          500: "#4498ED",
-        },
-  
-        // SECONDARY
-        pink: {
-          DEFAULT: "#FFC6C6",
-          100: "#FFC6C6",
-          200: "#FAB5B5",
-          300: "#F0A4A4",
-          500: "#BA7070",
-        },
-        orange: {
-          DEFAULT: "#FFBD6F",
-          100: "#FFBD6F",
-          200: "#FFAC4B",
-          300: "#F5980C",
-          500: "#BD7433",
-        },
-        yellow: {
-          DEFAULT: "#FCD858",
-          100: "#FCD858",
-          200: "#F8CB2C",
-          300: "#E9BA16",
-          500: "#AB8E28",
+          200: "#F4F9FF",
+          400: "#0573E8",
+          500: "#135FC5",
         },
         green: {
-          DEFAULT: "#A6D669",
-          100: "#A6D669",
-          200: "#93C94F",
-          300: "#81B241",
-          500: "#689332",
-        },
-        violet: {
-          DEFAULT: "#BDAEF8",
-          100: "#BDAEF8",
-          200: "#AF9DF2",
-          300: "#9E8BE8",
-          500: "#796DC3",
+          DEFAULT: "#7EAE5A",
+          50: "#F5FFF5",
+          100: "#CEEBB8",
+          500: "#7EAE5A",
+          700: "#4F7F2B",
+          900: "#006002",
         },
         red: {
-          500: "#FF6699",
+          DEFAULT: "#CD5A5A",
+          50: "#FFF5F5",
+          200: "#F7B9B9",
+          500: "#CD5A5A",
+          900: "#600002",
         },
-  
-        // SKIN TONES
-        skin: {
-          100: "#F8E7CD",
-          200: "#E6BF99",
-          300: "#BD8A5A",
-          400: "#8A5935",
-          500: "#573515",
-          110: "#F8DCCD",
-          210: "#C69378",
-          310: "#BD7B5A",
-          410: "#914423",
-          510: "#683124",
+        orange: {
+          DEFAULT: "#CE812E",
+          50: "#FFFCF5",
+          500: "#CE812E",
+          900: "#603000",
         },
-  
-        // RESPONSE
-        success: "#A6D669",
-        error: "#EF5D5D",
-  
-        // ADMIN: ORGANIZATIONAL AREAS
-        "org-areas": {
-          engineering: "#53599A",
-          design: "#00A896",
-          product: "#DE6449",
-          community: "#DA4167",
+        yellow: {
+          DEFAULT: "#EAB01A",
+          50: "#FFF8E9",
+          100: "#FFF2A1",
+          500: "#EAB01A",
+          900: "#A45200",
+        },
+        magenta: {
+          DEFAULT: "#CE66FF",
+          50: "#FCF5FF",
+          100: "#F4DBFF",
+          500: "#CE66FF",
+          900: "#420060",
+        },
+
+        // Semantic tokens (recruitment UI)
+        link: "#3279B7",
+        icon: "#2E3A59",
+        input: "#7D7D7D",
+        success: "#00A403",
+        error: "#CD5A5A",
+        surface: {
+          grey: "#F3F4F6",
+          muted: "#FAFAFA",
+          highlight: "#F1F1F1",
+          info: "#F4FAFF",
+        },
+        alert: {
+          errorBorder: "#E9B0B0",
+          errorText: "#9F1C1C",
+        },
+
+        // Legacy aliases (map to recruitment palette)
+        charcoal: {
+          DEFAULT: "#252525",
+          0: "#FFFFFF",
+          100: "#FAFAFA",
+          200: "#EEEEEE",
+          300: "#C4C4C4",
+          400: "#737373",
+          500: "#737373",
+          600: "#2D3748",
+          700: "#000000",
         },
       },
       fontFamily: {

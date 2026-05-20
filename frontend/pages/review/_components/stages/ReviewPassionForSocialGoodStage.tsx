@@ -1,13 +1,12 @@
-import { useTheme } from "@mui/material";
-import { useContext } from "react";
-import { ApplicationDTO } from "@/types";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
-import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ApplicationDTO } from "@/types";
+import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
-import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
+import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
+import { ReviewSetScoresContext } from "../ReviewContext";
 import { REVIEW_PFSG_SCORING_CRITERIA } from "../rubricConstants";
 import { ReviewScores } from "../types";
 import { ReviewAnswers } from "../common/ReviewAnswers";
@@ -31,7 +30,6 @@ export const ReviewPassionForSocialGoodStage = ({
   const secondShortAnswer = shortAnswers[1];
   const questions = secondShortAnswer ? [secondShortAnswer.question] : [];
   const answers = secondShortAnswer ? [secondShortAnswer.response] : [];
-  const theme = useTheme();
   return (
     <ReviewPageLayout currentStage={ReviewStage.PFSG} scores={scores}>
       <PanelLayout
@@ -50,10 +48,7 @@ export const ReviewPassionForSocialGoodStage = ({
         title="Passion for Social Good"
         subtitle={`${name}'s Application`}
       >
-                  <div
-                className="mt-6 w-full shrink-0"
-                style={{ height: "1px", background: "#C4C4C4" }}
-              />
+        <div className="mt-6 h-px w-full shrink-0 bg-neutral-200" />
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>
       <PanelLayout
@@ -77,10 +72,7 @@ export const ReviewPassionForSocialGoodStage = ({
             ariaLabel="Passion for social good score"
             onChange={(v) => updateScore?.(ReviewStage.PFSG, v)}
           />
-          <span
-            className="text-xl leading-none"
-            style={{ color: theme.palette.error.main }}
-          >
+          <span className="text-xl leading-none text-red-500">
             *
           </span>
         </div>

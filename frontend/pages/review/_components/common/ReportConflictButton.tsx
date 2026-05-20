@@ -1,6 +1,4 @@
-
 import { ReactElement } from "react";
-import { useTheme } from "@mui/material";
 import { WarningOutlineIcon } from "@/components/icons/warning-outline.icon";
 
 interface ReportConflictButtonProps {
@@ -16,33 +14,21 @@ export const ReportConflictButton = ({
   showQuestion = false,
   onClick,
 }: ReportConflictButtonProps): ReactElement => {
-  const theme = useTheme();
   const reportButton = (
     <button
       type="button"
       onClick={onClick}
       aria-label="Report conflict of interest"
-      className="shrink-0 inline-flex items-center justify-center gap-2 rounded-[20px] border-2 bg-white px-3 py-1.5 font-source font-normal text-base hover:bg-sky-100 hover:border-blue hover:text-blue transition-opacity"
-      style={{
-        lineHeight: 1.4,
-        color: theme.palette.primary.main,
-        borderColor: theme.palette.primary.main,
-      }}
+      className="inline-flex shrink-0 items-center justify-center gap-2 rounded-[20px] border-2 border-blue bg-white px-3 py-1.5 font-source text-base font-normal leading-[1.4] text-blue transition-opacity hover:border-blue hover:bg-sky-100 hover:text-blue"
     >
-      <WarningOutlineIcon className="h-6 w-6 shrink-0 text-[#0573E8]" />
+      <WarningOutlineIcon className="h-6 w-6 shrink-0 text-blue" />
       <span>Report</span>
     </button>
   );
 
   return showQuestion ? (
-    <div className="flex items-center gap-3 shrink-0">
-      <p
-        className="font-source italic text-normal"
-        style={{
-          lineHeight: "normal",
-          color: theme.palette.primary.main,
-        }}
-      >
+    <div className="flex shrink-0 items-center gap-3">
+      <p className="font-source text-normal italic leading-normal text-blue">
         Is the applicant a conflict of interest?
       </p>
       {reportButton}

@@ -26,11 +26,11 @@ export const Button: FC<Props> = ({
     switch (variant) {
       case "primary":
         // White border, white background, blue text
-        classes = `border-white bg-white text-blue hover:border-transparent hover:bg-sky-200 hover:text-blue-100`;
+        classes = `border-white bg-white text-blue hover:border-transparent hover:bg-sky-200 hover:text-blue-600`;
         break;
       case "secondary":
         // White border, blue background, white text
-        classes = `border-white bg-blue text-white hover:border-transparent hover:bg-sky-200 hover:text-blue-100`;
+        classes = `border-white bg-blue text-white hover:border-transparent hover:bg-sky-200 hover:text-blue-600`;
         break;
     }
   } else {

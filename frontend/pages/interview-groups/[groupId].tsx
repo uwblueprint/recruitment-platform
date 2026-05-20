@@ -1,13 +1,12 @@
+import InterviewGroupAPIClient from "@/APIClients/InterviewGroupAPIClient";
+import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
+import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import { PanelLayout } from "@/components/layouts/PanelLayout";
 import {
     SPLIT_PANEL_WIDTHS,
     SplitPanelLayout,
   } from "@/components/layouts/SplitPageLayout";
-  import { PanelLayout } from "@/components/layouts/PanelLayout";
-  import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
-  import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
   import { InterviewHeader } from "@/pages/interview/_components/layout";
-  import { RecruitmentPlatformThemeProvider } from "@/components/contexts/RecruitmentPlatformThemeProvider";
-  import InterviewGroupAPIClient from "@/APIClients/InterviewGroupAPIClient";
   import { useRouter } from "next/router";
   import { ReactElement, useState } from "react";
   import useInterviewGroupData from "@/hooks/useInterviewGroupData";
@@ -74,15 +73,15 @@ import { InterviewGroupStatus } from "@/graphql/typeUtils";
   
           <div className="flex flex-col gap-12 w-full">
             {isLoading && (
-              <div className="border border-[#C4C4C4] rounded-lg px-4 py-3 bg-[#F4FAFF]">
-                <p className="font-source text-sm text-[#3279B7] leading-[1.4]">
+              <div className="border border-neutral-200 rounded-lg px-4 py-3 bg-surface-info">
+                <p className="font-source text-sm text-link leading-[1.4]">
                   Loading interview group details...
                 </p>
               </div>
             )}
             {error && (
-              <div className="border border-[#E9B0B0] rounded-lg px-4 py-3 bg-[#FFF5F5]">
-                <p className="font-source text-sm text-[#9F1C1C] leading-[1.4]">
+              <div className="border border-alert-errorBorder rounded-lg px-4 py-3 bg-red-50">
+                <p className="font-source text-sm text-alert-errorText leading-[1.4]">
                   Could not load all interview details. Please refresh and try
                   again.
                 </p>
@@ -152,7 +151,6 @@ import { InterviewGroupStatus } from "@/graphql/typeUtils";
   };
   
   InterviewGroupPage.getLayout = (page: ReactElement) => (
-    <RecruitmentPlatformThemeProvider>
       <ProtectedRoute allowedRoles={["Admin", "User"]}>
         <SplitPanelLayout
           leftWidth={SPLIT_PANEL_WIDTHS.interview.left}
@@ -162,7 +160,6 @@ import { InterviewGroupStatus } from "@/graphql/typeUtils";
           {page}
         </SplitPanelLayout>
       </ProtectedRoute>
-    </RecruitmentPlatformThemeProvider>
   );
   
   export default InterviewGroupPage;

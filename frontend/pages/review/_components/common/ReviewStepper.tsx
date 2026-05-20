@@ -1,14 +1,12 @@
 import { Button } from "@/components/common/Button";
+import { LongLeftIcon } from "@/components/icons/long-left.icon";
+import Link from "next/link";
 import { useRouter } from "next/router";
-import { useContext, useState } from "react";
+import { ReactElement, useContext, useState } from "react";
 import { BACK_TO_HOME_HREF, REVIEW_STAGES, ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
-import { getApplicantRecordId } from "../utils";
 import { ReviewEndData, ReviewScores } from "../types";
-import { useTheme } from "@mui/material";
-import { ReactElement } from "react";
-import Link from "next/link";
-import { LongLeftIcon } from "@/components/icons/long-left.icon";
+import { getApplicantRecordId } from "../utils";
 
 const STAGE_RATING_FIELDS: [ReviewStage, string][] = [
   [ReviewStage.PFSG, "passionFSG"],
@@ -31,7 +29,6 @@ export const ReviewStepper = ({
   endData,
   onValidate,
 }: Props): ReactElement | null => {
-  const theme = useTheme();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const setStage = useContext(ReviewSetStageContext);
@@ -71,13 +68,7 @@ export const ReviewStepper = ({
   };
 
   return (
-    <div
-      className="px-6 py-4"
-      style={{
-        borderTop: `1px solid ${theme.palette.semantics.border.light}`,
-        backgroundColor: theme.palette.background.default,
-      }}
-    >
+    <div className="border-t border-neutral-200 bg-white px-6 py-4">
       <div className="flex justify-end items-center gap-3 flex-nowrap">
         {currentStageIndex === 0 && (
           <Link href={BACK_TO_HOME_HREF} className="font-source no-underline inline-flex justify-center items-center gap-2 w-fit cursor-pointer shrink-0 hover:opacity-90 rounded-full py-2 px-4 border-2 border-blue bg-white text-blue text-base font-normal leading-[1.4] hover:bg-sky-100 hover:border-blue hover:text-blue">

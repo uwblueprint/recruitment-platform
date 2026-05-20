@@ -1,17 +1,16 @@
-import { useContext } from "react";
+import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ApplicationDTO } from "@/types";
-import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
-import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
+import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
+import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
+import { ReviewSetScoresContext } from "../ReviewContext";
 import { REVIEW_D2L_SCORING_CRITERIA } from "../rubricConstants";
 import { ReviewScores } from "../types";
 import { ReviewAnswers } from "../common/ReviewAnswers";
 import { ReviewRubric } from "../common/ReviewRubric";
-import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
-import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { useTheme } from "@mui/material";
 
 interface Props {
   name: string;
@@ -31,7 +30,6 @@ export const ReviewDriveToLearnStage = ({
   const fourthShortAnswer = shortAnswers[3];
   const questions = fourthShortAnswer ? [fourthShortAnswer.question] : [];
   const answers = fourthShortAnswer ? [fourthShortAnswer.response] : [];
-  const theme = useTheme();
   return (
     <ReviewPageLayout currentStage={ReviewStage.D2L} scores={scores}>
       <PanelLayout
@@ -50,10 +48,7 @@ export const ReviewDriveToLearnStage = ({
         title="Drive to Learn"
         subtitle={`${name}'s Application`}
       >
-          <div
-                className="mt-6 w-full shrink-0"
-                style={{ height: "1px", background: "#C4C4C4" }}
-              />
+        <div className="mt-6 h-px w-full shrink-0 bg-neutral-200" />
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>
       <PanelLayout
@@ -77,10 +72,7 @@ export const ReviewDriveToLearnStage = ({
             ariaLabel="Drive to learn score"
             onChange={(v) => updateScore?.(ReviewStage.D2L, v)}
           />
-          <span
-            className="text-xl leading-none"
-            style={{ color: theme.palette.error.main }}
-          >
+          <span className="text-xl leading-none text-red-500">
             *
           </span>
         </div>

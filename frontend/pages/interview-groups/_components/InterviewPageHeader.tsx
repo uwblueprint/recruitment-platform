@@ -7,7 +7,7 @@ const InterviewPageHeader = () => (
         <LongLeftIcon />
         Back to home
     </Link>
-    <p className="font-poppins font-semibold text-[28px] text-[#252525] leading-[1.4]">
+    <p className="font-poppins font-semibold text-[28px] text-neutral-800 leading-[1.4]">
       Interview Pairing
     </p>
     <p className="font-poppins font-normal text-[20px] text-black leading-[1.4]">

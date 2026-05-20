@@ -16,14 +16,14 @@ const CalendlyLinkSubmitted = ({
   onEdit,
   onResubmit,
 }: CalendlyLinkSubmittedProps) => (
-  <div className="flex gap-4 border border-[#C4C4C4] rounded-lg py-6 pr-6 pl-4">
-    <div className="flex items-center justify-center w-9 h-9 rounded-full bg-[#00A403] text-white shrink-0">
+  <div className="flex gap-4 border border-neutral-200 rounded-lg py-6 pr-6 pl-4">
+    <div className="flex items-center justify-center w-9 h-9 rounded-full bg-success text-white shrink-0">
       <CheckCircleIcon />
     </div>
     <div className="flex flex-col gap-8 flex-1">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-3">
-          <p className="font-poppins font-medium text-xl text-[#00A403] leading-[1.4]">
+          <p className="font-poppins font-medium text-xl text-success leading-[1.4]">
             Link submitted!
           </p>
           <p className="font-source text-base text-black/75 leading-[1.4]">
@@ -36,11 +36,11 @@ const CalendlyLinkSubmitted = ({
             type="text"
             value={linkInput}
             onChange={(e) => onLinkChange(e.target.value)}
-            className="w-full border border-[#7D7D7D] rounded-[5px] py-[10px] px-5 text-sm text-charcoal-400 font-normal leading-[1.43] outline-none focus:border-blue"
+            className="w-full border border-input rounded-[5px] py-[10px] px-5 text-sm text-charcoal-400 font-normal leading-[1.43] outline-none focus:border-blue"
           />
         ) : (
-          <div className="flex items-center gap-[10px] border border-[#7D7D7D] rounded-[5px] py-[10px] px-5">
-            <span className="flex-1 text-sm text-[#3279B7] font-normal leading-[1.43] truncate">
+          <div className="flex items-center gap-[10px] border border-input rounded-[5px] py-[10px] px-5">
+            <span className="flex-1 text-sm text-link font-normal leading-[1.43] truncate">
               {linkInput}
             </span>
             <button
