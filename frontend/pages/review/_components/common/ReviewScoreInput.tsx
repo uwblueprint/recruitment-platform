@@ -85,7 +85,7 @@ export function ReviewScoreInput({
           onClick={handleDecrement}
           disabled={!canDecrement}
           aria-label="Decrease score"
-          className="flex min-h-0 flex-1 items-center justify-center bg-white disabled:cursor-not-allowed disabled:opacity-40"
+          className="flex min-h-0 flex-1 items-center justify-center bg-white text-neutral-800 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <UpCaret direction="down" />
         </button>

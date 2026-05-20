@@ -12,7 +12,7 @@ module.exports = {
         transparent: "transparent",
         current: "currentColor",
 
-        // Recruitment platform palette (see constants/palette.ts)
+        // Recruitment platform palette
         black: "#000000",
         white: "#FFFFFF",
 
