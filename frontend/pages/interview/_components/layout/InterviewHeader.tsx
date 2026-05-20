@@ -1,5 +1,4 @@
 import { BlueprintLogo } from "@/components/common/BlueprintLogo";
-import { blue, neutral } from "@/constants/palette";
 import Link from "next/link";
 import { useContext } from "react";
 import { PROFILE_HEADER_STEPS } from "../constants";
@@ -24,7 +23,7 @@ export const InterviewHeader = ({
   const activeStep = progressContext?.currentSubStep ?? currentStep;
 
   return (
-    <header className="w-full" style={{ backgroundColor: blue[500] }}>
+    <header className="w-full bg-blue">
       <div className="flex items-center justify-between px-9 py-4">
         <Link href="/admin">
           <BlueprintLogo />
@@ -37,21 +36,18 @@ export const InterviewHeader = ({
               <button
                 key={step}
                 onClick={() => progressContext?.setCurrentSubStep(step)}
-                className="flex flex-col items-center gap-1 w-[80px] hover:opacity-80 transition-opacity"
+                className="flex w-[80px] flex-col items-center gap-1 transition-opacity hover:opacity-80"
                 aria-label={`Navigate to ${label} step`}
               >
                 <div
-                  className="w-9 h-9 rounded-full border-2 flex items-center justify-center"
-                  style={{
-                    backgroundColor: active ? neutral[50] : "transparent",
-                    borderColor: neutral[50],
-                  }}
+                  className={`flex h-9 w-9 items-center justify-center rounded-full border-2 border-white ${
+                    active ? "bg-white" : "bg-transparent"
+                  }`}
                 >
                   <span
-                    className="text-sm font-medium"
-                    style={{
-                      color: active ? blue[500] : neutral[50],
-                    }}
+                    className={`text-sm font-medium ${
+                      active ? "text-blue" : "text-white"
+                    }`}
                   >
                     {index}
                   </span>

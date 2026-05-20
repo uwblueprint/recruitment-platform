@@ -1,6 +1,5 @@
 import { ArrowLeftIcon } from "@/components/icons/arrow-left.icon";
 import { ArrowRightIcon } from "@/components/icons/arrow-right.icon";
-import { blue, neutral } from "@/constants/palette";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { INTERVIEW_NAV_ITEMS } from "../constants";
@@ -21,19 +20,19 @@ export const InterviewNavPanel = ({
     <nav className="flex flex-col">
       <Link
         href="/admin"
-        className="w-fit flex justify-center items-center gap-2 py-2 px-4 rounded-full border-2 border-blue bg-white hover:bg-gray-50 transition-colors"
+        className="flex w-fit items-center justify-center gap-2 rounded-full border-2 border-blue bg-white px-4 py-2 transition-colors hover:bg-gray-50"
       >
-        <ArrowLeftIcon className="w-6 h-6 text-blue" />
-        <span className="text-blue text-base font-normal leading-snug">
+        <ArrowLeftIcon className="h-6 w-6 text-blue" />
+        <span className="text-base font-normal leading-snug text-blue">
           Back to home
         </span>
       </Link>
 
-      <h2 className="font-poppins text-[28px] font-semibold leading-[140%] text-[#252525] mt-5">
+      <h2 className="mt-5 font-poppins text-[28px] font-semibold leading-[140%] text-[#252525]">
         {candidateName}&apos;s Interview Review
       </h2>
 
-      <hr className="mt-8 mb-8 border-[#C4C4C4]" />
+      <hr className="my-8 border-[#C4C4C4]" />
 
       <ul className="flex flex-col gap-[36px]">
         {INTERVIEW_NAV_ITEMS.map((item) => {
@@ -47,11 +46,10 @@ export const InterviewNavPanel = ({
                     : item.path
                 }
                 className={`flex items-center justify-between self-stretch rounded-lg px-5 py-2.5 hover:bg-[#F1F1F1] ${
-                  active ? "bg-[#F1F1F1] font-semibold" : "font-normal"
+                  active
+                    ? "bg-[#F1F1F1] font-semibold text-blue"
+                    : "font-normal text-[#252525]"
                 }`}
-                style={{
-                  color: active ? blue[500] : neutral[800],
-                }}
               >
                 <span className="font-poppins text-xl font-normal leading-[140%]">
                   {item.label}
