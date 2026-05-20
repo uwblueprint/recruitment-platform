@@ -1,6 +1,5 @@
 import { Button } from "@/components/common/Button";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { neutral, red } from "@/constants/palette";
 import { ReactNode, useContext } from "react";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStage } from "../constants";
@@ -10,9 +9,6 @@ import { REVIEW_SKL_SCORING_CRITERIA } from "../rubricConstants";
 import { ReviewAnswers } from "../common/ReviewAnswers";
 import { ReviewStageProps } from "./ReviewInfoStage";
 import { ReviewRubric } from "../common/ReviewRubric";
-import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
-import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { useTheme } from "@mui/material";
 import { EditIcon } from "@/components/icons/edit.icon";
 
 
@@ -72,10 +68,7 @@ export const ReviewSkillStage = ({
         title="Skill"
         subtitle={`${name}'s Application`}
       >
-                          <div
-                className="mt-6 w-full shrink-0"
-                style={{ height: "1px", background: "#C4C4C4" }}
-              />
+        <div className="mt-6 h-px w-full shrink-0 bg-[#C4C4C4]" />
         {resumeLink ? <ResumeLink resumeLink={resumeLink} /> : null}
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>
@@ -100,10 +93,7 @@ export const ReviewSkillStage = ({
             ariaLabel="Skill score"
             onChange={(v) => updateScore?.(ReviewStage.SKL, v)}
           />
-          <span
-            className="text-xl leading-none"
-            style={{ color: red[500] }}
-          >
+          <span className="text-xl leading-none text-red-500">
             *
           </span>
         </div>

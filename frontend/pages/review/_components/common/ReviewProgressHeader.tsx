@@ -1,8 +1,7 @@
 import { CheckIcon } from "@/components/icons/check.icon";
-import { blue, green, neutral } from "@/constants/palette";
 import Image from "next/image";
 import Link from "next/link";
-import { CSSProperties, useContext } from "react";
+import { useContext } from "react";
 import { ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
 
@@ -34,6 +33,18 @@ const getStepState = (step: StepConfig, currentIndex: number): StepState => {
   return "future";
 };
 
+const circleClasses: Record<StepState, string> = {
+  completed: "border-[#7EAE5A] bg-[#7EAE5A]",
+  current: "border-white bg-white",
+  future: "border-white bg-transparent",
+};
+
+const numberClasses: Record<StepState, string> = {
+  completed: "text-sm text-white",
+  current: "text-sm font-bold text-blue",
+  future: "text-sm text-white",
+};
+
 interface StepIndicatorProps {
   step: StepConfig;
   state: StepState;
@@ -42,42 +53,18 @@ interface StepIndicatorProps {
 const StepIndicator = ({ step, state }: StepIndicatorProps) => {
   const setStage = useContext(ReviewSetStageContext);
 
-  const circleStyleObjects: Record<StepState, CSSProperties> = {
-    completed: {
-      backgroundColor: green[500],
-      borderColor: green[500],
-    },
-    current: {
-      backgroundColor: neutral[50],
-      borderColor: neutral[50],
-    },
-    future: {
-      backgroundColor: "transparent",
-      borderColor: neutral[50],
-    },
-  };
-
-  const numberStyleObjects: Record<StepState, CSSProperties> = {
-    completed: { color: neutral[50] },
-    current: { color: blue[500], fontWeight: 700 },
-    future: { color: neutral[50] },
-  };
-
   const content = (
     <>
       <div
-        className="w-9 h-9 rounded-full border-2 flex items-center justify-center"
-        style={circleStyleObjects[state]}
+        className={`flex h-9 w-9 items-center justify-center rounded-full border-2 ${circleClasses[state]}`}
       >
         {state === "completed" ? (
-          <CheckIcon className="w-5 h-5" style={{ color: neutral[50] }} />
+          <CheckIcon className="h-5 w-5 text-white" />
         ) : (
-          <span className={`text-sm`} style={numberStyleObjects[state]}>
-            {step.index}
-          </span>
+          <span className={numberClasses[state]}>{step.index}</span>
         )}
       </div>
-      <span className="text-white text-xs font-medium uppercase tracking-wide">
+      <span className="text-xs font-medium uppercase tracking-wide text-white">
         {step.label}
       </span>
     </>
@@ -87,7 +74,7 @@ const StepIndicator = ({ step, state }: StepIndicatorProps) => {
     <button
       type="button"
       onClick={() => setStage?.(step.stage)}
-      className="flex flex-col items-center gap-1 hover:opacity-80 transition-opacity"
+      className="flex flex-col items-center gap-1 transition-opacity hover:opacity-80"
       aria-label={`Navigate to ${step.label} step`}
     >
       {content}
@@ -99,8 +86,8 @@ export const ReviewProgressHeader = ({ currentStage }: Props) => {
   const currentIndex = steps.findIndex((s) => s.stage === currentStage);
 
   return (
-    <header className="w-full" style={{ backgroundColor: blue[500] }}>
-      <div className="flex items-center justify-between px-9 py-4 w-full">
+    <header className="w-full bg-blue">
+      <div className="flex w-full items-center justify-between px-9 py-4">
         {/* Left side - Logo */}
         <Link href="/review">
           <Image
@@ -113,7 +100,7 @@ export const ReviewProgressHeader = ({ currentStage }: Props) => {
         </Link>
 
         {/* Right side - Progress Stepper */}
-        <div className="hidden md:flex items-center gap-9">
+        <div className="hidden items-center gap-9 md:flex">
           {steps.map((step) => (
             <StepIndicator
               key={step.index}

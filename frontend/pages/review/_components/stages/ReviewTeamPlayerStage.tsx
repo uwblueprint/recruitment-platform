@@ -1,5 +1,4 @@
 import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { neutral, red } from "@/constants/palette";
 import { ApplicationDTO } from "@/types";
 import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
@@ -50,10 +49,7 @@ export const ReviewTeamPlayerStage = ({
         title="Team Player"
         subtitle={`${name}'s Application`}
       >
-                  <div
-                className="mt-6 w-full shrink-0"
-                style={{ height: "1px", background: "#C4C4C4" }}
-              />
+        <div className="mt-6 h-px w-full shrink-0 bg-[#C4C4C4]" />
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>
       <PanelLayout
@@ -78,8 +74,7 @@ export const ReviewTeamPlayerStage = ({
             onChange={(v) => updateScore?.(TP, v)}
           />
           <span
-            className="text-xl leading-none"
-            style={{ color: red[500] }}
+            className="text-xl leading-none text-red-500"
           >
             *
           </span>
