@@ -5,7 +5,7 @@ import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { ReviewStage } from "../constants";
 import { ReportConflictButton } from "../common/ReportConflictButton";
 import { ReviewScores } from "../types";
-import { ReviewAnswers } from "./ReviewAnswers";
+import { ReviewInfoAnswers } from "../common/ReviewInfoAnswers";
 
 export interface ReviewStageProps {
   name: string;
@@ -94,7 +94,7 @@ export const ReviewInfoStage = ({
         }
       >
         <div className="my-12 flex w-full flex-col">
-          <ReviewAnswers questions={questions} answers={answers} />
+          <ReviewInfoAnswers questions={questions} answers={answers} />
         </div>
       </PanelLayout>
     </ReviewPageLayout>

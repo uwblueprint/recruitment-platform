@@ -30,6 +30,7 @@ export const Dialogue = ({
           overflow: "hidden",
           boxShadow: "none",
           opacity: 1,
+          width: "310px",
         },
       }}
     >

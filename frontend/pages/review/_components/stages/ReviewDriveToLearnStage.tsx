@@ -7,8 +7,8 @@ import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
 import { REVIEW_D2L_SCORING_CRITERIA } from "../rubricConstants";
 import { ReviewScores } from "../types";
-import { ReviewAnswers } from "./ReviewAnswers";
-import { ReviewRubric } from "./ReviewRubric";
+import { ReviewAnswers } from "../common/ReviewAnswers";
+import { ReviewRubric } from "../common/ReviewRubric";
 import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { useTheme } from "@mui/material";
@@ -50,6 +50,10 @@ export const ReviewDriveToLearnStage = ({
         title="Drive to Learn"
         subtitle={`${name}'s Application`}
       >
+          <div
+                className="mt-6 w-full shrink-0"
+                style={{ height: "1px", background: "#C4C4C4" }}
+              />
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>
       <PanelLayout
@@ -62,12 +66,6 @@ export const ReviewDriveToLearnStage = ({
           scoringCriteria={REVIEW_D2L_SCORING_CRITERIA}
           scores={scores}
           currentStage={ReviewStage.D2L}
-        />
-        <div
-          className="w-full shrink-0 height-[1px]"
-          style={{
-            background: theme.palette.background.default,
-          }}
         />
         <div className="flex items-center gap-3">
           <ReviewScoreInput

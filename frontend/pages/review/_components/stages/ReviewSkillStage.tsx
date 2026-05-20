@@ -4,12 +4,14 @@ import { ReviewStage } from "../constants";
 import { ReviewSetScoresContext } from "../ReviewContext";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { REVIEW_SKL_SCORING_CRITERIA } from "../rubricConstants";
-import { ReviewAnswers } from "./ReviewAnswers";
+import { ReviewAnswers } from "../common/ReviewAnswers";
 import { ReviewStageProps } from "./ReviewInfoStage";
-import { ReviewRubric } from "./ReviewRubric";
+import { ReviewRubric } from "../common/ReviewRubric";
 import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { useTheme } from "@mui/material";
+import { EditIcon } from "@/components/icons/edit.icon";
+
 
 const ResumeLink = ({ resumeLink }: { resumeLink: string }) => {
   return (
@@ -21,7 +23,7 @@ const ResumeLink = ({ resumeLink }: { resumeLink: string }) => {
         href={resumeLink}
       >
         <div className="flex justify-center items-center gap-2">
-          <img className="stroke-3" src={"common/resume.svg"} alt="" /> View
+          <EditIcon className="w-4 h-4 text-blue"/> View
           Candidate Resume
         </div>
       </Button>
@@ -68,6 +70,10 @@ export const ReviewSkillStage = ({
         title="Skill"
         subtitle={`${name}'s Application`}
       >
+                          <div
+                className="mt-6 w-full shrink-0"
+                style={{ height: "1px", background: "#C4C4C4" }}
+              />
         {resumeLink ? <ResumeLink resumeLink={resumeLink} /> : null}
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>
@@ -81,13 +87,6 @@ export const ReviewSkillStage = ({
           scoringCriteria={REVIEW_SKL_SCORING_CRITERIA}
           scores={scores}
           currentStage={ReviewStage.SKL}
-        />
-        <div
-          className="w-full shrink-0"
-          style={{
-            height: "1px",
-            background: theme.palette.background.default,
-          }}
         />
         <div className="flex items-center gap-3">
           <ReviewScoreInput

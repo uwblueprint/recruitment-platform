@@ -10,8 +10,8 @@ import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
 import { REVIEW_TP_SCORING_CRITERIA } from "../rubricConstants";
 import { ReviewScores } from "../types";
-import { ReviewAnswers } from "./ReviewAnswers";
-import { ReviewRubric } from "./ReviewRubric";
+import { ReviewAnswers } from "../common/ReviewAnswers";
+import { ReviewRubric } from "../common/ReviewRubric";
 
 interface Props {
   name: string;
@@ -51,6 +51,10 @@ export const ReviewTeamPlayerStage = ({
         title="Team Player"
         subtitle={`${name}'s Application`}
       >
+                  <div
+                className="mt-6 w-full shrink-0"
+                style={{ height: "1px", background: "#C4C4C4" }}
+              />
         <ReviewAnswers questions={questions} answers={answers} />
       </PanelLayout>
       <PanelLayout
@@ -63,13 +67,6 @@ export const ReviewTeamPlayerStage = ({
           scoringCriteria={REVIEW_TP_SCORING_CRITERIA}
           scores={scores}
           currentStage={TP}
-        />
-        <div
-          className="w-full shrink-0"
-          style={{
-            height: "1px",
-            background: theme.palette.background.default,
-          }}
         />
         <div className="flex items-center gap-3">
           <ReviewScoreInput

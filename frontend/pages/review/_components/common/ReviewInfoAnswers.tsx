@@ -5,7 +5,7 @@ export interface Props {
   answers: string[];
 }
 
-export const ReviewAnswers = ({ questions, answers }: Props): ReactElement => {
+export const ReviewInfoAnswers = ({ questions, answers }: Props): ReactElement => {
   return (
     <div className="flex w-full flex-col gap-6">
       {questions.map((question, index) => {
