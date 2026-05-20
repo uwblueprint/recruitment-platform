@@ -1,4 +1,3 @@
-import { neutral, semanticColors } from "@/constants/palette";
 import { ReactNode } from "react";
 
 interface PanelLayoutProps {
@@ -18,6 +17,13 @@ interface PanelLayoutProps {
   children: ReactNode;
 }
 
+const titleClasses: Record<"xlarge" | "medium", string> = {
+  xlarge:
+    "font-poppins text-[28px] font-semibold leading-[140%] text-[#252525]",
+  medium:
+    "self-stretch font-poppins text-xl font-medium leading-[140%] text-[#252525]",
+};
+
 export const PanelLayout = ({
   title,
   subtitle,
@@ -31,23 +37,6 @@ export const PanelLayout = ({
   contentClassName,
   children,
 }: PanelLayoutProps) => {
-  const TITLE_STYLES = {
-    xlarge: {
-      color: neutral[800],
-      fontSize: "28px",
-      fontStyle: "normal",
-      fontWeight: 600,
-      lineHeight: "140%",
-    },
-    medium: {
-      alignSelf: "stretch",
-      color: neutral[800],
-      fontSize: "20px",
-      fontStyle: "normal",
-      fontWeight: 500,
-      lineHeight: "140%",
-    },
-  };
   const bg =
     variant === "sky"
       ? "bg-sky"
@@ -55,7 +44,6 @@ export const PanelLayout = ({
         ? "bg-[#F3F4F6]"
         : "bg-white";
   const hasHeader = !!(title || subtitle || header);
-  const titleStyle = TITLE_STYLES[titleVariant];
 
   const headerBlock = (
     <>
@@ -65,10 +53,7 @@ export const PanelLayout = ({
         </div>
       ) : null}
       {showApplicationTitle && subtitle && (
-        <p
-          className="font-poppins text-charcoal-500 mb-4 shrink-0 text-[15px]"
-          style={{ lineHeight: "140%" }}
-        >
+        <p className="mb-4 shrink-0 font-poppins text-[15px] leading-[140%] text-charcoal-500">
           {subtitle}
         </p>
       )}
@@ -76,21 +61,18 @@ export const PanelLayout = ({
         <>
           {title && titleButton ? (
             <div
-              className={`flex justify-between items-center shrink-0 ${
+              className={`flex shrink-0 items-center justify-between ${
                 titleVariant === "medium" ? "mb-4" : ""
               }`}
             >
-              <h2 className="font-poppins font-medium" style={titleStyle}>
-                {title}
-              </h2>
+              <h2 className={titleClasses[titleVariant]}>{title}</h2>
               {titleButton}
             </div>
           ) : title ? (
             <h2
-              className={`font-poppins ${
-                titleVariant === "xlarge" ? "shrink-0" : ""
-              } ${titleVariant === "medium" ? "mb-4 font-medium" : ""}`}
-              style={titleStyle}
+              className={`${titleClasses[titleVariant]} ${
+                titleVariant === "xlarge" ? "shrink-0" : "mb-4"
+              }`}
             >
               {title}
             </h2>
@@ -111,15 +93,11 @@ export const PanelLayout = ({
 
   return (
     <div
-      className={`flex flex-col h-full overflow-hidden relative ${bg} ${
-        borderRight ? "lg:border-r" : ""
-      } ${borderLeft ? "lg:border-l" : ""}`}
-      style={{
-        borderColor:
-          borderRight || borderLeft ? semanticColors.border.light : undefined,
-      }}
+      className={`relative flex h-full flex-col overflow-hidden ${bg} ${
+        borderRight ? "lg:border-r lg:border-[#C4C4C4]" : ""
+      } ${borderLeft ? "lg:border-l lg:border-[#C4C4C4]" : ""}`}
     >
-      <div className="flex h-full flex-col overflow-hidden pt-8 pb-8">
+      <div className="flex h-full flex-col overflow-hidden py-8">
         {showHeaderStack ? (
           <div className="shrink-0 px-9">{headerBlock}</div>
         ) : null}
@@ -128,9 +106,8 @@ export const PanelLayout = ({
             className={
               contentClassName
                 ? "box-border w-full px-9"
-                : "box-border flex min-h-full w-full flex-col gap-8 px-9"
+                : "box-border flex min-h-full w-full flex-col items-start gap-8 px-9"
             }
-            style={contentClassName ? undefined : { alignItems: "flex-start" }}
           >
             {children}
           </div>
