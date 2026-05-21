@@ -25,6 +25,14 @@ export type InterviewersByGroupIdQueryVariables = Exact<{
 
 export type InterviewersByGroupIdQuery = { interviewersByGroupId: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }> };
 
+export type IsAuthorizedByRoleQueryVariables = Exact<{
+  accessToken: string;
+  roles: Array<Types.Role> | Types.Role;
+}>;
+
+
+export type IsAuthorizedByRoleQuery = { isAuthorizedByRole: boolean };
+
 export type LoginMutationVariables = Exact<{
   email: string;
   password: string;

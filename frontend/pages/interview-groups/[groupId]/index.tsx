@@ -10,13 +10,13 @@ import {
   import { useRouter } from "next/router";
   import { ReactElement, useState } from "react";
   import useInterviewGroupData from "@/hooks/useInterviewGroupData";
-  import { NextPageWithLayout } from "../_app";
-  import CalendlyLinkForm from "./_components/CalendlyLinkForm";
-  import CalendlyLinkSubmitted from "./_components/CalendlyLinkSubmitted";
-  import CalendlySection from "./_components/CalendlySection";
-  import InterviewGroupIllustrationPanel from "./_components/InterviewGroupIllustrationPanel";
-  import InterviewPageHeader from "./_components/InterviewPageHeader";
-  import PartnerSection from "./_components/PartnerSection";
+  import { NextPageWithLayout } from "../../_app";
+  import CalendlyLinkForm from "../_components/CalendlyLinkForm";
+  import CalendlyLinkSubmitted from "../_components/CalendlyLinkSubmitted";
+  import CalendlySection from "../_components/CalendlySection";
+  import InterviewGroupIllustrationPanel from "../_components/InterviewGroupIllustrationPanel";
+  import InterviewPageHeader from "../_components/InterviewPageHeader";
+  import PartnerSection from "../_components/PartnerSection";
 import { InterviewGroupStatus } from "@/graphql/typeUtils";
   
   const InterviewGroupContent = ({
@@ -163,4 +163,3 @@ import { InterviewGroupStatus } from "@/graphql/typeUtils";
   );
   
   export default InterviewGroupPage;
-  
