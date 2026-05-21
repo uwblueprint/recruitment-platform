@@ -1,57 +1,101 @@
 #!/bin/sh
 
-FRONTEND_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -c "^frontend/")
-BACKEND_CHANGED=$(git diff --cached --name-only --diff-filter=ACM | grep -c "^backend/typescript/")
+# Git hooks run with a minimal PATH — extend it to find yarn/node
+# regardless of how the developer installed them
+export PATH="$HOME/.local/bin:$HOME/.hermes/node/bin:/usr/local/bin:/opt/homebrew/bin:$PATH"
+
+GREEN='\033[32m'
+RED='\033[31m'
+YELLOW='\033[33m'
+RESET='\033[0m'
+DOT_WIDTH=52
+
+FRONTEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "^frontend/")
+BACKEND_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep "^backend/typescript/")
 
 FAILED=0
 
-if [ "$FRONTEND_CHANGED" -gt 0 ]; then
-    echo "Frontend files staged. Running checks..."
+# Print a padded "Check name......Passed/Failed/Fixed" line
+print_result() {
+  label="$1"
+  status="$2"
+  pad=$((DOT_WIDTH - ${#label}))
+  printf "%s" "$label"
+  i=0; while [ $i -lt $pad ]; do printf "."; i=$((i+1)); done
+  case "$status" in
+    passed) printf "${GREEN}Passed${RESET}\n" ;;
+    fixed)  printf "${YELLOW}Fixed${RESET}\n" ;;
+    failed) printf "${RED}Failed${RESET}\n" ;;
+  esac
+}
 
-    echo "  Lint..."
-    yarn --cwd ./frontend lint
-    if [ $? -ne 0 ]; then
-        echo "  FAILED: frontend lint"
-        FAILED=1
-    fi
+# Run a read-only check; print result and capture failures
+run_check() {
+  label="$1"; shift
+  output=$("$@" 2>&1)
+  if [ $? -ne 0 ]; then
+    print_result "$label" "failed"
+    printf "%s\n\n" "$output"
+    FAILED=1
+  else
+    print_result "$label" "passed"
+  fi
+}
 
-    echo "  Type check..."
-    yarn --cwd ./frontend type-check
-    if [ $? -ne 0 ]; then
-        echo "  FAILED: frontend type check"
-        FAILED=1
-    fi
+# Auto-fix staged files with prettier + eslint, re-stage, report Fixed/Passed
+fix_and_stage() {
+  workspace="$1"   # e.g. "frontend" or "backend/typescript"
+  files="$2"       # newline-separated repo-root-relative paths
+
+  rel_files=$(printf "%s\n" "$files" | sed "s|^${workspace}/||g" | tr '\n' ' ')
+
+  # Prettier
+  snapshot_before=$(printf "%s\n" "$files" | tr '\n' '\0' | xargs -0 git show HEAD: 2>/dev/null | md5sum)
+  yarn --cwd "./$workspace" prettier --write $rel_files --log-level silent 2>/dev/null
+  printf "%s\n" "$files" | tr '\n' '\0' | xargs -0 git add
+  snapshot_after=$(printf "%s\n" "$files" | tr '\n' '\0' | xargs -0 git show HEAD: 2>/dev/null | md5sum)
+
+  if [ "$snapshot_before" != "$snapshot_after" ]; then
+    print_result "Prettier ($workspace)" "fixed"
+  else
+    print_result "Prettier ($workspace)" "passed"
+  fi
+
+  # ESLint --fix
+  snapshot_before=$(git diff --cached -- $files 2>/dev/null | md5sum)
+  yarn --cwd "./$workspace" eslint --fix $rel_files 2>/dev/null
+  printf "%s\n" "$files" | tr '\n' '\0' | xargs -0 git add
+  snapshot_after=$(git diff --cached -- $files 2>/dev/null | md5sum)
+
+  if [ "$snapshot_before" != "$snapshot_after" ]; then
+    print_result "ESLint auto-fix ($workspace)" "fixed"
+  else
+    print_result "ESLint auto-fix ($workspace)" "passed"
+  fi
+}
+
+# ── Frontend ──────────────────────────────────────────────────────────────────
+
+if [ -n "$FRONTEND_FILES" ]; then
+  fix_and_stage "frontend" "$FRONTEND_FILES"
+  run_check "ESLint (frontend)" yarn --cwd ./frontend lint
+  run_check "Type check (frontend)" yarn --cwd ./frontend type-check
 fi
 
-if [ "$BACKEND_CHANGED" -gt 0 ]; then
-    echo "Backend files staged. Running checks..."
+# ── Backend ───────────────────────────────────────────────────────────────────
 
-    echo "  Lint..."
-    yarn --cwd ./backend/typescript lint
-    if [ $? -ne 0 ]; then
-        echo "  FAILED: backend lint"
-        FAILED=1
-    fi
-
-    echo "  Type check..."
-    yarn --cwd ./backend/typescript type-check
-    if [ $? -ne 0 ]; then
-        echo "  FAILED: backend type check"
-        FAILED=1
-    fi
-
-    echo "  Tests..."
-    yarn --cwd ./backend/typescript test
-    if [ $? -ne 0 ]; then
-        echo "  FAILED: backend tests"
-        FAILED=1
-    fi
+if [ -n "$BACKEND_FILES" ]; then
+  fix_and_stage "backend/typescript" "$BACKEND_FILES"
+  run_check "ESLint (backend)" yarn --cwd ./backend/typescript lint
+  run_check "Type check (backend)" yarn --cwd ./backend/typescript type-check
+  run_check "Tests (backend)" yarn --cwd ./backend/typescript test
 fi
 
-if [ "$FAILED" -ne 0 ]; then
-    echo ""
-    echo "Pre-commit checks failed. Fix the issues above before committing."
-    exit 1
+# ── Summary ───────────────────────────────────────────────────────────────────
+
+if [ $FAILED -ne 0 ]; then
+  printf "\nPre-commit checks failed. Fix the issues above before committing.\n"
+  exit 1
 fi
 
 exit 0
