@@ -11,6 +11,7 @@ class UserService implements IUserService {
   /* eslint-disable class-methods-use-this */
 
   async getUserById(userId: string): Promise<UserDTO> {
+    const x = 1;
     let user: User | null;
     let firebaseUser: firebaseAdmin.auth.UserRecord;
 

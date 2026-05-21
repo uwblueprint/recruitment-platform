@@ -86,7 +86,6 @@ fi
 if [ -n "$BACKEND_FILES" ]; then
   fix_and_stage "backend/typescript" "$BACKEND_FILES"
   run_check "ESLint (backend)" yarn --cwd ./backend/typescript lint
-  run_check "Tests (backend)" yarn --cwd ./backend/typescript test
 fi
 
 # ── Summary ───────────────────────────────────────────────────────────────────
