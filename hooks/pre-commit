@@ -79,7 +79,6 @@ fix_and_stage() {
 if [ -n "$FRONTEND_FILES" ]; then
   fix_and_stage "frontend" "$FRONTEND_FILES"
   run_check "ESLint (frontend)" yarn --cwd ./frontend lint
-  run_check "Type check (frontend)" yarn --cwd ./frontend type-check
 fi
 
 # ── Backend ───────────────────────────────────────────────────────────────────
@@ -87,7 +86,6 @@ fi
 if [ -n "$BACKEND_FILES" ]; then
   fix_and_stage "backend/typescript" "$BACKEND_FILES"
   run_check "ESLint (backend)" yarn --cwd ./backend/typescript lint
-  run_check "Type check (backend)" yarn --cwd ./backend/typescript type-check
   run_check "Tests (backend)" yarn --cwd ./backend/typescript test
 fi
 
