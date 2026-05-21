@@ -100,15 +100,19 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
 export {
+  CreateTeamMemberDocument,
   InterviewedApplicantsByUserIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   ReportReviewConflictDocument,
+  TeamMembersDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
 } from "./__generated__/graphql";
 
 export type {
+  CreateTeamMemberMutation,
+  CreateTeamMemberMutationVariables,
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
   InterviewedApplicantsByUserIdQuery,
@@ -123,6 +127,8 @@ export type {
   RefreshMutationVariables,
   ReportReviewConflictMutation,
   ReportReviewConflictMutationVariables,
+  TeamMembersQuery,
+  TeamMembersQueryVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
@@ -172,3 +178,16 @@ export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
 >;
+export type TeamMemberResult = ArrayElement<
+  OperationField<Operations.TeamMembersQuery, "teamMembers">
+>;
+export type CreateTeamMemberResult = OperationField<
+  Operations.CreateTeamMemberMutation,
+  "createTeamMember"
+>;
+
+export {
+  TeamRole,
+} from "./__generated__/types";
+export type CreateTeamMemberDTO = WithoutTypename<Schema.CreateTeamMemberDto>;
+export type TeamMemberDTO = WithoutTypename<Schema.TeamMemberDto>;

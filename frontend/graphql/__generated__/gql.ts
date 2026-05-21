@@ -14,6 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {\n  createTeamMember(teamMember: $teamMember) {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}": typeof types.CreateTeamMemberDocument,
     "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.InterviewGroupDocument,
     "query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": typeof types.InterviewedApplicantsByUserIdDocument,
     "query InterviewersByGroupId($groupId: ID!) {\n  interviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": typeof types.InterviewersByGroupIdDocument,
@@ -21,10 +22,12 @@ type Documents = {
     "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": typeof types.LoginWithGoogleDocument,
     "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}": typeof types.RefreshDocument,
     "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": typeof types.ReportReviewConflictDocument,
+    "query TeamMembers {\n  teamMembers {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}": typeof types.TeamMembersDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupDocument,
     "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupSchedulingLinkDocument,
 };
 const documents: Documents = {
+    "mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {\n  createTeamMember(teamMember: $teamMember) {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}": types.CreateTeamMemberDocument,
     "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}": types.InterviewGroupDocument,
     "query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": types.InterviewedApplicantsByUserIdDocument,
     "query InterviewersByGroupId($groupId: ID!) {\n  interviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": types.InterviewersByGroupIdDocument,
@@ -32,6 +35,7 @@ const documents: Documents = {
     "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": types.LoginWithGoogleDocument,
     "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}": types.RefreshDocument,
     "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": types.ReportReviewConflictDocument,
+    "query TeamMembers {\n  teamMembers {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}": types.TeamMembersDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupDocument,
     "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupSchedulingLinkDocument,
 };
@@ -50,6 +54,10 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {\n  createTeamMember(teamMember: $teamMember) {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}"): (typeof documents)["mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {\n  createTeamMember(teamMember: $teamMember) {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -78,6 +86,10 @@ export function gql(source: "mutation Refresh($refreshToken: String!) {\n  refre
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}"): (typeof documents)["mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query TeamMembers {\n  teamMembers {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}"): (typeof documents)["query TeamMembers {\n  teamMembers {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

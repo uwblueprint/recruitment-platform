@@ -35,6 +35,8 @@ import interviewDelegationResolvers from "./resolvers/interviewDelegationResolve
 import interviewGroupResolvers from "./resolvers/interviewGroupResolvers";
 import interviewPageResolvers from "./resolvers/interviewPageResolvers";
 import interviewDashboardResolvers from "./resolvers/interviewDashboardResolvers";
+import teamMemberType from "./types/teamMemberType";
+import teamMemberResolvers from "./resolvers/teamMemberResolvers";
 
 const query = gql`
   type Query {
@@ -66,6 +68,7 @@ const executableSchema = makeExecutableSchema({
     reviewPageType,
     simpleEntityType,
     userType,
+    teamMemberType,
   ],
   resolvers: merge(
     adminCommentResolvers,
@@ -82,6 +85,7 @@ const executableSchema = makeExecutableSchema({
     interviewGroupResolvers,
     interviewPageResolvers,
     interviewDashboardResolvers,
+    teamMemberResolvers,
   ),
 });
 

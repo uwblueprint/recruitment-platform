@@ -4,6 +4,13 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type * as Types from './types';
 
+export type CreateTeamMemberMutationVariables = Exact<{
+  teamMember: Types.CreateTeamMemberDto;
+}>;
+
+
+export type CreateTeamMemberMutation = { createTeamMember: { id: string, firstName: string, lastName: string, teamRole: Types.TeamRole } };
+
 export type InterviewGroupQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -54,6 +61,11 @@ export type ReportReviewConflictMutationVariables = Exact<{
 
 
 export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRecordId: string, reviewerId: string, status: string, score: number | null, reviewerHasConflict: boolean } };
+
+export type TeamMembersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TeamMembersQuery = { teamMembers: Array<{ id: string, firstName: string, lastName: string, teamRole: Types.TeamRole }> };
 
 export type UpdateInterviewGroupMutationVariables = Exact<{
   id: string | number;
