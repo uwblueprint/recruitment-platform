@@ -1,0 +1,3 @@
+query IsAuthorizedByRole($accessToken: String!, $roles: [Role!]!) {
+  isAuthorizedByRole(accessToken: $accessToken, roles: $roles)
+}
