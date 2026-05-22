@@ -1,5 +1,5 @@
-mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {
-  createTeamMember(teamMember: $teamMember) {
+query TeamMembers {
+  teamMembers {
     id
     firstName
     lastName
