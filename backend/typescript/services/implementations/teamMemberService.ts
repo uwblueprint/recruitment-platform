@@ -3,10 +3,10 @@ import logger from "../../utilities/logger";
 import {
   CreateTeamMemberDTO,
   TeamMemberDTO,
-  toTeamMemberDTO,
 } from "../../types";
 import TeamMember from "../../models/teamMember.model";
 import { getErrorMessage } from "../../utilities/errorUtils";
+import { toTeamMemberDTO } from "../../utilities/dtoUtils";
 
 const Logger = logger(__filename);
 
