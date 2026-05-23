@@ -61,12 +61,14 @@ export type ReviewedApplicantRecordDTO =
   WithoutTypename<Schema.ReviewedApplicantRecordDto>;
 export type ReviewedApplicantsDTO =
   WithoutTypename<Schema.ReviewedApplicantsDto>;
-export type ShortAnswerQuestionDTO = WithoutTypename<Schema.ShortAnswerQuestion>;
+export type ShortAnswerQuestionDTO =
+  WithoutTypename<Schema.ShortAnswerQuestion>;
 export type SimpleEntityRequestDTO = Schema.SimpleEntityRequestDto;
 export type SimpleEntityResponseDTO =
   WithoutTypename<Schema.SimpleEntityResponseDto>;
 export type UserDTO = WithoutTypename<Schema.UserDto>;
-export type ReviewDashboardReviewDetails = WithoutTypename<Schema.ReviewDashboardReviewDetails>;
+export type ReviewDashboardReviewDetails =
+  WithoutTypename<Schema.ReviewDashboardReviewDetails>;
 
 /**
  * Clean aliases for generated GraphQL input types.
@@ -160,10 +162,7 @@ export type InterviewedApplicantResult = ArrayElement<
   >
 >;
 export type InterviewerResult = ArrayElement<
-  OperationField<
-    Operations.InterviewersByGroupIdQuery,
-    "interviewersByGroupId"
-  >
+  OperationField<Operations.InterviewersByGroupIdQuery, "interviewersByGroupId">
 >;
 export type UpdateInterviewGroupResult = OperationField<
   Operations.UpdateInterviewGroupMutation,
@@ -176,4 +175,23 @@ export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export {
+  CreateTeamMemberDocument,
+  TeamMembersDocument,
+} from "./__generated__/graphql";
+
+export type {
+  CreateTeamMemberMutation,
+  CreateTeamMemberMutationVariables,
+  TeamMembersQuery,
+  TeamMembersQueryVariables,
+} from "./__generated__/operation-types";
+
+export type TeamMemberResult = ArrayElement<
+  OperationField<Operations.TeamMembersQuery, "teamMembers">
+>;
+export type CreateTeamMemberResult = OperationField<
+  Operations.CreateTeamMemberMutation,
+  "createTeamMember"
 >;

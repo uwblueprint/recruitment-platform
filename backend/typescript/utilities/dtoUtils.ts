@@ -16,6 +16,7 @@ import {
   ReviewStatus,
   SkillCategory,
   UserDTO,
+  TeamMemberDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
@@ -25,6 +26,7 @@ import InterviewGroup from "../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 import User from "../models/user.model";
+import TeamMember from "../models/teamMember.model";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -219,5 +221,14 @@ export function toInterviewedApplicantDTO(
     interviewStatus: model.status,
     applicantFirstName: model.applicant_record.applicant.first_name,
     applicantLastName: model.applicant_record.applicant.last_name,
+  };
+}
+
+export function toTeamMemberDTO(teamMember: TeamMember): TeamMemberDTO {
+  return {
+    id: teamMember.id,
+    firstName: teamMember.first_name,
+    lastName: teamMember.last_name,
+    teamRole: teamMember.team_role,
   };
 }
