@@ -18,6 +18,7 @@ export {
   Role,
   SimpleEntityEnum,
   SkillCategory,
+  TeamRole,
 } from "./__generated__/types";
 
 type WithoutTypename<T> = Omit<T, "__typename">;
@@ -90,6 +91,8 @@ export type UpdateInterviewedApplicantRecordDTO =
 export type UpdateReviewedApplicantRecordDTO =
   Schema.UpdateReviewedApplicantRecordDto;
 export type UpdateUserDTO = Schema.UpdateUserDto;
+export type CreateTeamMemberDTO = WithoutTypename<Schema.CreateTeamMemberDto>;
+export type TeamMemberDTO = WithoutTypename<Schema.TeamMemberDto>;
 
 /**
  * Re-export generated operation result and variable types from one stable place.
@@ -176,4 +179,23 @@ export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export {
+  CreateTeamMemberDocument,
+  TeamMembersDocument,
+} from "./__generated__/graphql";
+
+export type {
+  CreateTeamMemberMutation,
+  CreateTeamMemberMutationVariables,
+  TeamMembersQuery,
+  TeamMembersQueryVariables,
+} from "./__generated__/operation-types";
+
+export type TeamMemberResult = ArrayElement<
+  OperationField<Operations.TeamMembersQuery, "teamMembers">
+>;
+export type CreateTeamMemberResult = OperationField<
+  Operations.CreateTeamMemberMutation,
+  "createTeamMember"
 >;

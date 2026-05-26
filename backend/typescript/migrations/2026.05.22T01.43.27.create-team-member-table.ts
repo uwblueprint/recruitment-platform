@@ -1,16 +1,15 @@
 import { DataType } from "sequelize-typescript";
-
 import { Migration } from "../umzug";
 
-const TABLE_NAME = "users";
+const TABLE_NAME = "team_members";
 
 export const up: Migration = async ({ context: sequelize }) => {
   await sequelize.getQueryInterface().createTable(TABLE_NAME, {
     id: {
       type: DataType.UUID,
       allowNull: false,
+      defaultValue: DataType.UUIDV4,
       primaryKey: true,
-      defaultValue: DataType.UUID,
     },
     first_name: {
       type: DataType.STRING,
