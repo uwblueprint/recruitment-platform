@@ -139,6 +139,7 @@ const graphQLMiddlewares = {
     deleteReviewedApplicantRecord: authorizedByAdmin(),
     bulkCreateReviewedApplicantRecord: authorizedByAdmin(),
     reportReviewConflict: authorizedByAllRoles(),
+    reportInterviewConflict: authorizedByAllRoles(),
     createInterviewedApplicantRecord: authorizedByAdmin(),
     updateInterviewedApplicantRecord: authorizedByAllRoles(),
     deleteInterviewedApplicantRecordById: authorizedByAdmin(),
