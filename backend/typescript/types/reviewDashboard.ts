@@ -2,6 +2,17 @@ import { ApplicationStatus, SkillCategory } from "./applicantRecord";
 import { Review, ReviewStatus } from "./reviewedApplicantRecord";
 import { UserDTO } from "./user";
 
+export type ReviewDashboardSortBy =
+  | "FIRST_NAME"
+  | "LAST_NAME"
+  | "CHOICE"
+  | "TIMES_APPLIED"
+  | "REVIEWER"
+  | "TOTAL_SCORE"
+  | "APPLICATION_STATUS";
+
+export type SortDirection = "ASC" | "DESC";
+
 export type ReviewDetails = {
   reviewer: UserDTO;
   review: Review;

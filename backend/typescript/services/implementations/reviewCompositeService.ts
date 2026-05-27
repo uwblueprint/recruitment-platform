@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, Order, col } from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
@@ -7,9 +7,11 @@ import {
   CreateReviewedApplicantRecordDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
+  ReviewDashboardSortBy,
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
   ReviewStatusEnum,
+  SortDirection,
 } from "../../types";
 import {
   toReviewDashboardRowDTO,
@@ -61,6 +63,8 @@ class ReviewCompositeService implements IReviewCompositeService {
   async getReviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    sortBy?: ReviewDashboardSortBy,
+    sortDirection?: SortDirection,
   ): Promise<ReviewDashboardRowDTO[]> {
     try {
       const perPage = Number.isFinite(Number(resultsPerPage))
@@ -71,16 +75,18 @@ class ReviewCompositeService implements IReviewCompositeService {
         : 1;
       const offsetRow = (currentPage - 1) * perPage;
 
-      // get applicant_record
-      // JOIN applicant ON applicant_id
-      // JOIN reviewed_applicant_record ON applicant_record_id
-      // JOIN user ON reviewer_id
-      const applicantRecords = await ApplicantRecord.findAll({
+      const direction = sortDirection ?? "ASC";
+
+      // separate: true runs the hasMany as a second query, so the main query is a
+      // plain BelongsTo join — Sequelize won't wrap it in a subquery, which lets
+      // ORDER BY reference the "applicant" table directly.
+      const includeConfig = {
         attributes: { exclude: ["createdAt", "updatedAt"] },
         include: [
           {
             attributes: { exclude: ["createdAt", "updatedAt"] },
             model: ReviewedApplicantRecord,
+            separate: true,
             include: [
               {
                 attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -93,7 +99,47 @@ class ReviewCompositeService implements IReviewCompositeService {
             model: Applicant,
           },
         ],
-        order: [["id", "ASC"]],
+      };
+
+      // Reviewer sort: fetch all records, sort by first reviewer name in app layer,
+      // then paginate manually to avoid Sequelize subquery/hasMany pagination issues.
+      if (sortBy === "REVIEWER") {
+        const all = await ApplicantRecord.findAll(includeConfig);
+        const sorted = all
+          .map(toReviewDashboardRowDTO)
+          .sort((a, b) => {
+            const nameA = a.reviewers[0]?.firstName ?? "";
+            const nameB = b.reviewers[0]?.firstName ?? "";
+            return direction === "ASC"
+              ? nameA.localeCompare(nameB)
+              : nameB.localeCompare(nameA);
+          });
+        return sorted.slice(offsetRow, offsetRow + perPage);
+      }
+
+      const sortColumnMap: Record<
+        Exclude<ReviewDashboardSortBy, "REVIEWER">,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        any[]
+      > = {
+        FIRST_NAME: [col("applicant.first_name"), direction],
+        LAST_NAME: [col("applicant.last_name"), direction],
+        TIMES_APPLIED: [col("applicant.times_applied"), direction],
+        CHOICE: ["choice", direction],
+        TOTAL_SCORE: ["combined_review_score", direction],
+        APPLICATION_STATUS: ["status", direction],
+      };
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const order = (sortBy ? [sortColumnMap[sortBy]] : [["id", "ASC"]]) as any as Order;
+
+      // get applicant_record
+      // JOIN applicant ON applicant_id
+      // JOIN reviewed_applicant_record ON applicant_record_id
+      // JOIN user ON reviewer_id
+      const applicantRecords = await ApplicantRecord.findAll({
+        ...includeConfig,
+        order,
         limit: perPage,
         offset: offsetRow,
       });

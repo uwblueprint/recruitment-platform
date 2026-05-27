@@ -29,10 +29,27 @@ const reviewDashboardType = gql`
     reviewDetails: [ReviewDashboardReviewDetails!]!
   }
 
+  enum ReviewDashboardSortBy {
+    FIRST_NAME
+    LAST_NAME
+    CHOICE
+    TIMES_APPLIED
+    REVIEWER
+    TOTAL_SCORE
+    APPLICATION_STATUS
+  }
+
+  enum SortDirection {
+    ASC
+    DESC
+  }
+
   extend type Query {
     reviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
+      sortBy: ReviewDashboardSortBy
+      sortDirection: SortDirection
     ): [ReviewDashboardRowDTO!]!
 
     reviewDashboardSidePanel(

@@ -2,7 +2,9 @@ import ReviewCompositeService from "../../services/implementations/reviewComposi
 import {
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
+  ReviewDashboardSortBy,
   ReviewedApplicantRecordDTO,
+  SortDirection,
 } from "../../types";
 
 const reviewCompositeService = new ReviewCompositeService();
@@ -13,11 +15,20 @@ const reviewDashboardResolvers = {
       {
         pageNumber,
         resultsPerPage,
-      }: { pageNumber: number; resultsPerPage: number },
+        sortBy,
+        sortDirection,
+      }: {
+        pageNumber: number;
+        resultsPerPage: number;
+        sortBy?: ReviewDashboardSortBy;
+        sortDirection?: SortDirection;
+      },
     ): Promise<ReviewDashboardRowDTO[]> => {
       return reviewCompositeService.getReviewDashboard(
         pageNumber,
         resultsPerPage,
+        sortBy,
+        sortDirection,
       );
     },
     reviewDashboardSidePanel: async (
