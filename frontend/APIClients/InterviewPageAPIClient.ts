@@ -10,6 +10,11 @@ import {
   type InterviewersByGroupIdQueryVariables,
   type InterviewedApplicantsDTO,
   type UserDTO,
+  type ReportInterviewConflictMutation,
+  type ReportInterviewConflictMutationVariables,
+  InterviewConflict,
+  ReportInterviewConflictResult,
+  ReportInterviewConflictDocument,
 } from "@/graphql/typeUtils";
 
 class InterviewPageAPIClient {
@@ -38,9 +43,7 @@ class InterviewPageAPIClient {
     }
   }
 
-  static async getInterviewersByGroupId(
-    groupId: string,
-  ): Promise<UserDTO[]> {
+  static async getInterviewersByGroupId(groupId: string): Promise<UserDTO[]> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
@@ -60,6 +63,35 @@ class InterviewPageAPIClient {
       return data.interviewersByGroupId;
     } catch {
       throw new Error("Failed to get interviewers by group id");
+    }
+  }
+
+  static async reportInterviewConflict(
+    interviewedApplicantRecordId: string,
+    interviewerId: string,
+    interviewHasConflict: InterviewConflict,
+  ): Promise<ReportInterviewConflictResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.mutate<
+        ReportInterviewConflictMutation,
+        ReportInterviewConflictMutationVariables
+      >({
+        mutation: ReportInterviewConflictDocument,
+        variables: {
+          interviewedApplicantRecordId,
+          interviewerId,
+          interviewHasConflict,
+        },
+      });
+
+      if (!data?.reportInterviewConflict) {
+        throw new Error("No data returned");
+      }
+      return data.reportInterviewConflict;
+    } catch {
+      throw new Error("Failed to report interview conflict");
     }
   }
 }

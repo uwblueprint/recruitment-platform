@@ -1,0 +1,14 @@
+mutation ReportInterviewConflict(
+  $interviewedApplicantRecordId: ID!
+  $interviewerId: ID!
+  $interviewHasConflict: InterviewConflict!
+) {
+  reportInterviewConflict(
+    interviewedApplicantRecordId: $interviewedApplicantRecordId
+    interviewerId: $interviewerId
+    interviewHasConflict: $interviewHasConflict
+  ) {
+    id
+    status
+  }
+}

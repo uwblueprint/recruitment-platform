@@ -106,6 +106,7 @@ export {
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
   RefreshDocument,
+  ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
@@ -126,6 +127,8 @@ export type {
   LoginWithGoogleMutationVariables,
   RefreshMutation,
   RefreshMutationVariables,
+  ReportInterviewConflictMutation,
+  ReportInterviewConflictMutationVariables,
   ReportReviewConflictMutation,
   ReportReviewConflictMutationVariables,
   UpdateInterviewGroupMutation,
@@ -176,4 +179,8 @@ export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export type ReportInterviewConflictResult = OperationField<
+  Operations.ReportInterviewConflictMutation,
+  "reportInterviewConflict"
 >;
