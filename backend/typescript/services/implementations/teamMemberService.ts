@@ -1,9 +1,6 @@
 import ITeamMemberService from "../interfaces/ITeamMemberService";
 import logger from "../../utilities/logger";
-import {
-  CreateTeamMemberDTO,
-  TeamMemberDTO,
-} from "../../types";
+import { CreateTeamMemberDTO, TeamMemberDTO } from "../../types";
 import TeamMember from "../../models/teamMember.model";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import { toTeamMemberDTO } from "../../utilities/dtoUtils";
