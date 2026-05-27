@@ -4,5 +4,6 @@
   "scripts": {
     "codegen": "yarn --cwd frontend generate",
     "generate": "yarn codegen"
-  }
+  },
+  "version": "0.0.0"
 }
