@@ -89,7 +89,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
 };
 
 AdminReviewPage.getLayout = (page: ReactElement) => (
-  <ProtectedRoute allowedRoles={["Admin", "User"]}>{page}</ProtectedRoute>
+  <ProtectedRoute allowedRoles={["Admin"]}>{page}</ProtectedRoute>
 );
 
 export default AdminReviewPage;
