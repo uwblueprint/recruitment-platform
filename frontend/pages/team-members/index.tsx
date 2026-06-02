@@ -9,11 +9,13 @@ import {
   Container,
   Typography,
 } from "@mui/material";
+import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { TeamMemberDTO, TeamRole } from "@/graphql/typeUtils";
 import TeamMemberAPIClient from "@/APIClients/TeamMemberAPIClient";
 
 const TeamMembersPage = (): React.ReactElement => {
   const [teamMembers, setTeamMembers] = useState<TeamMemberDTO[]>([]);
+  const authenticatedUser = useAuthenticatedUser();
 
   const getTeamMembers = async () => {
     const res = await TeamMemberAPIClient.getTeamMembers();
@@ -30,9 +32,11 @@ const TeamMembersPage = (): React.ReactElement => {
   };
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    getTeamMembers();
-  }, []);
+    if (authenticatedUser) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      getTeamMembers();
+    }
+  }, [authenticatedUser]);
 
   return (
     <Container sx={{ marginTop: 4 }}>
