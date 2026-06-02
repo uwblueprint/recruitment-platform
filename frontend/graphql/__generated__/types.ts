@@ -669,6 +669,7 @@ export type ReviewDashboardReviewDetails = {
 
 export type ReviewDashboardRowDto = {
   __typename?: 'ReviewDashboardRowDTO';
+  applicantRecordId: Scalars['ID']['output'];
   applicationStatus: ApplicationStatus;
   choice: Scalars['Int']['output'];
   firstName: Scalars['String']['output'];
