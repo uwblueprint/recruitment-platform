@@ -1,8 +1,12 @@
+type DashboardStatusChipOption<TStatus extends string> = {
+  value: TStatus;
+  label: string;
+};
+
 type DashboardStatusChipProps<TStatus extends string> = {
   value: TStatus;
-  options: readonly TStatus[];
+  options: readonly DashboardStatusChipOption<TStatus>[];
   tone?: "green" | "purple" | "blue" | "grey";
-  formatLabel?: (status: TStatus) => string;
   onChange?: (status: TStatus) => void;
 };
 
@@ -17,29 +21,23 @@ export const DashboardStatusChip = <TStatus extends string>({
   value,
   options,
   tone = "green",
-  formatLabel = defaultFormatLabel,
   onChange,
-}: DashboardStatusChipProps<TStatus>) => {
-  return (
-    <select
-      className={`h-7 min-w-[112px] rounded border-0 py-0 pl-4 pr-8 text-xs focus:ring-2 focus:ring-blue ${toneClasses[tone]}`}
-      value={value}
-      onChange={(event) => onChange?.(event.target.value as TStatus)}
-      onClick={(event) => event.stopPropagation()}
-    >
-      {options.map((option) => (
-        <option key={option} value={option}>
-          {formatLabel(option)}
-        </option>
-      ))}
-    </select>
-  );
-};
-
-export const defaultFormatLabel = (value: string) => {
-  return value
-    .toLowerCase()
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-};
+}: DashboardStatusChipProps<TStatus>) => (
+  <select
+    className={`h-7 min-w-[112px] rounded border-0 py-0 pl-4 pr-8 text-xs focus:ring-2 focus:ring-blue ${toneClasses[tone]}`}
+    value={value}
+    onChange={(event) =>
+      onChange?.(
+        options.find((option) => option.value === event.target.value)?.value ??
+          value,
+      )
+    }
+    onClick={(event) => event.stopPropagation()}
+  >
+    {options.map((option) => (
+      <option key={option.value} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+);

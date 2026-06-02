@@ -1,7 +1,6 @@
 import {
   ColumnDef,
   OnChangeFn,
-  Row,
   RowSelectionState,
   flexRender,
   getCoreRowModel,
@@ -9,6 +8,7 @@ import {
 } from "@tanstack/react-table";
 
 import { DashboardTablePagination } from "./DashboardTablePagination";
+import { DashboardTableRow } from "./DashboardTableRow";
 
 export type DashboardPaginationState = {
   pageNumber: number;
@@ -114,28 +114,5 @@ export const DashboardTable = <TData,>({
       </div>
       <DashboardTablePagination pagination={pagination} />
     </div>
-  );
-};
-
-type DashboardTableRowProps<TData> = {
-  row: Row<TData>;
-  onRowClick?: (row: TData) => void;
-};
-
-const DashboardTableRow = <TData,>({
-  row,
-  onRowClick,
-}: DashboardTableRowProps<TData>) => {
-  return (
-    <tr
-      className="h-11 cursor-pointer border-b border-neutral-100 bg-white last:border-b-0 hover:bg-surface-muted"
-      onClick={() => onRowClick?.(row.original)}
-    >
-      {row.getVisibleCells().map((cell) => (
-        <td key={cell.id} className="whitespace-nowrap px-4 align-middle">
-          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-        </td>
-      ))}
-    </tr>
   );
 };

@@ -1,20 +1,22 @@
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
+import {
+  ReviewDashboardDocument,
+  type ReviewDashboardQuery,
+  type ReviewDashboardQueryVariables,
+  type ReviewDashboardResult,
+} from "@/graphql/typeUtils";
+import { useQuery } from "@apollo/client/react";
 import { RowSelectionState } from "@tanstack/react-table";
-import { ReactElement, useEffect, useMemo, useState } from "react";
+import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
-import { getReviewDashboardColumns } from "./_components/reviewDashboardColumns";
+import { REVIEW_DASHBOARD_COLUMNS } from "@/components/dashboard/review/columns";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
 const AdminReviewPage: NextPageWithLayout = () => {
-  const [rows, setRows] = useState<ReviewDashboardResult[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [pageNumber, setPageNumber] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(
     DEFAULT_RESULTS_PER_PAGE,
@@ -24,46 +26,17 @@ const AdminReviewPage: NextPageWithLayout = () => {
     null,
   );
 
-  const columns = useMemo(() => getReviewDashboardColumns(), []);
+  const { data, loading, error } = useQuery<
+    ReviewDashboardQuery,
+    ReviewDashboardQueryVariables
+  >(ReviewDashboardDocument, {
+    variables: { pageNumber, resultsPerPage },
+    fetchPolicy: "network-only",
+  });
 
-  useEffect(() => {
-    let isMounted = true;
-
-    ReviewDashboardAPIClient.getReviewDashboard(pageNumber, resultsPerPage)
-      .then((reviewDashboardRows) => {
-        if (!isMounted) {
-          return;
-        }
-        setRows(reviewDashboardRows);
-      })
-      .catch((error) => {
-        if (!isMounted) {
-          return;
-        }
-        const message = error instanceof Error ? error.message : String(error);
-        setErrorMessage(message);
-        setRows([]);
-      })
-      .finally(() => {
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, [pageNumber, resultsPerPage]);
-
-  const handlePageChange = (nextPageNumber: number) => {
-    setIsLoading(true);
-    setErrorMessage(null);
-    setPageNumber(nextPageNumber);
-  };
+  const rows = data?.reviewDashboard ?? [];
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
-    setIsLoading(true);
-    setErrorMessage(null);
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
     setRowSelection({});
@@ -78,25 +51,25 @@ const AdminReviewPage: NextPageWithLayout = () => {
           </h1>
         </div>
 
-        {errorMessage ? (
+        {error ? (
           <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
-            {errorMessage}
+            {error.message}
           </div>
         ) : null}
 
         <DashboardTable
           data={rows}
-          columns={columns}
+          columns={REVIEW_DASHBOARD_COLUMNS}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           onRowClick={(row) => setActiveRow(row)}
-          isLoading={isLoading}
+          isLoading={loading}
           pagination={{
             pageNumber,
             resultsPerPage,
             canGoNext: rows.length === resultsPerPage,
-            onPageChange: handlePageChange,
+            onPageChange: setPageNumber,
             onResultsPerPageChange: handleResultsPerPageChange,
           }}
         />
