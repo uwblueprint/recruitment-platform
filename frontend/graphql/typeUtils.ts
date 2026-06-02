@@ -107,6 +107,7 @@ export {
   LoginWithGoogleDocument,
   RefreshDocument,
   ReportReviewConflictDocument,
+  ReviewDashboardDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
 } from "./__generated__/graphql";
@@ -128,6 +129,8 @@ export type {
   RefreshMutationVariables,
   ReportReviewConflictMutation,
   ReportReviewConflictMutationVariables,
+  ReviewDashboardQuery,
+  ReviewDashboardQueryVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
@@ -176,4 +179,7 @@ export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export type ReviewDashboardResult = ArrayElement<
+  OperationField<Operations.ReviewDashboardQuery, "reviewDashboard">
 >;

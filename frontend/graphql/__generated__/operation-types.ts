@@ -63,6 +63,14 @@ export type ReportReviewConflictMutationVariables = Exact<{
 
 export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRecordId: string, reviewerId: string, status: string, score: number | null, reviewerHasConflict: boolean } };
 
+export type ReviewDashboardQueryVariables = Exact<{
+  pageNumber: number;
+  resultsPerPage: number;
+}>;
+
+
+export type ReviewDashboardQuery = { reviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, timesApplied: string, applicationStatus: Types.ApplicationStatus, choice: number, totalScore: number | null, reviewers: Array<{ id: string, firstName: string, lastName: string, email: string, position: string | null, role: Types.Role, isArchived: boolean }> }> };
+
 export type UpdateInterviewGroupMutationVariables = Exact<{
   id: string | number;
   interviewGroup: Types.UpdateInterviewGroupDto;

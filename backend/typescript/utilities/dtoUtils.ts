@@ -196,6 +196,7 @@ export function toReviewDashboardRowDTO(
   applicantRecord: ApplicantRecord,
 ): ReviewDashboardRowDTO {
   return {
+    applicantRecordId: applicantRecord.id,
     firstName: applicantRecord.applicant.first_name,
     lastName: applicantRecord.applicant.last_name,
     position: applicantRecord.position,

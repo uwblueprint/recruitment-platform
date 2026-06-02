@@ -8,6 +8,7 @@ const reviewDashboardType = gql`
   }
 
   type ReviewDashboardRowDTO {
+    applicantRecordId: ID!
     firstName: String!
     lastName: String!
     position: String!
