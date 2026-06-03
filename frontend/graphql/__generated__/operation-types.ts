@@ -4,6 +4,13 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type * as Types from './types';
 
+export type ApplicationQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type ApplicationQuery = { application: { id: string, academicOrCoop: string, academicYear: string, email: string, firstName: string, heardFrom: string, lastName: string, locationPreference: string, program: string, position: string, pronouns: string, pronounsSpecified: string, resumeUrl: string, status: Types.ApplicationStatus, term: string, timesApplied: string, roleSpecificQuestions: Array<{ question: string, response: string }>, shortAnswerQuestions: Array<{ question: string, response: string }> } };
+
 export type InterviewGroupQueryVariables = Exact<{
   id: string | number;
 }>;

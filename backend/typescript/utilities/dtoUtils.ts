@@ -145,6 +145,7 @@ export function toApplicationDTO(
     heardFrom: applicant.heardFrom,
     locationPreference: applicant.locationPreference,
     program: applicant.program,
+    position: applicantRecord.position,
     timesApplied: applicant.timesApplied.toString(),
     pronouns: applicant.pronouns,
     pronounsSpecified: applicant.pronouns,

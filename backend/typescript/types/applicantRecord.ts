@@ -26,7 +26,7 @@ export type SkillCategory = ValueOf<typeof SkillCategoryEnum>;
 
 export type ShortAnswerQuestion = {
   question: string;
-  answer: string;
+  response: string;
 };
 
 export type ApplicantRecordDTO = {

@@ -13,7 +13,7 @@ const applicantRecordType = gql`
 
   type ShortAnswerQuestion {
     question: String!
-    answer: String!
+    response: String!
   }
 
   type ApplicantRecordDTO {

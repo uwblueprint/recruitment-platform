@@ -100,6 +100,7 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
 export {
+  ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
@@ -112,6 +113,8 @@ export {
 } from "./__generated__/graphql";
 
 export type {
+  ApplicationQuery,
+  ApplicationQueryVariables,
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
   InterviewedApplicantsByUserIdQuery,
