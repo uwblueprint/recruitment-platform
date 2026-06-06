@@ -12,6 +12,7 @@ import {
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewedApplicantRecordDTO,
+  ReviewedApplicantRecordWithReviewerDTO,
   ReviewedApplicantsDTO,
   ReviewStatus,
   SkillCategory,
@@ -124,6 +125,18 @@ export function toReviewedApplicantRecordDTO(
   return {
     applicantRecordId: model.applicant_record_id,
     reviewerId: String(model.reviewer_id),
+    review: model.review as Review,
+    status: model.status,
+    score: model.score,
+    reviewerHasConflict: model.reviewer_has_conflict,
+  };
+}
+
+export function toReviewedApplicantRecordWithReviewerDTO(
+  model: ReviewedApplicantRecord,
+): ReviewedApplicantRecordWithReviewerDTO {
+  return {
+    reviewer: toUserDTO(model.reviewer),
     review: model.review as Review,
     status: model.status,
     score: model.score,

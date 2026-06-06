@@ -1,5 +1,6 @@
 import { ValueOf } from "../utilities/typingUtils";
 import { SkillCategory } from "./applicantRecord";
+import { UserDTO } from "./user";
 
 export const ReviewStatusEnum = {
   TODO: "TODO",
@@ -35,3 +36,11 @@ export type CreateReviewedApplicantRecordDTO = Pick<
 export type UpdateReviewedApplicantRecordDTO = Partial<
   Pick<ReviewedApplicantRecordDTO, "review" | "status" | "reviewerHasConflict">
 >;
+
+export type ReviewedApplicantRecordWithReviewerDTO = {
+  reviewer: UserDTO;
+  review?: Review;
+  status: ReviewStatus;
+  score?: number;
+  reviewerHasConflict: boolean;
+};
