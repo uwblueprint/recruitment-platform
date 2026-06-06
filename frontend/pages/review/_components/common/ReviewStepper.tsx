@@ -21,6 +21,7 @@ interface Props {
   scores: ReviewScores;
   endData?: ReviewEndData;
   onValidate?: () => boolean;
+  viewOnly?: boolean;
 }
 
 export const ReviewStepper = ({
@@ -28,6 +29,7 @@ export const ReviewStepper = ({
   scores,
   endData,
   onValidate,
+  viewOnly = false,
 }: Props): ReactElement | null => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -43,6 +45,7 @@ export const ReviewStepper = ({
   const previousStage = REVIEW_STAGES[Math.max(currentStageIndex - 1, 0)];
 
   const isButtonDisabled =
+    !viewOnly &&
     currentStage !== ReviewStage.INFO &&
     currentStage !== ReviewStage.END_SUCCESS &&
     !(scores[currentStage] > 0 && scores[currentStage] <= 5);
@@ -67,6 +70,8 @@ export const ReviewStepper = ({
     ]);
   };
 
+  const isLastStage = currentStage === ReviewStage.END;
+
   return (
     <div className="border-t border-neutral-200 bg-white px-6 py-4">
       <div className="flex justify-end items-center gap-3 flex-nowrap">
@@ -86,7 +91,21 @@ export const ReviewStepper = ({
             Previous section
           </Button>
         )}
-        {currentStage === ReviewStage.END ? (
+        {viewOnly ? (
+          <Button
+            size="sm"
+            onClick={() => {
+              if (isLastStage) {
+                router.push(BACK_TO_HOME_HREF);
+              } else {
+                setStage?.(nextStage);
+              }
+            }}
+            className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-400 hover:border-transparent disabled:opacity-60"
+          >
+            {isLastStage ? "Finish" : "Continue"}
+          </Button>
+        ) : isLastStage ? (
           <Button
             size="sm"
             disabled={isSubmitting || !endData?.skillsCategory}
