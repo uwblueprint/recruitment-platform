@@ -6,6 +6,7 @@ import { ArrowLeftIcon } from "@/components/icons/arrow-left.icon";
 import Link from "next/link";
 import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
+import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
 
 interface Props {
   name: string;
@@ -14,7 +15,47 @@ interface Props {
   endData: ReviewEndData;
   setEndData: Dispatch<SetStateAction<ReviewEndData>>;
   onReportConflict?: () => void;
+  viewOnly?: boolean;
+  reviewers?: ReviewedApplicantRecordWithReviewerResult[];
 }
+
+const DIMENSION_ROWS: {
+  label: string;
+  field: "passionFSG" | "teamPlayer" | "desireToLearn" | "skill";
+}[] = [
+  { label: "Passion for Social Good", field: "passionFSG" },
+  { label: "Team Player", field: "teamPlayer" },
+  { label: "Desire to Learn", field: "desireToLearn" },
+  { label: "Skill", field: "skill" },
+];
+
+const SCORE_ROWS: { label: string; stage: ReviewStage }[] = [
+  { label: "Passion for Social Good", stage: ReviewStage.PFSG },
+  { label: "Team Player", stage: ReviewStage.TP },
+  { label: "Desire to Learn", stage: ReviewStage.D2L },
+  { label: "Skill", stage: ReviewStage.SKL },
+];
+
+const formatSkillCategory = (raw: string | null | undefined): string => {
+  if (!raw) return "—";
+  return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+};
+
+const aggregateSkillCategory = (
+  reviewers: ReviewedApplicantRecordWithReviewerResult[],
+): string => {
+  const distinct = Array.from(
+    new Set(
+      reviewers
+        .map(({ review }) => review?.skillCategory)
+        .filter((category): category is NonNullable<typeof category> =>
+          Boolean(category),
+        ),
+    ),
+  );
+  if (distinct.length === 0) return "—";
+  return distinct.map(formatSkillCategory).join(", ");
+};
 
 const LeftPanelContent = ({
   name,
@@ -27,13 +68,6 @@ const LeftPanelContent = ({
   scores: ReviewScores;
   onReportConflict?: () => void;
 }) => {
-  const SCORE_ROWS: { label: string; stage: ReviewStage }[] = [
-    { label: "Passion for Social Good", stage: ReviewStage.PFSG },
-    { label: "Team Player", stage: ReviewStage.TP },
-    { label: "Desire to Learn", stage: ReviewStage.D2L },
-    { label: "Skill", stage: ReviewStage.SKL },
-  ];
-
   const totalScore = SCORE_ROWS.reduce(
     (sum, { stage }) => sum + scores[stage],
     0,
@@ -109,6 +143,149 @@ const LeftPanelContent = ({
   );
 };
 
+const ReviewerScoresSection = ({
+  reviewers,
+}: {
+  reviewers: ReviewedApplicantRecordWithReviewerResult[];
+}) => {
+  const maxTotal = reviewers.length * 20;
+  const totalScore = reviewers.reduce((sum, entry) => {
+    if (entry.score != null) return sum + entry.score;
+    return (
+      sum +
+      DIMENSION_ROWS.reduce(
+        (s, { field }) => s + ((entry.review?.[field] as number | null) ?? 0),
+        0,
+      )
+    );
+  }, 0);
+
+  return (
+    <div className="flex flex-col gap-8 rounded-lg border border-neutral-200 bg-white p-6">
+      {reviewers.map(({ reviewer, review }, idx) => (
+        <div key={reviewer.id} className="flex flex-col gap-8">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex w-[235px] flex-col gap-6">
+              <span className="font-poppins text-xl font-medium leading-7 text-blue">
+                Topic
+              </span>
+              {DIMENSION_ROWS.map(({ label }) => (
+                <span
+                  key={label}
+                  className="text-base font-normal leading-snug text-black"
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+            <div className="flex flex-col items-end gap-6">
+              <span className="font-poppins text-xl font-normal leading-7 text-blue">
+                {reviewer.firstName}&rsquo;s rating
+              </span>
+              {DIMENSION_ROWS.map(({ label, field }) => {
+                const value = review?.[field] as number | null | undefined;
+                return (
+                  <span
+                    key={label}
+                    className="text-base font-normal leading-snug text-black"
+                  >
+                    {value != null ? `${value}/5` : "—/5"}
+                  </span>
+                );
+              })}
+            </div>
+          </div>
+          {idx < reviewers.length - 1 ? (
+            <hr className="border-neutral-200" />
+          ) : null}
+        </div>
+      ))}
+      <hr className="border-neutral-200" />
+      <div className="flex items-center justify-between">
+        <span className="font-poppins text-xl font-medium leading-7 text-black">
+          Total Score
+        </span>
+        <span className="font-poppins text-xl font-normal leading-7 text-blue">
+          {totalScore}/{maxTotal}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+const ViewOnlyLeftPanel = ({
+  name,
+  reviewers,
+}: {
+  name: string;
+  reviewers: ReviewedApplicantRecordWithReviewerResult[];
+}) => {
+  return (
+    <div className="flex w-full flex-col gap-6 p-3">
+      <Link
+        href="/admin"
+        className="font-source no-underline inline-flex w-fit shrink-0 cursor-pointer items-center gap-2 rounded-full border-2 border-blue bg-white px-4 py-2 text-base font-normal leading-[1.4] text-blue hover:border-blue hover:bg-sky-100 hover:text-blue"
+      >
+        <ArrowLeftIcon className="h-6 w-6 text-blue" />
+        Back to home
+      </Link>
+
+      <div className="flex flex-col gap-3">
+        <h2 className="text-3xl leading-snug text-neutral-800">
+          {name}&rsquo;s final scores
+        </h2>
+      </div>
+
+      {reviewers.length === 0 ? (
+        <p className="text-base text-neutral-800/75">
+          No reviewers have been assigned to this applicant yet.
+        </p>
+      ) : (
+        <ReviewerScoresSection reviewers={reviewers} />
+      )}
+    </div>
+  );
+};
+
+const ViewOnlyRightPanel = ({
+  reviewers,
+}: {
+  reviewers: ReviewedApplicantRecordWithReviewerResult[];
+}) => {
+  return (
+    <div className="flex w-full flex-col gap-8 lg:max-w-[541px] lg:mx-auto">
+      <div className="flex flex-col gap-6">
+        <h3 className="text-xl leading-7 text-neutral-800">Skill Category</h3>
+        <div className="h-14 w-full rounded-md border border-neutral-200 bg-white px-4 py-4 text-base font-normal leading-6 text-black">
+          {aggregateSkillCategory(reviewers)}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-6">
+        <h3 className="text-xl leading-7 text-neutral-800">Comments</h3>
+        <div className="flex flex-col gap-6 rounded-md border border-neutral-200 bg-white px-4 py-4">
+          {reviewers.length === 0 ? (
+            <p className="text-base text-neutral-800/75">
+              No comments to display.
+            </p>
+          ) : (
+            reviewers.map(({ reviewer, review }) => (
+              <div key={reviewer.id} className="flex flex-col gap-2">
+                <p className="text-base font-medium leading-6 text-black">
+                  {reviewer.firstName} {reviewer.lastName}&rsquo;s Comment:
+                </p>
+                <blockquote className="border-l-2 border-blue pl-3 text-base font-normal leading-6 text-black whitespace-pre-wrap">
+                  {review?.comments || "—"}
+                </blockquote>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const EndForm = ({
   endData,
   setEndData,
@@ -170,8 +347,27 @@ export const ReviewEndStage = ({
   endData,
   setEndData,
   onReportConflict,
+  viewOnly = false,
+  reviewers = [],
 }: Props) => {
   const [validationError, setValidationError] = useState(false);
+
+  if (viewOnly) {
+    return (
+      <ReviewPageLayout
+        currentStage={ReviewStage.END}
+        scores={scores}
+        viewOnly
+      >
+        <PanelLayout borderRight>
+          <ViewOnlyLeftPanel name={name} reviewers={reviewers} />
+        </PanelLayout>
+        <PanelLayout>
+          <ViewOnlyRightPanel reviewers={reviewers} />
+        </PanelLayout>
+      </ReviewPageLayout>
+    );
+  }
 
   return (
     <ReviewPageLayout
