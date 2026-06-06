@@ -22,6 +22,8 @@ type InterviewProgressState = {
   updateStepStatus: (step: InterviewStep, status: StepStatus) => void;
   currentSubStep: string | null;
   setCurrentSubStep: (subStep: string | null) => void;
+  reportDialogOpen: boolean;
+  setReportDialogOpen: (open: boolean) => void;
 };
 
 export type {

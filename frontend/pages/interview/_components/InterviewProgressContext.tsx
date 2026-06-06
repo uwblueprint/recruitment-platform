@@ -31,6 +31,7 @@ export const InterviewProgressProvider = ({
 }: InterviewProgressProviderProps) => {
   const router = useRouter();
   const [stepStatuses, setStepStatuses] = useState(INITIAL_STATUSES);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [subStepsBySection, setSubStepsBySection] = useState<
     Record<InterviewStepType, string | null>
   >({
@@ -61,6 +62,8 @@ export const InterviewProgressProvider = ({
         updateStepStatus,
         currentSubStep,
         setCurrentSubStep,
+        reportDialogOpen,
+        setReportDialogOpen,
       }}
     >
       {children}

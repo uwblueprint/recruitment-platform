@@ -13,10 +13,24 @@ import {
   InterviewFooter,
 } from "../_components/layout";
 import { NextPageWithLayout } from "../../_app";
+import { Dialogue } from "@/components/common/Dialogue";
+import { Button } from "@/components/common/Button";
+import { useInterviewProgress } from "../_components/InterviewProgressContext";
+
+const ReportIssueFooter = () => {
+  const { setReportDialogOpen } = useInterviewProgress();
+  return (
+    <InterviewFooter
+      onContinue={() => setReportDialogOpen(true)}
+      continueLabel="Submit Issue"
+    />
+  );
+};
 
 const InterviewReportPage: NextPageWithLayout = () => {
   const [selectedConflict, setSelectedConflict] =
     useState<InterviewConflict | null>(null);
+  const { reportDialogOpen, setReportDialogOpen } = useInterviewProgress();
   const radioColor = "#2E3A59";
 
   return (
@@ -142,15 +156,44 @@ const InterviewReportPage: NextPageWithLayout = () => {
           </FormControl>
         </div>
       </div>
+      <Dialogue
+        open={reportDialogOpen}
+        onClose={() => setReportDialogOpen(false)}
+        header="Report issue?"
+        text="Clicking yes will notify admins and cannot be undone."
+      >
+        <div className="flex gap-4 w-full">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => setReportDialogOpen(false)}
+            className="flex-1 min-w-0 flex justify-center items-center whitespace-nowrap !m-0"
+          >
+            <span className="text-[16px] font-normal font-source">Cancel</span>
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              // TODO: call reportInterviewConflict mutation once IDs are wired up
+              setReportDialogOpen(false);
+            }}
+            className="flex-1 min-w-0 flex justify-center items-center whitespace-nowrap !m-0"
+          >
+            <span className="text-[16px] font-normal font-source">
+              Yes, report
+            </span>
+          </Button>
+        </div>
+      </Dialogue>
     </div>
   );
 };
 
-// TODO: onContinue will trigger the submit issue action once wired up.
-// After submission the footer disappears (see Figma — submitted state has no footer).
+// TODO: After submission the footer disappears (see Figma — submitted state has no footer).
 InterviewReportPage.getLayout = getInterviewLayout(
   <InterviewHeader steps={[]} />,
-  <InterviewFooter onContinue={() => {}} continueLabel="Submit Issue" />,
+  <ReportIssueFooter />,
 );
 
 export default InterviewReportPage;
