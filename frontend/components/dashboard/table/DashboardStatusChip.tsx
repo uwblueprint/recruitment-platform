@@ -3,7 +3,7 @@ type DashboardStatusChipOption<TStatus extends string> = {
   label: string;
 };
 
-type DashboardStatusChipProps<TStatus extends string> = {
+export type DashboardStatusChipProps<TStatus extends string> = {
   value: TStatus;
   options: readonly DashboardStatusChipOption<TStatus>[];
   tone?: "green" | "purple" | "blue" | "grey";
