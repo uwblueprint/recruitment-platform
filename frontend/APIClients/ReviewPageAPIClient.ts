@@ -4,6 +4,10 @@ import {
   type ReportReviewConflictMutation,
   type ReportReviewConflictMutationVariables,
   type ReviewConflictReportResult,
+  ReviewedApplicantRecordsByApplicantRecordIdDocument,
+  type ReviewedApplicantRecordsByApplicantRecordIdQuery,
+  type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
+  type ReviewedApplicantRecordWithReviewerResult,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -31,6 +35,31 @@ class ReviewPageAPIClient {
       return data.reportReviewConflict;
     } catch {
       throw new Error("Failed to report review conflict");
+    }
+  }
+
+  static async getReviewedApplicantRecordsByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<ReviewedApplicantRecordWithReviewerResult[]> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ReviewedApplicantRecordsByApplicantRecordIdQuery,
+        ReviewedApplicantRecordsByApplicantRecordIdQueryVariables
+      >({
+        query: ReviewedApplicantRecordsByApplicantRecordIdDocument,
+        variables: { applicantRecordId },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.reviewedApplicantRecordsByApplicantRecordId) {
+        throw new Error("No data returned");
+      }
+
+      return data.reviewedApplicantRecordsByApplicantRecordId;
+    } catch {
+      throw new Error("Failed to fetch reviewed applicant records");
     }
   }
 }
