@@ -1,11 +1,11 @@
 import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { ApplicationCell } from "./ApplicationColumn";
-import { ReviewerCell } from "./ReviewerColumn";
-import { ReviewScoreCell } from "./ReviewScoreColumn";
-import { ReviewStatusCell } from "./ReviewStatusColumn";
-import { SelectAllHeader, SelectRowCell } from "./SelectionColumn";
+import { ApplicationCell } from "./ApplicationCell";
+import { ReviewerCell } from "./ReviewerCell";
+import { ReviewScoreCell } from "./ReviewScoreCell";
+import { ReviewStatusCell } from "./ReviewStatusCell";
+import { SelectAllHeader, SelectRowCell } from "./SelectionCell";
 
 const applicantName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
