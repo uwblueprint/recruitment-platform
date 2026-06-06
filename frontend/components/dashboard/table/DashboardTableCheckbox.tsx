@@ -1,22 +1,16 @@
-import { InputHTMLAttributes } from "react";
+import MuiCheckbox from "@mui/material/Checkbox";
+import type { CheckboxProps } from "@mui/material/Checkbox";
 
-type DashboardTableCheckboxProps = InputHTMLAttributes<HTMLInputElement> & {
-  indeterminate?: boolean;
-};
+type DashboardTableCheckboxProps = Pick<
+  CheckboxProps,
+  "checked" | "disabled" | "indeterminate" | "onChange" | "aria-label"
+>;
 
-export const DashboardTableCheckbox = ({
-  indeterminate = false,
-  ...props
-}: DashboardTableCheckboxProps) => (
-  <input
-    ref={(element) => {
-      if (element) {
-        element.indeterminate = indeterminate;
-      }
-    }}
-    type="checkbox"
-    className="h-3.5 w-3.5 rounded border-neutral-200 text-blue focus:ring-blue"
+export const DashboardTableCheckbox = (props: DashboardTableCheckboxProps) => (
+  <MuiCheckbox
+    size="small"
     onClick={(event) => event.stopPropagation()}
+    sx={{ padding: 0 }}
     {...props}
   />
 );
