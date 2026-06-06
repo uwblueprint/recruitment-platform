@@ -1,7 +1,9 @@
 import { Button } from "@/components/common/Button";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
+import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
 import { ReactNode, useContext } from "react";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
+import { ReviewerScoresList } from "../common/ReviewerScoresList";
 import { ReviewStage } from "../constants";
 import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { ReviewSetScoresContext } from "../ReviewContext";
@@ -30,13 +32,19 @@ const ResumeLink = ({ resumeLink }: { resumeLink: string }) => {
   );
 };
 
-type Props = ReviewStageProps & { header: ReactNode };
+type Props = ReviewStageProps & {
+  header: ReactNode;
+  viewOnly?: boolean;
+  reviewers?: ReviewedApplicantRecordWithReviewerResult[];
+};
 
 export const ReviewSkillStage = ({
   name,
   application,
   scores,
   header,
+  viewOnly = false,
+  reviewers = [],
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
   const resumeLink = application?.resumeUrl;
@@ -62,7 +70,11 @@ export const ReviewSkillStage = ({
   );
 
   return (
-    <ReviewPageLayout currentStage={ReviewStage.SKL} scores={scores}>
+    <ReviewPageLayout
+      currentStage={ReviewStage.SKL}
+      scores={scores}
+      viewOnly={viewOnly}
+    >
       <PanelLayout
         header={header}
         title="Skill"
@@ -83,20 +95,24 @@ export const ReviewSkillStage = ({
           scores={scores}
           currentStage={ReviewStage.SKL}
         />
-        <div className="flex items-center gap-3">
-          <ReviewScoreInput
-            id="skl-score"
-            value={scores[ReviewStage.SKL] || ""}
-            min={1}
-            max={5}
-            placeholder={`Enter ${name}'s score`}
-            ariaLabel="Skill score"
-            onChange={(v) => updateScore?.(ReviewStage.SKL, v)}
-          />
-          <span className="text-xl leading-none text-red-500">
-            *
-          </span>
-        </div>
+        {viewOnly ? (
+          <ReviewerScoresList reviewers={reviewers} field="skill" />
+        ) : (
+          <div className="flex items-center gap-3">
+            <ReviewScoreInput
+              id="skl-score"
+              value={scores[ReviewStage.SKL] || ""}
+              min={1}
+              max={5}
+              placeholder={`Enter ${name}'s score`}
+              ariaLabel="Skill score"
+              onChange={(v) => updateScore?.(ReviewStage.SKL, v)}
+            />
+            <span className="text-xl leading-none text-red-500">
+              *
+            </span>
+          </div>
+        )}
       </PanelLayout>
     </ReviewPageLayout>
   );
