@@ -1,18 +1,13 @@
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import {
-  ReviewDashboardDocument,
-  type ReviewDashboardQuery,
-  type ReviewDashboardQueryVariables,
-  type ReviewDashboardResult,
-} from "@/graphql/typeUtils";
-import { useQuery } from "@apollo/client/react";
+import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import { RowSelectionState } from "@tanstack/react-table";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
 import { REVIEW_DASHBOARD_COLUMNS } from "@/features/review/columns";
+import useReviewDashboard from "@/features/review/hooks/useReviewDashboard";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
@@ -26,15 +21,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
     null,
   );
 
-  const { data, loading, error } = useQuery<
-    ReviewDashboardQuery,
-    ReviewDashboardQueryVariables
-  >(ReviewDashboardDocument, {
-    variables: { pageNumber, resultsPerPage },
-    fetchPolicy: "network-only",
-  });
-
-  const rows = data?.reviewDashboard ?? [];
+  const { rows, isLoading, error } = useReviewDashboard(
+    pageNumber,
+    resultsPerPage,
+  );
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
@@ -53,7 +43,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
         {error ? (
           <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
-            {error.message}
+            Failed to load review dashboard
           </div>
         ) : null}
 
@@ -64,7 +54,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           onRowClick={(row) => setActiveRow(row)}
-          isLoading={loading}
+          isLoading={isLoading}
           pagination={{
             pageNumber,
             resultsPerPage,
