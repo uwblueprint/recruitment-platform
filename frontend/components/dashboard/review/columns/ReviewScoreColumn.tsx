@@ -4,8 +4,8 @@ type ReviewScoreCellProps = {
 
 const getScoreTone = (score: number) => {
   if (score >= 30) return "text-green-700";
-  if (score >= 20) return "text-amber-600";
-  return "text-red-600";
+  if (score >= 20) return "text-orange-500";
+  return "text-red-500";
 };
 
 export const ReviewScoreCell = ({ score }: ReviewScoreCellProps) => (
