@@ -12,7 +12,7 @@ import { RowSelectionState } from "@tanstack/react-table";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
-import { REVIEW_DASHBOARD_COLUMNS } from "@/components/dashboard/review/columns";
+import { REVIEW_DASHBOARD_COLUMNS } from "@/features/review/columns";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
