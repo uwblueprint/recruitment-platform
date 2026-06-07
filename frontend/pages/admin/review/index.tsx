@@ -6,8 +6,8 @@ import { RowSelectionState } from "@tanstack/react-table";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
-import { REVIEW_DASHBOARD_COLUMNS } from "@/features/review/columns";
-import useReviewDashboard from "@/features/review/hooks/useReviewDashboard";
+import { REVIEW_DASHBOARD_COLUMNS } from "./_components/columns";
+import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
