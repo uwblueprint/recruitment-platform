@@ -1,7 +1,7 @@
 import { InterviewStep as InterviewStepValues } from "./constants";
 
 type InterviewStep =
-  typeof InterviewStepValues[keyof typeof InterviewStepValues];
+  (typeof InterviewStepValues)[keyof typeof InterviewStepValues];
 type NavItem = {
   label: string;
   step: InterviewStep;
@@ -24,6 +24,8 @@ type InterviewProgressState = {
   setCurrentSubStep: (subStep: string | null) => void;
   reportDialogOpen: boolean;
   setReportDialogOpen: (open: boolean) => void;
+  reportIssueSubmitted: boolean;
+  setReportIssueSubmitted: (submitted: boolean) => void;
 };
 
 export type {
