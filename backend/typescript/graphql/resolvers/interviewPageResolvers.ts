@@ -11,8 +11,7 @@ import {
 } from "../../types";
 
 const interviewCompositeService = new InterviewCompositeService();
-const interviewedApplicantRecordsService =
-  new InterviewedApplicantRecordsService();
+const interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
 const interviewDelegationsService = new InterviewDelegationService();
 
 const interviewPageResolvers = {
