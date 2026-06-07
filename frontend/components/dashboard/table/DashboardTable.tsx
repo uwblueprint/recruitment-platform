@@ -2,10 +2,14 @@ import {
   ColumnDef,
   OnChangeFn,
   RowSelectionState,
+  SortingState,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import ArrowDownward from "@mui/icons-material/ArrowDownward";
+import ArrowUpward from "@mui/icons-material/ArrowUpward";
+import UnfoldMore from "@mui/icons-material/UnfoldMore";
 
 import { DashboardTablePagination } from "./DashboardTablePagination";
 import { DashboardTableRow } from "./DashboardTableRow";
@@ -26,6 +30,8 @@ type DashboardTableProps<TData> = {
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
   onRowClick?: (row: TData) => void;
   pagination: DashboardPaginationState;
+  sorting?: SortingState;
+  onSortingChange?: OnChangeFn<SortingState>;
   emptyMessage?: string;
   isLoading?: boolean;
 };
@@ -38,6 +44,8 @@ export const DashboardTable = <TData,>({
   onRowSelectionChange,
   onRowClick,
   pagination,
+  sorting,
+  onSortingChange,
   emptyMessage = "No results found.",
   isLoading = false,
 }: DashboardTableProps<TData>) => {
@@ -49,10 +57,13 @@ export const DashboardTable = <TData,>({
     getCoreRowModel: getCoreRowModel(),
     getRowId,
     enableRowSelection: true,
+    manualSorting: true,
     state: {
       rowSelection,
+      ...(sorting && { sorting }),
     },
     onRowSelectionChange,
+    ...(onSortingChange && { onSortingChange }),
   });
 
   const visibleRows = table.getRowModel().rows;
@@ -70,12 +81,26 @@ export const DashboardTable = <TData,>({
                     className="h-11 whitespace-nowrap px-4 text-xs font-normal text-neutral-800"
                     style={{ width: header.getSize() }}
                   >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                    {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                      <button
+                        className="flex w-full items-center justify-between gap-2 hover:text-blue"
+                        onClick={header.column.getToggleSortingHandler()}
+                        type="button"
+                      >
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        <span className="text-neutral-400">
+                          {header.column.getIsSorted() === "asc" ? (
+                            <ArrowUpward sx={{ fontSize: 14 }} />
+                          ) : header.column.getIsSorted() === "desc" ? (
+                            <ArrowDownward sx={{ fontSize: 14 }} />
+                          ) : (
+                            <UnfoldMore sx={{ fontSize: 14 }} />
+                          )}
+                        </span>
+                      </button>
+                    ) : (
+                      flexRender(header.column.columnDef.header, header.getContext())
+                    )}
                   </th>
                 ))}
               </tr>
