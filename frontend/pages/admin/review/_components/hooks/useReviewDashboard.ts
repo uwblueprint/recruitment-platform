@@ -19,6 +19,7 @@ const useReviewDashboard = (
   });
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState((prev) => ({ ...prev, isLoading: true, error: false }));
 
     ReviewDashboardAPIClient.getReviewDashboard(pageNumber, resultsPerPage)
