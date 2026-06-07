@@ -2,7 +2,7 @@ import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import type { ReviewDashboardResult } from "@/graphql/typeUtils";
-import { RowSelectionState } from "@tanstack/react-table";
+import { RowSelectionState, SortingState } from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
@@ -21,6 +21,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     DEFAULT_RESULTS_PER_PAGE,
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [sorting, setSorting] = useState<SortingState>([]);
   const [activeRow, setActiveRow] = useState<ReviewDashboardResult | null>(
     null,
   );
@@ -61,6 +62,8 @@ const AdminReviewPage: NextPageWithLayout = () => {
           onRowSelectionChange={setRowSelection}
           onRowClick={(row) => setActiveRow(row)}
           isLoading={isLoading}
+          sorting={sorting}
+          onSortingChange={setSorting}
           pagination={{
             pageNumber,
             resultsPerPage,

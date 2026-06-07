@@ -27,7 +27,9 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
   },
   {
     id: "application",
+    accessorFn: (row) => `${row.firstName} ${row.lastName}`,
     header: "Application",
+    enableSorting: true,
     cell: ({ row }) => (
       <ApplicationCell
         applicantName={applicantName(row.original.firstName, row.original.lastName)}
@@ -36,36 +38,48 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
   },
   {
     id: "position",
+    accessorFn: (row) => row.position,
     header: "Role",
+    enableSorting: true,
     cell: ({ row }) => row.original.position,
   },
   {
     id: "choice",
+    accessorFn: (row) => row.choice,
     header: "Choice",
+    enableSorting: true,
     cell: ({ row }) => row.original.choice,
   },
   {
     id: "timesApplied",
+    accessorFn: (row) => row.timesApplied,
     header: "Times Applied",
+    enableSorting: true,
     cell: ({ row }) => row.original.timesApplied,
   },
   {
     id: "reviewer1",
+    accessorFn: (row) => reviewerName(row, 0),
     header: "Reviewer 1",
+    enableSorting: true,
     cell: ({ row }) => (
       <ReviewerCell reviewerName={reviewerName(row.original, 0)} />
     ),
   },
   {
     id: "reviewer2",
+    accessorFn: (row) => reviewerName(row, 1),
     header: "Reviewer 2",
+    enableSorting: true,
     cell: ({ row }) => (
       <ReviewerCell reviewerName={reviewerName(row.original, 1)} />
     ),
   },
   {
     id: "totalScore",
+    accessorFn: (row) => row.totalScore,
     header: "Review Score",
+    enableSorting: true,
     cell: ({ row }) =>
       row.original.totalScore === null ? (
         "-"
@@ -75,7 +89,9 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
   },
   {
     id: "applicationStatus",
+    accessorFn: (row) => row.applicationStatus,
     header: "Status",
+    enableSorting: true,
     cell: ({ row }) => (
       <ReviewStatusCell status={row.original.applicationStatus} />
     ),
