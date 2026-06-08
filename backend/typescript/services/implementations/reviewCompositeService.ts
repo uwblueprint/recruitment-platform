@@ -1,4 +1,4 @@
-import { Op, Order, col } from "sequelize";
+import { Op, Order, OrderItem, col } from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
@@ -84,9 +84,13 @@ class ReviewCompositeService implements IReviewCompositeService {
         attributes: { exclude: ["createdAt", "updatedAt"] },
         include: [
           {
-            attributes: { exclude: ["createdAt", "updatedAt"] },
+            attributes: { exclude: ["updatedAt"] },
             model: ReviewedApplicantRecord,
             separate: true,
+            order: [
+              ["createdAt", "ASC"],
+              ["reviewer_id", "ASC"],
+            ] as Order,
             include: [
               {
                 attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -101,26 +105,29 @@ class ReviewCompositeService implements IReviewCompositeService {
         ],
       };
 
-      // Reviewer sort: fetch all records, sort by first reviewer name in app layer,
-      // then paginate manually to avoid Sequelize subquery/hasMany pagination issues.
-      if (sortBy === "REVIEWER") {
+      // Reviewer-N sort: fetch all records, sort by the Nth reviewer's name in
+      // the app layer, then paginate manually. "Reviewer 1" = the first reviewer
+      // assigned (inner query is ordered by createdAt ASC above); "reviewer 2"
+      // = the second-assigned reviewer, missing for rows with <2 reviewers.
+      if (sortBy === "REVIEWER_1" || sortBy === "REVIEWER_2") {
+        const idx = sortBy === "REVIEWER_1" ? 0 : 1;
         const all = await ApplicantRecord.findAll(includeConfig);
-        const sorted = all
-          .map(toReviewDashboardRowDTO)
-          .sort((a, b) => {
-            const nameA = a.reviewers[0]?.firstName ?? "";
-            const nameB = b.reviewers[0]?.firstName ?? "";
-            return direction === "ASC"
-              ? nameA.localeCompare(nameB)
-              : nameB.localeCompare(nameA);
-          });
+        const sorted = all.map(toReviewDashboardRowDTO).sort((a, b) => {
+          const cmp =
+            (a.reviewers[idx]?.firstName ?? "").localeCompare(
+              b.reviewers[idx]?.firstName ?? "",
+            ) ||
+            (a.reviewers[idx]?.lastName ?? "").localeCompare(
+              b.reviewers[idx]?.lastName ?? "",
+            );
+          return direction === "ASC" ? cmp : -cmp;
+        });
         return sorted.slice(offsetRow, offsetRow + perPage);
       }
 
       const sortColumnMap: Record<
-        Exclude<ReviewDashboardSortBy, "REVIEWER">,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        any[]
+        Exclude<ReviewDashboardSortBy, "REVIEWER_1" | "REVIEWER_2">,
+        OrderItem
       > = {
         FIRST_NAME: [col("applicant.first_name"), direction],
         LAST_NAME: [col("applicant.last_name"), direction],
@@ -130,8 +137,7 @@ class ReviewCompositeService implements IReviewCompositeService {
         APPLICATION_STATUS: ["status", direction],
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const order = (sortBy ? [sortColumnMap[sortBy]] : [["id", "ASC"]]) as any as Order;
+      const order: Order = sortBy ? [sortColumnMap[sortBy]] : [["id", "ASC"]];
 
       // get applicant_record
       // JOIN applicant ON applicant_id

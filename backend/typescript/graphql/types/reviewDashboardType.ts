@@ -34,7 +34,8 @@ const reviewDashboardType = gql`
     LAST_NAME
     CHOICE
     TIMES_APPLIED
-    REVIEWER
+    REVIEWER_1
+    REVIEWER_2
     TOTAL_SCORE
     APPLICATION_STATUS
   }
