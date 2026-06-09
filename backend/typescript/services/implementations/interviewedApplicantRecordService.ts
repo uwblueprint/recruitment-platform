@@ -74,6 +74,7 @@ class InterviewedApplicantRecordsService
   async updateInterviewedApplicantRecord(
     id: string,
     interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO,
+    t?: any,
   ): Promise<InterviewedApplicantRecordDTO> {
     try {
       const record: InterviewedApplicantRecord | null = await InterviewedApplicantRecord.findByPk(
