@@ -19,7 +19,7 @@ import { useInterviewProgress } from "../../_components/InterviewProgressContext
 import { useRouter } from "next/router";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import InterviewPageAPIClient from "@/APIClients/InterviewPageAPIClient";
-import { IssueSubmitted } from "../_components";
+import { IssueSubmitted } from "./_components";
 
 const ReportIssueFooter = () => {
   const { setReportDialogOpen, reportIssueSubmitted } = useInterviewProgress();

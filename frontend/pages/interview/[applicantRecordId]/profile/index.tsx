@@ -1,15 +1,15 @@
-import { useInterviewProgress } from "../_components";
+import { PanelLayout } from "@/components/layouts/PanelLayout";
+import { NextPageWithLayout } from "@/pages/_app";
 import {
+  useInterviewProgress,
   PROFILE_HEADER_STEPS,
   InterviewHeaderStep,
-} from "../_components/constants";
-import { PanelLayout } from "@/components/layouts/PanelLayout";
+} from "../../_components";
 import {
   getInterviewLayout,
   InterviewHeader,
   InterviewFooter,
-} from "../_components/layout";
-import { NextPageWithLayout } from "../../_app";
+} from "../../_components/layout";
 
 const InterviewProfilePage: NextPageWithLayout = () => {
   const { currentStep, stepStatuses } = useInterviewProgress();
