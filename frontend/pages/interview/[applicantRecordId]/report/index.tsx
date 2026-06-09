@@ -173,13 +173,14 @@ const InterviewReportPage: NextPageWithLayout = () => {
         open={reportDialogOpen}
         onClose={() => setReportDialogOpen(false)}
         header="Report issue?"
-        text={`${
+        text={
           !selectedConflict
             ? "Please select an issue before submitting."
-            : reportError
-            ? "Something went wrong. Please try again."
             : "Clicking yes will notify admins and cannot be undone."
-        }`}
+        }
+        errorText={
+          reportError ? "Something went wrong. Please try again." : undefined
+        }
       >
         <div className="flex gap-4 w-full">
           <Button
