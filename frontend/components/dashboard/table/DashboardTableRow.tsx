@@ -10,7 +10,7 @@ export const DashboardTableRow = <TData,>({
   onRowClick,
 }: DashboardTableRowProps<TData>) => (
   <tr
-    className="h-11 cursor-pointer border-b border-neutral-100 bg-white last:border-b-0 hover:bg-surface-muted"
+    className="h-11 cursor-pointer border-b border-neutral-100 bg-white even:bg-neutral-50 last:border-b-0 hover:bg-blue-50"
     onClick={() => onRowClick?.(row.original)}
   >
     {row.getVisibleCells().map((cell) => (
