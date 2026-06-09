@@ -40,6 +40,7 @@ const SCREEN_BREAKPOINTS = {
       },
   
       //Secondary Colours
+      R20: "#e55f5f",
       R30: "#ef5d5d",
       P10: "#ffc6c6",
       P20: "#fab5b5",
@@ -134,4 +135,3 @@ const SCREEN_BREAKPOINTS = {
       desktop: `@media only screen and (max-width: ${SCREEN_BREAKPOINTS.desktop}px)`,
     },
   };
-  

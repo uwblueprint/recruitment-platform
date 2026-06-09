@@ -20,6 +20,7 @@ import { useRouter } from "next/router";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import InterviewPageAPIClient from "@/APIClients/InterviewPageAPIClient";
 import { IssueSubmitted } from "./_components";
+import { theme } from "@/styles/Theme";
 
 const ReportIssueFooter = () => {
   const { setReportDialogOpen, reportIssueSubmitted } = useInterviewProgress();
@@ -45,7 +46,6 @@ const InterviewReportPage: NextPageWithLayout = () => {
     reportIssueSubmitted,
     setReportIssueSubmitted,
   } = useInterviewProgress();
-  const radioColor = "#2E3A59";
 
   const interviewedApplicantRecordId = router.isReady
     ? (router.query.applicantRecordId as string)
@@ -91,8 +91,8 @@ const InterviewReportPage: NextPageWithLayout = () => {
             </h4>
             <Typography
               className="!font-source"
+              sx={{ color: theme.colors.R20 }}
               variant="body2"
-              sx={{ color: "#E55F5F" }}
             >
               Note: Changes cannot be undone
             </Typography>
@@ -108,14 +108,7 @@ const InterviewReportPage: NextPageWithLayout = () => {
                 <FormControlLabel
                   value={InterviewConflict.ApplicantConflict}
                   sx={{ gap: 2 }}
-                  control={
-                    <Radio
-                      sx={{
-                        color: radioColor,
-                        "&.Mui-checked": { color: radioColor },
-                      }}
-                    />
-                  }
+                  control={<Radio className="!text-icon" />}
                   label={
                     <div className="py-5">
                       <p className="font-poppins font-semibold mb-2">
@@ -130,14 +123,7 @@ const InterviewReportPage: NextPageWithLayout = () => {
                 <FormControlLabel
                   value={InterviewConflict.ApplicantNoResponse}
                   sx={{ gap: 2 }}
-                  control={
-                    <Radio
-                      sx={{
-                        color: radioColor,
-                        "&.Mui-checked": { color: radioColor },
-                      }}
-                    />
-                  }
+                  control={<Radio className="!text-icon" />}
                   label={
                     <div className="py-5">
                       <p className="font-poppins font-semibold mb-2">
@@ -152,14 +138,7 @@ const InterviewReportPage: NextPageWithLayout = () => {
                 <FormControlLabel
                   value={InterviewConflict.PartnerNoResponse}
                   sx={{ gap: 2 }}
-                  control={
-                    <Radio
-                      sx={{
-                        color: radioColor,
-                        "&.Mui-checked": { color: radioColor },
-                      }}
-                    />
-                  }
+                  control={<Radio className="!text-icon" />}
                   label={
                     <div className="py-5">
                       <p className="font-poppins font-semibold mb-2">
@@ -174,14 +153,7 @@ const InterviewReportPage: NextPageWithLayout = () => {
                 <FormControlLabel
                   value={InterviewConflict.CannotAttend}
                   sx={{ gap: 2 }}
-                  control={
-                    <Radio
-                      sx={{
-                        color: radioColor,
-                        "&.Mui-checked": { color: radioColor },
-                      }}
-                    />
-                  }
+                  control={<Radio className="!text-icon" />}
                   label={
                     <div className="py-5">
                       <p className="font-poppins font-semibold mb-2">
