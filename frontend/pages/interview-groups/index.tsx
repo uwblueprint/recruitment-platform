@@ -8,6 +8,7 @@ import {
   import { NextPageWithLayout } from "../_app";
   import InterviewGroupIllustrationPanel from "./_components/InterviewGroupIllustrationPanel";
   
+
   const InterviewGroupsHomePage: NextPageWithLayout = () => {
     return (
       <PanelLayout borderLeft>
