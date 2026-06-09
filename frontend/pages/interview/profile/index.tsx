@@ -11,6 +11,7 @@ import {
 } from "../_components/layout";
 import { NextPageWithLayout } from "../../_app";
 
+
 const InterviewProfilePage: NextPageWithLayout = () => {
   const { currentStep, stepStatuses } = useInterviewProgress();
 

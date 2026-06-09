@@ -1,21 +1,31 @@
 import { FC, useState } from "react";
 import Link from "next/link";
-import { BlueprintLogo } from "./Logo";
+import { BlueprintLogo } from "./BlueprintLogo";
+import { useAuthUserContext, useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
+import { useRouter } from "next/router";
 
 export const Navbar: FC = () => {
   const [recruitmentOpen, setRecruitmentOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const { logout } = useAuthUserContext();
+  const authenticatedUser = useAuthenticatedUser();
+  const userName = authenticatedUser
+    ? `${authenticatedUser.firstName} ${authenticatedUser.lastName}`
+    : "User";
+  const router = useRouter();
+
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
     <nav className="flex items-center justify-between px-8 py-4 bg-white border-b border-gray-200">
-      {/* left: logo */}
       <Link href="/admin/review">
         <BlueprintLogo />
       </Link>
 
-      {/* center: nav links */}
       <div className="flex items-center gap-8">
-        {/* recruitment dropdown */}
         <div className="relative">
           <button
             onClick={() => setRecruitmentOpen(!recruitmentOpen)}
@@ -52,13 +62,12 @@ export const Navbar: FC = () => {
         </Link>
       </div>
 
-      {/* right: user profile dropdown */}
       <div className="relative">
         <button
           onClick={() => setProfileOpen(!profileOpen)}
           className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-blue-600"
         >
-          <span>User</span>
+          <span>{userName}</span>
           <span>▾</span>
         </button>
 
@@ -70,7 +79,10 @@ export const Navbar: FC = () => {
             <Link href="/home" className="block px-4 py-2 text-sm hover:bg-gray-100">
               Review
             </Link>
-            <button className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-500">
+            <button
+              onClick={handleLogout}
+              className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-500"
+            >
               Logout
             </button>
           </div>
