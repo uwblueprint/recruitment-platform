@@ -4,8 +4,8 @@ import {
   FormControlLabel,
   Radio,
   RadioGroup,
+  Typography,
 } from "@mui/material";
-import { Typography } from "@mui/material";
 import { InterviewConflict } from "@/graphql/typeUtils";
 import {
   getInterviewLayout,
@@ -21,6 +21,35 @@ import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import InterviewPageAPIClient from "@/APIClients/InterviewPageAPIClient";
 import { IssueSubmitted } from "./_components";
 import { theme } from "@/styles/Theme";
+
+type RadioOption = {
+  value: InterviewConflict;
+  title: string;
+  description: string;
+};
+
+const CONFLICT_OPTIONS: RadioOption[] = [
+  {
+    value: InterviewConflict.ApplicantConflict,
+    title: "Conflict with applicant",
+    description: "Conflict of interest with the applicant",
+  },
+  {
+    value: InterviewConflict.ApplicantNoResponse,
+    title: "Haven't heard back from applicant",
+    description: "Applicant has not replied to interview invite",
+  },
+  {
+    value: InterviewConflict.PartnerNoResponse,
+    title: "Haven't heard back from interview partner",
+    description: "Interviewer partner has not responded to messages",
+  },
+  {
+    value: InterviewConflict.CannotAttend,
+    title: "Cannot make Interview",
+    description: "Description here",
+  },
+];
 
 const ReportIssueFooter = () => {
   const { setReportDialogOpen, reportIssueSubmitted } = useInterviewProgress();
@@ -65,12 +94,12 @@ const InterviewReportPage: NextPageWithLayout = () => {
       await InterviewPageAPIClient.reportInterviewConflict(
         interviewedApplicantRecordId,
         authenticatedUser.id,
-        selectedConflict,
+        selectedConflict
       );
       setReportDialogOpen(false);
       setReportIssueSubmitted(true);
       setReportError(false);
-    } catch (err) {
+    } catch {
       setReportError(true);
     } finally {
       setLoading(false);
@@ -84,85 +113,46 @@ const InterviewReportPage: NextPageWithLayout = () => {
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-white">
       <div className="flex h-full flex-col overflow-y-auto py-8 pl-9 pr-44">
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-9">
           <div>
-            <h4 className="font-poppins font-semibold text-neutral-800 mb-0">
+            <h4 className="mb-0 font-poppins text-[24px] font-medium leading-[1.4] text-black">
               Please select the issue you&apos;d like to report
             </h4>
             <Typography
               className="!font-source"
+              variant="body1"
               sx={{ color: theme.colors.R20 }}
-              variant="body2"
             >
               Note: Changes cannot be undone
             </Typography>
           </div>
           <FormControl fullWidth>
-            <div className="border border-neutral-200 rounded-lg w-full px-7">
+            <div className="flex flex-col items-start self-stretch rounded-lg border border-neutral-200 p-6">
               <RadioGroup
                 value={selectedConflict ?? ""}
                 onChange={(e) =>
                   setSelectedConflict(e.target.value as InterviewConflict)
                 }
+                sx={{ gap: "48px" }}
               >
-                <FormControlLabel
-                  value={InterviewConflict.ApplicantConflict}
-                  sx={{ gap: 2 }}
-                  control={<Radio className="!text-icon" />}
-                  label={
-                    <div className="py-5">
-                      <p className="font-poppins font-semibold mb-2">
-                        Conflict with Applicant
-                      </p>
-                      <p className="text-sm font-source">
-                        Conflict of interest with the applicant
-                      </p>
-                    </div>
-                  }
-                />
-                <FormControlLabel
-                  value={InterviewConflict.ApplicantNoResponse}
-                  sx={{ gap: 2 }}
-                  control={<Radio className="!text-icon" />}
-                  label={
-                    <div className="py-5">
-                      <p className="font-poppins font-semibold mb-2">
-                        Haven&apos;t heard back from applicant
-                      </p>
-                      <p className="text-sm font-source">
-                        Applicant has not replied to interview invite
-                      </p>
-                    </div>
-                  }
-                />
-                <FormControlLabel
-                  value={InterviewConflict.PartnerNoResponse}
-                  sx={{ gap: 2 }}
-                  control={<Radio className="!text-icon" />}
-                  label={
-                    <div className="py-5">
-                      <p className="font-poppins font-semibold mb-2">
-                        Haven&apos;t heard back from interview partner
-                      </p>
-                      <p className="text-sm font-source">
-                        Interviewer partner has not responded to messages
-                      </p>
-                    </div>
-                  }
-                />
-                <FormControlLabel
-                  value={InterviewConflict.CannotAttend}
-                  sx={{ gap: 2 }}
-                  control={<Radio className="!text-icon" />}
-                  label={
-                    <div className="py-5">
-                      <p className="font-poppins font-semibold mb-2">
-                        Cannot make interview
-                      </p>
-                      <p className="text-sm font-source">Description here</p>
-                    </div>
-                  }
-                />
+                {CONFLICT_OPTIONS.map(({ value, title, description }) => (
+                  <FormControlLabel
+                    key={value}
+                    value={value}
+                    sx={{ gap: "18px", alignItems: "center" }}
+                    control={<Radio className="!text-icon" />}
+                    label={
+                      <div className="flex flex-col gap-2 leading-[1.4]">
+                        <p className="font-poppins text-[16px] font-medium text-black">
+                          {title}
+                        </p>
+                        <p className="font-source text-[16px] text-black">
+                          {description}
+                        </p>
+                      </div>
+                    }
+                  />
+                ))}
               </RadioGroup>
             </div>
           </FormControl>
@@ -182,7 +172,7 @@ const InterviewReportPage: NextPageWithLayout = () => {
           reportError ? "Something went wrong. Please try again." : undefined
         }
       >
-        <div className="flex gap-4 w-full">
+        <div className="flex w-full gap-4">
           <Button
             variant="secondary"
             size="sm"
@@ -190,7 +180,7 @@ const InterviewReportPage: NextPageWithLayout = () => {
             className="flex-1 min-w-0 flex justify-center items-center whitespace-nowrap !m-0"
             disabled={loading}
           >
-            <span className="text-[16px] font-normal font-source">Cancel</span>
+            <span className="font-source text-[16px] font-normal">Cancel</span>
           </Button>
           <Button
             variant="primary"
@@ -199,7 +189,7 @@ const InterviewReportPage: NextPageWithLayout = () => {
             className="flex-1 min-w-0 flex justify-center items-center whitespace-nowrap !m-0"
             disabled={loading || !selectedConflict}
           >
-            <span className="text-[16px] font-normal font-source">
+            <span className="font-source text-[16px] font-normal">
               {loading ? "Submitting..." : "Yes, report"}
             </span>
           </Button>
@@ -211,7 +201,7 @@ const InterviewReportPage: NextPageWithLayout = () => {
 
 InterviewReportPage.getLayout = getInterviewLayout(
   <InterviewHeader steps={[]} />,
-  <ReportIssueFooter />,
+  <ReportIssueFooter />
 );
 
 export default InterviewReportPage;
