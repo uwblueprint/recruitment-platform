@@ -1,6 +1,5 @@
 import {
   ReviewedApplicantRecordDTO,
-  ReviewedApplicantRecordWithReviewerDTO,
   CreateReviewedApplicantRecordDTO,
   UpdateReviewedApplicantRecordDTO,
 } from "../../types";
@@ -15,15 +14,6 @@ interface IReviewApplicantRecordService {
     applicantRecordId: string,
     reviewerId: string,
   ): Promise<ReviewedApplicantRecordDTO>;
-
-  /**
-   * Gets all reviewed applicant records for a given applicant record,
-   * with the reviewer's user info included.
-   * @Param applicantRecordId the ID of the applicant record
-   */
-  getReviewedApplicantRecordsByApplicantRecordId(
-    applicantRecordId: string,
-  ): Promise<ReviewedApplicantRecordWithReviewerDTO[]>;
 
   /**
    * Creates a single reviewed applicant record entry

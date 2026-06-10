@@ -39,6 +39,15 @@ export function toUserDTO(model: User): UserDTO {
   };
 }
 
+function toShortAnswerQuestions(
+  raw: { question: string; response?: string; answer?: string }[] | null | undefined,
+): { question: string; answer: string }[] {
+  return (raw ?? []).map(({ question, response, answer }) => ({
+    question,
+    answer: answer ?? response ?? "",
+  }));
+}
+
 export function toApplicantRecordDTO(
   model: ApplicantRecord,
 ): ApplicantRecordDTO {
@@ -46,7 +55,7 @@ export function toApplicantRecordDTO(
     id: model.id,
     applicantId: model.applicant_id,
     position: model.position,
-    roleSpecificQuestions: model.role_specific_questions,
+    roleSpecificQuestions: toShortAnswerQuestions(model.role_specific_questions),
     choice: model.choice,
     status: model.status,
     skillCategory: model.skill_category,
@@ -69,7 +78,7 @@ export function toApplicantDTO(model: Applicant): ApplicantDTO {
     pronouns: model.pronouns,
     resumeUrl: model.resume_url,
     timesApplied: model.times_applied,
-    shortAnswerQuestions: model.short_answer_questions,
+    shortAnswerQuestions: toShortAnswerQuestions(model.short_answer_questions),
     term: model.term,
     submittedAt: model.submitted_at,
   };
@@ -137,10 +146,7 @@ export function toReviewedApplicantRecordWithReviewerDTO(
 ): ReviewedApplicantRecordWithReviewerDTO {
   return {
     reviewer: toUserDTO(model.reviewer),
-    review: model.review as Review,
-    status: model.status,
-    score: model.score,
-    reviewerHasConflict: model.reviewer_has_conflict,
+    reviewedApplicantRecord: toReviewedApplicantRecordDTO(model),
   };
 }
 

@@ -1,7 +1,6 @@
 import ReviewedApplicantRecordService from "../../services/implementations/reviewedApplicantRecordService";
 import {
   ReviewedApplicantRecordDTO,
-  ReviewedApplicantRecordWithReviewerDTO,
   CreateReviewedApplicantRecordDTO,
   UpdateReviewedApplicantRecordDTO,
 } from "../../types";
@@ -20,15 +19,6 @@ const reviewedApplicantRecordResolvers = {
       return reviewedApplicantRecordService.getReviewedApplicantRecordByPk(
         applicantRecordId,
         reviewerId,
-      );
-    },
-
-    reviewedApplicantRecordsByApplicantRecordId: async (
-      _parent: undefined,
-      { applicantRecordId }: { applicantRecordId: string },
-    ): Promise<ReviewedApplicantRecordWithReviewerDTO[]> => {
-      return reviewedApplicantRecordService.getReviewedApplicantRecordsByApplicantRecordId(
-        applicantRecordId,
       );
     },
   },

@@ -1,18 +1,13 @@
 import { sequelize } from "../../models";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
-import User from "../../models/user.model";
 import {
   ReviewedApplicantRecordDTO,
-  ReviewedApplicantRecordWithReviewerDTO,
   CreateReviewedApplicantRecordDTO,
   UpdateReviewedApplicantRecordDTO,
   Review,
 } from "../../types";
-import {
-  toReviewedApplicantRecordDTO,
-  toReviewedApplicantRecordWithReviewerDTO,
-} from "../../utilities/dtoUtils";
+import { toReviewedApplicantRecordDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IReviewApplicantRecordService from "../interfaces/IReviewedApplicantRecordService";
@@ -54,26 +49,6 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to get reviewed applicant record. Reason = ${getErrorMessage(
-          error,
-        )}`,
-      );
-      throw error;
-    }
-  }
-
-  async getReviewedApplicantRecordsByApplicantRecordId(
-    applicantRecordId: string,
-  ): Promise<ReviewedApplicantRecordWithReviewerDTO[]> {
-    try {
-      const records = await ReviewedApplicantRecord.findAll({
-        where: { applicant_record_id: applicantRecordId },
-        include: [{ model: User, as: "reviewer" }],
-      });
-
-      return records.map(toReviewedApplicantRecordWithReviewerDTO);
-    } catch (error: unknown) {
-      Logger.error(
-        `Failed to get reviewed applicant records by applicant record id. Reason = ${getErrorMessage(
           error,
         )}`,
       );

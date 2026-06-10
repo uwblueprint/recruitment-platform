@@ -43,10 +43,7 @@ const reviewedApplicantRecordTypes = gql`
 
   type ReviewedApplicantRecordWithReviewerDTO {
     reviewer: UserDTO!
-    review: Review
-    status: ReviewStatus!
-    score: Int
-    reviewerHasConflict: Boolean!
+    reviewedApplicantRecord: ReviewedApplicantRecordDTO!
   }
 
   input CreateReviewedApplicantRecordDTO {
@@ -66,10 +63,6 @@ const reviewedApplicantRecordTypes = gql`
       applicantRecordId: ID!
       reviewerId: ID!
     ): ReviewedApplicantRecordDTO!
-
-    reviewedApplicantRecordsByApplicantRecordId(
-      applicantRecordId: ID!
-    ): [ReviewedApplicantRecordWithReviewerDTO!]!
   }
 
   extend type Mutation {

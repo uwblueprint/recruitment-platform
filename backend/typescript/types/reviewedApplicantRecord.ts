@@ -39,8 +39,5 @@ export type UpdateReviewedApplicantRecordDTO = Partial<
 
 export type ReviewedApplicantRecordWithReviewerDTO = {
   reviewer: UserDTO;
-  review?: Review;
-  status: ReviewStatus;
-  score?: number;
-  reviewerHasConflict: boolean;
+  reviewedApplicantRecord: ReviewedApplicantRecordDTO;
 };
