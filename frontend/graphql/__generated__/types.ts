@@ -33,6 +33,12 @@ export type ApplicantRecordDto = {
   status: ApplicationStatus;
 };
 
+export type ApplicantRecordWithReviewersDto = {
+  __typename?: 'ApplicantRecordWithReviewersDTO';
+  applicantRecord: ApplicantRecordDto;
+  reviewedApplicantRecords: Array<ReviewedApplicantRecordWithReviewerDto>;
+};
+
 export type ApplicationDto = {
   __typename?: 'ApplicationDTO';
   academicOrCoop: Scalars['String']['output'];
@@ -528,7 +534,7 @@ export type Query = {
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
-  reviewedApplicantRecordsByApplicantRecordId: Array<ReviewedApplicantRecordWithReviewerDto>;
+  reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
   reviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
   simpleEntities: Array<SimpleEntityResponseDto>;
   simpleEntitiesCSV: Scalars['String']['output'];
@@ -726,11 +732,8 @@ export type ReviewedApplicantRecordDto = {
 
 export type ReviewedApplicantRecordWithReviewerDto = {
   __typename?: 'ReviewedApplicantRecordWithReviewerDTO';
-  review?: Maybe<Review>;
+  reviewedApplicantRecord: ReviewedApplicantRecordDto;
   reviewer: UserDto;
-  reviewerHasConflict: Scalars['Boolean']['output'];
-  score?: Maybe<Scalars['Int']['output']>;
-  status: ReviewStatus;
 };
 
 export type ReviewedApplicantsDto = {

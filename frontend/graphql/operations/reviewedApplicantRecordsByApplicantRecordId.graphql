@@ -2,25 +2,34 @@ query ReviewedApplicantRecordsByApplicantRecordId($applicantRecordId: ID!) {
   reviewedApplicantRecordsByApplicantRecordId(
     applicantRecordId: $applicantRecordId
   ) {
-    reviewer {
+    applicantRecord {
       id
-      firstName
-      lastName
-      email
-      role
       position
-      isArchived
+      combinedReviewScore
     }
-    review {
-      passionFSG
-      teamPlayer
-      desireToLearn
-      skill
-      skillCategory
-      comments
+    reviewedApplicantRecords {
+      reviewer {
+        id
+        firstName
+        lastName
+        email
+        role
+        position
+        isArchived
+      }
+      reviewedApplicantRecord {
+        review {
+          passionFSG
+          teamPlayer
+          desireToLearn
+          skill
+          skillCategory
+          comments
+        }
+        status
+        score
+        reviewerHasConflict
+      }
     }
-    status
-    score
-    reviewerHasConflict
   }
 }
