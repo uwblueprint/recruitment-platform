@@ -36,6 +36,12 @@ export const ReviewTeamPlayerStage = ({
   const thirdShortAnswer = shortAnswers[2];
   const questions = thirdShortAnswer ? [thirdShortAnswer.question] : [];
   const answers = thirdShortAnswer ? [thirdShortAnswer.response] : [];
+  const reviewerScores = reviewers.map(
+    ({ reviewer, reviewedApplicantRecord }) => ({
+      reviewer,
+      score: reviewedApplicantRecord.review?.teamPlayer ?? null,
+    }),
+  );
   const { TP } = ReviewStage;
   return (
     <ReviewPageLayout currentStage={TP} scores={scores} viewOnly={viewOnly}>
@@ -72,7 +78,7 @@ export const ReviewTeamPlayerStage = ({
           currentStage={TP}
         />
         {viewOnly ? (
-          <ReviewerScoresList reviewers={reviewers} field="teamPlayer" />
+          <ReviewerScoresList scores={reviewerScores} />
         ) : (
           <div className="flex items-center gap-3">
             <ReviewScoreInput

@@ -17,6 +17,7 @@ interface Props {
   onReportConflict?: () => void;
   viewOnly?: boolean;
   reviewers?: ReviewedApplicantRecordWithReviewerResult[];
+  combinedReviewScore?: number | null;
 }
 
 const DIMENSION_ROWS: {
@@ -41,20 +42,30 @@ const formatSkillCategory = (raw: string | null | undefined): string => {
   return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
 };
 
+const SKILL_CATEGORY_RANK: Record<string, number> = {
+  JUNIOR: 1,
+  INTERMEDIATE: 2,
+  SENIOR: 3,
+};
+
 const aggregateSkillCategory = (
   reviewers: ReviewedApplicantRecordWithReviewerResult[],
 ): string => {
-  const distinct = Array.from(
-    new Set(
-      reviewers
-        .map(({ review }) => review?.skillCategory)
-        .filter((category): category is NonNullable<typeof category> =>
-          Boolean(category),
-        ),
-    ),
+  const categories = reviewers
+    .map(
+      ({ reviewedApplicantRecord }) =>
+        reviewedApplicantRecord.review?.skillCategory,
+    )
+    .filter((category): category is NonNullable<typeof category> =>
+      Boolean(category),
+    );
+  if (categories.length === 0) return "—";
+  const highest = categories.reduce((max, category) =>
+    (SKILL_CATEGORY_RANK[category] ?? 0) > (SKILL_CATEGORY_RANK[max] ?? 0)
+      ? category
+      : max,
   );
-  if (distinct.length === 0) return "—";
-  return distinct.map(formatSkillCategory).join(", ");
+  return formatSkillCategory(highest);
 };
 
 const LeftPanelContent = ({
@@ -145,24 +156,16 @@ const LeftPanelContent = ({
 
 const ReviewerScoresSection = ({
   reviewers,
+  combinedReviewScore,
 }: {
   reviewers: ReviewedApplicantRecordWithReviewerResult[];
+  combinedReviewScore: number | null | undefined;
 }) => {
   const maxTotal = reviewers.length * 20;
-  const totalScore = reviewers.reduce((sum, entry) => {
-    if (entry.score != null) return sum + entry.score;
-    return (
-      sum +
-      DIMENSION_ROWS.reduce(
-        (s, { field }) => s + ((entry.review?.[field] as number | null) ?? 0),
-        0,
-      )
-    );
-  }, 0);
 
   return (
     <div className="flex flex-col gap-8 rounded-lg border border-neutral-200 bg-white p-6">
-      {reviewers.map(({ reviewer, review }, idx) => (
+      {reviewers.map(({ reviewer, reviewedApplicantRecord }, idx) => (
         <div key={reviewer.id} className="flex flex-col gap-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex w-[235px] flex-col gap-6">
@@ -182,17 +185,16 @@ const ReviewerScoresSection = ({
               <span className="font-poppins text-xl font-normal leading-7 text-blue">
                 {reviewer.firstName}&rsquo;s rating
               </span>
-              {DIMENSION_ROWS.map(({ label, field }) => {
-                const value = review?.[field] as number | null | undefined;
-                return (
-                  <span
-                    key={label}
-                    className="text-base font-normal leading-snug text-black"
-                  >
-                    {value != null ? `${value}/5` : "—/5"}
-                  </span>
-                );
-              })}
+              {DIMENSION_ROWS.map(({ label, field }) => (
+                <span
+                  key={label}
+                  className="text-base font-normal leading-snug text-black"
+                >
+                  {reviewedApplicantRecord.review?.[field] != null
+                    ? `${reviewedApplicantRecord.review[field]}/5`
+                    : "—/5"}
+                </span>
+              ))}
             </div>
           </div>
           {idx < reviewers.length - 1 ? (
@@ -206,7 +208,7 @@ const ReviewerScoresSection = ({
           Total Score
         </span>
         <span className="font-poppins text-xl font-normal leading-7 text-blue">
-          {totalScore}/{maxTotal}
+          {combinedReviewScore ?? "—"}/{maxTotal}
         </span>
       </div>
     </div>
@@ -216,9 +218,11 @@ const ReviewerScoresSection = ({
 const ViewOnlyLeftPanel = ({
   name,
   reviewers,
+  combinedReviewScore,
 }: {
   name: string;
   reviewers: ReviewedApplicantRecordWithReviewerResult[];
+  combinedReviewScore: number | null | undefined;
 }) => {
   return (
     <div className="flex w-full flex-col gap-6 p-3">
@@ -241,7 +245,10 @@ const ViewOnlyLeftPanel = ({
           No reviewers have been assigned to this applicant yet.
         </p>
       ) : (
-        <ReviewerScoresSection reviewers={reviewers} />
+        <ReviewerScoresSection
+          reviewers={reviewers}
+          combinedReviewScore={combinedReviewScore}
+        />
       )}
     </div>
   );
@@ -269,13 +276,13 @@ const ViewOnlyRightPanel = ({
               No comments to display.
             </p>
           ) : (
-            reviewers.map(({ reviewer, review }) => (
+            reviewers.map(({ reviewer, reviewedApplicantRecord }) => (
               <div key={reviewer.id} className="flex flex-col gap-2">
                 <p className="text-base font-medium leading-6 text-black">
                   {reviewer.firstName} {reviewer.lastName}&rsquo;s Comment:
                 </p>
                 <blockquote className="border-l-2 border-blue pl-3 text-base font-normal leading-6 text-black whitespace-pre-wrap">
-                  {review?.comments || "—"}
+                  {reviewedApplicantRecord.review?.comments || "—"}
                 </blockquote>
               </div>
             ))
@@ -349,27 +356,24 @@ export const ReviewEndStage = ({
   onReportConflict,
   viewOnly = false,
   reviewers = [],
+  combinedReviewScore,
 }: Props) => {
   const [validationError, setValidationError] = useState(false);
 
-  if (viewOnly) {
-    return (
-      <ReviewPageLayout
-        currentStage={ReviewStage.END}
-        scores={scores}
-        viewOnly
-      >
-        <PanelLayout borderRight>
-          <ViewOnlyLeftPanel name={name} reviewers={reviewers} />
-        </PanelLayout>
-        <PanelLayout>
-          <ViewOnlyRightPanel reviewers={reviewers} />
-        </PanelLayout>
-      </ReviewPageLayout>
-    );
-  }
-
-  return (
+  return viewOnly ? (
+    <ReviewPageLayout currentStage={ReviewStage.END} scores={scores} viewOnly>
+      <PanelLayout borderRight>
+        <ViewOnlyLeftPanel
+          name={name}
+          reviewers={reviewers}
+          combinedReviewScore={combinedReviewScore}
+        />
+      </PanelLayout>
+      <PanelLayout>
+        <ViewOnlyRightPanel reviewers={reviewers} />
+      </PanelLayout>
+    </ReviewPageLayout>
+  ) : (
     <ReviewPageLayout
       currentStage={ReviewStage.END}
       scores={scores}

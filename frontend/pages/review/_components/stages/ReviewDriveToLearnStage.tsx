@@ -36,6 +36,12 @@ export const ReviewDriveToLearnStage = ({
   const fourthShortAnswer = shortAnswers[3];
   const questions = fourthShortAnswer ? [fourthShortAnswer.question] : [];
   const answers = fourthShortAnswer ? [fourthShortAnswer.response] : [];
+  const reviewerScores = reviewers.map(
+    ({ reviewer, reviewedApplicantRecord }) => ({
+      reviewer,
+      score: reviewedApplicantRecord.review?.desireToLearn ?? null,
+    }),
+  );
   return (
     <ReviewPageLayout
       currentStage={ReviewStage.D2L}
@@ -75,7 +81,7 @@ export const ReviewDriveToLearnStage = ({
           currentStage={ReviewStage.D2L}
         />
         {viewOnly ? (
-          <ReviewerScoresList reviewers={reviewers} field="desireToLearn" />
+          <ReviewerScoresList scores={reviewerScores} />
         ) : (
           <div className="flex items-center gap-3">
             <ReviewScoreInput

@@ -36,6 +36,12 @@ export const ReviewPassionForSocialGoodStage = ({
   const secondShortAnswer = shortAnswers[1];
   const questions = secondShortAnswer ? [secondShortAnswer.question] : [];
   const answers = secondShortAnswer ? [secondShortAnswer.response] : [];
+  const reviewerScores = reviewers.map(
+    ({ reviewer, reviewedApplicantRecord }) => ({
+      reviewer,
+      score: reviewedApplicantRecord.review?.passionFSG ?? null,
+    }),
+  );
   return (
     <ReviewPageLayout
       currentStage={ReviewStage.PFSG}
@@ -75,7 +81,7 @@ export const ReviewPassionForSocialGoodStage = ({
           currentStage={ReviewStage.PFSG}
         />
         {viewOnly ? (
-          <ReviewerScoresList reviewers={reviewers} field="passionFSG" />
+          <ReviewerScoresList scores={reviewerScores} />
         ) : (
           <div className="flex items-center gap-3">
             <ReviewScoreInput

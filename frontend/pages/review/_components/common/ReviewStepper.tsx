@@ -6,15 +6,6 @@ import { ReactElement, useContext, useState } from "react";
 import { BACK_TO_HOME_HREF, REVIEW_STAGES, ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
 import { ReviewEndData, ReviewScores } from "../types";
-import { getApplicantRecordId } from "../utils";
-
-const STAGE_RATING_FIELDS: [ReviewStage, string][] = [
-  [ReviewStage.PFSG, "passionFSG"],
-  [ReviewStage.TP, "teamPlayer"],
-  [ReviewStage.D2L, "desireToLearn"],
-  [ReviewStage.SKL, "skill"],
-];
-
 
 interface Props {
   currentStage: ReviewStage;
@@ -53,25 +44,6 @@ export const ReviewStepper = ({
   if (!router.isReady) return null;
   if (currentStage === ReviewStage.END_SUCCESS) return null;
 
-  const applicantRecordId = getApplicantRecordId(router.query);
-
-  const updateAllData = () => {
-    const ratingPromises = STAGE_RATING_FIELDS.map(([stage, field]) => {});
-
-    const {
-      comments = "",
-      skillsCategory = "",
-      secondChoiceRole = "",
-    } = endData ?? {};
-
-    return Promise.all([
-      ...ratingPromises,
-      {},
-    ]);
-  };
-
-  const isLastStage = currentStage === ReviewStage.END;
-
   return (
     <div className="border-t border-neutral-200 bg-white px-6 py-4">
       <div className="flex justify-end items-center gap-3 flex-nowrap">
@@ -94,34 +66,27 @@ export const ReviewStepper = ({
         {viewOnly ? (
           <Button
             size="sm"
-            onClick={() => {
-              if (isLastStage) {
-                router.push(BACK_TO_HOME_HREF);
-              } else {
-                setStage?.(nextStage);
-              }
-            }}
+            onClick={() =>
+              currentStage === ReviewStage.END
+                ? router.push(BACK_TO_HOME_HREF)
+                : setStage?.(nextStage)
+            }
             className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-400 hover:border-transparent disabled:opacity-60"
           >
-            {isLastStage ? "Finish" : "Continue"}
+            {currentStage === ReviewStage.END ? "Finish" : "Continue"}
           </Button>
-        ) : isLastStage ? (
+        ) : currentStage === ReviewStage.END ? (
           <Button
             size="sm"
             disabled={isSubmitting || !endData?.skillsCategory}
             className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-400 hover:border-transparent disabled:opacity-60"
-            onClick={async () => {
+            onClick={() => {
               if (onValidate && !onValidate()) {
                 return;
               }
-
               setIsSubmitting(true);
               try {
-                await updateAllData();
                 setStage?.(ReviewStage.END_SUCCESS);
-              } catch (error) {
-                console.error("Failed to submit review data:", error);
-                alert("Failed to submit review. Please try again.");
               } finally {
                 setIsSubmitting(false);
               }

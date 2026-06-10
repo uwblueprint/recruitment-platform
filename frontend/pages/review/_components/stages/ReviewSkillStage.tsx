@@ -34,7 +34,6 @@ const ResumeLink = ({ resumeLink }: { resumeLink: string }) => {
 
 type Props = ReviewStageProps & {
   header: ReactNode;
-  viewOnly?: boolean;
   reviewers?: ReviewedApplicantRecordWithReviewerResult[];
 };
 
@@ -48,6 +47,12 @@ export const ReviewSkillStage = ({
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
   const resumeLink = application?.resumeUrl;
+  const reviewerScores = reviewers.map(
+    ({ reviewer, reviewedApplicantRecord }) => ({
+      reviewer,
+      score: reviewedApplicantRecord.review?.skill ?? null,
+    }),
+  );
 
   const roleSpecificStr = application?.roleSpecificQuestions[0];
   const roleSpecificStrJSON = roleSpecificStr
@@ -96,7 +101,7 @@ export const ReviewSkillStage = ({
           currentStage={ReviewStage.SKL}
         />
         {viewOnly ? (
-          <ReviewerScoresList reviewers={reviewers} field="skill" />
+          <ReviewerScoresList scores={reviewerScores} />
         ) : (
           <div className="flex items-center gap-3">
             <ReviewScoreInput
