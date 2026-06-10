@@ -71,7 +71,7 @@ export const DashboardTable = <TData,>({
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="min-h-0 flex-1 overflow-auto rounded border border-neutral-200 bg-white">
-        <table className="w-full min-w-[920px] border-collapse text-left font-source text-sm text-neutral-800">
+        <table className="w-full min-w-[920px] table-fixed border-collapse text-left font-source text-sm text-neutral-800">
           <thead className="sticky top-0 z-10 bg-sky-200">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
