@@ -45,6 +45,7 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
   },
   {
     id: "choice",
+    size: 80,
     accessorFn: (row) => row.choice,
     header: "Choice",
     enableSorting: true,
@@ -52,6 +53,7 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
   },
   {
     id: "timesApplied",
+    size: 110,
     accessorFn: (row) => row.timesApplied,
     header: "Times Applied",
     enableSorting: true,
