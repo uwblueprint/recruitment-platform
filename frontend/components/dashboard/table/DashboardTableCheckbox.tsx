@@ -8,9 +8,14 @@ type DashboardTableCheckboxProps = Pick<
 
 export const DashboardTableCheckbox = (props: DashboardTableCheckboxProps) => (
   <MuiCheckbox
-    size="small"
     onClick={(event) => event.stopPropagation()}
-    sx={{ padding: 0 }}
+    sx={{
+      padding: 0,
+      "& .MuiSvgIcon-root": { fontSize: 16 },
+      color: "#C4C4C4",
+      "&.Mui-checked": { color: "#0573E8" },
+      "&.MuiCheckbox-indeterminate": { color: "#0573E8" },
+    }}
     {...props}
   />
 );
