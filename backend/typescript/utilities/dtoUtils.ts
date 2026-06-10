@@ -40,7 +40,10 @@ export function toUserDTO(model: User): UserDTO {
 }
 
 function toShortAnswerQuestions(
-  raw: { question: string; response?: string; answer?: string }[] | null | undefined,
+  raw:
+    | { question: string; response?: string; answer?: string }[]
+    | null
+    | undefined,
 ): { question: string; answer: string }[] {
   return (raw ?? []).map(({ question, response, answer }) => ({
     question,
@@ -55,7 +58,9 @@ export function toApplicantRecordDTO(
     id: model.id,
     applicantId: model.applicant_id,
     position: model.position,
-    roleSpecificQuestions: toShortAnswerQuestions(model.role_specific_questions),
+    roleSpecificQuestions: toShortAnswerQuestions(
+      model.role_specific_questions,
+    ),
     choice: model.choice,
     status: model.status,
     skillCategory: model.skill_category,
