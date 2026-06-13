@@ -4,7 +4,6 @@ import {
   ReviewDashboardSortBy,
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
-  SortDirection,
 } from "../../types";
 
 interface IReviewCompositeService {
@@ -21,13 +20,13 @@ interface IReviewCompositeService {
    * @Param page the page the viewer is on
    * @Param resultsPerPage the number of results per page
    * @Param sortBy the field to sort results by
-   * @Param sortDirection the direction to sort results
+   * @Param sortAscending whether to sort ascending; defaults to true
    */
   getReviewDashboard(
     page: number,
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
-    sortDirection?: SortDirection,
+    sortAscending?: boolean,
   ): Promise<ReviewDashboardRowDTO[]>;
 
   /**

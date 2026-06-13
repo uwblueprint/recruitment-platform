@@ -1,6 +1,6 @@
 import { DataTypes, Op } from "sequelize";
-import { v4 } from "uuid";
 import type { Seeder } from "../umzug-seed";
+import { generateApplicantSeedBundles } from "./factories/applicantSeedBundleFactory";
 
 /**
  * Dataset for testing every review-dashboard sort parameter
@@ -192,35 +192,29 @@ const reviewFromScore = (score: number) => {
 export const up: Seeder = async ({ context: sequelize }) => {
   const now = new Date();
 
+  // Base applicant/applicant_record bundles built from real export data via the
+  // shared factory; we override only the fields each entry varies across sort axes.
+  const bundles = generateApplicantSeedBundles(
+    SEED_EMAIL_PREFIX,
+    ENTRIES.length,
+  );
+
   const rows = ENTRIES.map((entry, index) => {
-    const applicantId = v4();
-    const applicantRecordId = v4();
+    const { applicant, firstChoiceApplicantRecord } = bundles[index];
     return {
       entry,
       applicant: {
-        id: applicantId,
+        ...applicant,
         first_name: entry.firstName,
         last_name: entry.lastName,
-        email: `${SEED_EMAIL_PREFIX}-${index}@example.com`,
-        academic_or_coop: "Academic",
-        academic_year: "2A",
-        heard_from: "Friend",
-        location_preference: "Remote",
-        program: "Computer Science",
-        pronouns: "they/them",
-        resume_url: "https://example.com/resume.pdf",
         times_applied: entry.timesApplied,
-        short_answer_questions: [],
-        term: "Fall 2026",
         submitted_at: now,
         createdAt: now,
         updatedAt: now,
       },
       applicantRecord: {
-        id: applicantRecordId,
-        applicant_id: applicantId,
+        ...firstChoiceApplicantRecord,
         position: POSITION_TITLE,
-        role_specific_questions: [],
         choice: entry.choice,
         status: entry.status,
         // Sum of reviewer scores; null when unreviewed (mirrors the app's derivation).
@@ -231,7 +225,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
         updatedAt: now,
       },
       reviewedApplicantRecords: entry.reviewers.map((reviewer, idx) => ({
-        applicant_record_id: applicantRecordId,
+        applicant_record_id: firstChoiceApplicantRecord.id,
         reviewer_id: reviewer.id,
         review: JSON.stringify(reviewFromScore(reviewer.score)),
         score: reviewer.score,

@@ -40,17 +40,12 @@ const reviewDashboardType = gql`
     APPLICATION_STATUS
   }
 
-  enum SortDirection {
-    ASC
-    DESC
-  }
-
   extend type Query {
     reviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
       sortBy: ReviewDashboardSortBy
-      sortDirection: SortDirection
+      sortAscending: Boolean
     ): [ReviewDashboardRowDTO!]!
 
     reviewDashboardSidePanel(
