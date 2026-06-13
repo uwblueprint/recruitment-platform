@@ -3,13 +3,26 @@ import { ApplicationStatus } from "@/graphql/typeUtils";
 import { useState } from "react";
 
 const APPLICATION_STATUS_OPTIONS = [
-  { value: ApplicationStatus.Applied, label: "Applied", className: "bg-neutral-100 text-neutral-700" },
-  { value: ApplicationStatus.InReview, label: "In Review", className: "bg-sky text-blue" },
-  { value: ApplicationStatus.Reviewed, label: "Reviewed", className: "bg-magenta-100 text-neutral-800" },
-  { value: ApplicationStatus.Selected, label: "Selected", className: "bg-green-100 text-green-700" },
-  { value: ApplicationStatus.Interviewed, label: "Interviewed", className: "bg-sky text-blue" },
-  { value: ApplicationStatus.Offered, label: "Offered", className: "bg-green-100 text-green-700" },
-  { value: ApplicationStatus.Rejected, label: "Rejected", className: "bg-neutral-100 text-neutral-700" },
+  {
+    value: ApplicationStatus.Applied,
+    label: "Applied",
+    className: "bg-neutral-200 text-black",
+  },
+  {
+    value: ApplicationStatus.InReview,
+    label: "In Review",
+    className: "bg-yellow-200 text-black",
+  },
+  {
+    value: ApplicationStatus.Reviewed,
+    label: "Reviewed",
+    className: "bg-green-200 text-black",
+  },
+  {
+    value: ApplicationStatus.Selected,
+    label: "Selected",
+    className: "bg-purple-200 text-black",
+  },
 ] as const;
 
 type ReviewStatusCellProps = {

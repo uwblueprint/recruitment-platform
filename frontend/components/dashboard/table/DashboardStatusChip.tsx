@@ -20,7 +20,7 @@ export const DashboardStatusChip = <TStatus extends string>({
 
   return (
     <select
-      className={`h-7 min-w-[112px] rounded border-0 py-0 pl-4 pr-8 text-xs focus:ring-2 focus:ring-blue ${selectedClassName}`}
+      className={`h-7 min-w-[112px] rounded border-0 py-0 pl-4 pr-8 text-center text-xs focus:ring-2 focus:ring-blue ${selectedClassName}`}
       value={value}
       onChange={(event) =>
         onChange?.(
