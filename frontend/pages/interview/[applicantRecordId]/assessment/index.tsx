@@ -10,7 +10,8 @@ import {
   InterviewFooter,
 } from "../../_components/layout";
 import { Button } from "@/components/common/Button";
-import { NextPageWithLayout } from "@/pages/_app";
+import { NextPageWithLayout } from "../../../_app";
+import { ScoresPanel } from "../../_components/assessment/ScoresPanel";
 
 // Sub-step constants: drive the header bubble (via context) and footer button state.
 const SCORES = AssessmentHeaderStep.SCORES;
@@ -74,11 +75,8 @@ const InterviewAssessmentPage: NextPageWithLayout = () => {
       );
     default:
       return (
-        <PanelLayout
-          title="Interview Assessment"
-          subtitle="Score the candidate"
-        >
-          <p>Application Scores content goes here.</p>
+        <PanelLayout>
+          <ScoresPanel />
         </PanelLayout>
       );
   }
