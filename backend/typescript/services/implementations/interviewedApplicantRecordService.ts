@@ -22,7 +22,7 @@ function isValidInterviewScores(interviewJson: Interview): boolean {
   };
 
   return !Object.entries(scores).some(
-    ([_field, value]) => value && (value < 1 || value > 5),
+    ([, value]) => value && (value < 1 || value > 5),
   );
 }
 
