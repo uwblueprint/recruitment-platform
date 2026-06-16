@@ -80,6 +80,7 @@ export const ReviewPassionForSocialGoodStage = ({
           scores={scores}
           currentStage={ReviewStage.PFSG}
         />
+        <div className="h-px w-full shrink-0 bg-neutral-200" />
         {viewOnly ? (
           <ReviewerScoresList scores={reviewerScores} />
         ) : (

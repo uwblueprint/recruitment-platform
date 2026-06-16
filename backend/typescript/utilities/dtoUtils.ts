@@ -40,10 +40,7 @@ export function toUserDTO(model: User): UserDTO {
 }
 
 function toShortAnswerQuestions(
-  raw:
-    | { question: string; response?: string; answer?: string }[]
-    | null
-    | undefined,
+  raw: { question: string; response?: string; answer?: string }[] | undefined,
 ): { question: string; answer: string }[] {
   return (raw ?? []).map(({ question, response, answer }) => ({
     question,
@@ -149,6 +146,11 @@ export function toReviewedApplicantRecordDTO(
 export function toReviewedApplicantRecordWithReviewerDTO(
   model: ReviewedApplicantRecord,
 ): ReviewedApplicantRecordWithReviewerDTO {
+  if (!model.reviewer) {
+    throw new Error(
+      `ReviewedApplicantRecord (applicant_record_id=${model.applicant_record_id}, reviewer_id=${model.reviewer_id}) is missing its reviewer association.`,
+    );
+  }
   return {
     reviewer: toUserDTO(model.reviewer),
     reviewedApplicantRecord: toReviewedApplicantRecordDTO(model),

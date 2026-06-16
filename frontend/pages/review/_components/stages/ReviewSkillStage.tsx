@@ -100,6 +100,7 @@ export const ReviewSkillStage = ({
           scores={scores}
           currentStage={ReviewStage.SKL}
         />
+        <div className="h-px w-full shrink-0 bg-neutral-200" />
         {viewOnly ? (
           <ReviewerScoresList scores={reviewerScores} />
         ) : (

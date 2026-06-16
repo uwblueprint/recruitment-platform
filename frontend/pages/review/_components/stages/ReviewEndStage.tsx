@@ -159,7 +159,7 @@ const ReviewerScoresSection = ({
   combinedReviewScore,
 }: {
   reviewers: ReviewedApplicantRecordWithReviewerResult[];
-  combinedReviewScore: number | null | undefined;
+  combinedReviewScore: number | null;
 }) => {
   const maxTotal = reviewers.length * 20;
 
@@ -190,7 +190,7 @@ const ReviewerScoresSection = ({
                   key={label}
                   className="text-base font-normal leading-snug text-black"
                 >
-                  {reviewedApplicantRecord.review?.[field] != null
+                  {reviewedApplicantRecord.review?.[field]
                     ? `${reviewedApplicantRecord.review[field]}/5`
                     : "—/5"}
                 </span>
@@ -207,7 +207,7 @@ const ReviewerScoresSection = ({
         <span className="font-poppins text-xl font-medium leading-7 text-black">
           Total Score
         </span>
-        <span className="font-poppins text-xl font-normal leading-7 text-blue">
+        <span className="font-poppins text-xl font-bold leading-7 text-blue">
           {combinedReviewScore ?? "—"}/{maxTotal}
         </span>
       </div>
@@ -222,7 +222,7 @@ const ViewOnlyLeftPanel = ({
 }: {
   name: string;
   reviewers: ReviewedApplicantRecordWithReviewerResult[];
-  combinedReviewScore: number | null | undefined;
+  combinedReviewScore: number | null;
 }) => {
   return (
     <div className="flex w-full flex-col gap-6 p-3">
@@ -278,10 +278,10 @@ const ViewOnlyRightPanel = ({
           ) : (
             reviewers.map(({ reviewer, reviewedApplicantRecord }) => (
               <div key={reviewer.id} className="flex flex-col gap-2">
-                <p className="text-base font-medium leading-6 text-black">
+                <p className="text-base font-semibold leading-6 text-black">
                   {reviewer.firstName} {reviewer.lastName}&rsquo;s Comment:
                 </p>
-                <blockquote className="border-l-2 border-blue pl-3 text-base font-normal leading-6 text-black whitespace-pre-wrap">
+                <blockquote className="border-l-4 border-blue pl-3 text-base font-normal leading-6 text-black whitespace-pre-wrap">
                   {reviewedApplicantRecord.review?.comments || "—"}
                 </blockquote>
               </div>

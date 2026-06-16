@@ -77,6 +77,7 @@ export const ReviewTeamPlayerStage = ({
           scores={scores}
           currentStage={TP}
         />
+        <div className="h-px w-full shrink-0 bg-neutral-200" />
         {viewOnly ? (
           <ReviewerScoresList scores={reviewerScores} />
         ) : (

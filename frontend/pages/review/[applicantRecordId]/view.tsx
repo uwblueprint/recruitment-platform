@@ -82,7 +82,8 @@ const ReviewViewPage: NextPage = () => {
     useState<ApplicantRecordWithReviewersResult | null>(null);
 
   const reviewers = reviewersData?.reviewedApplicantRecords ?? [];
-  const combinedReviewScore = reviewersData?.applicantRecord.combinedReviewScore;
+  const combinedReviewScore =
+    reviewersData?.applicantRecord.combinedReviewScore ?? null;
   const position = reviewersData?.applicantRecord.position ?? "";
 
   const applicantRecordId = router.isReady
