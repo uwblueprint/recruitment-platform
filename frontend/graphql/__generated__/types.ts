@@ -198,6 +198,7 @@ export type InterviewPairingsDto = {
 
 export enum InterviewStatus {
   Complete = 'COMPLETE',
+  ConflictReported = 'CONFLICT_REPORTED',
   InProgress = 'IN_PROGRESS',
   NeedsReview = 'NEEDS_REVIEW'
 }
@@ -253,6 +254,7 @@ export type Mutation = {
   logout?: Maybe<Scalars['ID']['output']>;
   refresh: Scalars['String']['output'];
   register: AuthDto;
+  reportInterviewConflict: InterviewedApplicantRecord;
   reportReviewConflict: ReviewedApplicantRecordDto;
   resetPassword: Scalars['Boolean']['output'];
   updateAdminComment: AdminCommentDto;
@@ -416,6 +418,13 @@ export type MutationRefreshArgs = {
 
 export type MutationRegisterArgs = {
   user: RegisterUserDto;
+};
+
+
+export type MutationReportInterviewConflictArgs = {
+  interviewHasConflict: InterviewConflict;
+  interviewedApplicantRecordId: Scalars['ID']['input'];
+  interviewerId: Scalars['ID']['input'];
 };
 
 

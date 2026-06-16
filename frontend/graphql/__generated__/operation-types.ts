@@ -55,6 +55,15 @@ export type RefreshMutationVariables = Exact<{
 
 export type RefreshMutation = { refresh: string };
 
+export type ReportInterviewConflictMutationVariables = Exact<{
+  interviewedApplicantRecordId: string | number;
+  interviewerId: string | number;
+  interviewHasConflict: Types.InterviewConflict;
+}>;
+
+
+export type ReportInterviewConflictMutation = { reportInterviewConflict: { id: string, status: Types.InterviewStatus } };
+
 export type ReportReviewConflictMutationVariables = Exact<{
   applicantRecordId: string | number;
   reviewerId: string | number;

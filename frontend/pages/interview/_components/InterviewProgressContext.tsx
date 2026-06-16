@@ -1,20 +1,21 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { useRouter } from "next/router";
 import { InterviewStep, INTERVIEW_NAV_ITEMS } from "./constants";
-import { InterviewProgressState, InterviewStep as InterviewStepType, StepStatus } from "./types";
+import {
+  InterviewProgressState,
+  InterviewStep as InterviewStepType,
+  StepStatus,
+} from "./types";
 
 export const InterviewProgressContext =
   createContext<InterviewProgressState | null>(null);
 
 const PATH_TO_STEP = INTERVIEW_NAV_ITEMS.reduce<
   Record<string, InterviewStepType>
->(
-  (acc, item) => {
-    acc[item.path] = item.step;
-    return acc;
-  },
-  {},
-);
+>((acc, item) => {
+  acc[item.path] = item.step;
+  return acc;
+}, {});
 
 const INITIAL_STATUSES: Record<InterviewStepType, StepStatus> = {
   [InterviewStep.PROFILE]: "not_started",
@@ -31,6 +32,8 @@ export const InterviewProgressProvider = ({
 }: InterviewProgressProviderProps) => {
   const router = useRouter();
   const [stepStatuses, setStepStatuses] = useState(INITIAL_STATUSES);
+  const [reportDialogOpen, setReportDialogOpen] = useState(false);
+  const [reportIssueSubmitted, setReportIssueSubmitted] = useState(false);
   const [subStepsBySection, setSubStepsBySection] = useState<
     Record<InterviewStepType, string | null>
   >({
@@ -61,6 +64,10 @@ export const InterviewProgressProvider = ({
         updateStepStatus,
         currentSubStep,
         setCurrentSubStep,
+        reportDialogOpen,
+        setReportDialogOpen,
+        reportIssueSubmitted,
+        setReportIssueSubmitted,
       }}
     >
       {children}

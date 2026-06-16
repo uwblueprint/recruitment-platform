@@ -19,6 +19,14 @@ const interviewPageType = gql`
     interviewedPairingsByUserId(userId: ID!): [InterviewPairingsDTO!]!
     interviewersByGroupId(groupId: ID!): [UserDTO!]!
   }
+
+  extend type Mutation {
+    reportInterviewConflict(
+      interviewedApplicantRecordId: ID!
+      interviewerId: ID!
+      interviewHasConflict: InterviewConflict!
+    ): InterviewedApplicantRecord!
+  }
 `;
 
 export default interviewPageType;

@@ -39,6 +39,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
     interviewedApplicantRecordId: string,
     interviewerId: string,
     interviewDelegation: UpdateInterviewDelegationDTO,
+    t?: any,
   ): Promise<InterviewDelegationDTO> {
     try {
       const existingDelegation = await InterviewDelegation.findOne({
