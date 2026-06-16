@@ -1,6 +1,7 @@
 import {
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
+  ReviewDashboardSortBy,
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
 } from "../../types";
@@ -18,10 +19,14 @@ interface IReviewCompositeService {
    * Pagination-supporting viewing of the virtual review dashboard
    * @Param page the page the viewer is on
    * @Param resultsPerPage the number of results per page
+   * @Param sortBy the field to sort results by
+   * @Param sortAscending whether to sort ascending; defaults to true
    */
   getReviewDashboard(
     page: number,
     resultsPerPage: number,
+    sortBy?: ReviewDashboardSortBy,
+    sortAscending?: boolean,
   ): Promise<ReviewDashboardRowDTO[]>;
 
   /**
