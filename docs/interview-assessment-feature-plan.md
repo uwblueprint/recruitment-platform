@@ -5,7 +5,7 @@ Ticket goal: build the 3-page interview assessment flow at `/interview/[applican
 1. **Score submission** (Scores page → Submitted state)
 2. **Interview notes upload** (Notes page) — PDF only, with replace + delete behavior
 
-We'll work on a single feature branch (`feat/interview-assessment`) and open two PRs into it (one per E2E feature), then a final PR from the feature branch into `main`.
+Both contributors will work directly on a single shared feature branch (`feat/interview-assessment`), then open one PR from that branch into `main` when both E2E features are done.
 
 ---
 
@@ -30,16 +30,21 @@ Frontend:
 
 ```
 main
- └── feat/interview-assessment              (long-lived feature branch)
-      ├── feat/interview-assessment-scores  (PR #1 → feat/interview-assessment)
-      └── feat/interview-assessment-notes   (PR #2 → feat/interview-assessment)
+ └── feat/interview-assessment   (single shared branch — both devs commit here)
 ```
 
-Final integration PR: `feat/interview-assessment → main` once both sub-PRs are merged and squashed.
+One PR at the end: `feat/interview-assessment → main`.
+
+Working agreement for two people on one branch:
+- `git pull --rebase` before starting any work session and before every push.
+- Push small, frequently. Don't sit on local commits for hours.
+- Coordinate (Slack/DM) before touching any of the shared files called out in §8 below.
+- Run `yarn codegen` locally and commit the generated output in the **same commit** as the `.graphql` change that triggered it — never in a separate commit.
+- If you hit a non-trivial conflict on pull, stop and resolve together rather than guessing.
 
 ---
 
-## 2. Route restructuring (shared prerequisite, lands first on the feature branch)
+## 2. Route restructuring (shared prerequisite, do this first, together)
 
 Move the existing pages under a dynamic segment. This is a small commit on `feat/interview-assessment` before either sub-feature branch is cut.
 
@@ -55,7 +60,7 @@ Acceptance: visiting `/interview/123/assessment` renders the existing scores/not
 
 ---
 
-## 3. PR #1 — Score submission E2E
+## 3. Workstream A — Score submission E2E (one dev)
 
 ### 3.1 Backend
 
@@ -140,7 +145,7 @@ Run `yarn codegen` in `frontend/`.
 - On error: show toast / inline error and stay on SCORES.
 - On "Submit & Finish" (from NOTES): the final submit also happens through `submitInterviewScores` only if the user edited scores on NOTES re-entry; otherwise it's a no-op. The "submitted" state is purely UI — backend status transition (e.g., to `COMPLETE`) is **out of scope** for this ticket per the acceptance criteria, but flag this in the PR description for product confirmation.
 
-### 3.3 PR #1 acceptance
+### 3.3 Workstream A acceptance
 
 - Navigate to `/interview/<applicantRecordId>/assessment`.
 - Scores form pre-populates if the record already has `interviewJson` values.
@@ -149,7 +154,7 @@ Run `yarn codegen` in `frontend/`.
 
 ---
 
-## 4. PR #2 — Interview notes PDF upload E2E
+## 4. Workstream B — Interview notes PDF upload E2E (other dev)
 
 ### 4.1 Backend infrastructure (one-time)
 
@@ -250,7 +255,7 @@ Add the mutation to `interviewPageResolvers` + `interviewPageType`.
 
 Add `scalar Upload` handling to codegen if needed (`scalars: { Upload: 'File' }` in `codegen.ts`).
 
-**API client** `frontend/APIClients/InterviewAssessmentAPIClient.ts` (extend from PR #1):
+**API client** `frontend/APIClients/InterviewAssessmentAPIClient.ts` (extend from Workstream A — see §8 for how to avoid conflicting on this file):
 - `getInterviewNotes(interviewedApplicantRecordId)` → metadata + signed URL or null.
 - `uploadInterviewNotes(interviewedApplicantRecordId, file: File)` → returns metadata.
 
@@ -269,7 +274,7 @@ Add `scalar Upload` handling to codegen if needed (`scalars: { Upload: 'File' }`
 - On a new file drop: call `uploadInterviewNotes`. While in flight, disable footer's "Submit & Finish".
 - After success: refetch / update local cache so the filled state shows the new filename.
 
-### 4.7 PR #2 acceptance
+### 4.7 Workstream B acceptance
 
 - Drop a PDF on the Notes page → file uploads, name appears, signed URL viewable.
 - Drop a non-PDF → blocked client-side with error message; never reaches backend.
@@ -279,11 +284,11 @@ Add `scalar Upload` handling to codegen if needed (`scalars: { Upload: 'File' }`
 
 ---
 
-## 5. Final integration PR (`feat/interview-assessment` → `main`)
+## 5. Final PR (`feat/interview-assessment` → `main`)
 
-- Manual smoke test of the full flow end-to-end (Scores → Notes → Submitted).
+- Both devs do a manual smoke test of the full flow end-to-end (Scores → Notes → Submitted).
 - Verify route param `applicantRecordId` is plumbed everywhere; deep links work.
-- Verify codegen output is committed.
+- Verify codegen output is committed and matches a fresh `yarn codegen` run.
 - Update `docs/` if any new GraphQL conventions were added (e.g., `Upload` scalar).
 - Squash merge into `main`.
 
@@ -299,20 +304,69 @@ Add `scalar Upload` handling to codegen if needed (`scalars: { Upload: 'File' }`
 
 ---
 
-## 7. Suggested commit ordering
+## 7. Suggested commit ordering (all on `feat/interview-assessment`)
 
-On `feat/interview-assessment` (base):
+Done together / first, before splitting the work:
 1. `chore(interview): move pages under [applicantRecordId] dynamic segment`
+2. `chore(backend): wire graphql-upload middleware and Upload scalar` — landing this up front (even though only Workstream B needs it) avoids both devs editing `server.ts` / `resolvers/index.ts` / `types/index.ts` later.
 
-On `feat/interview-assessment-scores` (PR #1):
-2. `feat(backend): add submitInterviewScores composite mutation + by-applicantRecordId getter`
-3. `feat(frontend): scores panel with load + submit wired to GraphQL`
-4. `test(backend): cover submitInterviewScores`
+Workstream A (scores):
+3. `feat(backend): add submitInterviewScores composite mutation + by-applicantRecordId getter`
+4. `feat(frontend): scores panel with load + submit wired to GraphQL`
+5. `test(backend): cover submitInterviewScores`
 
-On `feat/interview-assessment-notes` (PR #2):
-5. `chore(backend): wire graphql-upload middleware and Upload scalar`
+Workstream B (notes):
 6. `feat(backend): FirebaseFile service + interviewNotes composite query/mutation`
 7. `feat(frontend): apollo-upload-client + NotesUploader (PDF-only dropzone)`
 8. `test(backend): cover upload, replace, non-PDF rejection`
 
 Each commit small, scoped, and revertible — matches the PR/Commits Grooming Guidelines linked in the ticket.
+
+---
+
+## 8. Conflict hotspots (read this before you start)
+
+Because both devs are touching the interview-assessment area on the same branch, these files **will** be edited by both workstreams. Be deliberate about them.
+
+### 8.1 High-risk shared files (coordinate before editing)
+
+| File | Why both workstreams touch it | Mitigation |
+|---|---|---|
+| `backend/typescript/graphql/types/interviewPageType.ts` | A adds `submitInterviewScores`; B adds `interviewNotes` query + `uploadInterviewNotes` mutation + `InterviewNotes` type. | Append-only: each dev adds their `extend type Query` / `extend type Mutation` block at the bottom in a contiguous chunk. Don't reorder existing fields. |
+| `backend/typescript/graphql/resolvers/interviewPageResolvers.ts` | Same as above — both add resolver functions. | Add new resolver keys at the end of `Query` / `Mutation` objects. Avoid touching existing ones. |
+| `backend/typescript/services/interfaces/IInterviewCompositeService.ts` | Both add new method signatures. | Append new methods at the bottom of the interface. |
+| `backend/typescript/services/implementations/interviewCompositeService.ts` | Both add new method implementations + new constructor-injected services (`InterviewedApplicantRecordsService`, `FirebaseFileService`). | Agree up front on constructor signature. Easiest: instantiate sub-services as `private readonly` fields initialized inline (no constructor changes). Add methods at the bottom of the class. |
+| `backend/typescript/graphql/resolvers/index.ts` and `backend/typescript/graphql/types/index.ts` | B registers `Upload` scalar + `firebaseFileResolvers`; both may register new type files. | Landed in commit #2 (shared prerequisite). After that, only B adds the firebaseFile resolver entry — A shouldn't need to touch these. |
+| `backend/typescript/server.ts` | B adds `graphqlUploadExpress` middleware + `uploads: false` on ApolloServer. | Same — done in shared commit #2 so only one dev touches it. |
+| `frontend/APIClients/InterviewAssessmentAPIClient.ts` | A creates it with score methods; B extends it with notes methods. | A lands this file first. B adds notes functions as **new exports at the bottom** of the file, doesn't refactor A's exports. |
+| `frontend/pages/interview/[applicantRecordId]/assessment/index.tsx` | A wires Scores submit + load; B wires Notes load/upload + disables footer during upload. | Split clearly: A owns SCORES sub-step + the state-machine transitions, B owns NOTES sub-step. The page should compose two child panels (`<ScoresPanel/>`, `<NotesUploader/>`) so most logic lives in those component files, minimizing edits to `index.tsx` itself. |
+| `frontend/graphql/generated/*` (codegen output) | Regenerated by both workstreams. | Always commit codegen output **in the same commit** as the `.graphql` change. Rebase before running codegen. If you hit a conflict here, delete the generated folder and re-run `yarn codegen` rather than hand-merging. |
+| `frontend/package.json` / `yarn.lock` | B adds `react-dropzone` + `apollo-upload-client`. | B installs deps in a single dedicated commit, pushes immediately, and pings A to pull + `yarn install`. |
+| `frontend/apolloClient.ts` (or wherever `HttpLink` lives) | B swaps `HttpLink` → `createUploadLink`. | Single-line swap by B; A shouldn't need to touch it. |
+| `frontend/pages/interview/_components/constants.ts` and `InterviewProgressContext` / `InterviewNavPanel` | Touched by the route-restructuring commit. | Done together in commit #1; afterward, neither workstream should need to edit these. |
+
+### 8.2 Low-risk (each workstream owns its own files)
+
+These are new files; no overlap expected:
+- A: `frontend/pages/interview/_components/assessment/ScoresPanel.tsx`, `frontend/graphql/operations/interviewedApplicantRecord.graphql`, `frontend/graphql/operations/submitInterviewScores.graphql`, score-related test files.
+- B: `frontend/pages/interview/_components/assessment/NotesUploader.tsx`, `frontend/graphql/operations/interviewNotes.graphql`, `frontend/graphql/operations/uploadInterviewNotes.graphql`, `backend/typescript/services/implementations/firebaseFileService.ts` (+ interface, DTO, resolver, type, tests), `backend/typescript/graphql/types/uploadType.ts`.
+
+### 8.3 Logical (non-textual) conflicts to watch for
+
+These won't show up as git merge conflicts but can still break things:
+
+- **`InterviewedApplicantRecord` GraphQL query shape.** A defines `query InterviewedApplicantRecord` in `interviewedApplicantRecord.graphql`. If B also needs fields from that record on the Notes page, B should **reuse A's query / API client method** rather than defining a second overlapping query — otherwise codegen produces duplicate hooks and the client cache may diverge.
+- **`getInterviewedApplicantRecordByApplicantRecordId` resolver.** Added by A but consumed by both sub-pages. B depends on this existing; if A's commit lands late, B will be blocked. Land A's backend commit (#3) before B starts the frontend wire-up.
+- **Constructor of `InterviewCompositeService`.** If both devs independently add constructor params for their new sub-services, the resolver instantiation site will conflict. Agree to use inline field initializers (no constructor params) for the new sub-services.
+- **`status` transitions on submit.** Both workstreams might independently decide to set `status = COMPLETE` on "Submit & Finish". Per §6, this is out of scope — leave it alone in both workstreams unless explicitly agreed.
+- **`apollo-upload-client` upgrade side effects.** Swapping `HttpLink` for `createUploadLink` changes headers (adds `Apollo-Require-Preflight`). A's score mutations go through the same link — A should smoke-test their flow after B lands the swap.
+- **Database migrations.** Neither workstream is planned to add a migration (the `firebase_files` table and FK already exist per §0). If you discover you need one, stop and coordinate — concurrent migration files with overlapping timestamps are painful.
+- **Tests touching shared mocks/fixtures.** If both workstreams add to a shared `__mocks__` or fixture file for `InterviewedApplicantRecord`, keep additions append-only.
+
+### 8.4 Recommended daily rhythm
+
+1. `git pull --rebase origin feat/interview-assessment`
+2. `yarn install` (in `frontend/` and `backend/typescript/`) if `yarn.lock` changed.
+3. `yarn codegen` in `frontend/` if any `.graphql` files changed.
+4. Work on your slice. Commit. `git pull --rebase` again. Push.
+5. If your push is rejected, rebase, re-run codegen, re-run tests, push again.
