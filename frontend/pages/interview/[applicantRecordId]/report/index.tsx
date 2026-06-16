@@ -3,8 +3,8 @@ import {
   getInterviewLayout,
   InterviewHeader,
   InterviewFooter,
-} from "../_components/layout";
-import { NextPageWithLayout } from "../../_app";
+} from "../../_components/layout";
+import { NextPageWithLayout } from "../../../_app";
 
 const InterviewReportPage: NextPageWithLayout = () => {
   return (
