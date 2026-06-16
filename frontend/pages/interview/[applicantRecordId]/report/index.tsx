@@ -53,10 +53,9 @@ const CONFLICT_OPTIONS: RadioOption[] = [
 
 const ReportIssueFooter = () => {
   const { setReportDialogOpen, reportIssueSubmitted } = useInterviewProgress();
-  if (reportIssueSubmitted) return null;
   return (
     <InterviewFooter
-      onContinue={() => setReportDialogOpen(true)}
+      onContinue={reportIssueSubmitted ? undefined : () => setReportDialogOpen(true)}
       continueLabel="Submit Issue"
     />
   );
