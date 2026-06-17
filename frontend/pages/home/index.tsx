@@ -155,104 +155,119 @@ const HomePage: NextPageWithLayout = () => {
       {/* Tables */}
       <div className="mt-6">
         {activeTab === "Application Review" && (
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-neutral-200">
-                <th className="pb-3 font-poppins text-sm font-semibold text-neutral-800">Name</th>
-                <th className="pb-3 font-poppins text-sm font-semibold text-neutral-800">Status</th>
-                <th className="pb-3 text-right font-poppins text-sm font-semibold text-neutral-800">View application</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reviewedApplicants.map((applicant) => (
-                <tr key={applicant.applicantRecordId} className="border-b border-neutral-100">
-                  <td className="py-4 font-source text-sm text-neutral-800">
-                    {applicant.applicantFirstName} {applicant.applicantLastName}
-                  </td>
-                  <td className="py-4">
-                    <StatusBadge
-                      variant={REVIEW_STATUS_VARIANT[applicant.reviewStatus]}
-                      label={REVIEW_STATUS_LABEL[applicant.reviewStatus]}
-                    />
-                  </td>
-                  <td className="py-4 text-right">
-                    <ActionButton
-                      label="Review application"
-                      onClick={() => router.push(`/review/${applicant.applicantRecordId}`)}
-                    />
-                  </td>
+          <div className="rounded-lg border border-neutral-200">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-neutral-200">
+                  <th className="px-4 pb-3 pt-4 font-poppins text-sm font-semibold text-neutral-800">Name</th>
+                  <th className="px-4 pb-3 pt-4 font-poppins text-sm font-semibold text-neutral-800">Status</th>
+                  <th className="px-4 pb-3 pt-4 text-right font-poppins text-sm font-semibold text-neutral-800">View application</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {reviewedApplicants.map((applicant) => (
+                  <tr key={applicant.applicantRecordId} className="border-b border-neutral-100 last:border-b-0">
+                    <td className="px-4 py-4 font-source text-sm text-neutral-800">
+                      {applicant.applicantFirstName} {applicant.applicantLastName}
+                    </td>
+                    <td className="px-4 py-4">
+                      <StatusBadge
+                        variant={REVIEW_STATUS_VARIANT[applicant.reviewStatus]}
+                        label={REVIEW_STATUS_LABEL[applicant.reviewStatus]}
+                      />
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <ActionButton
+                        label="Review application"
+                        onClick={() => router.push(`/review/${applicant.applicantRecordId}`)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {activeTab === "Interview Review" && (
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-neutral-200">
-                <th className="pb-3 font-poppins text-sm font-semibold text-neutral-800">Name</th>
-                <th className="pb-3 font-poppins text-sm font-semibold text-neutral-800">Status</th>
-                <th className="pb-3 text-right font-poppins text-sm font-semibold text-neutral-800">View application</th>
-              </tr>
-            </thead>
-            <tbody>
-              {interviewedApplicants.map((applicant) => (
-                <tr key={applicant.applicantRecordId} className="border-b border-neutral-100">
-                  <td className="py-4 font-source text-sm text-neutral-800">
-                    {applicant.applicantFirstName} {applicant.applicantLastName}
-                  </td>
-                  <td className="py-4">
-                    <StatusBadge
-                      variant={INTERVIEW_STATUS_VARIANT[applicant.interviewStatus]}
-                      label={INTERVIEW_STATUS_LABEL[applicant.interviewStatus]}
-                    />
-                  </td>
-                  <td className="py-4 text-right">
-                    <ActionButton
-                      label="Review application"
-                      onClick={() => router.push(`/interview/${applicant.applicantRecordId}`)}
-                    />
-                  </td>
+          <div className="rounded-lg border border-neutral-200">
+            <table className="w-full text-left">
+              <thead>
+                <tr className="border-b border-neutral-200">
+                  <th className="px-4 pb-3 pt-4 font-poppins text-sm font-semibold text-neutral-800">Name</th>
+                  <th className="px-4 pb-3 pt-4 font-poppins text-sm font-semibold text-neutral-800">Status</th>
+                  <th className="px-4 pb-3 pt-4 text-right font-poppins text-sm font-semibold text-neutral-800">View application</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {interviewedApplicants.map((applicant) => (
+                  <tr key={applicant.applicantRecordId} className="border-b border-neutral-100 last:border-b-0">
+                    <td className="px-4 py-4 font-source text-sm text-neutral-800">
+                      {applicant.applicantFirstName} {applicant.applicantLastName}
+                    </td>
+                    <td className="px-4 py-4">
+                      <StatusBadge
+                        variant={INTERVIEW_STATUS_VARIANT[applicant.interviewStatus]}
+                        label={INTERVIEW_STATUS_LABEL[applicant.interviewStatus]}
+                      />
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <ActionButton
+                        label="Review application"
+                        onClick={() => router.push(`/interview/${applicant.applicantRecordId}`)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
 
         {activeTab === "Interview Pairing" && (
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-neutral-200">
-                <th className="pb-3 font-poppins text-sm font-semibold text-neutral-800">Interview Partner</th>
-                <th className="pb-3 font-poppins text-sm font-semibold text-neutral-800">Status</th>
-                <th className="pb-3 text-right font-poppins text-sm font-semibold text-neutral-800">View application</th>
-              </tr>
-            </thead>
-            <tbody>
-              {interviewedPairings.map((pairing) => (
-                <tr key={pairing.interviewedGroupId} className="border-b border-neutral-100">
-                  <td className="py-4 font-source text-sm text-neutral-800">
-                    {pairing.groupMembers
-                      .map((m) => `${m.firstName} ${m.lastName}`)
-                      .join(", ")}
-                  </td>
-                  <td className="py-4">
-                    <StatusBadge
-                      variant={INTERVIEW_GROUP_STATUS_VARIANT[pairing.interviewGroupStatus]}
-                      label={INTERVIEW_GROUP_STATUS_LABEL[pairing.interviewGroupStatus]}
-                    />
-                  </td>
-                  <td className="py-4 text-right">
-                    <ActionButton
-                      label="View details"
-                      onClick={() => router.push(`/interview-group/${pairing.interviewedGroupId}`)}
-                    />
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          interviewedPairings.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-16 text-neutral-500">
+              <svg xmlns="http://www.w3.org/2000/svg" className="mb-3 h-8 w-8 text-neutral-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+              </svg>
+              <p className="font-source text-sm">Interview pairs have not been released yet.</p>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-neutral-200">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-neutral-200">
+                    <th className="px-4 pb-3 pt-4 font-poppins text-sm font-semibold text-neutral-800">Interview Partner</th>
+                    <th className="px-4 pb-3 pt-4 font-poppins text-sm font-semibold text-neutral-800">Status</th>
+                    <th className="px-4 pb-3 pt-4 text-right font-poppins text-sm font-semibold text-neutral-800">View application</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {interviewedPairings.map((pairing) => (
+                    <tr key={pairing.interviewedGroupId} className="border-b border-neutral-100 last:border-b-0">
+                      <td className="px-4 py-4 font-source text-sm text-neutral-800">
+                        {pairing.groupMembers
+                          .map((m) => `${m.firstName} ${m.lastName}`)
+                          .join(", ")}
+                      </td>
+                      <td className="px-4 py-4">
+                        <StatusBadge
+                          variant={INTERVIEW_GROUP_STATUS_VARIANT[pairing.interviewGroupStatus]}
+                          label={INTERVIEW_GROUP_STATUS_LABEL[pairing.interviewGroupStatus]}
+                        />
+                      </td>
+                      <td className="px-4 py-4 text-right">
+                        <ActionButton
+                          label="View details"
+                          onClick={() => router.push(`/interview-group/${pairing.interviewedGroupId}`)}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
         )}
       </div>
     </div>
