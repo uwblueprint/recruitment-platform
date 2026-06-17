@@ -113,6 +113,7 @@ const graphQLMiddlewares = {
     interviewedApplicantsByUserId: authorizedByAllRoles(),
     interviewedPairingsByUserId: authorizedByAllRoles(),
     interviewersByGroupId: authorizedByAllRoles(),
+    interviewNotes: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
   },
@@ -156,6 +157,7 @@ const graphQLMiddlewares = {
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
     delegateInterviewers: authorizedBySuperAdmin(),
+    uploadInterviewNotes: authorizedByAllRoles(),
   },
 };
 

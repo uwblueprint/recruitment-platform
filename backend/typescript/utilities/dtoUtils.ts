@@ -17,10 +17,12 @@ import {
   ReviewStatus,
   SkillCategory,
   UserDTO,
+  FirebaseFileDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
 import ApplicantRecord from "../models/applicantRecord.model";
+import FirebaseFile from "../models/firebaseFile.model";
 import InterviewDelegation from "../models/interviewDelegation.model";
 import InterviewGroup from "../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
@@ -246,5 +248,15 @@ export function toInterviewedApplicantDTO(
     interviewStatus: model.status,
     applicantFirstName: model.applicant_record.applicant.first_name,
     applicantLastName: model.applicant_record.applicant.last_name,
+  };
+}
+
+export function toFirebaseFileDTO(model: FirebaseFile): FirebaseFileDTO {
+  return {
+    id: model.id,
+    storagePath: model.storage_path,
+    originalFileName: model.original_file_name,
+    uploadedUserId: model.uploaded_user_id,
+    sizeBytes: Number(model.size_bytes),
   };
 }
