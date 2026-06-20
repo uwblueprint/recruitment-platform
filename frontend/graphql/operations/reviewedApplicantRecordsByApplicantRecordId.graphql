@@ -1,0 +1,26 @@
+query ReviewedApplicantRecordsByApplicantRecordId($applicantRecordId: ID!) {
+  reviewedApplicantRecordsByApplicantRecordId(
+    applicantRecordId: $applicantRecordId
+  ) {
+    reviewer {
+      id
+      firstName
+      lastName
+      email
+      role
+      position
+      isArchived
+    }
+    review {
+      passionFSG
+      teamPlayer
+      desireToLearn
+      skill
+      skillCategory
+      comments
+    }
+    status
+    score
+    reviewerHasConflict
+  }
+}

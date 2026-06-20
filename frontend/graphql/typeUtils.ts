@@ -108,6 +108,7 @@ export {
   RefreshDocument,
   ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
+  ReviewedApplicantRecordsByApplicantRecordIdDocument,
   ReviewDashboardDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
@@ -132,6 +133,8 @@ export type {
   ReportInterviewConflictMutationVariables,
   ReportReviewConflictMutation,
   ReportReviewConflictMutationVariables,
+  ReviewedApplicantRecordsByApplicantRecordIdQuery,
+  ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
   ReviewDashboardQuery,
   ReviewDashboardQueryVariables,
   UpdateInterviewGroupMutation,
@@ -182,6 +185,12 @@ export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export type ReviewedApplicantRecordWithReviewerResult = ArrayElement<
+  OperationField<
+    Operations.ReviewedApplicantRecordsByApplicantRecordIdQuery,
+    "reviewedApplicantRecordsByApplicantRecordId"
+  >
 >;
 export type ReportInterviewConflictResult = OperationField<
   Operations.ReportInterviewConflictMutation,

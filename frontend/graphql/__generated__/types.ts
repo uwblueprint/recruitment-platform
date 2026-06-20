@@ -528,6 +528,7 @@ export type Query = {
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
+  reviewedApplicantRecordsByApplicantRecordId: Array<ReviewedApplicantRecordWithReviewerDto>;
   reviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
   simpleEntities: Array<SimpleEntityResponseDto>;
   simpleEntitiesCSV: Scalars['String']['output'];
@@ -624,6 +625,11 @@ export type QueryReviewedApplicantRecordArgs = {
 };
 
 
+export type QueryReviewedApplicantRecordsByApplicantRecordIdArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryReviewedApplicantsByUserIdArgs = {
   userId: Scalars['ID']['input'];
 };
@@ -716,6 +722,15 @@ export type ReviewedApplicantRecordDto = {
   reviewerId: Scalars['ID']['output'];
   score?: Maybe<Scalars['Int']['output']>;
   status: Scalars['String']['output'];
+};
+
+export type ReviewedApplicantRecordWithReviewerDto = {
+  __typename?: 'ReviewedApplicantRecordWithReviewerDTO';
+  review?: Maybe<Review>;
+  reviewer: UserDto;
+  reviewerHasConflict: Scalars['Boolean']['output'];
+  score?: Maybe<Scalars['Int']['output']>;
+  status: ReviewStatus;
 };
 
 export type ReviewedApplicantsDto = {

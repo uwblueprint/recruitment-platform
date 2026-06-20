@@ -72,6 +72,13 @@ export type ReportReviewConflictMutationVariables = Exact<{
 
 export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRecordId: string, reviewerId: string, status: string, score: number | null, reviewerHasConflict: boolean } };
 
+export type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type ReviewedApplicantRecordsByApplicantRecordIdQuery = { reviewedApplicantRecordsByApplicantRecordId: Array<{ status: Types.ReviewStatus, score: number | null, reviewerHasConflict: boolean, reviewer: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null }> };
+
 export type ReviewDashboardQueryVariables = Exact<{
   pageNumber: number;
   resultsPerPage: number;
