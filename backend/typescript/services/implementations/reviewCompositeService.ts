@@ -4,6 +4,7 @@ import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
 import User from "../../models/user.model";
 import {
+  ApplicantRecordWithReviewersDTO,
   CreateReviewedApplicantRecordDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
@@ -14,9 +15,11 @@ import {
   ReviewStatusEnum,
 } from "../../types";
 import {
+  toApplicantRecordDTO,
   toReviewDashboardRowDTO,
   toReviewDashboardSidePanelDTO,
   toReviewedApplicantDTO,
+  toReviewedApplicantRecordWithReviewerDTO,
 } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
@@ -29,6 +32,38 @@ const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
 
 class ReviewCompositeService implements IReviewCompositeService {
   /* eslint-disable class-methods-use-this */
+
+  async getReviewedApplicantRecordsByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<ApplicantRecordWithReviewersDTO> {
+    try {
+      const applicantRecord = await ApplicantRecord.findByPk(applicantRecordId);
+      if (!applicantRecord) {
+        throw new Error(
+          `ApplicantRecord with id ${applicantRecordId} not found.`,
+        );
+      }
+
+      const records = await ReviewedApplicantRecord.findAll({
+        where: { applicant_record_id: applicantRecordId },
+        include: [{ model: User, as: "reviewer" }],
+      });
+
+      return {
+        applicantRecord: toApplicantRecordDTO(applicantRecord),
+        reviewedApplicantRecords: records.map(
+          toReviewedApplicantRecordWithReviewerDTO,
+        ),
+      };
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get reviewed applicant records by applicant record id. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
 
   async getReviewedApplicantsByUserId(
     userId: string,

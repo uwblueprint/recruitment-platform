@@ -1,9 +1,11 @@
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ApplicationDTO } from "@/types";
+import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
 import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
+import { ReviewerScoresList } from "../common/ReviewerScoresList";
 import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
 import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { ReviewSetScoresContext } from "../ReviewContext";
@@ -17,6 +19,8 @@ export interface Props {
   application: ApplicationDTO | undefined;
   scores: ReviewScores;
   onReportConflict?: () => void;
+  viewOnly?: boolean;
+  reviewers?: ReviewedApplicantRecordWithReviewerResult[];
 }
 
 export const ReviewPassionForSocialGoodStage = ({
@@ -24,24 +28,38 @@ export const ReviewPassionForSocialGoodStage = ({
   application,
   scores,
   onReportConflict,
+  viewOnly = false,
+  reviewers = [],
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
   const shortAnswers = application?.shortAnswerQuestions ?? [];
   const secondShortAnswer = shortAnswers[1];
   const questions = secondShortAnswer ? [secondShortAnswer.question] : [];
   const answers = secondShortAnswer ? [secondShortAnswer.response] : [];
+  const reviewerScores = reviewers.map(
+    ({ reviewer, reviewedApplicantRecord }) => ({
+      reviewer,
+      score: reviewedApplicantRecord.review?.passionFSG ?? null,
+    }),
+  );
   return (
-    <ReviewPageLayout currentStage={ReviewStage.PFSG} scores={scores}>
+    <ReviewPageLayout
+      currentStage={ReviewStage.PFSG}
+      scores={scores}
+      viewOnly={viewOnly}
+    >
       <PanelLayout
         header={
           <ReviewStageHeader
             backHref={BACK_TO_HOME_HREF}
             right={
-              <ReportConflictButton
-                name={name}
-                showQuestion
-                onClick={onReportConflict}
-              />
+              viewOnly ? null : (
+                <ReportConflictButton
+                  name={name}
+                  showQuestion
+                  onClick={onReportConflict}
+                />
+              )
             }
           />
         }
@@ -62,20 +80,25 @@ export const ReviewPassionForSocialGoodStage = ({
           scores={scores}
           currentStage={ReviewStage.PFSG}
         />
-        <div className="flex items-center gap-3">
-          <ReviewScoreInput
-            id="pfsg-score"
-            value={scores[ReviewStage.PFSG] || ""}
-            min={1}
-            max={5}
-            placeholder={`Enter ${name}'s score`}
-            ariaLabel="Passion for social good score"
-            onChange={(v) => updateScore?.(ReviewStage.PFSG, v)}
-          />
-          <span className="text-xl leading-none text-red-500">
-            *
-          </span>
-        </div>
+        <div className="h-px w-full shrink-0 bg-neutral-200" />
+        {viewOnly ? (
+          <ReviewerScoresList scores={reviewerScores} />
+        ) : (
+          <div className="flex items-center gap-3">
+            <ReviewScoreInput
+              id="pfsg-score"
+              value={scores[ReviewStage.PFSG] || ""}
+              min={1}
+              max={5}
+              placeholder={`Enter ${name}'s score`}
+              ariaLabel="Passion for social good score"
+              onChange={(v) => updateScore?.(ReviewStage.PFSG, v)}
+            />
+            <span className="text-xl leading-none text-red-500">
+              *
+            </span>
+          </div>
+        )}
       </PanelLayout>
     </ReviewPageLayout>
   );

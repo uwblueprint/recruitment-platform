@@ -12,6 +12,7 @@ import {
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewedApplicantRecordDTO,
+  ReviewedApplicantRecordWithReviewerDTO,
   ReviewedApplicantsDTO,
   ReviewStatus,
   SkillCategory,
@@ -38,6 +39,15 @@ export function toUserDTO(model: User): UserDTO {
   };
 }
 
+function toShortAnswerQuestions(
+  raw: { question: string; response?: string; answer?: string }[] | undefined,
+): { question: string; answer: string }[] {
+  return (raw ?? []).map(({ question, response, answer }) => ({
+    question,
+    answer: answer ?? response ?? "",
+  }));
+}
+
 export function toApplicantRecordDTO(
   model: ApplicantRecord,
 ): ApplicantRecordDTO {
@@ -45,7 +55,9 @@ export function toApplicantRecordDTO(
     id: model.id,
     applicantId: model.applicant_id,
     position: model.position,
-    roleSpecificQuestions: model.role_specific_questions,
+    roleSpecificQuestions: toShortAnswerQuestions(
+      model.role_specific_questions,
+    ),
     choice: model.choice,
     status: model.status,
     skillCategory: model.skill_category,
@@ -68,7 +80,7 @@ export function toApplicantDTO(model: Applicant): ApplicantDTO {
     pronouns: model.pronouns,
     resumeUrl: model.resume_url,
     timesApplied: model.times_applied,
-    shortAnswerQuestions: model.short_answer_questions,
+    shortAnswerQuestions: toShortAnswerQuestions(model.short_answer_questions),
     term: model.term,
     submittedAt: model.submitted_at,
   };
@@ -128,6 +140,20 @@ export function toReviewedApplicantRecordDTO(
     status: model.status,
     score: model.score,
     reviewerHasConflict: model.reviewer_has_conflict,
+  };
+}
+
+export function toReviewedApplicantRecordWithReviewerDTO(
+  model: ReviewedApplicantRecord,
+): ReviewedApplicantRecordWithReviewerDTO {
+  if (!model.reviewer) {
+    throw new Error(
+      `ReviewedApplicantRecord (applicant_record_id=${model.applicant_record_id}, reviewer_id=${model.reviewer_id}) is missing its reviewer association.`,
+    );
+  }
+  return {
+    reviewer: toUserDTO(model.reviewer),
+    reviewedApplicantRecord: toReviewedApplicantRecordDTO(model),
   };
 }
 

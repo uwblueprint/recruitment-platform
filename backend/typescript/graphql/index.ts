@@ -104,6 +104,7 @@ const graphQLMiddlewares = {
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
     reviewedApplicantRecord: authorizedByAdmin(),
+    reviewedApplicantRecordsByApplicantRecordId: authorizedByAdmin(),
     reviewedApplicantsByUserId: authorizedByAllRoles(),
     application: authorizedByAllRoles(),
     interviewedApplicantRecord: authorizedByAllRoles(),

@@ -1,4 +1,5 @@
 import {
+  ApplicantRecordWithReviewersDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -7,6 +8,15 @@ import {
 } from "../../types";
 
 interface IReviewCompositeService {
+  /**
+   * Fetches the applicant record along with all of its reviewers (with the
+   * reviewer's user info attached to each reviewed applicant record).
+   * @param applicantRecordId the ID of the applicant record
+   */
+  getReviewedApplicantRecordsByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<ApplicantRecordWithReviewersDTO>;
+
   /**
    * Fetches information about all the applicants assigned to a user to review
    * @param userId the id of the user that the viewer is interested in

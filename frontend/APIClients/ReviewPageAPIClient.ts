@@ -1,14 +1,47 @@
 import { client } from "@/client";
 import {
+  type ApplicantRecordWithReviewersResult,
+  ApplicationDocument,
+  type ApplicationQuery,
+  type ApplicationQueryVariables,
+  type ApplicationResult,
   ReportReviewConflictDocument,
   type ReportReviewConflictMutation,
   type ReportReviewConflictMutationVariables,
   type ReviewConflictReportResult,
+  ReviewedApplicantRecordsByApplicantRecordIdDocument,
+  type ReviewedApplicantRecordsByApplicantRecordIdQuery,
+  type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
 
 class ReviewPageAPIClient {
+  static async getApplication(
+    applicantRecordId: string,
+  ): Promise<ApplicationResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ApplicationQuery,
+        ApplicationQueryVariables
+      >({
+        query: ApplicationDocument,
+        variables: { applicantRecordId },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.application) {
+        throw new Error("No data returned");
+      }
+
+      return data.application;
+    } catch {
+      throw new Error("Failed to fetch application");
+    }
+  }
+
   static async reportReviewConflict(
     applicantRecordId: string,
     reviewerId: string,
@@ -31,6 +64,31 @@ class ReviewPageAPIClient {
       return data.reportReviewConflict;
     } catch {
       throw new Error("Failed to report review conflict");
+    }
+  }
+
+  static async getReviewedApplicantRecordsByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<ApplicantRecordWithReviewersResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ReviewedApplicantRecordsByApplicantRecordIdQuery,
+        ReviewedApplicantRecordsByApplicantRecordIdQueryVariables
+      >({
+        query: ReviewedApplicantRecordsByApplicantRecordIdDocument,
+        variables: { applicantRecordId },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.reviewedApplicantRecordsByApplicantRecordId) {
+        throw new Error("No data returned");
+      }
+
+      return data.reviewedApplicantRecordsByApplicantRecordId;
+    } catch {
+      throw new Error("Failed to fetch reviewed applicant records");
     }
   }
 }

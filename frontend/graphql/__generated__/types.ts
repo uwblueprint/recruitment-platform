@@ -33,6 +33,12 @@ export type ApplicantRecordDto = {
   status: ApplicationStatus;
 };
 
+export type ApplicantRecordWithReviewersDto = {
+  __typename?: 'ApplicantRecordWithReviewersDTO';
+  applicantRecord: ApplicantRecordDto;
+  reviewedApplicantRecords: Array<ReviewedApplicantRecordWithReviewerDto>;
+};
+
 export type ApplicationDto = {
   __typename?: 'ApplicationDTO';
   academicOrCoop: Scalars['String']['output'];
@@ -528,6 +534,7 @@ export type Query = {
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
+  reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
   reviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
   simpleEntities: Array<SimpleEntityResponseDto>;
   simpleEntitiesCSV: Scalars['String']['output'];
@@ -624,6 +631,11 @@ export type QueryReviewedApplicantRecordArgs = {
 };
 
 
+export type QueryReviewedApplicantRecordsByApplicantRecordIdArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryReviewedApplicantsByUserIdArgs = {
   userId: Scalars['ID']['input'];
 };
@@ -716,6 +728,12 @@ export type ReviewedApplicantRecordDto = {
   reviewerId: Scalars['ID']['output'];
   score?: Maybe<Scalars['Int']['output']>;
   status: Scalars['String']['output'];
+};
+
+export type ReviewedApplicantRecordWithReviewerDto = {
+  __typename?: 'ReviewedApplicantRecordWithReviewerDTO';
+  reviewedApplicantRecord: ReviewedApplicantRecordDto;
+  reviewer: UserDto;
 };
 
 export type ReviewedApplicantsDto = {
