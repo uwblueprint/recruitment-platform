@@ -1,0 +1,21 @@
+query ReviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {
+  reviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {
+    applicantRecordId
+    firstName
+    lastName
+    position
+    timesApplied
+    applicationStatus
+    choice
+    reviewers {
+      id
+      firstName
+      lastName
+      email
+      position
+      role
+      isArchived
+    }
+    totalScore
+  }
+}

@@ -23,6 +23,7 @@ export type ReviewDetails = {
 };
 
 export type ReviewDashboardRowDTO = {
+  applicantRecordId: string;
   firstName: string;
   lastName: string;
   position: string;
