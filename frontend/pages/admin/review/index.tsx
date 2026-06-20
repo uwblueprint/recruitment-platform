@@ -2,12 +2,19 @@ import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import type { ReviewDashboardResult } from "@/graphql/typeUtils";
-import { RowSelectionState, SortingState } from "@tanstack/react-table";
+import {
+  OnChangeFn,
+  RowSelectionState,
+  SortingState,
+} from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
-import { REVIEW_DASHBOARD_COLUMNS } from "./_components/columns";
+import {
+  COLUMN_ID_TO_SORT_BY,
+  REVIEW_DASHBOARD_COLUMNS,
+} from "./_components/columns";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
@@ -26,13 +33,29 @@ const AdminReviewPage: NextPageWithLayout = () => {
     null,
   );
 
+  // The table is single-sort, so only the first SortingState entry is used.
+  // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
+  // undefined and the backend falls back to its default order.
+  const activeSort = sorting[0];
+  const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
+  const sortAscending = activeSort ? !activeSort.desc : undefined;
+
   const { rows, isLoading, error } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
+    sortBy,
+    sortAscending,
   );
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
+    setPageNumber(1);
+    setRowSelection({});
+  };
+
+  // Changing the sort can shrink the result set, so return to the first page.
+  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
+    setSorting(updater);
     setPageNumber(1);
     setRowSelection({});
   };
@@ -63,7 +86,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           onRowClick={(row) => setActiveRow(row)}
           isLoading={isLoading}
           sorting={sorting}
-          onSortingChange={setSorting}
+          onSortingChange={handleSortingChange}
           pagination={{
             pageNumber,
             resultsPerPage,

@@ -14,6 +14,7 @@ export {
   InterviewConflict,
   InterviewGroupStatus,
   InterviewStatus,
+  ReviewDashboardSortBy,
   ReviewStatus,
   Role,
   SimpleEntityEnum,
