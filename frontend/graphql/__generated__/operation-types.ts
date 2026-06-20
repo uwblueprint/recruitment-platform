@@ -66,6 +66,8 @@ export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRe
 export type ReviewDashboardQueryVariables = Exact<{
   pageNumber: number;
   resultsPerPage: number;
+  sortBy?: Types.ReviewDashboardSortBy | null | undefined;
+  sortAscending?: boolean | null | undefined;
 }>;
 
 
