@@ -1,9 +1,11 @@
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ApplicationDTO } from "@/types";
+import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
 import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
 import { ReviewScoreInput } from "../common/ReviewScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
+import { ReviewerScoresList } from "../common/ReviewerScoresList";
 import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
 import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
 import { ReviewSetScoresContext } from "../ReviewContext";
@@ -17,6 +19,8 @@ interface Props {
   application: ApplicationDTO | undefined;
   scores: ReviewScores;
   onReportConflict?: () => void;
+  viewOnly?: boolean;
+  reviewers?: ReviewedApplicantRecordWithReviewerResult[];
 }
 
 export const ReviewDriveToLearnStage = ({
@@ -24,24 +28,38 @@ export const ReviewDriveToLearnStage = ({
   application,
   scores,
   onReportConflict,
+  viewOnly = false,
+  reviewers = [],
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
   const shortAnswers = application?.shortAnswerQuestions ?? [];
   const fourthShortAnswer = shortAnswers[3];
   const questions = fourthShortAnswer ? [fourthShortAnswer.question] : [];
   const answers = fourthShortAnswer ? [fourthShortAnswer.response] : [];
+  const reviewerScores = reviewers.map(
+    ({ reviewer, reviewedApplicantRecord }) => ({
+      reviewer,
+      score: reviewedApplicantRecord.review?.desireToLearn ?? null,
+    }),
+  );
   return (
-    <ReviewPageLayout currentStage={ReviewStage.D2L} scores={scores}>
+    <ReviewPageLayout
+      currentStage={ReviewStage.D2L}
+      scores={scores}
+      viewOnly={viewOnly}
+    >
       <PanelLayout
         header={
           <ReviewStageHeader
             backHref={BACK_TO_HOME_HREF}
             right={
-              <ReportConflictButton
-                name={name}
-                showQuestion
-                onClick={onReportConflict}
-              />
+              viewOnly ? null : (
+                <ReportConflictButton
+                  name={name}
+                  showQuestion
+                  onClick={onReportConflict}
+                />
+              )
             }
           />
         }
@@ -62,20 +80,25 @@ export const ReviewDriveToLearnStage = ({
           scores={scores}
           currentStage={ReviewStage.D2L}
         />
-        <div className="flex items-center gap-3">
-          <ReviewScoreInput
-            id="d2l-score"
-            value={scores[ReviewStage.D2L] || ""}
-            min={1}
-            max={5}
-            placeholder={`Enter ${name}'s score`}
-            ariaLabel="Drive to learn score"
-            onChange={(v) => updateScore?.(ReviewStage.D2L, v)}
-          />
-          <span className="text-xl leading-none text-red-500">
-            *
-          </span>
-        </div>
+        <div className="h-px w-full shrink-0 bg-neutral-200" />
+        {viewOnly ? (
+          <ReviewerScoresList scores={reviewerScores} />
+        ) : (
+          <div className="flex items-center gap-3">
+            <ReviewScoreInput
+              id="d2l-score"
+              value={scores[ReviewStage.D2L] || ""}
+              min={1}
+              max={5}
+              placeholder={`Enter ${name}'s score`}
+              ariaLabel="Drive to learn score"
+              onChange={(v) => updateScore?.(ReviewStage.D2L, v)}
+            />
+            <span className="text-xl leading-none text-red-500">
+              *
+            </span>
+          </div>
+        )}
       </PanelLayout>
     </ReviewPageLayout>
   );

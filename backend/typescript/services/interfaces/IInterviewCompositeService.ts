@@ -3,6 +3,7 @@ import {
   InterviewDelegationDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
+  InterviewNotesDTO,
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
@@ -44,6 +45,36 @@ interface IInterviewCompositeService {
     interviewedApplicantRecordId: string,
     scores: Interview,
   ): Promise<InterviewedApplicantRecordDTO>;
+
+  /**
+   * Fetch the interview notes attached to an interviewed applicant record.
+   * Returns null if no notes file has been uploaded yet.
+   * @param interviewedApplicantRecordId the InterviewedApplicantRecord PK.
+   */
+  getInterviewNotesByInterviewedApplicantRecordId(
+    interviewedApplicantRecordId: string,
+  ): Promise<InterviewNotesDTO | null>;
+
+  /**
+   * Upload (or replace) the PDF interview notes for an interviewed applicant
+   * record. If a previous file exists, it is deleted from storage + DB after
+   * the new file is successfully attached. Best-effort cleanup: cleanup
+   * failures are logged but do not fail the mutation.
+   * @throws if the file is not a PDF.
+   * @param interviewedApplicantRecordId the InterviewedApplicantRecord PK.
+   * @param uploadedUserId the id of the user performing the upload.
+   * @param upload local-disk metadata for the streamed-in file.
+   */
+  uploadInterviewNotes(
+    interviewedApplicantRecordId: string,
+    uploadedUserId: number,
+    upload: {
+      localFilePath: string;
+      originalFileName: string;
+      sizeBytes: number;
+      contentType: string;
+    },
+  ): Promise<InterviewNotesDTO>;
 }
 
 export default IInterviewCompositeService;

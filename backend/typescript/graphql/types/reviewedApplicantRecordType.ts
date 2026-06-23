@@ -41,6 +41,11 @@ const reviewedApplicantRecordTypes = gql`
     reviewerHasConflict: Boolean!
   }
 
+  type ReviewedApplicantRecordWithReviewerDTO {
+    reviewer: UserDTO!
+    reviewedApplicantRecord: ReviewedApplicantRecordDTO!
+  }
+
   input CreateReviewedApplicantRecordDTO {
     applicantRecordId: ID!
     reviewerId: ID!

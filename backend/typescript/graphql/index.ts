@@ -104,6 +104,7 @@ const graphQLMiddlewares = {
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
     reviewedApplicantRecord: authorizedByAdmin(),
+    reviewedApplicantRecordsByApplicantRecordId: authorizedByAdmin(),
     reviewedApplicantsByUserId: authorizedByAllRoles(),
     application: authorizedByAllRoles(),
     interviewedApplicantRecord: authorizedByAllRoles(),
@@ -112,6 +113,7 @@ const graphQLMiddlewares = {
     interviewedApplicantsByUserId: authorizedByAllRoles(),
     interviewedPairingsByUserId: authorizedByAllRoles(),
     interviewersByGroupId: authorizedByAllRoles(),
+    interviewNotes: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
   },
@@ -139,6 +141,7 @@ const graphQLMiddlewares = {
     deleteReviewedApplicantRecord: authorizedByAdmin(),
     bulkCreateReviewedApplicantRecord: authorizedByAdmin(),
     reportReviewConflict: authorizedByAllRoles(),
+    reportInterviewConflict: authorizedByAllRoles(),
     createInterviewedApplicantRecord: authorizedByAdmin(),
     updateInterviewedApplicantRecord: authorizedByAllRoles(),
     deleteInterviewedApplicantRecordById: authorizedByAdmin(),
@@ -154,6 +157,7 @@ const graphQLMiddlewares = {
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
     delegateInterviewers: authorizedBySuperAdmin(),
+    uploadInterviewNotes: authorizedByAllRoles(),
   },
 };
 

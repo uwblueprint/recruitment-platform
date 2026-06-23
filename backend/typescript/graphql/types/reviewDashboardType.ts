@@ -8,6 +8,7 @@ const reviewDashboardType = gql`
   }
 
   type ReviewDashboardRowDTO {
+    applicantRecordId: ID!
     firstName: String!
     lastName: String!
     position: String!
@@ -29,10 +30,23 @@ const reviewDashboardType = gql`
     reviewDetails: [ReviewDashboardReviewDetails!]!
   }
 
+  enum ReviewDashboardSortBy {
+    FIRST_NAME
+    LAST_NAME
+    CHOICE
+    TIMES_APPLIED
+    REVIEWER_1
+    REVIEWER_2
+    TOTAL_SCORE
+    APPLICATION_STATUS
+  }
+
   extend type Query {
     reviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
+      sortBy: ReviewDashboardSortBy
+      sortAscending: Boolean
     ): [ReviewDashboardRowDTO!]!
 
     reviewDashboardSidePanel(

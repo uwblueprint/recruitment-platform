@@ -92,14 +92,12 @@ export type UpdateReviewedApplicantRecordDTO =
 export type UpdateUserDTO = Schema.UpdateUserDto;
 
 /**
- * Re-export generated operation result and variable types from one stable place.
- */
-/**
  * Re-export typed GraphQL documents from the client preset artifact.
  *
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
 export {
+  ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
   InterviewedApplicantRecordByApplicantRecordIdDocument,
   InterviewersByGroupIdDocument,
@@ -107,13 +105,18 @@ export {
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
   RefreshDocument,
+  ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
+  ReviewedApplicantRecordsByApplicantRecordIdDocument,
+  ReviewDashboardDocument,
   SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
 } from "./__generated__/graphql";
 
 export type {
+  ApplicationQuery,
+  ApplicationQueryVariables,
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
   InterviewedApplicantRecordByApplicantRecordIdQuery,
@@ -130,8 +133,14 @@ export type {
   LoginWithGoogleMutationVariables,
   RefreshMutation,
   RefreshMutationVariables,
+  ReportInterviewConflictMutation,
+  ReportInterviewConflictMutationVariables,
   ReportReviewConflictMutation,
   ReportReviewConflictMutationVariables,
+  ReviewedApplicantRecordsByApplicantRecordIdQuery,
+  ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
+  ReviewDashboardQuery,
+  ReviewDashboardQueryVariables,
   SubmitInterviewScoresMutation,
   SubmitInterviewScoresMutationVariables,
   UpdateInterviewGroupMutation,
@@ -179,6 +188,10 @@ export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
   Operations.UpdateInterviewGroupSchedulingLinkMutation,
   "updateInterviewGroupSchedulingLink"
 >;
+export type ApplicationResult = OperationField<
+  Operations.ApplicationQuery,
+  "application"
+>;
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
@@ -190,4 +203,18 @@ export type InterviewedApplicantRecordResult = OperationField<
 export type SubmitInterviewScoresResult = OperationField<
   Operations.SubmitInterviewScoresMutation,
   "submitInterviewScores"
+>;
+export type ApplicantRecordWithReviewersResult = OperationField<
+  Operations.ReviewedApplicantRecordsByApplicantRecordIdQuery,
+  "reviewedApplicantRecordsByApplicantRecordId"
+>;
+export type ReviewedApplicantRecordWithReviewerResult = ArrayElement<
+  ApplicantRecordWithReviewersResult["reviewedApplicantRecords"]
+>;
+export type ReportInterviewConflictResult = OperationField<
+  Operations.ReportInterviewConflictMutation,
+  "reportInterviewConflict"
+>;
+export type ReviewDashboardResult = ArrayElement<
+  OperationField<Operations.ReviewDashboardQuery, "reviewDashboard">
 >;

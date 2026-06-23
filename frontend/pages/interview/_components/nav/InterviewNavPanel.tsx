@@ -43,7 +43,7 @@ export const InterviewNavPanel = ({
                 href={
                   applicantRecordId
                     ? item.path.replace("[applicantRecordId]", applicantRecordId)
-                    : "#"
+                    : item.path
                 }
                 className={`flex items-center justify-between self-stretch rounded-lg px-5 py-2.5 hover:bg-surface-highlight ${
                   active

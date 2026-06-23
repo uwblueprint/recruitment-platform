@@ -22,7 +22,7 @@ function isValidInterviewScores(interviewJson: Interview): boolean {
   };
 
   return !Object.entries(scores).some(
-    ([_field, value]) => value && (value < 1 || value > 5),
+    ([, value]) => value && (value < 1 || value > 5),
   );
 }
 
@@ -95,6 +95,7 @@ class InterviewedApplicantRecordsService
   async updateInterviewedApplicantRecord(
     id: string,
     interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO,
+    t?: any,
   ): Promise<InterviewedApplicantRecordDTO> {
     try {
       const record: InterviewedApplicantRecord | null = await InterviewedApplicantRecord.findByPk(

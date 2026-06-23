@@ -4,6 +4,13 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type * as Types from './types';
 
+export type ApplicationQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type ApplicationQuery = { application: { id: string, academicOrCoop: string, academicYear: string, email: string, firstName: string, lastName: string, heardFrom: string, locationPreference: string, program: string, pronouns: string, pronounsSpecified: string, resumeUrl: string, status: Types.ApplicationStatus, term: string, timesApplied: string, roleSpecificQuestions: Array<{ question: string, answer: string }>, shortAnswerQuestions: Array<{ question: string, answer: string }> } };
+
 export type InterviewGroupQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -62,6 +69,15 @@ export type RefreshMutationVariables = Exact<{
 
 export type RefreshMutation = { refresh: string };
 
+export type ReportInterviewConflictMutationVariables = Exact<{
+  interviewedApplicantRecordId: string | number;
+  interviewerId: string | number;
+  interviewHasConflict: Types.InterviewConflict;
+}>;
+
+
+export type ReportInterviewConflictMutation = { reportInterviewConflict: { id: string, status: Types.InterviewStatus } };
+
 export type ReportReviewConflictMutationVariables = Exact<{
   applicantRecordId: string | number;
   reviewerId: string | number;
@@ -69,6 +85,21 @@ export type ReportReviewConflictMutationVariables = Exact<{
 
 
 export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRecordId: string, reviewerId: string, status: string, score: number | null, reviewerHasConflict: boolean } };
+
+export type ReviewDashboardQueryVariables = Exact<{
+  pageNumber: number;
+  resultsPerPage: number;
+}>;
+
+
+export type ReviewDashboardQuery = { reviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, timesApplied: string, applicationStatus: Types.ApplicationStatus, choice: number, totalScore: number | null, reviewers: Array<{ id: string, firstName: string, lastName: string, email: string, position: string | null, role: Types.Role, isArchived: boolean }> }> };
+
+export type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type ReviewedApplicantRecordsByApplicantRecordIdQuery = { reviewedApplicantRecordsByApplicantRecordId: { applicantRecord: { id: string, position: string, combinedReviewScore: number | null }, reviewedApplicantRecords: Array<{ reviewer: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }, reviewedApplicantRecord: { status: string, score: number | null, reviewerHasConflict: boolean, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } }> } };
 
 export type SubmitInterviewScoresMutationVariables = Exact<{
   id: string | number;

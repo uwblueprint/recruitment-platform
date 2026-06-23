@@ -33,6 +33,12 @@ export type ApplicantRecordDto = {
   status: ApplicationStatus;
 };
 
+export type ApplicantRecordWithReviewersDto = {
+  __typename?: 'ApplicantRecordWithReviewersDTO';
+  applicantRecord: ApplicantRecordDto;
+  reviewedApplicantRecords: Array<ReviewedApplicantRecordWithReviewerDto>;
+};
+
 export type ApplicationDto = {
   __typename?: 'ApplicationDTO';
   academicOrCoop: Scalars['String']['output'];
@@ -198,6 +204,7 @@ export type InterviewPairingsDto = {
 
 export enum InterviewStatus {
   Complete = 'COMPLETE',
+  ConflictReported = 'CONFLICT_REPORTED',
   InProgress = 'IN_PROGRESS',
   NeedsReview = 'NEEDS_REVIEW'
 }
@@ -253,6 +260,7 @@ export type Mutation = {
   logout?: Maybe<Scalars['ID']['output']>;
   refresh: Scalars['String']['output'];
   register: AuthDto;
+  reportInterviewConflict: InterviewedApplicantRecord;
   reportReviewConflict: ReviewedApplicantRecordDto;
   resetPassword: Scalars['Boolean']['output'];
   submitInterviewScores: InterviewedApplicantRecord;
@@ -420,6 +428,13 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationReportInterviewConflictArgs = {
+  interviewHasConflict: InterviewConflict;
+  interviewedApplicantRecordId: Scalars['ID']['input'];
+  interviewerId: Scalars['ID']['input'];
+};
+
+
 export type MutationReportReviewConflictArgs = {
   applicantRecordId: Scalars['ID']['input'];
   reviewerId: Scalars['ID']['input'];
@@ -527,6 +542,7 @@ export type Query = {
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
+  reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
   reviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
   simpleEntities: Array<SimpleEntityResponseDto>;
   simpleEntitiesCSV: Scalars['String']['output'];
@@ -628,6 +644,11 @@ export type QueryReviewedApplicantRecordArgs = {
 };
 
 
+export type QueryReviewedApplicantRecordsByApplicantRecordIdArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryReviewedApplicantsByUserIdArgs = {
   userId: Scalars['ID']['input'];
 };
@@ -673,6 +694,7 @@ export type ReviewDashboardReviewDetails = {
 
 export type ReviewDashboardRowDto = {
   __typename?: 'ReviewDashboardRowDTO';
+  applicantRecordId: Scalars['ID']['output'];
   applicationStatus: ApplicationStatus;
   choice: Scalars['Int']['output'];
   firstName: Scalars['String']['output'];
@@ -719,6 +741,12 @@ export type ReviewedApplicantRecordDto = {
   reviewerId: Scalars['ID']['output'];
   score?: Maybe<Scalars['Int']['output']>;
   status: Scalars['String']['output'];
+};
+
+export type ReviewedApplicantRecordWithReviewerDto = {
+  __typename?: 'ReviewedApplicantRecordWithReviewerDTO';
+  reviewedApplicantRecord: ReviewedApplicantRecordDto;
+  reviewer: UserDto;
 };
 
 export type ReviewedApplicantsDto = {

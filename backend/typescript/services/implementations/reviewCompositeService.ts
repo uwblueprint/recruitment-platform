@@ -1,20 +1,25 @@
-import { Op } from "sequelize";
+import { Op, Order, OrderItem, col, literal } from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
 import User from "../../models/user.model";
 import {
+  ApplicantRecordWithReviewersDTO,
   CreateReviewedApplicantRecordDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
+  ReviewDashboardSortBy,
+  ReviewDashboardSortByEnum,
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
   ReviewStatusEnum,
 } from "../../types";
 import {
+  toApplicantRecordDTO,
   toReviewDashboardRowDTO,
   toReviewDashboardSidePanelDTO,
   toReviewedApplicantDTO,
+  toReviewedApplicantRecordWithReviewerDTO,
 } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
@@ -27,6 +32,38 @@ const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
 
 class ReviewCompositeService implements IReviewCompositeService {
   /* eslint-disable class-methods-use-this */
+
+  async getReviewedApplicantRecordsByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<ApplicantRecordWithReviewersDTO> {
+    try {
+      const applicantRecord = await ApplicantRecord.findByPk(applicantRecordId);
+      if (!applicantRecord) {
+        throw new Error(
+          `ApplicantRecord with id ${applicantRecordId} not found.`,
+        );
+      }
+
+      const records = await ReviewedApplicantRecord.findAll({
+        where: { applicant_record_id: applicantRecordId },
+        include: [{ model: User, as: "reviewer" }],
+      });
+
+      return {
+        applicantRecord: toApplicantRecordDTO(applicantRecord),
+        reviewedApplicantRecords: records.map(
+          toReviewedApplicantRecordWithReviewerDTO,
+        ),
+      };
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get reviewed applicant records by applicant record id. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
 
   async getReviewedApplicantsByUserId(
     userId: string,
@@ -61,6 +98,8 @@ class ReviewCompositeService implements IReviewCompositeService {
   async getReviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    sortBy?: ReviewDashboardSortBy,
+    sortAscending?: boolean,
   ): Promise<ReviewDashboardRowDTO[]> {
     try {
       const perPage = Number.isFinite(Number(resultsPerPage))
@@ -71,16 +110,74 @@ class ReviewCompositeService implements IReviewCompositeService {
         : 1;
       const offsetRow = (currentPage - 1) * perPage;
 
+      const direction = sortAscending === false ? "DESC" : "ASC";
+
+      const sortColumnMap: Record<
+        Exclude<ReviewDashboardSortBy, "REVIEWER_1" | "REVIEWER_2">,
+        OrderItem
+      > = {
+        FIRST_NAME: [col("applicant.first_name"), direction],
+        LAST_NAME: [col("applicant.last_name"), direction],
+        TIMES_APPLIED: [col("applicant.times_applied"), direction],
+        CHOICE: ["choice", direction],
+        TOTAL_SCORE: ["combined_review_score", direction],
+        APPLICATION_STATUS: ["status", direction],
+      };
+
+      // Reviewers are a hasMany loaded via `separate: true`, so their names are
+      // not in this query and a plain ORDER BY can't reference them. Instead,
+      // order by the Nth reviewer's "last first" name via a correlated subquery
+      // (LIMIT 1 OFFSET idx mirrors how reviewers[idx] is picked in the DTO).
+      // Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows
+      // land on each page — sorting the returned page in JS would only order
+      // within a page, since the DB would already have chosen the page by id.
+      // COALESCE(...,'') keeps records missing that reviewer ordered as empty
+      // strings (first on ASC, last on DESC), and id is a stable tiebreak.
+      let order: Order;
+      if (
+        sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ||
+        sortBy === ReviewDashboardSortByEnum.REVIEWER_2
+      ) {
+        const idx = sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ? 0 : 1;
+        order = [
+          [
+            literal(`COALESCE((
+              SELECT u."last_name" || ' ' || u."first_name"
+              FROM "reviewed_applicant_records" AS r
+              JOIN "users" AS u ON u."id" = r."reviewer_id"
+              WHERE r."applicant_record_id" = "ApplicantRecord"."id"
+              ORDER BY r."createdAt" ASC, r."reviewer_id" ASC
+              LIMIT 1 OFFSET ${idx}
+            ), '')`),
+            direction,
+          ],
+          ["id", "ASC"],
+        ];
+      } else if (sortBy) {
+        order = [sortColumnMap[sortBy], ["id", "ASC"]];
+      } else {
+        order = [["id", "ASC"]];
+      }
+
       // get applicant_record
       // JOIN applicant ON applicant_id
       // JOIN reviewed_applicant_record ON applicant_record_id
       // JOIN user ON reviewer_id
+      //
+      // separate: true runs the hasMany as a second query, so the main query is a
+      // plain BelongsTo join — Sequelize won't wrap it in a subquery, which lets
+      // ORDER BY reference the "applicant" table directly.
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: { exclude: ["createdAt", "updatedAt"] },
         include: [
           {
-            attributes: { exclude: ["createdAt", "updatedAt"] },
+            attributes: { exclude: ["updatedAt"] },
             model: ReviewedApplicantRecord,
+            separate: true,
+            order: [
+              ["createdAt", "ASC"],
+              ["reviewer_id", "ASC"],
+            ] as Order,
             include: [
               {
                 attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -93,7 +190,7 @@ class ReviewCompositeService implements IReviewCompositeService {
             model: Applicant,
           },
         ],
-        order: [["id", "ASC"]],
+        order,
         limit: perPage,
         offset: offsetRow,
       });

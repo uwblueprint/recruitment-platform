@@ -18,7 +18,7 @@ export const InterviewFooter = ({
   continueDisabled = false,
 }: InterviewFooterProps) => {
   return (
-    <div className="w-full bg-white px-6 py-3">
+    <div className="w-full bg-white px-6 py-3 min-h-[60px]">
       <div className="flex items-center justify-end gap-3">
         {onBack && (
           <Button size="sm" variant="secondary" onClick={onBack}>

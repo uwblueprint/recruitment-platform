@@ -12,14 +12,17 @@ import {
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewedApplicantRecordDTO,
+  ReviewedApplicantRecordWithReviewerDTO,
   ReviewedApplicantsDTO,
   ReviewStatus,
   SkillCategory,
   UserDTO,
+  FirebaseFileDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
 import ApplicantRecord from "../models/applicantRecord.model";
+import FirebaseFile from "../models/firebaseFile.model";
 import InterviewDelegation from "../models/interviewDelegation.model";
 import InterviewGroup from "../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
@@ -38,6 +41,15 @@ export function toUserDTO(model: User): UserDTO {
   };
 }
 
+function toShortAnswerQuestions(
+  raw: { question: string; response?: string; answer?: string }[] | undefined,
+): { question: string; answer: string }[] {
+  return (raw ?? []).map(({ question, response, answer }) => ({
+    question,
+    answer: answer ?? response ?? "",
+  }));
+}
+
 export function toApplicantRecordDTO(
   model: ApplicantRecord,
 ): ApplicantRecordDTO {
@@ -45,7 +57,9 @@ export function toApplicantRecordDTO(
     id: model.id,
     applicantId: model.applicant_id,
     position: model.position,
-    roleSpecificQuestions: model.role_specific_questions,
+    roleSpecificQuestions: toShortAnswerQuestions(
+      model.role_specific_questions,
+    ),
     choice: model.choice,
     status: model.status,
     skillCategory: model.skill_category,
@@ -68,7 +82,7 @@ export function toApplicantDTO(model: Applicant): ApplicantDTO {
     pronouns: model.pronouns,
     resumeUrl: model.resume_url,
     timesApplied: model.times_applied,
-    shortAnswerQuestions: model.short_answer_questions,
+    shortAnswerQuestions: toShortAnswerQuestions(model.short_answer_questions),
     term: model.term,
     submittedAt: model.submitted_at,
   };
@@ -128,6 +142,20 @@ export function toReviewedApplicantRecordDTO(
     status: model.status,
     score: model.score,
     reviewerHasConflict: model.reviewer_has_conflict,
+  };
+}
+
+export function toReviewedApplicantRecordWithReviewerDTO(
+  model: ReviewedApplicantRecord,
+): ReviewedApplicantRecordWithReviewerDTO {
+  if (!model.reviewer) {
+    throw new Error(
+      `ReviewedApplicantRecord (applicant_record_id=${model.applicant_record_id}, reviewer_id=${model.reviewer_id}) is missing its reviewer association.`,
+    );
+  }
+  return {
+    reviewer: toUserDTO(model.reviewer),
+    reviewedApplicantRecord: toReviewedApplicantRecordDTO(model),
   };
 }
 
@@ -196,6 +224,7 @@ export function toReviewDashboardRowDTO(
   applicantRecord: ApplicantRecord,
 ): ReviewDashboardRowDTO {
   return {
+    applicantRecordId: applicantRecord.id,
     firstName: applicantRecord.applicant.first_name,
     lastName: applicantRecord.applicant.last_name,
     position: applicantRecord.position,
@@ -219,5 +248,15 @@ export function toInterviewedApplicantDTO(
     interviewStatus: model.status,
     applicantFirstName: model.applicant_record.applicant.first_name,
     applicantLastName: model.applicant_record.applicant.last_name,
+  };
+}
+
+export function toFirebaseFileDTO(model: FirebaseFile): FirebaseFileDTO {
+  return {
+    id: model.id,
+    storagePath: model.storage_path,
+    originalFileName: model.original_file_name,
+    uploadedUserId: model.uploaded_user_id,
+    sizeBytes: Number(model.size_bytes),
   };
 }

@@ -11,6 +11,7 @@ interface ReviewPageLayoutProps {
   endData?: ReviewEndData;
   onValidate?: () => boolean;
   children: ReactNode;
+  viewOnly?: boolean;
 }
 
 export const ReviewPageLayout = ({
@@ -19,6 +20,7 @@ export const ReviewPageLayout = ({
   endData,
   onValidate,
   children,
+  viewOnly = false,
 }: ReviewPageLayoutProps) => {
   return (
     <SplitPanelLayout
@@ -29,6 +31,7 @@ export const ReviewPageLayout = ({
           scores={scores}
           endData={endData}
           onValidate={onValidate}
+          viewOnly={viewOnly}
         />
       }
     >
