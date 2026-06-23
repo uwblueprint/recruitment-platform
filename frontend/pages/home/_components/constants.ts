@@ -4,8 +4,21 @@ import {
   ReviewStatus,
 } from "@/graphql/typeUtils";
 
-export const TABS = ["Application Review", "Interview Review", "Interview Pairing"] as const;
-export type Tab = (typeof TABS)[number];
+type ValueOf<T> = T[keyof T];
+
+export const HomeTab = {
+  APPLICATION_REVIEW: "Application Review",
+  INTERVIEW_REVIEW: "Interview Review",
+  INTERVIEW_PAIRING: "Interview Pairing",
+} as const;
+
+export type Tab = ValueOf<typeof HomeTab>;
+
+export const TABS = [
+  HomeTab.APPLICATION_REVIEW,
+  HomeTab.INTERVIEW_REVIEW,
+  HomeTab.INTERVIEW_PAIRING,
+] as const;
 
 export const REVIEW_STATUS_LABEL: Record<ReviewStatus, string> = {
   [ReviewStatus.Todo]: "Needs Review",

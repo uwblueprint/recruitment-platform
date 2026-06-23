@@ -15,6 +15,7 @@ import IllustrationPanel from "./_components/IllustrationPanel";
 import Tabs from "@/components/common/Tabs";
 import {
   Tab,
+  HomeTab,
   TABS,
   REVIEW_STATUS_LABEL,
   REVIEW_STATUS_VARIANT,
@@ -51,7 +52,7 @@ const HomePage: NextPageWithLayout = () => {
   const router = useRouter();
   const user = useAuthenticatedUser();
 
-  const [activeTab, setActiveTab] = useState<Tab>(TABS[0]);
+  const [activeTab, setActiveTab] = useState<Tab>(HomeTab.APPLICATION_REVIEW);
   const [reviewedApplicants, setReviewedApplicants] = useState<ReviewedApplicantResult[]>([]);
   const [interviewedApplicants, setInterviewedApplicants] = useState<InterviewedApplicantsDTO[]>([]);
   const [interviewedPairings, setInterviewedPairings] = useState<InterviewedPairingResult[]>([]);
@@ -74,9 +75,9 @@ const HomePage: NextPageWithLayout = () => {
   }, [user?.id]);
 
   const tabCounts: Record<Tab, number> = {
-    "Application Review": reviewedApplicants.length,
-    "Interview Review": interviewedApplicants.length,
-    "Interview Pairing": interviewedPairings.length,
+    [HomeTab.APPLICATION_REVIEW]: reviewedApplicants.length,
+    [HomeTab.INTERVIEW_REVIEW]: interviewedApplicants.length,
+    [HomeTab.INTERVIEW_PAIRING]: interviewedPairings.length,
   };
 
   const totalApplications =
@@ -105,7 +106,7 @@ const HomePage: NextPageWithLayout = () => {
       />
 
       <div className="mt-6">
-        {activeTab === "Application Review" &&
+        {activeTab === HomeTab.APPLICATION_REVIEW &&
           (reviewedApplicants.length === 0 ? (
             <EmptyState message="No applicants assigned." />
           ) : (
@@ -134,7 +135,7 @@ const HomePage: NextPageWithLayout = () => {
             </HomeTable>
           ))}
 
-        {activeTab === "Interview Review" &&
+        {activeTab === HomeTab.INTERVIEW_REVIEW &&
           (interviewedApplicants.length === 0 ? (
             <EmptyState message="No applicants assigned." />
           ) : (
@@ -163,7 +164,7 @@ const HomePage: NextPageWithLayout = () => {
             </HomeTable>
           ))}
 
-        {activeTab === "Interview Pairing" &&
+        {activeTab === HomeTab.INTERVIEW_PAIRING &&
           (interviewedPairings.length === 0 ? (
             <EmptyState message="Interview pairs have not been released yet." />
           ) : (
