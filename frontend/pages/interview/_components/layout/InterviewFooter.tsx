@@ -7,6 +7,7 @@ interface InterviewFooterProps {
   // Only shown if provided.
   onContinue?: () => void;
   continueLabel?: string;
+  continueDisabled?: boolean;
 }
 
 export const InterviewFooter = ({
@@ -14,6 +15,7 @@ export const InterviewFooter = ({
   backLabel = "Back to home",
   onContinue,
   continueLabel = "Continue",
+  continueDisabled = false,
 }: InterviewFooterProps) => {
   return (
     <div className="w-full bg-white px-6 py-3">
@@ -24,7 +26,7 @@ export const InterviewFooter = ({
           </Button>
         )}
         {onContinue && (
-          <Button size="sm" onClick={onContinue}>
+          <Button size="sm" onClick={onContinue} disabled={continueDisabled}>
             {continueLabel}
           </Button>
         )}

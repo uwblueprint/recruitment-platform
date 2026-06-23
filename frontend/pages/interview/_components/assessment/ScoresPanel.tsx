@@ -1,10 +1,9 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
+import { SkillCategory } from "@/graphql/typeUtils";
 
-type ScoreKey = "passionFSG" | "teamPlayer" | "desireToLearn" | "skill";
+export type ScoreKey = "passionFSG" | "teamPlayer" | "desireToLearn" | "skill";
 
-type SkillCategory = "JUNIOR" | "INTERMEDIATE" | "SENIOR";
-
-type ScoreFormState = {
+export type ScoreFormState = {
   passionFSG: number | "";
   teamPlayer: number | "";
   desireToLearn: number | "";
@@ -12,6 +11,25 @@ type ScoreFormState = {
   skillCategory: SkillCategory | "";
   comments: string;
 };
+
+export const EMPTY_SCORE_FORM: ScoreFormState = {
+  passionFSG: "",
+  teamPlayer: "",
+  desireToLearn: "",
+  skill: "",
+  skillCategory: "",
+  comments: "",
+};
+
+export function isScoreFormComplete(form: ScoreFormState): boolean {
+  return (
+    typeof form.passionFSG === "number" &&
+    typeof form.teamPlayer === "number" &&
+    typeof form.desireToLearn === "number" &&
+    typeof form.skill === "number" &&
+    form.skillCategory !== ""
+  );
+}
 
 const SCORE_ROWS: { key: ScoreKey; label: string }[] = [
   { key: "passionFSG", label: "Passion for Social Good" },
@@ -28,9 +46,9 @@ const SKILL_CATEGORY_OPTIONS: { value: SkillCategory; label: string }[] = [
 
 const MAX_TOTAL = 20;
 
-function computeTotal(scores: Pick<ScoreFormState, ScoreKey>): number {
+function computeTotal(form: ScoreFormState): number {
   return SCORE_ROWS.reduce((sum, { key }) => {
-    const v = scores[key];
+    const v = form[key];
     return sum + (typeof v === "number" ? v : 0);
   }, 0);
 }
@@ -61,20 +79,16 @@ const ScoreInput = ({
   />
 );
 
-export const ScoresPanel = () => {
-  const [form, setForm] = useState<ScoreFormState>({
-    passionFSG: "",
-    teamPlayer: "",
-    desireToLearn: "",
-    skill: "",
-    skillCategory: "",
-    comments: "",
-  });
+interface ScoresPanelProps {
+  form: ScoreFormState;
+  onChange: (form: ScoreFormState) => void;
+}
 
+export const ScoresPanel = ({ form, onChange }: ScoresPanelProps) => {
   const total = computeTotal(form);
 
   const setScore = (key: ScoreKey, value: number | "") => {
-    setForm((prev) => ({ ...prev, [key]: value }));
+    onChange({ ...form, [key]: value });
   };
 
   return (
@@ -124,10 +138,10 @@ export const ScoresPanel = () => {
             <select
               value={form.skillCategory}
               onChange={(e) =>
-                setForm((prev) => ({
-                  ...prev,
+                onChange({
+                  ...form,
                   skillCategory: e.target.value as SkillCategory | "",
-                }))
+                })
               }
               className="w-40 rounded border border-neutral-200 px-3 py-2 font-poppins text-sm text-neutral-800 focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue"
             >
@@ -161,9 +175,7 @@ export const ScoresPanel = () => {
         </h3>
         <textarea
           value={form.comments}
-          onChange={(e) =>
-            setForm((prev) => ({ ...prev, comments: e.target.value }))
-          }
+          onChange={(e) => onChange({ ...form, comments: e.target.value })}
           placeholder="Leave Comments here"
           rows={5}
           className="w-full resize-none rounded-lg border border-neutral-200 px-4 py-3 font-poppins text-sm text-neutral-800 placeholder:text-neutral-200 focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue"

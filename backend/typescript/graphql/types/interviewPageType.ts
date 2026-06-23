@@ -18,6 +18,14 @@ const interviewPageType = gql`
     interviewedApplicantsByUserId(userId: ID!): [InterviewedApplicantsDTO!]!
     interviewedPairingsByUserId(userId: ID!): [InterviewPairingsDTO!]!
     interviewersByGroupId(groupId: ID!): [UserDTO!]!
+    interviewedApplicantRecordByApplicantRecordId(applicantRecordId: ID!): InterviewedApplicantRecord!
+  }
+
+  extend type Mutation {
+    submitInterviewScores(
+      id: ID!
+      interviewJson: InterviewInput!
+    ): InterviewedApplicantRecord!
   }
 `;
 

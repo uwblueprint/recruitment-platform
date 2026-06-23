@@ -11,6 +11,13 @@ export type InterviewGroupQueryVariables = Exact<{
 
 export type InterviewGroupQuery = { interviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
 
+export type InterviewedApplicantRecordByApplicantRecordIdQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type InterviewedApplicantRecordByApplicantRecordIdQuery = { interviewedApplicantRecordByApplicantRecordId: { id: string, applicantRecordId: string, score: number | null, status: Types.InterviewStatus, interviewNotesId: string | null, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
+
 export type InterviewedApplicantsByUserIdQueryVariables = Exact<{
   userId: string | number;
 }>;
@@ -62,6 +69,14 @@ export type ReportReviewConflictMutationVariables = Exact<{
 
 
 export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRecordId: string, reviewerId: string, status: string, score: number | null, reviewerHasConflict: boolean } };
+
+export type SubmitInterviewScoresMutationVariables = Exact<{
+  id: string | number;
+  interviewJson: Types.InterviewInput;
+}>;
+
+
+export type SubmitInterviewScoresMutation = { submitInterviewScores: { id: string, score: number | null, status: Types.InterviewStatus, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
 
 export type UpdateInterviewGroupMutationVariables = Exact<{
   id: string | number;

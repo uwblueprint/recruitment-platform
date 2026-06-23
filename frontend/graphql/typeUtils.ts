@@ -101,12 +101,14 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  */
 export {
   InterviewedApplicantsByUserIdDocument,
+  InterviewedApplicantRecordByApplicantRecordIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
   RefreshDocument,
   ReportReviewConflictDocument,
+  SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
 } from "./__generated__/graphql";
@@ -114,6 +116,8 @@ export {
 export type {
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
+  InterviewedApplicantRecordByApplicantRecordIdQuery,
+  InterviewedApplicantRecordByApplicantRecordIdQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
   InterviewersByGroupIdQuery,
@@ -128,6 +132,8 @@ export type {
   RefreshMutationVariables,
   ReportReviewConflictMutation,
   ReportReviewConflictMutationVariables,
+  SubmitInterviewScoresMutation,
+  SubmitInterviewScoresMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
@@ -176,4 +182,12 @@ export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export type InterviewedApplicantRecordResult = OperationField<
+  Operations.InterviewedApplicantRecordByApplicantRecordIdQuery,
+  "interviewedApplicantRecordByApplicantRecordId"
+>;
+export type SubmitInterviewScoresResult = OperationField<
+  Operations.SubmitInterviewScoresMutation,
+  "submitInterviewScores"
 >;

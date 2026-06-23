@@ -50,6 +50,27 @@ class InterviewedApplicantRecordsService
     }
   }
 
+  async getInterviewedApplicantRecordByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<InterviewedApplicantRecordDTO> {
+    try {
+      const record = await InterviewedApplicantRecord.findOne({
+        where: { applicant_record_id: applicantRecordId },
+      });
+      if (!record) {
+        throw new Error(
+          `No interviewed applicant record with applicant record id ${applicantRecordId} found.`,
+        );
+      }
+      return toInterviewedApplicantRecordDTO(record);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to fetch interviewed applicant record by applicant record id. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
   async createInterviewedApplicantRecord(
     interviewedApplicantRecord: CreateInterviewedApplicantRecordDTO,
   ): Promise<InterviewedApplicantRecordDTO> {

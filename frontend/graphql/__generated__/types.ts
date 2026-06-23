@@ -255,6 +255,7 @@ export type Mutation = {
   register: AuthDto;
   reportReviewConflict: ReviewedApplicantRecordDto;
   resetPassword: Scalars['Boolean']['output'];
+  submitInterviewScores: InterviewedApplicantRecord;
   updateAdminComment: AdminCommentDto;
   updateApplicantRecordIsApplicantFlagged: ApplicantRecordDto;
   updateApplicantRecordStatus: ApplicantRecordDto;
@@ -430,6 +431,12 @@ export type MutationResetPasswordArgs = {
 };
 
 
+export type MutationSubmitInterviewScoresArgs = {
+  id: Scalars['ID']['input'];
+  interviewJson: InterviewInput;
+};
+
+
 export type MutationUpdateAdminCommentArgs = {
   adminComment: UpdateAdminCommentDto;
   id: Scalars['ID']['input'];
@@ -511,6 +518,7 @@ export type Query = {
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
   interviewedApplicantRecord: InterviewedApplicantRecord;
+  interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
   interviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
   interviewedPairingsByUserId: Array<InterviewPairingsDto>;
   interviewersByGroupId: Array<UserDto>;
@@ -568,6 +576,11 @@ export type QueryInterviewGroupArgs = {
 
 export type QueryInterviewedApplicantRecordArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewedApplicantRecordByApplicantRecordIdArgs = {
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
