@@ -3,13 +3,16 @@ import User from "../../models/user.model";
 import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.model";
 import {
   CreateInterviewDelegationDTO,
+  Interview,
   InterviewDelegationDTO,
+  InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
   InterviewNotesDTO,
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
+import InterviewedApplicantRecordsService from "./interviewedApplicantRecordService";
 import { toInterviewedApplicantDTO, toUserDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
@@ -18,7 +21,6 @@ import FileStorageService from "./fileStorageService";
 import FirebaseFileService from "./firebaseFileService";
 import InterviewDelegationService from "./interviewDelegationService";
 import InterviewGroupService from "./interviewGroupService";
-import InterviewedApplicantRecordsService from "./interviewedApplicantRecordService";
 import IFirebaseFileService from "../interfaces/IFirebaseFileService";
 import IInterviewDelegationService from "../interfaces/IInterviewDelegationService";
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
@@ -85,6 +87,8 @@ function dedupeUsersById(users: User[]): User[] {
 }
 
 class InterviewCompositeService implements IInterviewCompositeService {
+  private interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
+
   /* eslint-disable class-methods-use-this */
   async getInterviewedApplicantsByUserId(
     userId: string,
@@ -327,6 +331,23 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to delegate interviewers. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async submitInterviewScores(
+    interviewedApplicantRecordId: string,
+    scores: Interview,
+  ): Promise<InterviewedApplicantRecordDTO> {
+    try {
+      return await this.interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
+        interviewedApplicantRecordId,
+        { interviewJson: scores },
+      );
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to submit interview scores. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     }

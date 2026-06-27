@@ -92,9 +92,6 @@ export type UpdateReviewedApplicantRecordDTO =
 export type UpdateUserDTO = Schema.UpdateUserDto;
 
 /**
- * Re-export generated operation result and variable types from one stable place.
- */
-/**
  * Re-export typed GraphQL documents from the client preset artifact.
  *
  * Import documents from this file instead of `__generated__/graphql` directly.
@@ -102,6 +99,7 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
 export {
   ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
+  InterviewedApplicantRecordByApplicantRecordIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   IsAuthorizedByRoleDocument,
@@ -111,6 +109,7 @@ export {
   ReportReviewConflictDocument,
   ReviewedApplicantRecordsByApplicantRecordIdDocument,
   ReviewDashboardDocument,
+  SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
 } from "./__generated__/graphql";
@@ -120,6 +119,8 @@ export type {
   ApplicationQueryVariables,
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
+  InterviewedApplicantRecordByApplicantRecordIdQuery,
+  InterviewedApplicantRecordByApplicantRecordIdQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
   InterviewersByGroupIdQuery,
@@ -140,6 +141,8 @@ export type {
   ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
   ReviewDashboardQuery,
   ReviewDashboardQueryVariables,
+  SubmitInterviewScoresMutation,
+  SubmitInterviewScoresMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
@@ -192,6 +195,14 @@ export type ApplicationResult = OperationField<
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export type InterviewedApplicantRecordResult = OperationField<
+  Operations.InterviewedApplicantRecordByApplicantRecordIdQuery,
+  "interviewedApplicantRecordByApplicantRecordId"
+>;
+export type SubmitInterviewScoresResult = OperationField<
+  Operations.SubmitInterviewScoresMutation,
+  "submitInterviewScores"
 >;
 export type ApplicantRecordWithReviewersResult = OperationField<
   Operations.ReviewedApplicantRecordsByApplicantRecordIdQuery,

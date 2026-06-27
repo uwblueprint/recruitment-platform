@@ -1,5 +1,5 @@
 import { PanelLayout } from "@/components/layouts/PanelLayout";
-import { NextPageWithLayout } from "@/pages/_app";
+import { NextPageWithLayout } from "../../../_app";
 import {
   useInterviewProgress,
   PROFILE_HEADER_STEPS,

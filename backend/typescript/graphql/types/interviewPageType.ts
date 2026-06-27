@@ -24,17 +24,21 @@ const interviewPageType = gql`
     interviewedApplicantsByUserId(userId: ID!): [InterviewedApplicantsDTO!]!
     interviewedPairingsByUserId(userId: ID!): [InterviewPairingsDTO!]!
     interviewersByGroupId(groupId: ID!): [UserDTO!]!
+    interviewedApplicantRecordByApplicantRecordId(applicantRecordId: ID!): InterviewedApplicantRecord!
     interviewNotes(interviewedApplicantRecordId: ID!): InterviewNotes
   }
 
   extend type Mutation {
+    submitInterviewScores(
+      id: ID!
+      interviewJson: InterviewInput!
+    ): InterviewedApplicantRecord!
+
     uploadInterviewNotes(
       interviewedApplicantRecordId: ID!
       file: Upload!
     ): InterviewNotes!
-  }
 
-  extend type Mutation {
     reportInterviewConflict(
       interviewedApplicantRecordId: ID!
       interviewerId: ID!

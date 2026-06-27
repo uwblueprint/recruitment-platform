@@ -6,6 +6,7 @@ import InterviewCompositeService from "../../services/implementations/interviewC
 import InterviewDelegationService from "../../services/implementations/interviewDelegationService";
 import InterviewedApplicantRecordsService from "../../services/implementations/interviewedApplicantRecordService";
 import {
+  Interview,
   InterviewConflict,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -42,11 +43,17 @@ const interviewPageResolvers = {
     ): Promise<UserDTO[]> => {
       return interviewCompositeService.getInterviewersByGroupId(groupId);
     },
+    interviewedApplicantRecordByApplicantRecordId: async (
+      _parent: undefined,
+      { applicantRecordId }: { applicantRecordId: string },
+    ): Promise<InterviewedApplicantRecordDTO> => {
+      return interviewedApplicantRecordsService.getInterviewedApplicantRecordByApplicantRecordId(
+        applicantRecordId,
+      );
+    },
     interviewNotes: async (
       _parent: undefined,
-      {
-        interviewedApplicantRecordId,
-      }: { interviewedApplicantRecordId: string },
+      { interviewedApplicantRecordId }: { interviewedApplicantRecordId: string },
     ): Promise<InterviewNotesDTO | null> => {
       return interviewCompositeService.getInterviewNotesByInterviewedApplicantRecordId(
         interviewedApplicantRecordId,
@@ -54,6 +61,12 @@ const interviewPageResolvers = {
     },
   },
   Mutation: {
+    submitInterviewScores: async (
+      _parent: undefined,
+      { id, interviewJson }: { id: string; interviewJson: Interview },
+    ): Promise<InterviewedApplicantRecordDTO> => {
+      return interviewCompositeService.submitInterviewScores(id, interviewJson);
+    },
     uploadInterviewNotes: async (
       _parent: undefined,
       {
@@ -94,13 +107,11 @@ const interviewPageResolvers = {
           { interviewHasConflict },
           t,
         );
-
         const result = await interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
           interviewedApplicantRecordId,
           { status: InterviewStatusEnum.CONFLICT_REPORTED },
           t,
         );
-
         await t.commit();
         return result;
       } catch (error) {
