@@ -24,7 +24,9 @@ const interviewPageType = gql`
     interviewedApplicantsByUserId(userId: ID!): [InterviewedApplicantsDTO!]!
     interviewedPairingsByUserId(userId: ID!): [InterviewPairingsDTO!]!
     interviewersByGroupId(groupId: ID!): [UserDTO!]!
-    interviewedApplicantRecordByApplicantRecordId(applicantRecordId: ID!): InterviewedApplicantRecord!
+    interviewedApplicantRecordByApplicantRecordId(
+      applicantRecordId: ID!
+    ): InterviewedApplicantRecord!
     interviewNotes(interviewedApplicantRecordId: ID!): InterviewNotes
   }
 

@@ -35,8 +35,11 @@ class AuthAPIClient {
       });
 
       return Boolean(data?.isAuthorizedByRole);
-    } catch {
-      throw new Error("Auth Validation Error");
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error("isAuthorizedByRole failed:", e);
+      const detail = e instanceof Error ? e.message : String(e);
+      throw new Error(`Auth Validation Error: ${detail}`);
     }
   }
 

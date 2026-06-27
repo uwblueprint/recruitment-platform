@@ -184,7 +184,7 @@ export type UpdateInterviewGroupSchedulingLinkMutation = { updateInterviewGroupS
 
 export type UploadInterviewNotesMutationVariables = Exact<{
   interviewedApplicantRecordId: string | number;
-  file: unknown;
+  file: File;
 }>;
 
 

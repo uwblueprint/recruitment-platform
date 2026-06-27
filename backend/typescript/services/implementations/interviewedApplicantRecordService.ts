@@ -65,7 +65,9 @@ class InterviewedApplicantRecordsService
       return toInterviewedApplicantRecordDTO(record);
     } catch (error: unknown) {
       Logger.error(
-        `Failed to fetch interviewed applicant record by applicant record id. Reason = ${getErrorMessage(error)}`,
+        `Failed to fetch interviewed applicant record by applicant record id. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }

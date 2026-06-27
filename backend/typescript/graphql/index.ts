@@ -1,5 +1,6 @@
 import { makeExecutableSchema, gql } from "apollo-server-express";
 import { applyMiddleware } from "graphql-middleware";
+import { GraphQLUpload } from "graphql-upload";
 import { merge } from "lodash";
 
 import {
@@ -68,6 +69,12 @@ const executableSchema = makeExecutableSchema({
     userType,
   ],
   resolvers: merge(
+    // `Upload` scalar resolver. The `scalar Upload` declaration lives in
+    // `entityType.ts` (predates this PR). With `uploads: false` on the
+    // ApolloServer, apollo-server v2 no longer auto-injects this resolver,
+    // so we register it here explicitly — otherwise `Upload!` arguments
+    // arrive as `null`.
+    { Upload: GraphQLUpload },
     adminCommentResolvers,
     applicantRecordResolvers,
     authResolvers,
@@ -157,6 +164,7 @@ const graphQLMiddlewares = {
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
     delegateInterviewers: authorizedBySuperAdmin(),
+    submitInterviewScores: authorizedByAllRoles(),
     uploadInterviewNotes: authorizedByAllRoles(),
   },
 };

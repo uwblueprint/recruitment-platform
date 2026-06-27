@@ -102,6 +102,7 @@ export {
   InterviewedApplicantRecordByApplicantRecordIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
+  InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
   RefreshDocument,
@@ -112,6 +113,7 @@ export {
   SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
+  UploadInterviewNotesDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -125,6 +127,8 @@ export type {
   InterviewedApplicantsByUserIdQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
+  InterviewNotesQuery,
+  InterviewNotesQueryVariables,
   IsAuthorizedByRoleQuery,
   IsAuthorizedByRoleQueryVariables,
   LoginMutation,
@@ -147,6 +151,8 @@ export type {
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
   UpdateInterviewGroupSchedulingLinkMutationVariables,
+  UploadInterviewNotesMutation,
+  UploadInterviewNotesMutationVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -203,6 +209,14 @@ export type InterviewedApplicantRecordResult = OperationField<
 export type SubmitInterviewScoresResult = OperationField<
   Operations.SubmitInterviewScoresMutation,
   "submitInterviewScores"
+>;
+export type InterviewNotesResult = OperationField<
+  Operations.InterviewNotesQuery,
+  "interviewNotes"
+>;
+export type UploadInterviewNotesResult = OperationField<
+  Operations.UploadInterviewNotesMutation,
+  "uploadInterviewNotes"
 >;
 export type ApplicantRecordWithReviewersResult = OperationField<
   Operations.ReviewedApplicantRecordsByApplicantRecordIdQuery,

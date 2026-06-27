@@ -53,7 +53,9 @@ const interviewPageResolvers = {
     },
     interviewNotes: async (
       _parent: undefined,
-      { interviewedApplicantRecordId }: { interviewedApplicantRecordId: string },
+      {
+        interviewedApplicantRecordId,
+      }: { interviewedApplicantRecordId: string },
     ): Promise<InterviewNotesDTO | null> => {
       return interviewCompositeService.getInterviewNotesByInterviewedApplicantRecordId(
         interviewedApplicantRecordId,

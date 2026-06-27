@@ -28,6 +28,7 @@ import {
   isScoreFormComplete,
   type ScoreFormState,
 } from "../../_components/assessment/ScoresPanel";
+import NotesUploader from "../../_components/assessment/NotesUploader";
 import InterviewAssessmentAPIClient from "@/APIClients/InterviewAssessmentAPIClient";
 import { type InterviewInput } from "@/graphql/typeUtils";
 
@@ -40,6 +41,12 @@ type AssessmentContextValue = {
   setForm: Dispatch<SetStateAction<ScoreFormState>>;
   recordId: string | null;
   isSubmitting: boolean;
+  // Tracks an in-flight interview-notes upload so the footer can disable
+  // "Submit & Finish" until the file is persisted server-side. Lives on the
+  // assessment context (not the notes uploader) because the footer is
+  // rendered outside the page slot in SplitPanelLayout.
+  isUploadingNotes: boolean;
+  setIsUploadingNotes: Dispatch<SetStateAction<boolean>>;
   error: string | null;
   submitScores: () => Promise<void>;
 };
@@ -55,11 +62,14 @@ const useAssessment = () => {
 
 const AssessmentProvider = ({ children }: { children: ReactNode }) => {
   const router = useRouter();
-  const applicantRecordId = router.query.applicantRecordId as string | undefined;
+  const applicantRecordId = router.isReady
+    ? (router.query.applicantRecordId as string | undefined)
+    : undefined;
 
   const [form, setForm] = useState<ScoreFormState>(EMPTY_SCORE_FORM);
   const [recordId, setRecordId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingNotes, setIsUploadingNotes] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -81,7 +91,12 @@ const AssessmentProvider = ({ children }: { children: ReactNode }) => {
           });
         }
       })
-      .catch(() => setError("Failed to load assessment record."));
+      .catch((e) => {
+        // eslint-disable-next-line no-console
+        console.error("Failed to load assessment record:", e);
+        const detail = e instanceof Error ? e.message : String(e);
+        setError(`Failed to load assessment record. ${detail}`);
+      });
   }, [applicantRecordId]);
 
   const submitScores = useCallback(async () => {
@@ -92,11 +107,13 @@ const AssessmentProvider = ({ children }: { children: ReactNode }) => {
       await InterviewAssessmentAPIClient.submitInterviewScores(
         recordId,
         {
-          passionFSG: form.passionFSG || undefined,
-          teamPlayer: form.teamPlayer || undefined,
-          desireToLearn: form.desireToLearn || undefined,
-          skill: form.skill || undefined,
-          skillCategory: form.skillCategory || undefined,
+          passionFSG: form.passionFSG === "" ? undefined : form.passionFSG,
+          teamPlayer: form.teamPlayer === "" ? undefined : form.teamPlayer,
+          desireToLearn:
+            form.desireToLearn === "" ? undefined : form.desireToLearn,
+          skill: form.skill === "" ? undefined : form.skill,
+          skillCategory:
+            form.skillCategory === "" ? undefined : form.skillCategory,
           comments: form.comments || undefined,
         } as InterviewInput,
       );
@@ -110,7 +127,16 @@ const AssessmentProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <AssessmentContext.Provider
-      value={{ form, setForm, recordId, isSubmitting, error, submitScores }}
+      value={{
+        form,
+        setForm,
+        recordId,
+        isSubmitting,
+        isUploadingNotes,
+        setIsUploadingNotes,
+        error,
+        submitScores,
+      }}
     >
       {children}
     </AssessmentContext.Provider>
@@ -131,7 +157,7 @@ const SUBMITTED = "SUBMITTED";
 
 const AssessmentFooter = () => {
   const { currentSubStep, setCurrentSubStep } = useInterviewProgress();
-  const { form, isSubmitting, submitScores } = useAssessment();
+  const { form, isSubmitting, isUploadingNotes, submitScores } = useAssessment();
 
   const formComplete = isScoreFormComplete(form);
 
@@ -144,7 +170,10 @@ const AssessmentFooter = () => {
           onBack={() => setCurrentSubStep(SCORES)}
           backLabel="Previous Page"
           onContinue={() => setCurrentSubStep(SUBMITTED)}
-          continueLabel="Submit & Finish"
+          continueLabel={
+            isUploadingNotes ? "Uploading…" : "Submit & Finish"
+          }
+          continueDisabled={isUploadingNotes}
         />
       );
     default:
@@ -188,20 +217,23 @@ const AssessmentSubmitted = () => {
 
 const InterviewAssessmentPage: NextPageWithLayout = () => {
   const { currentSubStep, setCurrentSubStep } = useInterviewProgress();
-  const { form, setForm, error } = useAssessment();
+  const { form, setForm, recordId, error, setIsUploadingNotes } =
+    useAssessment();
 
-  if (currentSubStep === null) setCurrentSubStep(SCORES);
+  useEffect(() => {
+    if (currentSubStep === null) setCurrentSubStep(SCORES);
+  }, [currentSubStep, setCurrentSubStep]);
 
   switch (currentSubStep) {
     case SUBMITTED:
       return <AssessmentSubmitted />;
     case NOTES:
       return (
-        <PanelLayout
-          title="Interview Assessment"
-          subtitle="Score the candidate"
-        >
-          <p>Assessment Notes content goes here.</p>
+        <PanelLayout>
+          <NotesUploader
+            interviewedApplicantRecordId={recordId}
+            onUploadingChange={setIsUploadingNotes}
+          />
         </PanelLayout>
       );
     default:
