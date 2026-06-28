@@ -14,6 +14,14 @@ interface IInterviewedApplicantRecordsService {
   ): Promise<InterviewedApplicantRecordDTO>;
 
   /**
+   * Gets a single interviewed applicant record by applicant record ID
+   * @Param applicantRecordId the ID of the applicant record
+   */
+  getInterviewedApplicantRecordByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<InterviewedApplicantRecordDTO>;
+
+  /**
    * Creates a single interviewed applicant record
    * @Param interviewedApplicantRecord the interviewed applicant record to create
    */

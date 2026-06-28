@@ -3,20 +3,32 @@ import User from "../../models/user.model";
 import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.model";
 import {
   CreateInterviewDelegationDTO,
+  Interview,
   InterviewDelegationDTO,
+  InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
+  InterviewNotesDTO,
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
+import InterviewedApplicantRecordsService from "./interviewedApplicantRecordService";
 import { toInterviewedApplicantDTO, toUserDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";
+import FileStorageService from "./fileStorageService";
+import FirebaseFileService from "./firebaseFileService";
 import InterviewDelegationService from "./interviewDelegationService";
 import InterviewGroupService from "./interviewGroupService";
+import IFirebaseFileService from "../interfaces/IFirebaseFileService";
 import IInterviewDelegationService from "../interfaces/IInterviewDelegationService";
+import {
+  INTERVIEW_NOTES_ACCEPTED_EXTENSION,
+  INTERVIEW_NOTES_ACCEPTED_MIME_TYPE,
+} from "../../constants/interviewNotes";
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
+import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedApplicantRecordService";
 import InterviewDelegation from "../../models/interviewDelegation.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import Applicant from "../../models/applicant.model";
@@ -27,6 +39,20 @@ const Logger = logger(__filename);
 const interviewDelegationsService: IInterviewDelegationService = new InterviewDelegationService();
 
 const interviewGroupService: IInterviewGroupService = new InterviewGroupService();
+
+// Inline-initialized so this class's constructor stays parameter-less. Other
+// devs working on this same composite service can append methods without
+// having to reconcile constructor signatures.
+// TODO(workstream B follow-up / firebase sync): the bucket name is read from
+// `FIREBASE_STORAGE_DEFAULT_BUCKET`. Until the real interview-notes bucket is
+// wired up, this points at whatever bucket the rest of the app uses (see
+// `entityResolvers.ts`). The upload code path will hit firebase at runtime;
+// confirm with partner before merging.
+const interviewNotesBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
+const firebaseFileService: IFirebaseFileService = new FirebaseFileService(
+  new FileStorageService(interviewNotesBucket),
+);
+const interviewedApplicantRecordsService: IInterviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
 
 type InterviewerAssignment = {
   interviewedApplicantRecordId: string;
@@ -65,6 +91,8 @@ function dedupeUsersById(users: User[]): User[] {
 }
 
 class InterviewCompositeService implements IInterviewCompositeService {
+  private interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
+
   /* eslint-disable class-methods-use-this */
   async getInterviewedApplicantsByUserId(
     userId: string,
@@ -307,6 +335,150 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to delegate interviewers. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async submitInterviewScores(
+    interviewedApplicantRecordId: string,
+    scores: Interview,
+  ): Promise<InterviewedApplicantRecordDTO> {
+    try {
+      return await this.interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
+        interviewedApplicantRecordId,
+        { interviewJson: scores },
+      );
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to submit interview scores. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getInterviewNotesByInterviewedApplicantRecordId(
+    interviewedApplicantRecordId: string,
+  ): Promise<InterviewNotesDTO | null> {
+    try {
+      const record = await interviewedApplicantRecordsService.getInterviewedApplicantRecordById(
+        interviewedApplicantRecordId,
+      );
+      if (!record.interviewNotesId) {
+        return null;
+      }
+      const file = await firebaseFileService.getFirebaseFileById(
+        record.interviewNotesId,
+      );
+      const signedUrl = await firebaseFileService.getSignedUrl(
+        file.storagePath,
+      );
+      return {
+        fileId: file.id,
+        fileName: file.originalFileName,
+        signedUrl,
+      };
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get interview notes for record ${interviewedApplicantRecordId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async uploadInterviewNotes(
+    interviewedApplicantRecordId: string,
+    uploadedUserId: number,
+    upload: {
+      localFilePath: string;
+      originalFileName: string;
+      sizeBytes: number;
+      contentType: string;
+    },
+  ): Promise<InterviewNotesDTO> {
+    try {
+      // Defense in depth: validate both mimetype and extension. The frontend
+      // dropzone enforces this too, but the resolver is the trust boundary.
+      if (
+        upload.contentType !== INTERVIEW_NOTES_ACCEPTED_MIME_TYPE ||
+        !upload.originalFileName
+          .toLowerCase()
+          .endsWith(INTERVIEW_NOTES_ACCEPTED_EXTENSION)
+      ) {
+        throw new Error("Only PDF files are accepted for interview notes.");
+      }
+
+      // Load the record up front. This both validates existence and captures
+      // the previous notes id so we can clean it up after a successful swap.
+      const record = await interviewedApplicantRecordsService.getInterviewedApplicantRecordById(
+        interviewedApplicantRecordId,
+      );
+      const previousNotesId = record.interviewNotesId;
+
+      // 1) Persist the new file (storage + DB row) before touching the FK.
+      const newFile = await firebaseFileService.createFirebaseFile({
+        originalFileName: upload.originalFileName,
+        uploadedUserId,
+        sizeBytes: upload.sizeBytes,
+        localFilePath: upload.localFilePath,
+        contentType: INTERVIEW_NOTES_ACCEPTED_MIME_TYPE,
+      });
+
+      // 2) Point the interviewed-applicant record at the new file via the
+      // GENERIC update service (per ticket: the FK update must go through the
+      // shared update path so any future side-effects there fire uniformly).
+      try {
+        await interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
+          interviewedApplicantRecordId,
+          { interviewNotesId: newFile.id },
+        );
+      } catch (updateError: unknown) {
+        // FK update failed — roll back the just-created file so we don't leak
+        // an orphan blob + row.
+        try {
+          await firebaseFileService.deleteFirebaseFileById(newFile.id);
+        } catch (rollbackError: unknown) {
+          Logger.error(
+            `Failed to roll back orphan firebase file ${
+              newFile.id
+            } after FK update failure. Reason = ${getErrorMessage(
+              rollbackError,
+            )}`,
+          );
+        }
+        throw updateError;
+      }
+
+      // 3) Best-effort delete of the previous file. Failures here are logged
+      // and swallowed: the user's new file is already attached and visible,
+      // and we'd rather leak a blob than fail an otherwise-successful upload.
+      if (previousNotesId) {
+        try {
+          await firebaseFileService.deleteFirebaseFileById(previousNotesId);
+        } catch (cleanupError: unknown) {
+          Logger.error(
+            `Failed to delete previous interview notes file ${previousNotesId} for record ${interviewedApplicantRecordId}. Reason = ${getErrorMessage(
+              cleanupError,
+            )}`,
+          );
+        }
+      }
+
+      const signedUrl = await firebaseFileService.getSignedUrl(
+        newFile.storagePath,
+      );
+      return {
+        fileId: newFile.id,
+        fileName: newFile.originalFileName,
+        signedUrl,
+      };
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to upload interview notes for record ${interviewedApplicantRecordId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }

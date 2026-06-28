@@ -2,10 +2,12 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import express from "express";
 import * as firebaseAdmin from "firebase-admin";
+import { graphqlUploadExpress } from "graphql-upload";
 
 import { ApolloServer } from "apollo-server-express";
 import { sequelize } from "./models";
 import schema from "./graphql";
+import { INTERVIEW_NOTES_MAX_BYTES } from "./constants/interviewNotes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -25,8 +27,14 @@ app.use(cors(CORS_OPTIONS));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use(
+  "/graphql",
+  graphqlUploadExpress({ maxFileSize: INTERVIEW_NOTES_MAX_BYTES, maxFiles: 1 }),
+);
+
 const server = new ApolloServer({
   schema,
+  uploads: false,
   context: ({ req, res }) => ({ req, res }),
   playground: {
     settings: {

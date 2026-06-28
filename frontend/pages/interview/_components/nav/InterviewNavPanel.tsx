@@ -13,10 +13,8 @@ export const InterviewNavPanel = ({
 }: InterviewNavPanelProps) => {
   const router = useRouter();
 
-  const { applicantRecordId } = router.query;
+  const applicantRecordId = router.query.applicantRecordId as string | undefined;
   const isActive = (path: string) => router.pathname === path;
-
-  console.log("applicantRecordId:", applicantRecordId);
 
   return (
     <nav className="flex flex-col">
@@ -44,10 +42,7 @@ export const InterviewNavPanel = ({
               <Link
                 href={
                   applicantRecordId
-                    ? item.path.replace(
-                        "[applicantRecordId]",
-                        applicantRecordId as string,
-                      )
+                    ? item.path.replace("[applicantRecordId]", applicantRecordId)
                     : item.path
                 }
                 className={`flex items-center justify-between self-stretch rounded-lg px-5 py-2.5 hover:bg-surface-highlight ${

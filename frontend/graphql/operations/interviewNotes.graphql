@@ -1,0 +1,7 @@
+query InterviewNotes($interviewedApplicantRecordId: ID!) {
+  interviewNotes(interviewedApplicantRecordId: $interviewedApplicantRecordId) {
+    fileId
+    fileName
+    signedUrl
+  }
+}
