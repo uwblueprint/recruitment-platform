@@ -91,8 +91,6 @@ class FirebaseFileService implements IFirebaseFileService {
     try {
       const row = await FirebaseFile.findByPk(id);
       if (!row) {
-        // Already gone — nothing to do, log and return so callers don't have
-        // to special-case the "old file was deleted out from under us" path.
         Logger.warn(
           `deleteFirebaseFileById called on missing file id ${id}; ignoring.`,
         );

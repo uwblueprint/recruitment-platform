@@ -61,6 +61,17 @@ interface IAuthService {
   isAuthorizedByRole(accessToken: string, roles: Set<Role>): Promise<boolean>;
 
   /**
+   * Resolve the numeric users.id of the caller from a verified access token.
+   * Use when a resolver needs the user's id itself (e.g. to record
+   * `uploaded_user_id` on a new row); use `isAuthorizedByUserId` when you just
+   * need a yes/no check against an id the client supplied.
+   * @param accessToken user's access token
+   * @returns the caller's `users.id`
+   * @throws Error if token invalid, revoked, or no matching user row
+   */
+  getUserIdByAccessToken(accessToken: string): Promise<number>;
+
+  /**
    * Determine if the provided access token is valid and issued to the requested user
    * @param accessToken user's access token
    * @param requestedUserId userId of requested user

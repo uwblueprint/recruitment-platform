@@ -15,7 +15,7 @@ import {
   InterviewStatusEnum,
   UserDTO,
 } from "../../types";
-import { getUserIdFromContext } from "../../utilities/authUtils";
+import { getUserIdFromContext } from "../../middlewares/auth";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import { withUploadAsTempFile } from "../../utilities/graphqlUploadUtils";
 import { INTERVIEW_NOTES_TMP_DIR_PREFIX } from "../../constants/interviewNotes";

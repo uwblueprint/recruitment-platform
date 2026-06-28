@@ -69,11 +69,6 @@ const executableSchema = makeExecutableSchema({
     userType,
   ],
   resolvers: merge(
-    // `Upload` scalar resolver. The `scalar Upload` declaration lives in
-    // `entityType.ts` (predates this PR). With `uploads: false` on the
-    // ApolloServer, apollo-server v2 no longer auto-injects this resolver,
-    // so we register it here explicitly — otherwise `Upload!` arguments
-    // arrive as `null`.
     { Upload: GraphQLUpload },
     adminCommentResolvers,
     applicantRecordResolvers,

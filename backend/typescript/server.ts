@@ -27,9 +27,6 @@ app.use(cors(CORS_OPTIONS));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// `graphql-upload` middleware must run BEFORE Apollo's request handler so
-// that multipart/form-data bodies are parsed into `Promise<FileUpload>`
-// arguments. Mount it on the same path Apollo will use.
 app.use(
   "/graphql",
   graphqlUploadExpress({ maxFileSize: INTERVIEW_NOTES_MAX_BYTES, maxFiles: 1 }),
@@ -37,8 +34,6 @@ app.use(
 
 const server = new ApolloServer({
   schema,
-  // Disable apollo-server v2's built-in upload handling — we mount the
-  // middleware ourselves above so we can control limits and ordering.
   uploads: false,
   context: ({ req, res }) => ({ req, res }),
   playground: {
