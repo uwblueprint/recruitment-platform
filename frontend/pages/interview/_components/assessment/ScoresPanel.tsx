@@ -1,27 +1,15 @@
 import { ChangeEvent } from "react";
 
 import {
-  EMPTY_SCORE_FORM,
   INTERVIEW_SCORE_FIELDS,
   MAX_INTERVIEW_SCORE,
   MAX_TOTAL_INTERVIEW_SCORE,
   MIN_INTERVIEW_SCORE,
   SKILL_CATEGORY_OPTIONS,
-  isScoreFormComplete,
   type ScoreFormState,
   type ScoreKey,
 } from "./constants";
 import { SkillCategory } from "@/graphql/typeUtils";
-
-// Re-export the data-layer pieces so existing call sites that import them
-// from this UI module keep working. Prefer importing directly from
-// `./constants` in new code.
-export {
-  EMPTY_SCORE_FORM,
-  isScoreFormComplete,
-  type ScoreFormState,
-  type ScoreKey,
-};
 
 function computeTotal(form: ScoreFormState): number {
   return INTERVIEW_SCORE_FIELDS.reduce((sum, { key }) => {

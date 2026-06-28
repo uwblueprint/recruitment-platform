@@ -10,25 +10,12 @@ import {
   INTERVIEW_NOTES_MAX_BYTES,
 } from "./constants";
 
-// `INTERVIEW_NOTES_MAX_BYTES` is duplicated in
-// `backend/typescript/constants/interviewNotes.ts`. Defensive client-side
-// check so the dropzone can reject oversize files locally without a round
-// trip; the server is still the trust boundary.
-
 type Props = {
   interviewedApplicantRecordId: string | null;
-  /**
-   * Notifies the parent whenever an upload is in flight, so the footer can
-   * disable "Submit & Finish" until the file is persisted server-side.
-   */
   onUploadingChange?: (uploading: boolean) => void;
 };
 
 type RemoteState =
-  // `recordId` is stamped onto each loaded state so we can derive a fresh
-  // "loading" display whenever `interviewedApplicantRecordId` changes
-  // without calling setState synchronously inside an effect (which trips
-  // react-hooks/set-state-in-effect on cascading renders).
   | { kind: "empty"; recordId: string }
   | { kind: "filled"; recordId: string; notes: InterviewNotesResult }
   | { kind: "error"; recordId: string; message: string };
@@ -40,8 +27,6 @@ const formatBytes = (bytes: number): string => {
 };
 
 // ---- Inline icons ---------------------------------------------------------
-// Kept local to avoid polluting the shared icons folder with one-off marks
-// only this page uses.
 
 const CloudUploadIcon = () => (
   <svg
@@ -137,8 +122,6 @@ export const NotesUploader = ({
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
-  // Surface upload-in-flight state to the parent (used to disable Submit &
-  // Finish). Effect, not call-in-render, to avoid setState-during-render.
   useEffect(() => {
     onUploadingChange?.(isUploading);
   }, [isUploading, onUploadingChange]);
@@ -219,16 +202,11 @@ export const NotesUploader = ({
     maxFiles: 1,
     maxSize: INTERVIEW_NOTES_MAX_BYTES,
     multiple: false,
-    // We render our own button; suppress click-anywhere so users only open the
-    // picker via the explicit Browse/Replace control.
     noClick: true,
     noKeyboard: true,
     disabled: isUploading || !interviewedApplicantRecordId,
   });
 
-  // Derive a fresh "loading" view whenever the prop changes before the
-  // matching fetch resolves. This replaces a synchronous setState in the
-  // effect body and keeps stale data from briefly leaking across records.
   const loaded =
     remote && remote.recordId === interviewedApplicantRecordId ? remote : null;
 
@@ -249,7 +227,6 @@ export const NotesUploader = ({
 
   return (
     <div className="flex w-full flex-col gap-4">
-      {/* Heading row — green check appears only once a file has been attached. */}
       {isFilled && (
         <div className="-mb-1">
           <SuccessCheckIcon />
@@ -350,8 +327,6 @@ const FileChip = ({
     <button
       type="button"
       onClick={(e) => {
-        // Prevent the click from also triggering the surrounding dropzone /
-        // anchor — we just want to open the file picker.
         e.stopPropagation();
         e.preventDefault();
         onRemove();

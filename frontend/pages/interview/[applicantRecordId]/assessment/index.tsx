@@ -24,10 +24,12 @@ import { Button } from "@/components/common/Button";
 import { NextPageWithLayout } from "../../../_app";
 import {
   ScoresPanel,
+} from "../../_components/assessment/ScoresPanel";
+import {
   EMPTY_SCORE_FORM,
   isScoreFormComplete,
   type ScoreFormState,
-} from "../../_components/assessment/ScoresPanel";
+} from "../../_components/assessment/constants";
 import NotesUploader from "../../_components/assessment/NotesUploader";
 import InterviewAssessmentAPIClient from "@/APIClients/InterviewAssessmentAPIClient";
 import { type InterviewInput } from "@/graphql/typeUtils";
@@ -41,10 +43,6 @@ type AssessmentContextValue = {
   setForm: Dispatch<SetStateAction<ScoreFormState>>;
   recordId: string | null;
   isSubmitting: boolean;
-  // Tracks an in-flight interview-notes upload so the footer can disable
-  // "Submit & Finish" until the file is persisted server-side. Lives on the
-  // assessment context (not the notes uploader) because the footer is
-  // rendered outside the page slot in SplitPanelLayout.
   isUploadingNotes: boolean;
   setIsUploadingNotes: Dispatch<SetStateAction<boolean>>;
   error: string | null;
