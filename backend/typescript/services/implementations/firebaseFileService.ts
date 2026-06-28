@@ -10,12 +10,9 @@ import {
 import { toFirebaseFileDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
+import { INTERVIEW_NOTES_STORAGE_PREFIX } from "../../constants/interviewNotes";
 
 const Logger = logger(__filename);
-
-// Folder prefix inside the bucket for interview notes uploads. Kept here so
-// the composite service doesn't need to know about storage layout.
-const INTERVIEW_NOTES_PREFIX = "interview-notes";
 
 class FirebaseFileService implements IFirebaseFileService {
   /* eslint-disable class-methods-use-this */
@@ -47,7 +44,7 @@ class FirebaseFileService implements IFirebaseFileService {
   ): Promise<FirebaseFileDTO> {
     // Generate a unique storage path. The uuid prefix prevents collisions
     // across files that happen to share an original filename.
-    const storagePath = `${INTERVIEW_NOTES_PREFIX}/${uuidv4()}-${
+    const storagePath = `${INTERVIEW_NOTES_STORAGE_PREFIX}/${uuidv4()}-${
       input.originalFileName
     }`;
 

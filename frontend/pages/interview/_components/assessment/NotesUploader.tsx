@@ -5,10 +5,15 @@ import InterviewAssessmentAPIClient from "@/APIClients/InterviewAssessmentAPICli
 import { Button } from "@/components/common/Button";
 import type { InterviewNotesResult } from "@/graphql/typeUtils";
 
-// Keep in sync with backend `MAX_UPLOAD_BYTES` in `server.ts`. Defensive
-// duplicate so the dropzone rejects oversize files locally without a round
+import {
+  INTERVIEW_NOTES_DROPZONE_ACCEPT,
+  INTERVIEW_NOTES_MAX_BYTES,
+} from "./constants";
+
+// `INTERVIEW_NOTES_MAX_BYTES` is duplicated in
+// `backend/typescript/constants/interviewNotes.ts`. Defensive client-side
+// check so the dropzone can reject oversize files locally without a round
 // trip; the server is still the trust boundary.
-const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
 
 type Props = {
   interviewedApplicantRecordId: string | null;
@@ -194,7 +199,7 @@ export const NotesUploader = ({
         const map: Record<string, string> = {
           "file-invalid-type": "Only PDF files are accepted.",
           "file-too-large": `File exceeds the ${formatBytes(
-            MAX_UPLOAD_BYTES,
+            INTERVIEW_NOTES_MAX_BYTES,
           )} limit.`,
           "too-many-files": "Upload one file at a time.",
         };
@@ -210,9 +215,9 @@ export const NotesUploader = ({
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     onDrop,
-    accept: { "application/pdf": [".pdf"] },
+    accept: INTERVIEW_NOTES_DROPZONE_ACCEPT,
     maxFiles: 1,
-    maxSize: MAX_UPLOAD_BYTES,
+    maxSize: INTERVIEW_NOTES_MAX_BYTES,
     multiple: false,
     // We render our own button; suppress click-anywhere so users only open the
     // picker via the explicit Browse/Replace control.

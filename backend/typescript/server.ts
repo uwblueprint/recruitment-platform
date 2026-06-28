@@ -7,11 +7,7 @@ import { graphqlUploadExpress } from "graphql-upload";
 import { ApolloServer } from "apollo-server-express";
 import { sequelize } from "./models";
 import schema from "./graphql";
-
-// 25 MB cap on a single uploaded file. Matches the dropzone client guard and
-// is comfortably above a typical interview-notes PDF. Tune here if product
-// raises the limit.
-const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+import { INTERVIEW_NOTES_MAX_BYTES } from "./constants/interviewNotes";
 
 const CORS_ALLOW_LIST = [
   "http://localhost:3000",
@@ -36,7 +32,7 @@ app.use(express.urlencoded({ extended: true }));
 // arguments. Mount it on the same path Apollo will use.
 app.use(
   "/graphql",
-  graphqlUploadExpress({ maxFileSize: MAX_UPLOAD_BYTES, maxFiles: 1 }),
+  graphqlUploadExpress({ maxFileSize: INTERVIEW_NOTES_MAX_BYTES, maxFiles: 1 }),
 );
 
 const server = new ApolloServer({

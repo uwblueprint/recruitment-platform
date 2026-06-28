@@ -18,6 +18,7 @@ import {
 import { getUserIdFromContext } from "../../utilities/authUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import { withUploadAsTempFile } from "../../utilities/graphqlUploadUtils";
+import { INTERVIEW_NOTES_TMP_DIR_PREFIX } from "../../constants/interviewNotes";
 
 const interviewCompositeService = new InterviewCompositeService();
 const interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
@@ -81,12 +82,15 @@ const interviewPageResolvers = {
       context: ExpressContext,
     ): Promise<InterviewNotesDTO> => {
       const uploadedUserId = await getUserIdFromContext(context);
-      return withUploadAsTempFile(file, "interview-notes-", (upload) =>
-        interviewCompositeService.uploadInterviewNotes(
-          interviewedApplicantRecordId,
-          uploadedUserId,
-          upload,
-        ),
+      return withUploadAsTempFile(
+        file,
+        INTERVIEW_NOTES_TMP_DIR_PREFIX,
+        (upload) =>
+          interviewCompositeService.uploadInterviewNotes(
+            interviewedApplicantRecordId,
+            uploadedUserId,
+            upload,
+          ),
       );
     },
     reportInterviewConflict: async (

@@ -23,6 +23,10 @@ import InterviewDelegationService from "./interviewDelegationService";
 import InterviewGroupService from "./interviewGroupService";
 import IFirebaseFileService from "../interfaces/IFirebaseFileService";
 import IInterviewDelegationService from "../interfaces/IInterviewDelegationService";
+import {
+  INTERVIEW_NOTES_ACCEPTED_EXTENSION,
+  INTERVIEW_NOTES_ACCEPTED_MIME_TYPE,
+} from "../../constants/interviewNotes";
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
 import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedApplicantRecordService";
 import InterviewDelegation from "../../models/interviewDelegation.model";
@@ -398,8 +402,10 @@ class InterviewCompositeService implements IInterviewCompositeService {
       // Defense in depth: validate both mimetype and extension. The frontend
       // dropzone enforces this too, but the resolver is the trust boundary.
       if (
-        upload.contentType !== "application/pdf" ||
-        !upload.originalFileName.toLowerCase().endsWith(".pdf")
+        upload.contentType !== INTERVIEW_NOTES_ACCEPTED_MIME_TYPE ||
+        !upload.originalFileName
+          .toLowerCase()
+          .endsWith(INTERVIEW_NOTES_ACCEPTED_EXTENSION)
       ) {
         throw new Error("Only PDF files are accepted for interview notes.");
       }
@@ -417,7 +423,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
         uploadedUserId,
         sizeBytes: upload.sizeBytes,
         localFilePath: upload.localFilePath,
-        contentType: "application/pdf",
+        contentType: INTERVIEW_NOTES_ACCEPTED_MIME_TYPE,
       });
 
       // 2) Point the interviewed-applicant record at the new file via the

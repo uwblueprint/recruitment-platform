@@ -1,53 +1,30 @@
 import { ChangeEvent } from "react";
+
+import {
+  EMPTY_SCORE_FORM,
+  INTERVIEW_SCORE_FIELDS,
+  MAX_INTERVIEW_SCORE,
+  MAX_TOTAL_INTERVIEW_SCORE,
+  MIN_INTERVIEW_SCORE,
+  SKILL_CATEGORY_OPTIONS,
+  isScoreFormComplete,
+  type ScoreFormState,
+  type ScoreKey,
+} from "./constants";
 import { SkillCategory } from "@/graphql/typeUtils";
 
-export type ScoreKey = "passionFSG" | "teamPlayer" | "desireToLearn" | "skill";
-
-export type ScoreFormState = {
-  passionFSG: number | "";
-  teamPlayer: number | "";
-  desireToLearn: number | "";
-  skill: number | "";
-  skillCategory: SkillCategory | "";
-  comments: string;
+// Re-export the data-layer pieces so existing call sites that import them
+// from this UI module keep working. Prefer importing directly from
+// `./constants` in new code.
+export {
+  EMPTY_SCORE_FORM,
+  isScoreFormComplete,
+  type ScoreFormState,
+  type ScoreKey,
 };
-
-export const EMPTY_SCORE_FORM: ScoreFormState = {
-  passionFSG: "",
-  teamPlayer: "",
-  desireToLearn: "",
-  skill: "",
-  skillCategory: "",
-  comments: "",
-};
-
-export function isScoreFormComplete(form: ScoreFormState): boolean {
-  return (
-    typeof form.passionFSG === "number" &&
-    typeof form.teamPlayer === "number" &&
-    typeof form.desireToLearn === "number" &&
-    typeof form.skill === "number" &&
-    form.skillCategory !== ""
-  );
-}
-
-const SCORE_ROWS: { key: ScoreKey; label: string }[] = [
-  { key: "passionFSG", label: "Passion for Social Good" },
-  { key: "teamPlayer", label: "Team Player" },
-  { key: "desireToLearn", label: "Drive to Learn" },
-  { key: "skill", label: "Skill" },
-];
-
-const SKILL_CATEGORY_OPTIONS: { value: SkillCategory; label: string }[] = [
-  { value: "JUNIOR", label: "Junior" },
-  { value: "INTERMEDIATE", label: "Intermediate" },
-  { value: "SENIOR", label: "Senior" },
-];
-
-const MAX_TOTAL = 20;
 
 function computeTotal(form: ScoreFormState): number {
-  return SCORE_ROWS.reduce((sum, { key }) => {
+  return INTERVIEW_SCORE_FIELDS.reduce((sum, { key }) => {
     const v = form[key];
     return sum + (typeof v === "number" ? v : 0);
   }, 0);
@@ -62,8 +39,8 @@ const ScoreInput = ({
 }) => (
   <input
     type="number"
-    min={1}
-    max={5}
+    min={MIN_INTERVIEW_SCORE}
+    max={MAX_INTERVIEW_SCORE}
     value={value}
     placeholder="–"
     onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +49,10 @@ const ScoreInput = ({
         onChange("");
         return;
       }
-      const n = Math.min(5, Math.max(1, parseInt(raw, 10)));
+      const n = Math.min(
+        MAX_INTERVIEW_SCORE,
+        Math.max(MIN_INTERVIEW_SCORE, parseInt(raw, 10)),
+      );
       if (!isNaN(n)) onChange(n);
     }}
     className="w-40 rounded border border-neutral-200 px-3 py-2 text-right font-poppins text-sm text-neutral-800 placeholder:text-neutral-200 focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue"
@@ -115,7 +95,7 @@ export const ScoresPanel = ({ form, onChange }: ScoresPanelProps) => {
 
         {/* Score rows */}
         <div className="divide-y divide-neutral-200">
-          {SCORE_ROWS.map(({ key, label }) => (
+          {INTERVIEW_SCORE_FIELDS.map(({ key, label }) => (
             <div
               key={key}
               className="flex items-center justify-between px-6 py-4"
@@ -163,7 +143,7 @@ export const ScoresPanel = ({ form, onChange }: ScoresPanelProps) => {
             Total Score
           </span>
           <span className="font-poppins text-sm font-semibold text-blue">
-            {total}/{MAX_TOTAL}
+            {total}/{MAX_TOTAL_INTERVIEW_SCORE}
           </span>
         </div>
       </div>
