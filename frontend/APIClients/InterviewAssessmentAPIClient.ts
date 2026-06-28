@@ -44,7 +44,6 @@ class InterviewAssessmentAPIClient {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : String(error);
-      // eslint-disable-next-line no-console
       console.error("getInterviewedApplicantRecordByApplicantRecordId failed:", error);
       throw new Error(`Failed to get interviewed applicant record: ${message}`);
     }
@@ -73,7 +72,6 @@ class InterviewAssessmentAPIClient {
     } catch (error) {
       const message =
         error instanceof Error ? error.message : String(error);
-      // eslint-disable-next-line no-console
       console.error("submitInterviewScores failed:", error);
       throw new Error(`Failed to submit interview scores: ${message}`);
     }
@@ -101,7 +99,6 @@ class InterviewAssessmentAPIClient {
       return data?.interviewNotes ?? null;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      // eslint-disable-next-line no-console
       console.error("getInterviewNotes failed:", error);
       throw new Error(`Failed to get interview notes: ${message}`);
     }
@@ -137,7 +134,6 @@ class InterviewAssessmentAPIClient {
       return data.uploadInterviewNotes;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      // eslint-disable-next-line no-console
       console.error("uploadInterviewNotes failed:", error);
       throw new Error(`Failed to upload interview notes: ${message}`);
     }

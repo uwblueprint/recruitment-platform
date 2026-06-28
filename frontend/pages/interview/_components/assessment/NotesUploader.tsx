@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
 
 import InterviewAssessmentAPIClient from "@/APIClients/InterviewAssessmentAPIClient";
@@ -20,10 +20,13 @@ type Props = {
 };
 
 type RemoteState =
-  | { kind: "loading" }
-  | { kind: "empty" }
-  | { kind: "filled"; notes: InterviewNotesResult }
-  | { kind: "error"; message: string };
+  // `recordId` is stamped onto each loaded state so we can derive a fresh
+  // "loading" display whenever `interviewedApplicantRecordId` changes
+  // without calling setState synchronously inside an effect (which trips
+  // react-hooks/set-state-in-effect on cascading renders).
+  | { kind: "empty"; recordId: string }
+  | { kind: "filled"; recordId: string; notes: InterviewNotesResult }
+  | { kind: "error"; recordId: string; message: string };
 
 const formatBytes = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
@@ -125,14 +128,9 @@ export const NotesUploader = ({
   interviewedApplicantRecordId,
   onUploadingChange,
 }: Props) => {
-  const [remote, setRemote] = useState<RemoteState>({ kind: "loading" });
+  const [remote, setRemote] = useState<RemoteState | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-
-  // Track the most recent successfully-uploaded filename so we can show
-  // "Notes have been submitted" with that filename even before the next
-  // refetch settles. Reset when the record changes.
-  const lastUploadedNameRef = useRef<string | null>(null);
 
   // Surface upload-in-flight state to the parent (used to disable Submit &
   // Finish). Effect, not call-in-render, to avoid setState-during-render.
@@ -140,20 +138,27 @@ export const NotesUploader = ({
     onUploadingChange?.(isUploading);
   }, [isUploading, onUploadingChange]);
 
-  // Initial fetch of any existing notes file.
+  // Initial fetch of any existing notes file. setState happens only inside
+  // async callbacks (allowed by react-hooks/set-state-in-effect) — the
+  // visible "loading" state is derived below by comparing the stamped
+  // `recordId` on `remote` against the current prop.
   useEffect(() => {
     if (!interviewedApplicantRecordId) return;
+    const recordId = interviewedApplicantRecordId;
     let cancelled = false;
-    setRemote({ kind: "loading" });
-    InterviewAssessmentAPIClient.getInterviewNotes(interviewedApplicantRecordId)
+    InterviewAssessmentAPIClient.getInterviewNotes(recordId)
       .then((notes) => {
         if (cancelled) return;
-        setRemote(notes ? { kind: "filled", notes } : { kind: "empty" });
+        setRemote(
+          notes
+            ? { kind: "filled", recordId, notes }
+            : { kind: "empty", recordId },
+        );
       })
       .catch((e) => {
         if (cancelled) return;
         const detail = e instanceof Error ? e.message : String(e);
-        setRemote({ kind: "error", message: detail });
+        setRemote({ kind: "error", recordId, message: detail });
       });
     return () => {
       cancelled = true;
@@ -163,15 +168,15 @@ export const NotesUploader = ({
   const handleFile = useCallback(
     async (file: File) => {
       if (!interviewedApplicantRecordId) return;
+      const recordId = interviewedApplicantRecordId;
       setUploadError(null);
       setIsUploading(true);
       try {
         const result = await InterviewAssessmentAPIClient.uploadInterviewNotes(
-          interviewedApplicantRecordId,
+          recordId,
           file,
         );
-        lastUploadedNameRef.current = result.fileName;
-        setRemote({ kind: "filled", notes: result });
+        setRemote({ kind: "filled", recordId, notes: result });
       } catch (e) {
         const detail = e instanceof Error ? e.message : String(e);
         setUploadError(detail);
@@ -216,18 +221,26 @@ export const NotesUploader = ({
     disabled: isUploading || !interviewedApplicantRecordId,
   });
 
-  if (remote.kind === "loading") {
-    return <p className="font-poppins text-sm text-charcoal-500">Loading notes…</p>;
+  // Derive a fresh "loading" view whenever the prop changes before the
+  // matching fetch resolves. This replaces a synchronous setState in the
+  // effect body and keeps stale data from briefly leaking across records.
+  const loaded =
+    remote && remote.recordId === interviewedApplicantRecordId ? remote : null;
+
+  if (!loaded) {
+    return (
+      <p className="font-poppins text-sm text-charcoal-500">Loading notes…</p>
+    );
   }
-  if (remote.kind === "error") {
+  if (loaded.kind === "error") {
     return (
       <p className="font-poppins text-sm text-error">
-        Failed to load existing notes: {remote.message}
+        Failed to load existing notes: {loaded.message}
       </p>
     );
   }
 
-  const isFilled = remote.kind === "filled";
+  const isFilled = loaded.kind === "filled";
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -259,8 +272,8 @@ export const NotesUploader = ({
         {isFilled ? (
           <>
             <FileChip
-              fileName={remote.notes.fileName}
-              signedUrl={remote.notes.signedUrl}
+              fileName={loaded.notes.fileName}
+              signedUrl={loaded.notes.signedUrl}
               onRemove={open}
               disabled={isUploading}
             />

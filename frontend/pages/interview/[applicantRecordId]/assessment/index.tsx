@@ -92,7 +92,6 @@ const AssessmentProvider = ({ children }: { children: ReactNode }) => {
         }
       })
       .catch((e) => {
-        // eslint-disable-next-line no-console
         console.error("Failed to load assessment record:", e);
         const detail = e instanceof Error ? e.message : String(e);
         setError(`Failed to load assessment record. ${detail}`);
