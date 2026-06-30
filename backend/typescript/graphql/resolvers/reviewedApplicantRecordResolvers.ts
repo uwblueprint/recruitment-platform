@@ -80,6 +80,24 @@ const reviewedApplicantRecordResolvers = {
         },
       );
     },
+    reassignReviewer: async (
+      _parent: undefined,
+      {
+        applicantRecordId,
+        oldReviewerId,
+        newReviewerId,
+      }: {
+        applicantRecordId: string;
+        oldReviewerId: string;
+        newReviewerId: string;
+      },
+    ): Promise<ReviewedApplicantRecordDTO> => {
+      return reviewedApplicantRecordService.reassignReviewer(
+        applicantRecordId,
+        oldReviewerId,
+        newReviewerId,
+      );
+    },
   },
 };
 
