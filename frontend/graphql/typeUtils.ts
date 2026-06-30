@@ -50,6 +50,8 @@ export type InterviewedApplicantRecordDTO =
   WithoutTypename<Schema.InterviewedApplicantRecord>;
 export type InterviewedApplicantsDTO =
   WithoutTypename<Schema.InterviewedApplicantsDto>;
+export type InterviewDashboardRowDTO =
+  WithoutTypename<Schema.InterviewDashboardRowDto>;
 export type ReviewDTO = WithoutTypename<Schema.Review>;
 export type ReviewDashboardRowDTO =
   WithoutTypename<Schema.ReviewDashboardRowDto>;
@@ -103,6 +105,7 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
 export {
   ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
+  InterviewDashboardDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   IsAuthorizedByRoleDocument,
@@ -125,6 +128,8 @@ export type {
   InterviewGroupQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
+  InterviewDashboardQuery,
+  InterviewDashboardQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
   IsAuthorizedByRoleQuery,
@@ -177,6 +182,9 @@ export type InterviewedApplicantResult = ArrayElement<
     Operations.InterviewedApplicantsByUserIdQuery,
     "interviewedApplicantsByUserId"
   >
+>;
+export type InterviewDashboardResult = ArrayElement<
+  OperationField<Operations.InterviewDashboardQuery, "interviewDashboard">
 >;
 export type InterviewerResult = ArrayElement<
   OperationField<

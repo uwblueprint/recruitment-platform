@@ -1,0 +1,19 @@
+query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {
+  interviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {
+    applicantRecordId
+    firstName
+    lastName
+    position
+    applicationStatus
+    interviewers {
+      id
+      firstName
+      lastName
+      email
+      position
+      role
+      isArchived
+    }
+    interviewScore
+  }
+}

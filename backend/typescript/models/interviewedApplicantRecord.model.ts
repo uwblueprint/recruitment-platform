@@ -7,6 +7,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import { Interview, InterviewStatus, InterviewStatusEnum } from "../types";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import ApplicantRecord from "./applicantRecord.model";
 import FirebaseFile from "./firebaseFile.model";
 // eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
