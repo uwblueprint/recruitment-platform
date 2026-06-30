@@ -95,7 +95,10 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
     header: "Status",
     enableSorting: true,
     cell: ({ row }) => (
-      <ReviewStatusCell status={row.original.applicationStatus} />
+      <ReviewStatusCell
+        applicantRecordId={row.original.applicantRecordId}
+        status={row.original.applicationStatus}
+      />
     ),
   },
   {

@@ -1,5 +1,6 @@
 import { DashboardStatusChip } from "@/components/dashboard/table";
 import { ApplicationStatus } from "@/graphql/typeUtils";
+import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
 import { useState } from "react";
 
 const APPLICATION_STATUS_OPTIONS = [
@@ -26,17 +27,36 @@ const APPLICATION_STATUS_OPTIONS = [
 ] as const;
 
 type ReviewStatusCellProps = {
+  applicantRecordId: string;
   status: ApplicationStatus;
 };
 
-export const ReviewStatusCell = ({ status }: ReviewStatusCellProps) => {
+export const ReviewStatusCell = ({
+  applicantRecordId,
+  status,
+}: ReviewStatusCellProps) => {
   const [selectedStatus, setSelectedStatus] = useState(status);
+
+  const handleChange = async (newStatus: ApplicationStatus) => {
+    const previous = selectedStatus;
+    setSelectedStatus(newStatus);
+    try {
+      await ReviewDashboardAPIClient.updateApplicantRecordStatus(
+        applicantRecordId,
+        newStatus,
+      );
+      console.log("Status updated:", applicantRecordId, newStatus);
+    } catch (err) {
+      console.error("Failed to update status:", err);
+      setSelectedStatus(previous);
+    }
+  };
 
   return (
     <DashboardStatusChip
       value={selectedStatus}
       options={APPLICATION_STATUS_OPTIONS}
-      onChange={setSelectedStatus}
+      onChange={handleChange}
     />
   );
 };

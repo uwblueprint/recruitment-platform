@@ -111,6 +111,7 @@ export {
   ReportReviewConflictDocument,
   ReviewedApplicantRecordsByApplicantRecordIdDocument,
   ReviewDashboardDocument,
+  UpdateApplicantRecordStatusDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
 } from "./__generated__/graphql";
@@ -140,6 +141,8 @@ export type {
   ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
   ReviewDashboardQuery,
   ReviewDashboardQueryVariables,
+  UpdateApplicantRecordStatusMutation,
+  UpdateApplicantRecordStatusMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
