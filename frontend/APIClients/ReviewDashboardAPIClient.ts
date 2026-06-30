@@ -1,9 +1,13 @@
 import { client } from "@/client";
 import {
   ReviewDashboardDocument,
+  ReviewDashboardSidePanelDocument,
   type ReviewDashboardQuery,
   type ReviewDashboardQueryVariables,
   type ReviewDashboardResult,
+  type ReviewDashboardSidePanelQuery,
+  type ReviewDashboardSidePanelQueryVariables,
+  type ReviewDashboardSidePanelResult,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -32,6 +36,31 @@ class ReviewDashboardAPIClient {
       return data.reviewDashboard;
     } catch {
       throw new Error("Failed to get review dashboard");
+    }
+  }
+
+  static async getReviewDashboardSidePanel(
+    applicantRecordId: string,
+  ): Promise<ReviewDashboardSidePanelResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ReviewDashboardSidePanelQuery,
+        ReviewDashboardSidePanelQueryVariables
+      >({
+        query: ReviewDashboardSidePanelDocument,
+        variables: { applicantRecordId },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.reviewDashboardSidePanel) {
+        throw new Error("No data returned");
+      }
+
+      return data.reviewDashboardSidePanel;
+    } catch {
+      throw new Error("Failed to get review dashboard side panel");
     }
   }
 }

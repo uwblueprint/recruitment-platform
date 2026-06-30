@@ -1,46 +1,232 @@
+import BookmarkBorderOutlined from "@mui/icons-material/BookmarkBorderOutlined";
+import BookmarkOutlined from "@mui/icons-material/BookmarkOutlined";
+import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
+import DescriptionOutlined from "@mui/icons-material/DescriptionOutlined";
+import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
+import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
+import KeyboardDoubleArrowLeft from "@mui/icons-material/KeyboardDoubleArrowLeft";
+import OpenInNew from "@mui/icons-material/OpenInNew";
 import Drawer from "@mui/material/Drawer";
-import { ReactNode } from "react";
+import { useState } from "react";
+
+import type {
+  ReviewDashboardResult,
+  ReviewDashboardSidePanelResult,
+} from "@/graphql/typeUtils";
+
+import { SidePanelReviewerColumn } from "./SidePanelReviewerColumn";
+import { SidePanelSkillCategoryChip } from "./SidePanelSkillCategoryChip";
+import { SidePanelStatusSelect } from "./SidePanelStatusSelect";
+
+/** Maximum combined review score: 4 criteria × 5 points × 2 reviewers. */
+const MAX_TOTAL_SCORE = 40;
+
+const EMPTY_VALUE = "-";
+
+export type SidePanelNavigation = {
+  /** 1-based position of the active applicant in the current display order. */
+  current: number;
+  total: number;
+  canPrev: boolean;
+  canNext: boolean;
+  onPrev: () => void;
+  onNext: () => void;
+};
 
 type DashboardSidePanelProps = {
   open: boolean;
   onClose: () => void;
-  title?: string;
-  children?: ReactNode;
+  /** Row that was clicked; drives the always-available header summary. */
+  row: ReviewDashboardResult | null;
+  /** Expanded details fetched for the active applicant. */
+  details: ReviewDashboardSidePanelResult | null;
+  isLoading?: boolean;
+  navigation?: SidePanelNavigation;
 };
 
 export const DashboardSidePanel = ({
   open,
   onClose,
-  title = "Applicant details",
-  children,
+  row,
+  details,
+  isLoading = false,
+  navigation,
 }: DashboardSidePanelProps) => (
   <Drawer
     anchor="right"
     open={open}
     onClose={onClose}
-    PaperProps={{
-      className: "w-full max-w-[480px]",
-    }}
+    PaperProps={{ className: "w-full max-w-[920px]" }}
   >
-    <aside className="flex h-full flex-col bg-white">
-      <header className="flex h-16 shrink-0 items-center justify-between border-b border-neutral-200 px-6">
-        <h2 className="font-poppins text-lg font-semibold leading-none text-neutral-800">
-          {title}
-        </h2>
+    <aside className="flex h-full flex-col bg-white font-source text-neutral-800">
+      <header className="flex shrink-0 items-center justify-between px-8 pb-2 pt-6">
         <button
           aria-label="Close side panel"
-          className="flex h-8 w-8 items-center justify-center rounded text-2xl leading-none text-neutral-700 hover:bg-surface-muted"
+          className="flex h-8 w-8 items-center justify-center rounded text-neutral-500 hover:bg-surface-muted"
           onClick={onClose}
           type="button"
         >
-          ×
+          <KeyboardDoubleArrowLeft sx={{ fontSize: 22 }} />
         </button>
+
+        {navigation ? (
+          <div className="flex items-center gap-3 text-sm text-neutral-500">
+            <button
+              aria-label="Previous applicant"
+              className="flex h-7 w-7 items-center justify-center rounded hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={navigation.onPrev}
+              disabled={!navigation.canPrev}
+              type="button"
+            >
+              <KeyboardArrowLeft sx={{ fontSize: 20 }} />
+            </button>
+            <span className="tabular-nums">
+              {navigation.current}/{navigation.total}
+            </span>
+            <button
+              aria-label="Next applicant"
+              className="flex h-7 w-7 items-center justify-center rounded hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-40"
+              onClick={navigation.onNext}
+              disabled={!navigation.canNext}
+              type="button"
+            >
+              <KeyboardArrowRight sx={{ fontSize: 20 }} />
+            </button>
+          </div>
+        ) : null}
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">
-        {children ?? (
-          <div className="h-full rounded border border-dashed border-neutral-200" />
+
+      <div
+        key={row?.applicantRecordId}
+        className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8"
+      >
+        <SidePanelApplicantBar row={row} details={details} />
+        <SidePanelInfoRow row={row} details={details} />
+
+        {isLoading && !details ? (
+          <p className="py-8 text-center text-sm text-neutral-500">Loading…</p>
+        ) : (
+          <div className="flex flex-col gap-10 border-b border-neutral-200 pb-4 md:flex-row">
+            <SidePanelReviewerColumn
+              index={0}
+              detail={details?.reviewDetails[0]}
+            />
+            <SidePanelReviewerColumn
+              index={1}
+              detail={details?.reviewDetails[1]}
+            />
+          </div>
         )}
       </div>
+
+      <footer className="flex shrink-0 justify-end px-8 py-5">
+        <button
+          className="flex items-center gap-2 rounded-[20px] bg-blue px-4 py-2 font-source font-semibold text-white hover:bg-blue-600"
+          type="button"
+        >
+          <CheckCircleOutline sx={{ fontSize: 19 }} />
+          Shortlist Applicant
+        </button>
+      </footer>
     </aside>
   </Drawer>
 );
+
+const SidePanelApplicantBar = ({
+  row,
+  details,
+}: Pick<DashboardSidePanelProps, "row" | "details">) => {
+  const applicantName = row
+    ? `${row.firstName} ${row.lastName}`
+    : "Applicant details";
+  const totalScore = row?.totalScore;
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+      <div className="flex min-w-0 items-center gap-2">
+        <OpenInNew className="text-blue" sx={{ fontSize: 18 }} />
+        <h2 className="truncate font-source text-lg font-bold text-blue-900">
+          {applicantName}
+        </h2>
+        {totalScore !== null && totalScore !== undefined ? (
+          <span className="whitespace-nowrap font-poppins font-medium text-green-700">
+            {totalScore}/{MAX_TOTAL_SCORE}
+          </span>
+        ) : null}
+      </div>
+
+      <div className="flex items-center gap-2.5">
+        <SidePanelSkillCategoryChip category={details?.skillCategory} />
+        {row ? (
+          <SidePanelStatusSelect status={row.applicationStatus} />
+        ) : null}
+      </div>
+
+      <BookmarkButton />
+    </div>
+  );
+};
+
+const SidePanelInfoRow = ({
+  row,
+  details,
+}: Pick<DashboardSidePanelProps, "row" | "details">) => {
+  const role = details?.position ?? row?.position ?? EMPTY_VALUE;
+  const program = details?.program ?? EMPTY_VALUE;
+  const resumeUrl = details?.resumeUrl;
+
+  return (
+    <div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-neutral-200 pb-2 text-sm">
+      {/* Term is not yet provided by the side-panel query; render as empty. */}
+      <InfoField label="Term" value={EMPTY_VALUE} />
+      <InfoField label="Program" value={program} />
+      <InfoField label="Role" value={role} />
+      {resumeUrl ? (
+        <a
+          className="flex items-center gap-1 text-neutral-800 underline hover:text-blue"
+          href={resumeUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <DescriptionOutlined className="text-blue" sx={{ fontSize: 18 }} />
+          View Resume
+        </a>
+      ) : null}
+      <span className="flex items-center gap-1 text-neutral-800 underline">
+        <OpenInNew className="text-blue" sx={{ fontSize: 16 }} />
+        View Application
+      </span>
+    </div>
+  );
+};
+
+const InfoField = ({ label, value }: { label: string; value: string }) => (
+  <div className="flex items-center gap-2">
+    <span className="font-semibold text-blue-900">{label}</span>
+    <span>{value}</span>
+  </div>
+);
+
+/**
+ * Visual-only bookmark toggle. Persisting the bookmark is handled in a future
+ * ticket.
+ */
+const BookmarkButton = () => {
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  return (
+    <button
+      className="ml-auto flex items-center gap-2 rounded-[20px] px-4 py-2 text-[#936A00] hover:bg-orange-50"
+      onClick={() => setIsBookmarked((prev) => !prev)}
+      aria-pressed={isBookmarked}
+      type="button"
+    >
+      {isBookmarked ? (
+        <BookmarkOutlined sx={{ fontSize: 19 }} />
+      ) : (
+        <BookmarkBorderOutlined sx={{ fontSize: 19 }} />
+      )}
+      Bookmark Applicant
+    </button>
+  );
+};

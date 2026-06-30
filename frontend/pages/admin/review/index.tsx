@@ -9,6 +9,7 @@ import { NextPageWithLayout } from "../../_app";
 
 import { REVIEW_DASHBOARD_COLUMNS } from "./_components/columns";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
+import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
@@ -22,19 +23,32 @@ const AdminReviewPage: NextPageWithLayout = () => {
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [activeRow, setActiveRow] = useState<ReviewDashboardResult | null>(
-    null,
-  );
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const { rows, isLoading, error } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
   );
 
+  // `rows` is already in display order because the table sorts server-side
+  // (manualSorting), so navigating by index walks the current display order.
+  const activeRow: ReviewDashboardResult | null =
+    activeIndex !== null ? (rows[activeIndex] ?? null) : null;
+
+  const { details, isLoading: isDetailsLoading } = useReviewDashboardSidePanel(
+    activeRow?.applicantRecordId ?? null,
+  );
+
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
     setRowSelection({});
+    setActiveIndex(null);
+  };
+
+  const handlePageChange = (nextPageNumber: number) => {
+    setPageNumber(nextPageNumber);
+    setActiveIndex(null);
   };
 
   return (
@@ -60,7 +74,14 @@ const AdminReviewPage: NextPageWithLayout = () => {
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
-          onRowClick={(row) => setActiveRow(row)}
+          onRowClick={(row) =>
+            setActiveIndex(
+              rows.findIndex(
+                (candidate) =>
+                  candidate.applicantRecordId === row.applicantRecordId,
+              ),
+            )
+          }
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={setSorting}
@@ -68,19 +89,29 @@ const AdminReviewPage: NextPageWithLayout = () => {
             pageNumber,
             resultsPerPage,
             canGoNext: rows.length === resultsPerPage,
-            onPageChange: setPageNumber,
+            onPageChange: handlePageChange,
             onResultsPerPageChange: handleResultsPerPageChange,
           }}
         />
       </main>
 
       <DashboardSidePanel
-        open={!!activeRow}
-        onClose={() => setActiveRow(null)}
-        title={
-          activeRow
-            ? `${activeRow.firstName} ${activeRow.lastName}`
-            : "Applicant details"
+        open={activeRow !== null}
+        onClose={() => setActiveIndex(null)}
+        row={activeRow}
+        details={details}
+        isLoading={isDetailsLoading}
+        navigation={
+          activeIndex !== null
+            ? {
+                current: activeIndex + 1,
+                total: rows.length,
+                canPrev: activeIndex > 0,
+                canNext: activeIndex < rows.length - 1,
+                onPrev: () => setActiveIndex((index) => (index ?? 0) - 1),
+                onNext: () => setActiveIndex((index) => (index ?? 0) + 1),
+              }
+            : undefined
         }
       />
     </div>
