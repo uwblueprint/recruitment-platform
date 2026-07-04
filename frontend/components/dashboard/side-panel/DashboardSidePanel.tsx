@@ -7,16 +7,21 @@ import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import KeyboardDoubleArrowLeft from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import OpenInNew from "@mui/icons-material/OpenInNew";
 import Drawer from "@mui/material/Drawer";
+import Link from "next/link";
 import { useState } from "react";
 
+import { Button } from "@/components/common/Button";
 import type {
   ReviewDashboardResult,
   ReviewDashboardSidePanelResult,
 } from "@/graphql/typeUtils";
 
+import {
+  APPLICATION_STATUS_OPTIONS,
+  DashboardStatusChip,
+  SKILL_CATEGORY_OPTIONS,
+} from "../common";
 import { SidePanelReviewerColumn } from "./SidePanelReviewerColumn";
-import { SidePanelSkillCategoryChip } from "./SidePanelSkillCategoryChip";
-import { SidePanelStatusSelect } from "./SidePanelStatusSelect";
 
 /** Maximum combined review score: 4 criteria × 5 points × 2 reviewers. */
 const MAX_TOTAL_SCORE = 40;
@@ -37,11 +42,17 @@ type DashboardSidePanelProps = {
   open: boolean;
   onClose: () => void;
   /** Row that was clicked; drives the always-available header summary. */
-  row: ReviewDashboardResult | null;
+  row?: ReviewDashboardResult;
   /** Expanded details fetched for the active applicant. */
-  details: ReviewDashboardSidePanelResult | null;
+  details?: ReviewDashboardSidePanelResult;
   isLoading?: boolean;
   navigation?: SidePanelNavigation;
+};
+
+/** Props for sections that only render once an active row exists. */
+type ActiveApplicantProps = {
+  row: ReviewDashboardResult;
+  details?: ReviewDashboardSidePanelResult;
 };
 
 export const DashboardSidePanel = ({
@@ -96,50 +107,51 @@ export const DashboardSidePanel = ({
         ) : null}
       </header>
 
-      <div
-        key={row?.applicantRecordId}
-        className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8"
-      >
-        <SidePanelApplicantBar row={row} details={details} />
-        <SidePanelInfoRow row={row} details={details} />
+      {row ? (
+        <div
+          key={row.applicantRecordId}
+          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8"
+        >
+          <SidePanelApplicantBar row={row} details={details} />
+          <SidePanelInfoRow row={row} details={details} />
 
-        {isLoading && !details ? (
-          <p className="py-8 text-center text-sm text-neutral-500">Loading…</p>
-        ) : (
-          <div className="flex flex-col gap-10 border-b border-neutral-200 pb-4 md:flex-row">
-            <SidePanelReviewerColumn
-              index={0}
-              detail={details?.reviewDetails[0]}
-            />
-            <SidePanelReviewerColumn
-              index={1}
-              detail={details?.reviewDetails[1]}
-            />
-          </div>
-        )}
-      </div>
+          {details ? (
+            <div className="flex flex-col gap-10 border-b border-neutral-200 pb-4 md:flex-row">
+              <SidePanelReviewerColumn
+                index={0}
+                detail={details.reviewDetails[0]}
+              />
+              <SidePanelReviewerColumn
+                index={1}
+                detail={details.reviewDetails[1]}
+              />
+            </div>
+          ) : isLoading ? (
+            <p className="py-8 text-center text-sm text-neutral-500">
+              Loading…
+            </p>
+          ) : null}
+        </div>
+      ) : null}
 
       <footer className="flex shrink-0 justify-end px-8 py-5">
-        <button
-          className="flex items-center gap-2 rounded-[20px] bg-blue px-4 py-2 font-source font-semibold text-white hover:bg-blue-600"
-          type="button"
-        >
+        <Button size="sm" className="flex items-center gap-2">
           <CheckCircleOutline sx={{ fontSize: 19 }} />
           Shortlist Applicant
-        </button>
+        </Button>
       </footer>
     </aside>
   </Drawer>
 );
 
-const SidePanelApplicantBar = ({
-  row,
-  details,
-}: Pick<DashboardSidePanelProps, "row" | "details">) => {
-  const applicantName = row
-    ? `${row.firstName} ${row.lastName}`
-    : "Applicant details";
-  const totalScore = row?.totalScore;
+const SidePanelApplicantBar = ({ row, details }: ActiveApplicantProps) => {
+  const applicantName = `${row.firstName} ${row.lastName}`;
+  const { totalScore } = row;
+
+  // Visual-only status control. Selecting a value updates the chip locally;
+  // persisting to the backend is handled in a future ticket. The container is
+  // keyed by applicant record id, so this state resets per applicant.
+  const [selectedStatus, setSelectedStatus] = useState(row.applicationStatus);
 
   return (
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -148,7 +160,7 @@ const SidePanelApplicantBar = ({
         <h2 className="truncate font-source text-lg font-bold text-blue-900">
           {applicantName}
         </h2>
-        {totalScore !== null && totalScore !== undefined ? (
+        {totalScore !== null ? (
           <span className="whitespace-nowrap font-poppins font-medium text-green-700">
             {totalScore}/{MAX_TOTAL_SCORE}
           </span>
@@ -156,10 +168,18 @@ const SidePanelApplicantBar = ({
       </div>
 
       <div className="flex items-center gap-2.5">
-        <SidePanelSkillCategoryChip category={details?.skillCategory} />
-        {row ? (
-          <SidePanelStatusSelect status={row.applicationStatus} />
+        {details?.skillCategory ? (
+          // Read-only: no onChange, so selecting an option is a no-op.
+          <DashboardStatusChip
+            value={details.skillCategory}
+            options={SKILL_CATEGORY_OPTIONS}
+          />
         ) : null}
+        <DashboardStatusChip
+          value={selectedStatus}
+          options={APPLICATION_STATUS_OPTIONS}
+          onChange={setSelectedStatus}
+        />
       </div>
 
       <BookmarkButton />
@@ -167,18 +187,17 @@ const SidePanelApplicantBar = ({
   );
 };
 
-const SidePanelInfoRow = ({
-  row,
-  details,
-}: Pick<DashboardSidePanelProps, "row" | "details">) => {
-  const role = details?.position ?? row?.position ?? EMPTY_VALUE;
+const SidePanelInfoRow = ({ row, details }: ActiveApplicantProps) => {
+  // "Term" in the UI is the academic term (e.g. 2A, 2B), not the recruitment
+  // cycle stored in `applicant.term`.
+  const term = details?.academicYear ?? EMPTY_VALUE;
   const program = details?.program ?? EMPTY_VALUE;
+  const role = details?.position ?? row.position;
   const resumeUrl = details?.resumeUrl;
 
   return (
     <div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-neutral-200 pb-2 text-sm">
-      {/* Term is not yet provided by the side-panel query; render as empty. */}
-      <InfoField label="Term" value={EMPTY_VALUE} />
+      <InfoField label="Term" value={term} />
       <InfoField label="Program" value={program} />
       <InfoField label="Role" value={role} />
       {resumeUrl ? (
@@ -192,10 +211,13 @@ const SidePanelInfoRow = ({
           View Resume
         </a>
       ) : null}
-      <span className="flex items-center gap-1 text-neutral-800 underline">
+      <Link
+        className="flex items-center gap-1 text-neutral-800 underline hover:text-blue"
+        href={`/review/${row.applicantRecordId}/view`}
+      >
         <OpenInNew className="text-blue" sx={{ fontSize: 16 }} />
         View Application
-      </span>
+      </Link>
     </div>
   );
 };

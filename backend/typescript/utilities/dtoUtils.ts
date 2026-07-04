@@ -211,6 +211,7 @@ export function toReviewDashboardSidePanelDTO(
     lastName: applicantRecord.applicant.last_name,
     position: applicantRecord.position,
     program: applicantRecord.applicant.program,
+    academicYear: applicantRecord.applicant.academic_year,
     resumeUrl: applicantRecord.applicant.resume_url,
     applicationStatus: applicantRecord.status,
     skillCategory: applicantRecord.skill_category as SkillCategory,

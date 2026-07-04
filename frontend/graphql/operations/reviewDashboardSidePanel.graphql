@@ -4,6 +4,7 @@ query ReviewDashboardSidePanel($applicantRecordId: ID!) {
     lastName
     position
     program
+    academicYear
     resumeUrl
     applicationStatus
     skillCategory

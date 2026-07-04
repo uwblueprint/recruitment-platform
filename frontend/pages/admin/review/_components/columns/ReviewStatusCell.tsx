@@ -1,7 +1,7 @@
 import {
   APPLICATION_STATUS_OPTIONS,
   DashboardStatusChip,
-} from "@/components/dashboard/table";
+} from "@/components/dashboard/common";
 import { ApplicationStatus } from "@/graphql/typeUtils";
 import { useState } from "react";
 

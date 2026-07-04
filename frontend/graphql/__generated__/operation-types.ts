@@ -87,12 +87,20 @@ export type ReviewDashboardQueryVariables = Exact<{
 
 export type ReviewDashboardQuery = { reviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, timesApplied: string, applicationStatus: Types.ApplicationStatus, choice: number, totalScore: number | null, reviewers: Array<{ id: string, firstName: string, lastName: string, email: string, position: string | null, role: Types.Role, isArchived: boolean }> }> };
 
+export type ReviewDashboardApplicantRecordIdsQueryVariables = Exact<{
+  sortBy?: Types.ReviewDashboardSortBy | null | undefined;
+  sortAscending?: boolean | null | undefined;
+}>;
+
+
+export type ReviewDashboardApplicantRecordIdsQuery = { reviewDashboardApplicantRecordIds: Array<string> };
+
 export type ReviewDashboardSidePanelQueryVariables = Exact<{
   applicantRecordId: string | number;
 }>;
 
 
-export type ReviewDashboardSidePanelQuery = { reviewDashboardSidePanel: { firstName: string, lastName: string, position: string, program: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, reviewDetails: Array<{ reviewStatus: Types.ReviewStatus, reviewer: { id: string, firstName: string, lastName: string }, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null }> } };
+export type ReviewDashboardSidePanelQuery = { reviewDashboardSidePanel: { firstName: string, lastName: string, position: string, program: string, academicYear: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, reviewDetails: Array<{ reviewStatus: Types.ReviewStatus, reviewer: { id: string, firstName: string, lastName: string }, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null }> } };
 
 export type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables = Exact<{
   applicantRecordId: string | number;

@@ -1,7 +1,10 @@
 import { client } from "@/client";
 import {
+  ReviewDashboardApplicantRecordIdsDocument,
   ReviewDashboardDocument,
   ReviewDashboardSidePanelDocument,
+  type ReviewDashboardApplicantRecordIdsQuery,
+  type ReviewDashboardApplicantRecordIdsQueryVariables,
   type ReviewDashboardQuery,
   type ReviewDashboardQueryVariables,
   type ReviewDashboardResult,
@@ -36,6 +39,29 @@ class ReviewDashboardAPIClient {
       return data.reviewDashboard;
     } catch {
       throw new Error("Failed to get review dashboard");
+    }
+  }
+
+  static async getReviewDashboardApplicantRecordIds(): Promise<string[]> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ReviewDashboardApplicantRecordIdsQuery,
+        ReviewDashboardApplicantRecordIdsQueryVariables
+      >({
+        query: ReviewDashboardApplicantRecordIdsDocument,
+        variables: {},
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.reviewDashboardApplicantRecordIds) {
+        throw new Error("No data returned");
+      }
+
+      return data.reviewDashboardApplicantRecordIds;
+    } catch {
+      throw new Error("Failed to get review dashboard applicant record ids");
     }
   }
 

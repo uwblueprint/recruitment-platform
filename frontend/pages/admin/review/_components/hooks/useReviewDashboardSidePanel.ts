@@ -3,7 +3,7 @@ import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
 import type { ReviewDashboardSidePanelResult } from "@/graphql/typeUtils";
 
 type UseReviewDashboardSidePanelResult = {
-  details: ReviewDashboardSidePanelResult | null;
+  details?: ReviewDashboardSidePanelResult;
   isLoading: boolean;
   error: boolean;
 };
@@ -11,14 +11,14 @@ type UseReviewDashboardSidePanelResult = {
 /**
  * Fetches the expanded side-panel details for a single applicant record.
  *
- * Pass `null` when no row is active to skip fetching and clear any previous
- * result.
+ * Pass `undefined` when no row is active to skip fetching and clear any
+ * previous result.
  */
 const useReviewDashboardSidePanel = (
-  applicantRecordId: string | null,
+  applicantRecordId: string | undefined,
 ): UseReviewDashboardSidePanelResult => {
   const [state, setState] = useState<UseReviewDashboardSidePanelResult>({
-    details: null,
+    details: undefined,
     isLoading: false,
     error: false,
   });
@@ -26,7 +26,7 @@ const useReviewDashboardSidePanel = (
   useEffect(() => {
     if (!applicantRecordId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setState({ details: null, isLoading: false, error: false });
+      setState({ details: undefined, isLoading: false, error: false });
       return;
     }
 
@@ -41,7 +41,7 @@ const useReviewDashboardSidePanel = (
       })
       .catch(() => {
         if (isCurrent) {
-          setState({ details: null, isLoading: false, error: true });
+          setState({ details: undefined, isLoading: false, error: true });
         }
       });
 

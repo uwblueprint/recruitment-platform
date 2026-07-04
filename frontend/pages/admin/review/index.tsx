@@ -1,7 +1,6 @@
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import { RowSelectionState, SortingState } from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { ReactElement, useState } from "react";
@@ -9,6 +8,7 @@ import { NextPageWithLayout } from "../../_app";
 
 import { REVIEW_DASHBOARD_COLUMNS } from "./_components/columns";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
+import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
@@ -23,32 +23,50 @@ const AdminReviewPage: NextPageWithLayout = () => {
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [activeId, setActiveId] = useState<string | undefined>(undefined);
 
   const { rows, isLoading, error } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
   );
 
-  // `rows` is already in display order because the table sorts server-side
-  // (manualSorting), so navigating by index walks the current display order.
-  const activeRow: ReviewDashboardResult | null =
-    activeIndex !== null ? (rows[activeIndex] ?? null) : null;
+  // Every applicant record id in display order, so the side panel can walk the
+  // whole dashboard instead of only the page currently loaded in `rows`.
+  const applicantRecordIds = useReviewDashboardApplicantRecordIds();
+
+  // The active row is only available while the active applicant's page is
+  // loaded; navigating to another page leaves it undefined until the page
+  // fetch settles.
+  const activeRow = rows.find((row) => row.applicantRecordId === activeId);
 
   const { details, isLoading: isDetailsLoading } = useReviewDashboardSidePanel(
-    activeRow?.applicantRecordId ?? null,
+    activeId,
   );
+
+  const activeNavigationIndex =
+    activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
+
+  // Jumps the side panel to the applicant at `index` and keeps the table on
+  // the page that applicant lives on.
+  const goToApplicant = (index: number) => {
+    const applicantRecordId = applicantRecordIds[index];
+    if (!applicantRecordId) {
+      return;
+    }
+    setActiveId(applicantRecordId);
+    setPageNumber(Math.floor(index / resultsPerPage) + 1);
+  };
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
     setRowSelection({});
-    setActiveIndex(null);
+    setActiveId(undefined);
   };
 
   const handlePageChange = (nextPageNumber: number) => {
     setPageNumber(nextPageNumber);
-    setActiveIndex(null);
+    setActiveId(undefined);
   };
 
   return (
@@ -74,14 +92,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
-          onRowClick={(row) =>
-            setActiveIndex(
-              rows.findIndex(
-                (candidate) =>
-                  candidate.applicantRecordId === row.applicantRecordId,
-              ),
-            )
-          }
+          onRowClick={(row) => setActiveId(row.applicantRecordId)}
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={setSorting}
@@ -96,20 +107,20 @@ const AdminReviewPage: NextPageWithLayout = () => {
       </main>
 
       <DashboardSidePanel
-        open={activeRow !== null}
-        onClose={() => setActiveIndex(null)}
+        open={activeId !== undefined}
+        onClose={() => setActiveId(undefined)}
         row={activeRow}
         details={details}
         isLoading={isDetailsLoading}
         navigation={
-          activeIndex !== null
+          activeNavigationIndex >= 0
             ? {
-                current: activeIndex + 1,
-                total: rows.length,
-                canPrev: activeIndex > 0,
-                canNext: activeIndex < rows.length - 1,
-                onPrev: () => setActiveIndex((index) => (index ?? 0) - 1),
-                onNext: () => setActiveIndex((index) => (index ?? 0) + 1),
+                current: activeNavigationIndex + 1,
+                total: applicantRecordIds.length,
+                canPrev: activeNavigationIndex > 0,
+                canNext: activeNavigationIndex < applicantRecordIds.length - 1,
+                onPrev: () => goToApplicant(activeNavigationIndex - 1),
+                onNext: () => goToApplicant(activeNavigationIndex + 1),
               }
             : undefined
         }
