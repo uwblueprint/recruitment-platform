@@ -19,16 +19,6 @@ const APPLICATION_STATUS_OPTIONS = [
     className: "bg-green-200 text-black",
   },
   {
-    value: ApplicationStatus.Interviewed,
-    label: "Interviewed",
-    className: "bg-blue-200 text-black",
-  },
-  {
-    value: ApplicationStatus.Offered,
-    label: "Offered",
-    className: "bg-teal-200 text-black",
-  },
-  {
     value: ApplicationStatus.Selected,
     label: "Selected",
     className: "bg-purple-200 text-black",
