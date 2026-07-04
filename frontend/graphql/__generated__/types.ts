@@ -258,6 +258,7 @@ export type Mutation = {
   login: AuthDto;
   loginWithGoogle: AuthDto;
   logout?: Maybe<Scalars['ID']['output']>;
+  reassignReviewer: ReviewedApplicantRecordDto;
   refresh: Scalars['String']['output'];
   register: AuthDto;
   reportInterviewConflict: InterviewedApplicantRecord;
@@ -417,6 +418,13 @@ export type MutationLogoutArgs = {
 };
 
 
+export type MutationReassignReviewerArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+  newReviewerId: Scalars['ID']['input'];
+  oldReviewerId: Scalars['ID']['input'];
+};
+
+
 export type MutationRefreshArgs = {
   refreshToken: Scalars['String']['input'];
 };
@@ -542,6 +550,7 @@ export type Query = {
   userByEmail: UserDto;
   userById: UserDto;
   users: Array<UserDto>;
+  usersByPosition: Array<Maybe<UserDto>>;
   usersCSV: Scalars['String']['output'];
 };
 
@@ -617,6 +626,8 @@ export type QueryIsAuthorizedToReviewArgs = {
 export type QueryReviewDashboardArgs = {
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
+  sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
+  sortBy?: InputMaybe<ReviewDashboardSortBy>;
 };
 
 
@@ -653,6 +664,11 @@ export type QueryUserByEmailArgs = {
 
 export type QueryUserByIdArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryUsersByPositionArgs = {
+  position: Scalars['String']['input'];
 };
 
 export type RegisterUserDto = {
@@ -703,6 +719,17 @@ export type ReviewDashboardSidePanelDto = {
   reviewDetails: Array<ReviewDashboardReviewDetails>;
   skillCategory?: Maybe<SkillCategory>;
 };
+
+export enum ReviewDashboardSortBy {
+  ApplicationStatus = 'APPLICATION_STATUS',
+  Choice = 'CHOICE',
+  FirstName = 'FIRST_NAME',
+  LastName = 'LAST_NAME',
+  Reviewer_1 = 'REVIEWER_1',
+  Reviewer_2 = 'REVIEWER_2',
+  TimesApplied = 'TIMES_APPLIED',
+  TotalScore = 'TOTAL_SCORE'
+}
 
 export type ReviewInput = {
   comments?: InputMaybe<Scalars['String']['input']>;

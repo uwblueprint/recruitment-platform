@@ -106,6 +106,7 @@ export {
   InterviewGroupDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
+  ReassignReviewerDocument,
   RefreshDocument,
   ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
@@ -113,6 +114,7 @@ export {
   ReviewDashboardDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
+  UsersByPositionDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -130,6 +132,8 @@ export type {
   LoginMutationVariables,
   LoginWithGoogleMutation,
   LoginWithGoogleMutationVariables,
+  ReassignReviewerMutation,
+  ReassignReviewerMutationVariables,
   RefreshMutation,
   RefreshMutationVariables,
   ReportInterviewConflictMutation,
@@ -144,6 +148,8 @@ export type {
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
   UpdateInterviewGroupSchedulingLinkMutationVariables,
+  UsersByPositionQuery,
+  UsersByPositionQueryVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -206,4 +212,14 @@ export type ReportInterviewConflictResult = OperationField<
 >;
 export type ReviewDashboardResult = ArrayElement<
   OperationField<Operations.ReviewDashboardQuery, "reviewDashboard">
+>;
+
+export type ReassignReviewerResult = OperationField<
+  Operations.ReassignReviewerMutation,
+  "reassignReviewer"
+>;
+
+export type UsersByPositionResult = OperationField<
+  Operations.UsersByPositionQuery,
+  "usersByPosition"
 >;

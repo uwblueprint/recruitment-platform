@@ -5,6 +5,10 @@ import {
   type ApplicationQuery,
   type ApplicationQueryVariables,
   type ApplicationResult,
+  ReassignReviewerDocument,
+  type ReassignReviewerMutation,
+  type ReassignReviewerMutationVariables,
+  type ReassignReviewerResult,
   ReportReviewConflictDocument,
   type ReportReviewConflictMutation,
   type ReportReviewConflictMutationVariables,
@@ -12,6 +16,10 @@ import {
   ReviewedApplicantRecordsByApplicantRecordIdDocument,
   type ReviewedApplicantRecordsByApplicantRecordIdQuery,
   type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
+  UsersByPositionDocument,
+  type UsersByPositionQuery,
+  type UsersByPositionQueryVariables,
+  type UsersByPositionResult,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -89,6 +97,57 @@ class ReviewPageAPIClient {
       return data.reviewedApplicantRecordsByApplicantRecordId;
     } catch {
       throw new Error("Failed to fetch reviewed applicant records");
+    }
+  }
+
+  static async getUsersByPosition(
+    position: string,
+  ): Promise<UsersByPositionResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        UsersByPositionQuery,
+        UsersByPositionQueryVariables
+      >({
+        query: UsersByPositionDocument,
+        variables: { position },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.usersByPosition) {
+        throw new Error("No data returned");
+      }
+
+      return data.usersByPosition;
+    } catch {
+      throw new Error(`Failed to fetch users with position ${position}`);
+    }
+  }
+
+  static async reassignReviewer(
+    applicantRecordId: string,
+    oldReviewerId: string,
+    newReviewerId: string,
+  ): Promise<ReassignReviewerResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.mutate<
+        ReassignReviewerMutation,
+        ReassignReviewerMutationVariables
+      >({
+        mutation: ReassignReviewerDocument,
+        variables: { applicantRecordId, oldReviewerId, newReviewerId },
+      });
+
+      if (!data?.reassignReviewer) {
+        throw new Error("No data returned");
+      }
+
+      return data.reassignReviewer;
+    } catch {
+      throw new Error("Failed to reassign reviewer");
     }
   }
 }
