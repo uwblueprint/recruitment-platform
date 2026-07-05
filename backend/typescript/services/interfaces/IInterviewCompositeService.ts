@@ -1,6 +1,7 @@
 import {
   InterviewDelegationDTO,
   InterviewDashboardRowDTO,
+  InterviewInviteDTO,
   InterviewedApplicantsDTO,
   InterviewPairingsDTO,
   UserDTO,
@@ -40,6 +41,11 @@ interface IInterviewCompositeService {
    * @param groupId the interview group id
    */
   getInterviewersByGroupId(groupId: string): Promise<UserDTO[]>;
+
+  /**
+   * Fetches all interview groups with their interviewers and interviewees for the admin interview invites page.
+   */
+  getInterviewInvites(): Promise<InterviewInviteDTO[]>;
 }
 
 export default IInterviewCompositeService;

@@ -3,13 +3,20 @@ import { InterviewInvite } from "./types";
 import { theme } from "@/styles/Theme";
 import { ArrowDownIcon } from "@/components/icons/arrow-down.icon";
 import { ArrowUpIcon } from "@/components/icons/arrow-up.icon";
-import { Checkbox, Divider, Collapse, Chip } from "@mui/material";
+import { Checkbox, Divider, Collapse, Chip, Avatar } from "@mui/material";
+
+const STATUS_LABELS: Record<string, string> = {
+  AVAILABILITY_PENDING: "Availability pending",
+  READY_TO_INTERVIEW: "Ready for invite",
+  INVITES_SENT: "Invites sent",
+};
 
 type InterviewInviteRowProps = {
   invite: InterviewInvite;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
 };
+
 export const InterviewInviteRow = ({
   invite,
   isSelected,
@@ -25,6 +32,8 @@ export const InterviewInviteRow = ({
       ? interviewers[0]
       : `${interviewers[0]} + ${interviewers[1]}`;
 
+  const statusLabel = STATUS_LABELS[status] ?? status;
+
   const dividerSx = {
     borderRightWidth: 2,
     height: 24,
@@ -33,7 +42,7 @@ export const InterviewInviteRow = ({
   return (
     <div className="w-full">
       <div
-        className="flex justify-between items-center w-full px-6 py-3 pl-3 cursor-pointer select-none border-[1px] border-neutral-200 rounded-t-[4px]"
+        className="flex justify-between items-center w-full px-6 py-3 pl-3 cursor-pointer select-none border border-neutral-200 rounded-t-[4px] bg-white"
         onClick={() => setOpen((prev) => !prev)}
       >
         {/* Left Side */}
@@ -47,9 +56,37 @@ export const InterviewInviteRow = ({
               width: 20,
               height: 20,
               color: theme.colors.greys.checkbox_border,
-              "&.Mui-checked": { color: theme.colors.B15 },
+              "&.Mui-checked": { color: theme.colors.B10 },
             }}
           />
+
+          {/* Stacked avatars */}
+          <div className="flex items-center">
+            <Avatar
+              sx={{
+                width: 42,
+                height: 42,
+                mr: "-10px",
+                zIndex: 1,
+                bgcolor: "#C4C4C4",
+                fontSize: 16,
+              }}
+            >
+              {interviewers[0]?.[0]?.toUpperCase()}
+            </Avatar>
+            {interviewers.length > 1 && (
+              <Avatar
+                sx={{
+                  width: 42,
+                  height: 42,
+                  bgcolor: "#9f9f9f",
+                  fontSize: 16,
+                }}
+              >
+                {interviewers[1]?.[0]?.toUpperCase()}
+              </Avatar>
+            )}
+          </div>
 
           {/* Interview Info */}
           <div>
@@ -63,11 +100,11 @@ export const InterviewInviteRow = ({
 
           <Divider
             orientation="vertical"
-            className="!h-6 !self-center !border-r-2 !bg-neutral-200"
             flexItem
             sx={dividerSx}
+            className="!h-6 !self-center !border-r-2 !bg-neutral-200"
           />
-          {/* Interviewee Count */}
+
           <span className="font-source text-sm text-neutral-800 whitespace-nowrap">
             {interviewees.length} Interviewee
             {interviewees.length !== 1 ? "s" : ""}
@@ -75,27 +112,25 @@ export const InterviewInviteRow = ({
 
           <Divider
             orientation="vertical"
-            className="!h-6 !self-center !border-r-2 !bg-neutral-200"
             flexItem
             sx={dividerSx}
+            className="!h-6 !self-center !border-r-2 !bg-neutral-200"
           />
-          {/* Review Status */}
+
           <div className="flex items-center gap-3">
             <span className="font-source text-sm text-neutral-800 whitespace-nowrap">
               Status:
             </span>
             <Chip
-              label={status}
+              label={statusLabel}
               size="small"
-              className="font-source !rounded-[4px] !py-4 !bg-purple-200"
-              sx={{
-                backgroundColor: `${theme.colors.V05}`,
-              }}
+              className="font-source !rounded-[4px] !py-4"
+              sx={{ backgroundColor: theme.colors.V05 }}
             />
           </div>
         </div>
 
-        {/* Right Side */}
+        {/* Chevron */}
         {open ? (
           <ArrowUpIcon className="text-neutral-800" />
         ) : (
@@ -108,29 +143,35 @@ export const InterviewInviteRow = ({
           <div className="grid grid-cols-[0.8fr_1.6fr_1.6fr]">
             {/* Column 1: Interviewer availability */}
             <div className="flex flex-col items-start gap-3 self-stretch px-6 py-4 border-r border-neutral-200">
-              <p className="font-source font-semibold text-sm text-neutral-800">
+              <p className="font-source font-semibold text-base text-neutral-800">
                 Interviewer availability:
               </p>
-              <a
-                href={calendlyLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-source text-sm text-link underline break-all"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {calendlyLink}
-              </a>
+              {calendlyLink ? (
+                <a
+                  href={calendlyLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-source text-sm text-link underline break-all"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {calendlyLink}
+                </a>
+              ) : (
+                <span className="font-source text-sm text-neutral-500 italic">
+                  No link provided
+                </span>
+              )}
             </div>
 
             {/* Column 2: Interviewees */}
             <div className="flex flex-col">
-              <p className="font-source font-semibold text-sm text-neutral-800 px-5 py-3">
+              <p className="font-source font-semibold text-base text-neutral-800 px-6 py-4">
                 Interviewees:
               </p>
               {interviewees.map((interviewee, idx) => (
                 <p
                   key={idx}
-                  className={`font-source text-sm text-neutral-800 px-5 py-3 ${
+                  className={`font-source text-base text-neutral-800 px-6 py-4 h-14 flex items-center ${
                     idx % 2 === 0 ? "bg-charcoal-100" : "bg-white"
                   }`}
                 >
@@ -141,13 +182,13 @@ export const InterviewInviteRow = ({
 
             {/* Column 3: Role interviewing for */}
             <div className="flex flex-col">
-              <p className="font-source font-semibold text-sm text-neutral-800 px-5 py-3">
+              <p className="font-source font-semibold text-base text-neutral-800 px-6 py-4">
                 Role interviewing for:
               </p>
               {interviewees.map((interviewee, idx) => (
                 <p
                   key={idx}
-                  className={`font-source text-sm text-neutral-800 px-5 py-3 ${
+                  className={`font-source text-base text-neutral-800 px-6 py-4 h-14 flex items-center ${
                     idx % 2 === 0 ? "bg-charcoal-100" : "bg-white"
                   }`}
                 >

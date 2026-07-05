@@ -20,6 +20,7 @@ type Documents = {
     "mutation DeleteAdminCommentById($id: ID!) {\n  deleteAdminCommentById(id: $id) {\n    id\n  }\n}": typeof types.DeleteAdminCommentByIdDocument,
     "query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  interviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    applicantRecordId\n    firstName\n    lastName\n    position\n    applicationStatus\n    interviewers {\n      firstName\n      lastName\n    }\n    interviewScore\n  }\n}": typeof types.InterviewDashboardDocument,
     "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.InterviewGroupDocument,
+    "query InterviewInvites {\n  interviewInvites {\n    id\n    interviewers {\n      id\n      firstName\n      lastName\n    }\n    interviewees {\n      firstName\n      lastName\n      position\n    }\n    position\n    schedulingLink\n    status\n  }\n}": typeof types.InterviewInvitesDocument,
     "query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": typeof types.InterviewedApplicantsByUserIdDocument,
     "query InterviewedPairingsByUserId($userId: ID!) {\n  interviewedPairingsByUserId(userId: $userId) {\n    interviewedGroupId\n    interviewGroupStatus\n    groupMembers {\n      id\n      firstName\n      lastName\n      email\n      role\n      position\n      isArchived\n    }\n  }\n}": typeof types.InterviewedPairingsByUserIdDocument,
     "query InterviewersByGroupId($groupId: ID!) {\n  interviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": typeof types.InterviewersByGroupIdDocument,
@@ -46,6 +47,7 @@ const documents: Documents = {
     "mutation DeleteAdminCommentById($id: ID!) {\n  deleteAdminCommentById(id: $id) {\n    id\n  }\n}": types.DeleteAdminCommentByIdDocument,
     "query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  interviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    applicantRecordId\n    firstName\n    lastName\n    position\n    applicationStatus\n    interviewers {\n      firstName\n      lastName\n    }\n    interviewScore\n  }\n}": types.InterviewDashboardDocument,
     "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}": types.InterviewGroupDocument,
+    "query InterviewInvites {\n  interviewInvites {\n    id\n    interviewers {\n      id\n      firstName\n      lastName\n    }\n    interviewees {\n      firstName\n      lastName\n      position\n    }\n    position\n    schedulingLink\n    status\n  }\n}": types.InterviewInvitesDocument,
     "query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": types.InterviewedApplicantsByUserIdDocument,
     "query InterviewedPairingsByUserId($userId: ID!) {\n  interviewedPairingsByUserId(userId: $userId) {\n    interviewedGroupId\n    interviewGroupStatus\n    groupMembers {\n      id\n      firstName\n      lastName\n      email\n      role\n      position\n      isArchived\n    }\n  }\n}": types.InterviewedPairingsByUserIdDocument,
     "query InterviewersByGroupId($groupId: ID!) {\n  interviewersByGroupId(groupId: $groupId) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": types.InterviewersByGroupIdDocument,
@@ -104,6 +106,10 @@ export function gql(source: "query InterviewDashboard($pageNumber: Int!, $result
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}"): (typeof documents)["query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query InterviewInvites {\n  interviewInvites {\n    id\n    interviewers {\n      id\n      firstName\n      lastName\n    }\n    interviewees {\n      firstName\n      lastName\n      position\n    }\n    position\n    schedulingLink\n    status\n  }\n}"): (typeof documents)["query InterviewInvites {\n  interviewInvites {\n    id\n    interviewers {\n      id\n      firstName\n      lastName\n    }\n    interviewees {\n      firstName\n      lastName\n      position\n    }\n    position\n    schedulingLink\n    status\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

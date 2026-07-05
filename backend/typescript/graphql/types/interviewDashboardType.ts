@@ -11,11 +11,27 @@ const interviewDashboardTypes = gql`
     interviewScore: Int
   }
 
+  type InterviewInviteeDTO {
+    firstName: String!
+    lastName: String!
+    position: String!
+  }
+
+  type InterviewInviteDTO {
+    id: ID!
+    interviewers: [UserDTO!]!
+    interviewees: [InterviewInviteeDTO!]!
+    position: String!
+    schedulingLink: String
+    status: InterviewGroupStatus!
+  }
+
   extend type Query {
     interviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
     ): [InterviewDashboardRowDTO!]!
+    interviewInvites: [InterviewInviteDTO!]!
   }
 
   extend type Mutation {

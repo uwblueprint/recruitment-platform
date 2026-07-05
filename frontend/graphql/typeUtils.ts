@@ -46,6 +46,8 @@ export type InterviewDTO = WithoutTypename<Schema.Interview>;
 export type InterviewDelegationDTO =
   WithoutTypename<Schema.InterviewDelegationDto>;
 export type InterviewGroupDTO = WithoutTypename<Schema.InterviewGroupDto>;
+export type InterviewInviteeDTO = WithoutTypename<Schema.InterviewInviteeDto>;
+export type InterviewInviteDTO = WithoutTypename<Schema.InterviewInviteDto>;
 export type InterviewPairingsDTO = WithoutTypename<Schema.InterviewPairingsDto>;
 export type InterviewedApplicantRecordDTO =
   WithoutTypename<Schema.InterviewedApplicantRecord>;
@@ -112,6 +114,7 @@ export {
   InterviewDashboardDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
+  InterviewInvitesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
   RefreshDocument,
@@ -140,6 +143,8 @@ export type {
   ApplicationQueryVariables,
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
+  InterviewInvitesQuery,
+  InterviewInvitesQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
   InterviewedPairingsByUserIdQuery,
@@ -269,6 +274,9 @@ export type InterviewedPairingResult = ArrayElement<
     Operations.InterviewedPairingsByUserIdQuery,
     "interviewedPairingsByUserId"
   >
+>;
+export type InterviewInviteResult = ArrayElement<
+  OperationField<Operations.InterviewInvitesQuery, "interviewInvites">
 >;
 export type AdminCommentResult = ArrayElement<
   OperationField<
