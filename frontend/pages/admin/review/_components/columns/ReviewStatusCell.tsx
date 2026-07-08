@@ -23,6 +23,11 @@ const APPLICATION_STATUS_OPTIONS = [
     label: "Selected",
     className: "bg-purple-200 text-black",
   },
+  {
+    value: ApplicationStatus.Rejected,
+    label: "Rejected",
+    className: "bg-red-200 text-black",
+  },
 ] as const;
 
 type ReviewStatusCellProps = {
