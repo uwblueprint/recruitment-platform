@@ -3,6 +3,14 @@ import { ApplicationStatus, SkillCategory } from "./applicantRecord";
 import { Review, ReviewStatus } from "./reviewedApplicantRecord";
 import { UserDTO } from "./user";
 
+export const DashboardViewEnum = {
+  ALL: "ALL",
+  SHORTLISTED: "SHORTLISTED",
+  CONFLICTS: "CONFLICTS",
+} as const;
+
+export type DashboardView = ValueOf<typeof DashboardViewEnum>;
+
 export const ReviewDashboardSortByEnum = {
   FIRST_NAME: "FIRST_NAME",
   LAST_NAME: "LAST_NAME",

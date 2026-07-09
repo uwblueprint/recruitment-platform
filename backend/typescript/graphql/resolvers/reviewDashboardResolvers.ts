@@ -1,5 +1,6 @@
 import ReviewCompositeService from "../../services/implementations/reviewCompositeService";
 import {
+  DashboardView,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -16,11 +17,13 @@ const reviewDashboardResolvers = {
         resultsPerPage,
         sortBy,
         sortAscending,
+        view,
       }: {
         pageNumber: number;
         resultsPerPage: number;
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
+        view?: DashboardView;
       },
     ): Promise<ReviewDashboardRowDTO[]> => {
       return reviewCompositeService.getReviewDashboard(
@@ -28,6 +31,7 @@ const reviewDashboardResolvers = {
         resultsPerPage,
         sortBy,
         sortAscending,
+        view,
       );
     },
     reviewDashboardSidePanel: async (

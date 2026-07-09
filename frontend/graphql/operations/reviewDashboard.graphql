@@ -1,5 +1,5 @@
-query ReviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {
-  reviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {
+query ReviewDashboard($pageNumber: Int!, $resultsPerPage: Int!, $view: DashboardView) {
+  reviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage, view: $view) {
     applicantRecordId
     firstName
     lastName

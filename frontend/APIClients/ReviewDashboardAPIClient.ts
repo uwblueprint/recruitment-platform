@@ -1,5 +1,6 @@
 import { client } from "@/client";
 import {
+  DashboardView,
   ReviewDashboardDocument,
   type ReviewDashboardQuery,
   type ReviewDashboardQueryVariables,
@@ -12,6 +13,7 @@ class ReviewDashboardAPIClient {
   static async getReviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    view?: DashboardView,
   ): Promise<ReviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
@@ -21,7 +23,7 @@ class ReviewDashboardAPIClient {
         ReviewDashboardQueryVariables
       >({
         query: ReviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage },
+        variables: { pageNumber, resultsPerPage, view },
         fetchPolicy: "network-only",
       });
 

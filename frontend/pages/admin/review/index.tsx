@@ -1,13 +1,15 @@
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import { DashboardView } from "@/graphql/typeUtils";
 import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import { RowSelectionState, SortingState } from "@tanstack/react-table";
 import { useRouter } from "next/router";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
 import { REVIEW_DASHBOARD_COLUMNS } from "./_components/columns";
+import { DashboardTabs } from "./_components/DashboardTabs";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
@@ -16,26 +18,45 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const router = useRouter();
   const position = typeof router.query.position === "string" ? router.query.position : null;
 
+  const [activeView, setActiveView] = useState<DashboardView>(DashboardView.All);
   const [pageNumber, setPageNumber] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(
-    DEFAULT_RESULTS_PER_PAGE,
-  );
+  const [resultsPerPage, setResultsPerPage] = useState(DEFAULT_RESULTS_PER_PAGE);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [activeRow, setActiveRow] = useState<ReviewDashboardResult | null>(
-    null,
-  );
+  const [activeRow, setActiveRow] = useState<ReviewDashboardResult | null>(null);
+  // Track the last-known count for each view so tab counts stay stable while switching
+  const [tabCounts, setTabCounts] = useState<Record<DashboardView, number>>({
+    [DashboardView.All]: 0,
+    [DashboardView.Shortlisted]: 0,
+    [DashboardView.Conflicts]: 0,
+  });
 
   const { rows, isLoading, error } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
+    activeView,
   );
+
+  // Update the count for the current view whenever rows change
+  useEffect(() => {
+    if (!isLoading) {
+      setTabCounts((prev) => ({ ...prev, [activeView]: rows.length }));
+    }
+  }, [rows, isLoading, activeView]);
+
+  const handleViewChange = (view: DashboardView) => {
+    setActiveView(view);
+    setPageNumber(1);
+    setRowSelection({});
+  };
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
     setRowSelection({});
   };
+
+  const selectedCount = Object.values(rowSelection).filter(Boolean).length;
 
   return (
     <div className="flex h-screen flex-col bg-white">
@@ -47,6 +68,14 @@ const AdminReviewPage: NextPageWithLayout = () => {
             </h1>
           ) : null}
         </div>
+
+        <DashboardTabs
+          activeView={activeView}
+          onViewChange={handleViewChange}
+          counts={tabCounts}
+          selectedCount={selectedCount}
+          onClearAll={() => setRowSelection({})}
+        />
 
         {error ? (
           <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">

@@ -10,6 +10,7 @@ import type * as Schema from "./__generated__/types";
  */
 export {
   ApplicationStatus,
+  DashboardView,
   Enum,
   InterviewConflict,
   InterviewGroupStatus,
