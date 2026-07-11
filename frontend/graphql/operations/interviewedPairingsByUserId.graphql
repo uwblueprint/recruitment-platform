@@ -1,0 +1,11 @@
+query InterviewedPairingsByUserId($userId: ID!) {
+  interviewedPairingsByUserId(userId: $userId) {
+    interviewedGroupId
+    interviewGroupStatus
+    groupMembers {
+      id
+      firstName
+      lastName
+    }
+  }
+}
