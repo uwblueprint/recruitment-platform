@@ -473,7 +473,8 @@ class InterviewCompositeService implements IInterviewCompositeService {
               !!iar?.applicant_record?.applicant,
           )
           .filter((iar) => {
-            if (seenApplicantRecordIds.has(iar.applicant_record_id)) return false;
+            if (seenApplicantRecordIds.has(iar.applicant_record_id))
+              return false;
             seenApplicantRecordIds.add(iar.applicant_record_id);
             return true;
           })
