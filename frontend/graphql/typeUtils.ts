@@ -114,6 +114,8 @@ export {
   ReviewDashboardDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
+  ReviewedApplicantsByUserIdDocument,
+  InterviewedPairingsByUserIdDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -145,6 +147,10 @@ export type {
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
   UpdateInterviewGroupSchedulingLinkMutationVariables,
+  ReviewedApplicantsByUserIdQuery,
+  ReviewedApplicantsByUserIdQueryVariables,
+  InterviewedPairingsByUserIdQuery,
+  InterviewedPairingsByUserIdQueryVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -207,4 +213,16 @@ export type ReportInterviewConflictResult = OperationField<
 >;
 export type ReviewDashboardResult = ArrayElement<
   OperationField<Operations.ReviewDashboardQuery, "reviewDashboard">
+>;
+export type ReviewedApplicantResult = ArrayElement<
+  OperationField<
+    Operations.ReviewedApplicantsByUserIdQuery,
+    "reviewedApplicantsByUserId"
+  >
+>;
+export type InterviewedPairingResult = ArrayElement<
+  OperationField<
+    Operations.InterviewedPairingsByUserIdQuery,
+    "interviewedPairingsByUserId"
+  >
 >;
