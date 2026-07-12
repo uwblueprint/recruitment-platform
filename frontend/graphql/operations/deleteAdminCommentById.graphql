@@ -1,0 +1,5 @@
+mutation DeleteAdminCommentById($id: ID!) {
+  deleteAdminCommentById(id: $id) {
+    id
+  }
+}

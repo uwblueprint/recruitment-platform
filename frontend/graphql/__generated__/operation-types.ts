@@ -4,12 +4,33 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type * as Types from './types';
 
+export type AdminCommentsByApplicantRecordIdQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type AdminCommentsByApplicantRecordIdQuery = { adminCommentsByApplicantRecordId: Array<{ id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string }> };
+
 export type ApplicationQueryVariables = Exact<{
   applicantRecordId: string | number;
 }>;
 
 
 export type ApplicationQuery = { application: { id: string, academicOrCoop: string, academicYear: string, email: string, firstName: string, lastName: string, heardFrom: string, locationPreference: string, program: string, pronouns: string, pronounsSpecified: string, resumeUrl: string, status: Types.ApplicationStatus, term: string, timesApplied: string, roleSpecificQuestions: Array<{ question: string, answer: string }>, shortAnswerQuestions: Array<{ question: string, answer: string }> } };
+
+export type CreateAdminCommentMutationVariables = Exact<{
+  adminComment: Types.CreateAdminCommentDto;
+}>;
+
+
+export type CreateAdminCommentMutation = { createAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
+
+export type DeleteAdminCommentByIdMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAdminCommentByIdMutation = { deleteAdminCommentById: { id: string } };
 
 export type InterviewDashboardQueryVariables = Exact<{
   pageNumber: number;
@@ -133,6 +154,14 @@ export type ReviewedApplicantsByUserIdQueryVariables = Exact<{
 
 
 export type ReviewedApplicantsByUserIdQuery = { reviewedApplicantsByUserId: Array<{ applicantRecordId: string, reviewStatus: Types.ReviewStatus, applicantFirstName: string, applicantLastName: string }> };
+
+export type UpdateAdminCommentMutationVariables = Exact<{
+  id: string | number;
+  adminComment: Types.UpdateAdminCommentDto;
+}>;
+
+
+export type UpdateAdminCommentMutation = { updateAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
 
 export type UpdateApplicantRecordStatusMutationVariables = Exact<{
   id: string | number;
