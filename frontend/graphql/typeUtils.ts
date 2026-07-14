@@ -50,8 +50,6 @@ export type InterviewedApplicantRecordDTO =
   WithoutTypename<Schema.InterviewedApplicantRecord>;
 export type InterviewedApplicantsDTO =
   WithoutTypename<Schema.InterviewedApplicantsDto>;
-export type InterviewDashboardRowDTO =
-  WithoutTypename<Schema.InterviewDashboardRowDto>;
 export type ReviewDTO = WithoutTypename<Schema.Review>;
 export type ReviewDashboardRowDTO =
   WithoutTypename<Schema.ReviewDashboardRowDto>;

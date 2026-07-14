@@ -17,7 +17,7 @@ export type InterviewDashboardQueryVariables = Exact<{
 }>;
 
 
-export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, interviewScore: number | null, interviewers: Array<{ id: string, firstName: string, lastName: string, email: string, position: string | null, role: Types.Role, isArchived: boolean }> }> };
+export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
 
 export type InterviewGroupQueryVariables = Exact<{
   id: string | number;

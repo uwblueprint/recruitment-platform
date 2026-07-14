@@ -15,7 +15,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const { rows, isLoading, error } = useInterviewDashboard(
+  const { rows, isLoading, hasError } = useInterviewDashboard(
     pageNumber,
     resultsPerPage,
   );
@@ -33,7 +33,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           Interview Dashboard
         </h1>
 
-        {error ? (
+        {hasError ? (
           <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
             Failed to load interview dashboard
           </div>

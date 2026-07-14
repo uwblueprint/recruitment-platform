@@ -77,16 +77,19 @@ class InterviewCompositeService implements IInterviewCompositeService {
     resultsPerPage: number,
   ): Promise<InterviewDashboardRowDTO[]> {
     try {
-      const perPage = Number.isFinite(Number(resultsPerPage))
-        ? Number(resultsPerPage)
-        : 1;
-      const currentPage = Number.isFinite(Number(pageNumber))
-        ? Number(pageNumber)
-        : 1;
-      const offsetRow = (currentPage - 1) * perPage;
+      if (
+        !Number.isInteger(pageNumber) ||
+        pageNumber < 1 ||
+        !Number.isInteger(resultsPerPage) ||
+        resultsPerPage < 1
+      ) {
+        throw new Error(
+          "pageNumber and resultsPerPage must be positive integers",
+        );
+      }
 
       const applicantRecords = await ApplicantRecord.findAll({
-        attributes: { exclude: ["createdAt", "updatedAt"] },
+        attributes: ["id", "position", "status"],
         where: {
           status: {
             [Op.in]: [
@@ -97,20 +100,33 @@ class InterviewCompositeService implements IInterviewCompositeService {
         },
         include: [
           {
-            attributes: { exclude: ["createdAt", "updatedAt"] },
+            attributes: ["first_name", "last_name"],
             model: Applicant,
             required: true,
           },
           {
+            attributes: ["id", "applicant_record_id", "score"],
             model: InterviewedApplicantRecord,
             as: "interviewed_applicant_record",
             include: [
               {
+                attributes: [
+                  "interviewed_applicant_record_id",
+                  "interviewer_id",
+                ],
                 model: InterviewDelegation,
                 as: "interview_delegations",
                 include: [
                   {
-                    attributes: { exclude: ["createdAt", "updatedAt"] },
+                    attributes: [
+                      "id",
+                      "first_name",
+                      "last_name",
+                      "email",
+                      "position",
+                      "role",
+                      "is_archived",
+                    ],
                     model: User,
                     as: "interviewer",
                   },
@@ -140,16 +156,11 @@ class InterviewCompositeService implements IInterviewCompositeService {
             "ASC",
           ],
         ],
-        limit: perPage,
-        offset: offsetRow,
+        limit: resultsPerPage,
+        offset: (pageNumber - 1) * resultsPerPage,
       });
 
-      return applicantRecords.map((applicantRecord) =>
-        toInterviewDashboardRowDTO(
-          applicantRecord,
-          applicantRecord.interviewed_applicant_record,
-        ),
-      );
+      return applicantRecords.map(toInterviewDashboardRowDTO);
     } catch (error: unknown) {
       Logger.error(
         `Failed to get interview dashboard. Reason = ${getErrorMessage(error)}`,

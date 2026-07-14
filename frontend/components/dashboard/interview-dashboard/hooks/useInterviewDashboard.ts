@@ -5,7 +5,7 @@ import type { InterviewDashboardResult } from "@/graphql/typeUtils";
 type UseInterviewDashboardResult = {
   rows: InterviewDashboardResult[];
   isLoading: boolean;
-  error: boolean;
+  hasError: boolean;
 };
 
 const useInterviewDashboard = (
@@ -15,25 +15,37 @@ const useInterviewDashboard = (
   const [state, setState] = useState<UseInterviewDashboardResult>({
     rows: [],
     isLoading: false,
-    error: false,
+    hasError: false,
   });
 
-  // This mirrors the current dashboard API-client pattern. It can be cleaned up
-  // when GraphQL fetching moves to Apollo hooks or a query library consistently.
   useEffect(() => {
+    let isCurrentRequest = true;
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState((prev) => ({ ...prev, isLoading: true, error: false }));
+    setState((previousState) => ({
+      ...previousState,
+      isLoading: true,
+      hasError: false,
+    }));
 
     InterviewDashboardAPIClient.getInterviewDashboard(
       pageNumber,
       resultsPerPage,
     )
       .then((rows) => {
-        setState({ rows, isLoading: false, error: false });
+        if (isCurrentRequest) {
+          setState({ rows, isLoading: false, hasError: false });
+        }
       })
       .catch(() => {
-        setState({ rows: [], isLoading: false, error: true });
+        if (isCurrentRequest) {
+          setState({ rows: [], isLoading: false, hasError: true });
+        }
       });
+
+    return () => {
+      isCurrentRequest = false;
+    };
   }, [pageNumber, resultsPerPage]);
 
   return state;

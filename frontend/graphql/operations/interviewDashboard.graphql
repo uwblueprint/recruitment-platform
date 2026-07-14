@@ -6,13 +6,8 @@ query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {
     position
     applicationStatus
     interviewers {
-      id
       firstName
       lastName
-      email
-      position
-      role
-      isArchived
     }
     interviewScore
   }

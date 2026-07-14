@@ -241,8 +241,10 @@ export function toReviewDashboardRowDTO(
 
 export function toInterviewDashboardRowDTO(
   applicantRecord: ApplicantRecord,
-  interviewedApplicantRecord?: InterviewedApplicantRecord,
 ): InterviewDashboardRowDTO {
+  const interviewedApplicantRecord =
+    applicantRecord.interviewed_applicant_record;
+
   return {
     applicantRecordId: applicantRecord.id,
     firstName: applicantRecord.applicant.first_name,

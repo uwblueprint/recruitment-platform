@@ -26,6 +26,7 @@ export default class InterviewedApplicantRecord extends Model {
   @Column({
     type: DataType.UUID,
     allowNull: false,
+    unique: true,
     references: {
       model: "applicant_records",
       key: "id",
