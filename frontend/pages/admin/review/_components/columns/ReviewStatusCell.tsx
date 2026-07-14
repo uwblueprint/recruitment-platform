@@ -38,17 +38,15 @@ export const ReviewStatusCell = ({
   const [selectedStatus, setSelectedStatus] = useState(status);
 
   const handleChange = async (newStatus: ApplicationStatus) => {
-    const previous = selectedStatus;
     setSelectedStatus(newStatus);
     try {
-      await ReviewDashboardAPIClient.updateApplicantRecordStatus(
+      const confirmedStatus = await ReviewDashboardAPIClient.updateApplicantRecordStatus(
         applicantRecordId,
         newStatus,
       );
-      console.log("Status updated:", applicantRecordId, newStatus);
+      setSelectedStatus(confirmedStatus);
     } catch (err) {
       console.error("Failed to update status:", err);
-      setSelectedStatus(previous);
     }
   };
 

@@ -42,17 +42,23 @@ class ReviewDashboardAPIClient {
   static async updateApplicantRecordStatus(
     id: string,
     status: ApplicationStatus,
-  ): Promise<void> {
+  ): Promise<ApplicationStatus> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
-      await client.mutate<
+      const { data } = await client.mutate<
         UpdateApplicantRecordStatusMutation,
         UpdateApplicantRecordStatusMutationVariables
       >({
         mutation: UpdateApplicantRecordStatusDocument,
         variables: { id, status },
       });
+
+      const updatedStatus = data?.updateApplicantRecordStatus?.status;
+      if (!updatedStatus) {
+        throw new Error("No status returned");
+      }
+      return updatedStatus;
     } catch {
       throw new Error("Failed to update applicant status");
     }
