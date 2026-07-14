@@ -8,6 +8,7 @@ import {
   InterviewGroupDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
+  InterviewDashboardRowDTO,
   Review,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
@@ -235,6 +236,25 @@ export function toReviewDashboardRowDTO(
       toUserDTO(reviewedApplicantRecord.reviewer),
     ),
     totalScore: applicantRecord.combined_review_score ?? null,
+  };
+}
+
+export function toInterviewDashboardRowDTO(
+  applicantRecord: ApplicantRecord,
+): InterviewDashboardRowDTO {
+  const interviewedApplicantRecord =
+    applicantRecord.interviewed_applicant_record;
+
+  return {
+    applicantRecordId: applicantRecord.id,
+    firstName: applicantRecord.applicant.first_name,
+    lastName: applicantRecord.applicant.last_name,
+    position: applicantRecord.position,
+    applicationStatus: applicantRecord.status,
+    interviewers: (
+      interviewedApplicantRecord?.interview_delegations ?? []
+    ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),
+    interviewScore: interviewedApplicantRecord?.score ?? null,
   };
 }
 
