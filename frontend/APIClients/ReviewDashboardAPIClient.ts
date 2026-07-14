@@ -6,6 +6,7 @@ import {
   type ReviewDashboardQuery,
   type ReviewDashboardQueryVariables,
   type ReviewDashboardResult,
+  type ReviewDashboardSortBy,
   type UpdateApplicantRecordStatusMutation,
   type UpdateApplicantRecordStatusMutationVariables,
 } from "@/graphql/typeUtils";
@@ -16,6 +17,8 @@ class ReviewDashboardAPIClient {
   static async getReviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    sortBy?: ReviewDashboardSortBy,
+    sortAscending?: boolean,
   ): Promise<ReviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
@@ -25,7 +28,7 @@ class ReviewDashboardAPIClient {
         ReviewDashboardQueryVariables
       >({
         query: ReviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage },
+        variables: { pageNumber, resultsPerPage, sortBy, sortAscending },
         fetchPolicy: "network-only",
       });
 

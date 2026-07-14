@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
+import type {
+  ReviewDashboardResult,
+  ReviewDashboardSortBy,
+} from "@/graphql/typeUtils";
 
 type UseReviewDashboardResult = {
   rows: ReviewDashboardResult[];
@@ -11,6 +14,8 @@ type UseReviewDashboardResult = {
 const useReviewDashboard = (
   pageNumber: number,
   resultsPerPage: number,
+  sortBy?: ReviewDashboardSortBy,
+  sortAscending?: boolean,
 ): UseReviewDashboardResult => {
   const [state, setState] = useState<UseReviewDashboardResult>({
     rows: [],
@@ -22,14 +27,19 @@ const useReviewDashboard = (
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setState((prev) => ({ ...prev, isLoading: true, error: false }));
 
-    ReviewDashboardAPIClient.getReviewDashboard(pageNumber, resultsPerPage)
+    ReviewDashboardAPIClient.getReviewDashboard(
+      pageNumber,
+      resultsPerPage,
+      sortBy,
+      sortAscending,
+    )
       .then((rows) => {
         setState({ rows, isLoading: false, error: false });
       })
       .catch(() => {
         setState({ rows: [], isLoading: false, error: true });
       });
-  }, [pageNumber, resultsPerPage]);
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending]);
 
   return state;
 };

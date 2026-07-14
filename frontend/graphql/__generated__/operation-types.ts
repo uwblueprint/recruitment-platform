@@ -25,6 +25,13 @@ export type InterviewedApplicantsByUserIdQueryVariables = Exact<{
 
 export type InterviewedApplicantsByUserIdQuery = { interviewedApplicantsByUserId: Array<{ applicantRecordId: string, interviewStatus: Types.InterviewStatus, applicantFirstName: string, applicantLastName: string }> };
 
+export type InterviewedPairingsByUserIdQueryVariables = Exact<{
+  userId: string | number;
+}>;
+
+
+export type InterviewedPairingsByUserIdQuery = { interviewedPairingsByUserId: Array<{ interviewedGroupId: string, interviewGroupStatus: Types.InterviewGroupStatus, groupMembers: Array<{ id: string, firstName: string, lastName: string }> }> };
+
 export type InterviewersByGroupIdQueryVariables = Exact<{
   groupId: string | number;
 }>;
@@ -82,6 +89,8 @@ export type ReportReviewConflictMutation = { reportReviewConflict: { applicantRe
 export type ReviewDashboardQueryVariables = Exact<{
   pageNumber: number;
   resultsPerPage: number;
+  sortBy?: Types.ReviewDashboardSortBy | null | undefined;
+  sortAscending?: boolean | null | undefined;
 }>;
 
 
@@ -93,6 +102,13 @@ export type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables = Exact<{
 
 
 export type ReviewedApplicantRecordsByApplicantRecordIdQuery = { reviewedApplicantRecordsByApplicantRecordId: { applicantRecord: { id: string, position: string, combinedReviewScore: number | null }, reviewedApplicantRecords: Array<{ reviewer: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }, reviewedApplicantRecord: { status: string, score: number | null, reviewerHasConflict: boolean, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } }> } };
+
+export type ReviewedApplicantsByUserIdQueryVariables = Exact<{
+  userId: string | number;
+}>;
+
+
+export type ReviewedApplicantsByUserIdQuery = { reviewedApplicantsByUserId: Array<{ applicantRecordId: string, reviewStatus: Types.ReviewStatus, applicantFirstName: string, applicantLastName: string }> };
 
 export type UpdateApplicantRecordStatusMutationVariables = Exact<{
   id: string | number;
