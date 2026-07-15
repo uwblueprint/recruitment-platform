@@ -3,6 +3,8 @@ FROM node:20.19.0-slim
 WORKDIR /app
 
 COPY package.json yarn.lock tsconfig.json ./
+# emails/templates is needed by the postinstall script (tsc && cp -R emails/templates build/emails/)
+COPY emails ./emails
 
 RUN echo "deb http://archive.debian.org/debian stretch main" > /etc/apt/sources.list
 

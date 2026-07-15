@@ -1,8 +1,17 @@
 import ApplicantRecordService from "../../services/implementations/applicantRecordService";
+import EmailService from "../../services/implementations/emailService";
 import IApplicantRecordService from "../../services/interfaces/IApplicantRecordService";
+import IEmailService from "../../services/interfaces/emailService";
+import nodemailerConfig from "../../nodemailer.config";
 import { ApplicantRecordDTO, ApplicationStatus } from "../../types";
 
-const applicantRecordService: IApplicantRecordService = new ApplicantRecordService();
+const emailService: IEmailService = new EmailService(
+  nodemailerConfig,
+  "UW Blueprint Recruitment",
+);
+const applicantRecordService: IApplicantRecordService = new ApplicantRecordService(
+  emailService,
+);
 
 const applicantRecordResolvers = {
   Mutation: {

@@ -1,7 +1,6 @@
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import { RowSelectionState, SortingState } from "@tanstack/react-table";
 import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
