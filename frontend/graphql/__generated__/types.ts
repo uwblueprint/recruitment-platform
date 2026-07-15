@@ -165,6 +165,17 @@ export enum InterviewConflict {
   PartnerNoResponse = 'PARTNER_NO_RESPONSE'
 }
 
+export type InterviewDashboardRowDto = {
+  __typename?: 'InterviewDashboardRowDTO';
+  applicantRecordId: Scalars['ID']['output'];
+  applicationStatus: ApplicationStatus;
+  firstName: Scalars['String']['output'];
+  interviewScore?: Maybe<Scalars['Int']['output']>;
+  interviewers: Array<UserDto>;
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
+};
+
 export type InterviewDelegationDto = {
   __typename?: 'InterviewDelegationDTO';
   groupId: Scalars['ID']['output'];
@@ -531,6 +542,7 @@ export type Query = {
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
   file: Scalars['String']['output'];
+  interviewDashboard: Array<InterviewDashboardRowDto>;
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
   interviewedApplicantRecord: InterviewedApplicantRecord;
@@ -577,6 +589,12 @@ export type QueryEntityArgs = {
 
 export type QueryFileArgs = {
   fileUUID: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewDashboardArgs = {
+  pageNumber: Scalars['Int']['input'];
+  resultsPerPage: Scalars['Int']['input'];
 };
 
 

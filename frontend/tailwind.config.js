@@ -96,6 +96,9 @@ module.exports = {
         input: "#7D7D7D",
         success: "#00A403",
         error: "#CD5A5A",
+        status: {
+          interviewed: "#DAD7E9",
+        },
         surface: {
           grey: "#F3F4F6",
           muted: "#FAFAFA",

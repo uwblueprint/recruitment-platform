@@ -11,6 +11,14 @@ export type ApplicationQueryVariables = Exact<{
 
 export type ApplicationQuery = { application: { id: string, academicOrCoop: string, academicYear: string, email: string, firstName: string, lastName: string, heardFrom: string, locationPreference: string, program: string, pronouns: string, pronounsSpecified: string, resumeUrl: string, status: Types.ApplicationStatus, term: string, timesApplied: string, roleSpecificQuestions: Array<{ question: string, answer: string }>, shortAnswerQuestions: Array<{ question: string, answer: string }> } };
 
+export type InterviewDashboardQueryVariables = Exact<{
+  pageNumber: number;
+  resultsPerPage: number;
+}>;
+
+
+export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
+
 export type InterviewGroupQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -125,6 +133,14 @@ export type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables = Exact<{
 
 
 export type ReviewedApplicantRecordsByApplicantRecordIdQuery = { reviewedApplicantRecordsByApplicantRecordId: { applicantRecord: { id: string, position: string, combinedReviewScore: number | null }, reviewedApplicantRecords: Array<{ reviewer: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }, reviewedApplicantRecord: { status: string, score: number | null, reviewerHasConflict: boolean, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } }> } };
+
+export type UpdateApplicantRecordStatusMutationVariables = Exact<{
+  id: string | number;
+  status: Types.ApplicationStatus;
+}>;
+
+
+export type UpdateApplicantRecordStatusMutation = { updateApplicantRecordStatus: { id: string, status: Types.ApplicationStatus } };
 
 export type UpdateInterviewGroupMutationVariables = Exact<{
   id: string | number;
