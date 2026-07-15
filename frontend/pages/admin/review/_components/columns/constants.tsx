@@ -1,3 +1,4 @@
+import { ReviewDashboardSortBy } from "@/graphql/typeUtils";
 import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -6,6 +7,16 @@ import { ReviewerCell } from "./ReviewerCell";
 import { ReviewScoreCell } from "./ReviewScoreCell";
 import { ReviewStatusCell } from "./ReviewStatusCell";
 import { SelectAllHeader, SelectRowCell } from "./SelectionCell";
+
+export const COLUMN_ID_TO_SORT_BY: Record<string, ReviewDashboardSortBy> = {
+  application: ReviewDashboardSortBy.LastName,
+  choice: ReviewDashboardSortBy.Choice,
+  timesApplied: ReviewDashboardSortBy.TimesApplied,
+  reviewer1: ReviewDashboardSortBy.Reviewer_1,
+  reviewer2: ReviewDashboardSortBy.Reviewer_2,
+  totalScore: ReviewDashboardSortBy.TotalScore,
+  applicationStatus: ReviewDashboardSortBy.ApplicationStatus,
+};
 
 const applicantName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
@@ -40,7 +51,8 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
     id: "position",
     accessorFn: (row) => row.position,
     header: "Role",
-    enableSorting: true,
+    // Not sortable: the backend ReviewDashboardSortBy enum has no position value.
+    enableSorting: false,
     cell: ({ row }) => row.original.position,
   },
   {
