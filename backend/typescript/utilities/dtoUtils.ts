@@ -4,8 +4,10 @@ import {
   ApplicantDTO,
   ApplicantRecordDTO,
   ApplicationDTO,
+  FirebaseFileDTO,
   InterviewDelegationDTO,
   InterviewGroupDTO,
+  InterviewNotesDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   Review,
@@ -17,7 +19,6 @@ import {
   ReviewStatus,
   SkillCategory,
   UserDTO,
-  FirebaseFileDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
@@ -257,6 +258,17 @@ export function toFirebaseFileDTO(model: FirebaseFile): FirebaseFileDTO {
     storagePath: model.storage_path,
     originalFileName: model.original_file_name,
     uploadedUserId: model.uploaded_user_id,
-    sizeBytes: Number(model.size_bytes),
+    sizeBytes: Number(model.size_bytes), // BIGINT comes back as string from pg driver
+  };
+}
+
+export function toInterviewNotesDTO(
+  model: FirebaseFile,
+  signedUrl: string,
+): InterviewNotesDTO {
+  return {
+    fileId: model.id,
+    fileName: model.original_file_name,
+    signedUrl,
   };
 }

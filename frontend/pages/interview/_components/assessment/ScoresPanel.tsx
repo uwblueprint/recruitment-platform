@@ -1,5 +1,3 @@
-import { ChangeEvent } from "react";
-
 import {
   INTERVIEW_SCORE_FIELDS,
   MAX_INTERVIEW_SCORE,
@@ -10,6 +8,7 @@ import {
   type ScoreKey,
 } from "./constants";
 import { SkillCategory } from "@/graphql/typeUtils";
+import { ReviewScoreInput } from "@/components/common/ReviewScoreInput";
 
 function computeTotal(form: ScoreFormState): number {
   return INTERVIEW_SCORE_FIELDS.reduce((sum, { key }) => {
@@ -17,35 +16,6 @@ function computeTotal(form: ScoreFormState): number {
     return sum + (typeof v === "number" ? v : 0);
   }, 0);
 }
-
-const ScoreInput = ({
-  value,
-  onChange,
-}: {
-  value: number | "";
-  onChange: (v: number | "") => void;
-}) => (
-  <input
-    type="number"
-    min={MIN_INTERVIEW_SCORE}
-    max={MAX_INTERVIEW_SCORE}
-    value={value}
-    placeholder="–"
-    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-      const raw = e.target.value;
-      if (raw === "") {
-        onChange("");
-        return;
-      }
-      const n = Math.min(
-        MAX_INTERVIEW_SCORE,
-        Math.max(MIN_INTERVIEW_SCORE, parseInt(raw, 10)),
-      );
-      if (!isNaN(n)) onChange(n);
-    }}
-    className="w-40 rounded border border-neutral-200 px-3 py-2 text-right font-poppins text-sm text-neutral-800 placeholder:text-neutral-200 focus:border-blue focus:outline-none focus:ring-1 focus:ring-blue"
-  />
-);
 
 interface ScoresPanelProps {
   form: ScoreFormState;
@@ -91,9 +61,15 @@ export const ScoresPanel = ({ form, onChange }: ScoresPanelProps) => {
               <span className="font-poppins text-sm text-neutral-800">
                 {label}
               </span>
-              <ScoreInput
+              <ReviewScoreInput
+                id={key}
                 value={form[key]}
-                onChange={(v) => setScore(key, v)}
+                min={MIN_INTERVIEW_SCORE}
+                max={MAX_INTERVIEW_SCORE}
+                placeholder="Enter score"
+                ariaLabel={`${label} score`}
+                onChange={(v) => setScore(key, v === 0 ? "" : v)}
+                className="w-40"
               />
             </div>
           ))}

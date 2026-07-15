@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from "uuid";
-
+import { sequelize } from "../../models";
 import FirebaseFile from "../../models/firebaseFile.model";
 import IFileStorageService from "../interfaces/fileStorageService";
 import IFirebaseFileService from "../interfaces/IFirebaseFileService";
@@ -42,76 +41,60 @@ class FirebaseFileService implements IFirebaseFileService {
   async createFirebaseFile(
     input: CreateFirebaseFileDTO,
   ): Promise<FirebaseFileDTO> {
-    // Generate a unique storage path. The uuid prefix prevents collisions
-    // across files that happen to share an original filename.
-    const storagePath = `${INTERVIEW_NOTES_STORAGE_PREFIX}/${uuidv4()}-${
-      input.originalFileName
-    }`;
-
-    let storageUploaded = false;
+    const transaction = await sequelize.transaction();
     try {
+      // Create the DB row first so we can use its ID as the storage path.
+      const row = await FirebaseFile.create(
+        {
+          original_file_name: input.originalFileName,
+          uploaded_user_id: input.uploadedUserId,
+          size_bytes: input.sizeBytes,
+          // storage_path is set after we know the ID
+          storage_path: "",
+        },
+        { transaction },
+      );
+
+      const storagePath = `${INTERVIEW_NOTES_STORAGE_PREFIX}/${row.id}`;
+
+      await row.update({ storage_path: storagePath }, { transaction });
+
       await this.fileStorageService.createFile(
         storagePath,
         input.localFilePath,
         input.contentType,
       );
-      storageUploaded = true;
 
-      const row = await FirebaseFile.create({
-        storage_path: storagePath,
-        original_file_name: input.originalFileName,
-        uploaded_user_id: input.uploadedUserId,
-        size_bytes: input.sizeBytes,
-      });
+      await transaction.commit();
       return toFirebaseFileDTO(row);
     } catch (error: unknown) {
+      await transaction.rollback();
       Logger.error(
-        `Failed to create firebase file at ${storagePath}. Reason = ${getErrorMessage(
-          error,
-        )}`,
+        `Failed to create firebase file. Reason = ${getErrorMessage(error)}`,
       );
-      // If we uploaded to storage but failed to persist the DB row, roll back
-      // the blob so we don't leak orphaned files in the bucket.
-      if (storageUploaded) {
-        try {
-          await this.fileStorageService.deleteFile(storagePath);
-        } catch (cleanupError: unknown) {
-          Logger.error(
-            `Failed to roll back storage blob ${storagePath} after DB error. Reason = ${getErrorMessage(
-              cleanupError,
-            )}`,
-          );
-        }
-      }
       throw error;
     }
   }
 
   async deleteFirebaseFileById(id: string): Promise<void> {
+    const transaction = await sequelize.transaction();
     try {
-      const row = await FirebaseFile.findByPk(id);
+      const row = await FirebaseFile.findByPk(id, { transaction });
       if (!row) {
+        await transaction.rollback();
         Logger.warn(
           `deleteFirebaseFileById called on missing file id ${id}; ignoring.`,
         );
         return;
       }
-      // Best-effort storage delete: if the blob is missing or storage errors,
-      // we still drop the DB row so we don't leak orphan rows pointing at
-      // nothing. The composite caller treats cleanup failures as non-fatal.
-      try {
-        await this.fileStorageService.deleteFile(row.storage_path);
-      } catch (storageError: unknown) {
-        Logger.error(
-          `Failed to delete storage blob ${
-            row.storage_path
-          } for file ${id}; deleting DB row anyway. Reason = ${getErrorMessage(
-            storageError,
-          )}`,
-        );
-      }
-      await row.destroy();
+
+      await row.destroy({ transaction });
+
+      await this.fileStorageService.deleteFile(row.storage_path);
+
+      await transaction.commit();
     } catch (error: unknown) {
+      await transaction.rollback();
       Logger.error(
         `Failed to delete firebase file ${id}. Reason = ${getErrorMessage(
           error,

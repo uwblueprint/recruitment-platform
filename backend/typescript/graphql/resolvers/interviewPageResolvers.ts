@@ -5,8 +5,9 @@ import { sequelize } from "../../models";
 import InterviewCompositeService from "../../services/implementations/interviewCompositeService";
 import InterviewDelegationService from "../../services/implementations/interviewDelegationService";
 import InterviewedApplicantRecordsService from "../../services/implementations/interviewedApplicantRecordService";
+import FirebaseFileService from "../../services/implementations/firebaseFileService";
+import FileStorageService from "../../services/implementations/fileStorageService";
 import {
-  Interview,
   InterviewConflict,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -19,6 +20,11 @@ import { getUserIdFromContext } from "../../middlewares/auth";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import { withUploadAsTempFile } from "../../utilities/graphqlUploadUtils";
 import { INTERVIEW_NOTES_TMP_DIR_PREFIX } from "../../constants/interviewNotes";
+
+const interviewNotesBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
+const firebaseFileService = new FirebaseFileService(
+  new FileStorageService(interviewNotesBucket),
+);
 
 const interviewCompositeService = new InterviewCompositeService();
 const interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
@@ -58,18 +64,20 @@ const interviewPageResolvers = {
         interviewedApplicantRecordId,
       }: { interviewedApplicantRecordId: string },
     ): Promise<InterviewNotesDTO | null> => {
-      return interviewCompositeService.getInterviewNotesByInterviewedApplicantRecordId(
+      const record = await interviewedApplicantRecordsService.getInterviewedApplicantRecordById(
         interviewedApplicantRecordId,
       );
+      if (!record.interviewNotesId) {
+        return null;
+      }
+      const file = await firebaseFileService.getFirebaseFileById(
+        record.interviewNotesId,
+      );
+      const signedUrl = await firebaseFileService.getSignedUrl(file.storagePath);
+      return { fileId: file.id, fileName: file.originalFileName, signedUrl };
     },
   },
   Mutation: {
-    submitInterviewScores: async (
-      _parent: undefined,
-      { id, interviewJson }: { id: string; interviewJson: Interview },
-    ): Promise<InterviewedApplicantRecordDTO> => {
-      return interviewCompositeService.submitInterviewScores(id, interviewJson);
-    },
     uploadInterviewNotes: async (
       _parent: undefined,
       {
@@ -88,8 +96,7 @@ const interviewPageResolvers = {
         (upload) =>
           interviewCompositeService.uploadInterviewNotes(
             interviewedApplicantRecordId,
-            uploadedUserId,
-            upload,
+            { ...upload, uploadedUserId },
           ),
       );
     },

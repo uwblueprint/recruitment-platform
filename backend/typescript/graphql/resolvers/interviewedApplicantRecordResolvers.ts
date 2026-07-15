@@ -2,6 +2,7 @@ import InterviewedApplicantRecordsService from "../../services/implementations/i
 import IInterviewedApplicantRecordsService from "../../services/interfaces/IInterviewedApplicantRecordService";
 import {
   CreateInterviewedApplicantRecordDTO,
+  Interview,
   InterviewedApplicantRecordDTO,
   UpdateInterviewedApplicantRecordDTO,
 } from "../../types";
@@ -53,6 +54,16 @@ const interviewedApplicantRecordsResolvers = {
     ): Promise<InterviewedApplicantRecordDTO> => {
       return interviewedApplicantRecordsService.deleteInterviewedApplicantRecordById(
         id,
+      );
+    },
+
+    submitInterviewScores: async (
+      _parent: undefined,
+      { id, interviewJson }: { id: string; interviewJson: Interview },
+    ): Promise<InterviewedApplicantRecordDTO> => {
+      return interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
+        id,
+        { interviewJson },
       );
     },
   },

@@ -37,6 +37,7 @@ interface IInterviewedApplicantRecordsService {
   updateInterviewedApplicantRecord(
     id: string,
     interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO,
+    transaction?: any,
   ): Promise<InterviewedApplicantRecordDTO>;
 
   /**

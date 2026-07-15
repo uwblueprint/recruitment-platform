@@ -1,0 +1,21 @@
+import { ReactElement } from "react";
+
+export const CheckCircleFilledIcon = (): ReactElement => (
+  <svg
+    width="32"
+    height="32"
+    viewBox="0 0 32 32"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    aria-hidden="true"
+  >
+    <circle cx="16" cy="16" r="16" fill="#16A34A" />
+    <path
+      d="m10 16.5 4 4 8-9"
+      stroke="white"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
