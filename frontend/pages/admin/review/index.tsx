@@ -2,11 +2,20 @@ import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { RowSelectionState, SortingState } from "@tanstack/react-table";
+import type { ReviewDashboardResult } from "@/graphql/typeUtils";
+import {
+  OnChangeFn,
+  RowSelectionState,
+  SortingState,
+} from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
-import { REVIEW_DASHBOARD_COLUMNS } from "./_components/columns";
+import {
+  COLUMN_ID_TO_SORT_BY,
+  REVIEW_DASHBOARD_COLUMNS,
+} from "./_components/columns";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
@@ -25,9 +34,18 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
 
+  // The table is single-sort, so only the first SortingState entry is used.
+  // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
+  // undefined and the backend falls back to its default order.
+  const activeSort = sorting[0];
+  const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
+  const sortAscending = activeSort && !activeSort.desc;
+
   const { rows, isLoading, error } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
+    sortBy,
+    sortAscending,
   );
 
   // Every applicant record id in display order, so the side panel can walk the
@@ -69,6 +87,13 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setActiveId(undefined);
   };
 
+  // Changing the sort can shrink the result set, so return to the first page.
+  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
+    setSorting(updater);
+    setPageNumber(1);
+    setRowSelection({});
+  };
+
   return (
     <div className="flex h-screen flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
@@ -95,7 +120,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           onRowClick={(row) => setActiveId(row.applicantRecordId)}
           isLoading={isLoading}
           sorting={sorting}
-          onSortingChange={setSorting}
+          onSortingChange={handleSortingChange}
           pagination={{
             pageNumber,
             resultsPerPage,

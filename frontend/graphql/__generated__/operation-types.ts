@@ -25,6 +25,13 @@ export type InterviewedApplicantsByUserIdQueryVariables = Exact<{
 
 export type InterviewedApplicantsByUserIdQuery = { interviewedApplicantsByUserId: Array<{ applicantRecordId: string, interviewStatus: Types.InterviewStatus, applicantFirstName: string, applicantLastName: string }> };
 
+export type InterviewedPairingsByUserIdQueryVariables = Exact<{
+  userId: string | number;
+}>;
+
+
+export type InterviewedPairingsByUserIdQuery = { interviewedPairingsByUserId: Array<{ interviewedGroupId: string, interviewGroupStatus: Types.InterviewGroupStatus, groupMembers: Array<{ id: string, firstName: string, lastName: string }> }> };
+
 export type InterviewersByGroupIdQueryVariables = Exact<{
   groupId: string | number;
 }>;

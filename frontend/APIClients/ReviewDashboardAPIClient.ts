@@ -11,6 +11,7 @@ import {
   type ReviewDashboardSidePanelQuery,
   type ReviewDashboardSidePanelQueryVariables,
   type ReviewDashboardSidePanelResult,
+  type ReviewDashboardSortBy,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -19,6 +20,8 @@ class ReviewDashboardAPIClient {
   static async getReviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    sortBy?: ReviewDashboardSortBy,
+    sortAscending?: boolean,
   ): Promise<ReviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
@@ -28,7 +31,7 @@ class ReviewDashboardAPIClient {
         ReviewDashboardQueryVariables
       >({
         query: ReviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage },
+        variables: { pageNumber, resultsPerPage, sortBy, sortAscending },
         fetchPolicy: "network-only",
       });
 

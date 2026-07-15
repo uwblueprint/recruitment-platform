@@ -14,6 +14,7 @@ export {
   InterviewConflict,
   InterviewGroupStatus,
   InterviewStatus,
+  ReviewDashboardSortBy,
   ReviewStatus,
   Role,
   SimpleEntityEnum,
@@ -115,6 +116,8 @@ export {
   ReviewDashboardSidePanelDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
+  ReviewedApplicantsByUserIdDocument,
+  InterviewedPairingsByUserIdDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -150,6 +153,10 @@ export type {
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
   UpdateInterviewGroupSchedulingLinkMutationVariables,
+  ReviewedApplicantsByUserIdQuery,
+  ReviewedApplicantsByUserIdQueryVariables,
+  InterviewedPairingsByUserIdQuery,
+  InterviewedPairingsByUserIdQueryVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -219,4 +226,16 @@ export type ReviewDashboardSidePanelResult = OperationField<
 >;
 export type ReviewDashboardSidePanelReviewDetail = ArrayElement<
   ReviewDashboardSidePanelResult["reviewDetails"]
+ >;
+export type ReviewedApplicantResult = ArrayElement<
+  OperationField<
+    Operations.ReviewedApplicantsByUserIdQuery,
+    "reviewedApplicantsByUserId"
+  >
+>;
+export type InterviewedPairingResult = ArrayElement<
+  OperationField<
+    Operations.InterviewedPairingsByUserIdQuery,
+    "interviewedPairingsByUserId"
+  >
 >;
