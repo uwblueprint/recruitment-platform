@@ -3,13 +3,19 @@ import User from "../../models/user.model";
 import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.model";
 import {
   CreateInterviewDelegationDTO,
+  ApplicationStatusEnum,
+  InterviewDashboardRowDTO,
   InterviewDelegationDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
-import { toInterviewedApplicantDTO, toUserDTO } from "../../utilities/dtoUtils";
+import {
+  toInterviewDashboardRowDTO,
+  toInterviewedApplicantDTO,
+  toUserDTO,
+} from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";
@@ -66,6 +72,103 @@ function dedupeUsersById(users: User[]): User[] {
 
 class InterviewCompositeService implements IInterviewCompositeService {
   /* eslint-disable class-methods-use-this */
+  async getInterviewDashboard(
+    pageNumber: number,
+    resultsPerPage: number,
+  ): Promise<InterviewDashboardRowDTO[]> {
+    try {
+      if (
+        !Number.isInteger(pageNumber) ||
+        pageNumber < 1 ||
+        !Number.isInteger(resultsPerPage) ||
+        resultsPerPage < 1
+      ) {
+        throw new Error(
+          "pageNumber and resultsPerPage must be positive integers",
+        );
+      }
+
+      const applicantRecords = await ApplicantRecord.findAll({
+        attributes: ["id", "position", "status"],
+        where: {
+          status: {
+            [Op.in]: [
+              ApplicationStatusEnum.INTERVIEWED,
+              ApplicationStatusEnum.SELECTED,
+            ],
+          },
+        },
+        include: [
+          {
+            attributes: ["first_name", "last_name"],
+            model: Applicant,
+            required: true,
+          },
+          {
+            attributes: ["id", "applicant_record_id", "score"],
+            model: InterviewedApplicantRecord,
+            as: "interviewed_applicant_record",
+            include: [
+              {
+                attributes: [
+                  "interviewed_applicant_record_id",
+                  "interviewer_id",
+                ],
+                model: InterviewDelegation,
+                as: "interview_delegations",
+                include: [
+                  {
+                    attributes: [
+                      "id",
+                      "first_name",
+                      "last_name",
+                      "email",
+                      "position",
+                      "role",
+                      "is_archived",
+                    ],
+                    model: User,
+                    as: "interviewer",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        order: [
+          ["id", "ASC"],
+          [
+            {
+              model: InterviewedApplicantRecord,
+              as: "interviewed_applicant_record",
+            },
+            { model: InterviewDelegation, as: "interview_delegations" },
+            "createdAt",
+            "ASC",
+          ],
+          [
+            {
+              model: InterviewedApplicantRecord,
+              as: "interviewed_applicant_record",
+            },
+            { model: InterviewDelegation, as: "interview_delegations" },
+            "interviewer_id",
+            "ASC",
+          ],
+        ],
+        limit: resultsPerPage,
+        offset: (pageNumber - 1) * resultsPerPage,
+      });
+
+      return applicantRecords.map(toInterviewDashboardRowDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get interview dashboard. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
   async getInterviewedApplicantsByUserId(
     userId: string,
   ): Promise<InterviewedApplicantsDTO[]> {

@@ -103,6 +103,7 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
 export {
   ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
+  InterviewDashboardDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   IsAuthorizedByRoleDocument,
@@ -114,6 +115,7 @@ export {
   ReviewDashboardApplicantRecordIdsDocument,
   ReviewDashboardDocument,
   ReviewDashboardSidePanelDocument,
+  UpdateApplicantRecordStatusDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
   ReviewedApplicantsByUserIdDocument,
@@ -127,6 +129,8 @@ export type {
   InterviewGroupQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
+  InterviewDashboardQuery,
+  InterviewDashboardQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
   IsAuthorizedByRoleQuery,
@@ -149,6 +153,8 @@ export type {
   ReviewDashboardQueryVariables,
   ReviewDashboardSidePanelQuery,
   ReviewDashboardSidePanelQueryVariables,
+  UpdateApplicantRecordStatusMutation,
+  UpdateApplicantRecordStatusMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
@@ -183,6 +189,9 @@ export type InterviewedApplicantResult = ArrayElement<
     Operations.InterviewedApplicantsByUserIdQuery,
     "interviewedApplicantsByUserId"
   >
+>;
+export type InterviewDashboardResult = ArrayElement<
+  OperationField<Operations.InterviewDashboardQuery, "interviewDashboard">
 >;
 export type InterviewerResult = ArrayElement<
   OperationField<
