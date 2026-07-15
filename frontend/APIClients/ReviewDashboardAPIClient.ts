@@ -6,7 +6,6 @@ import {
   type ReviewDashboardApplicantRecordIdsQuery,
   type ReviewDashboardApplicantRecordIdsQueryVariables,
   ApplicationStatus,
-  ReviewDashboardDocument,
   UpdateApplicantRecordStatusDocument,
   type ReviewDashboardQuery,
   type ReviewDashboardQueryVariables,
@@ -95,6 +94,9 @@ class ReviewDashboardAPIClient {
       return data.reviewDashboardSidePanel;
     } catch {
       throw new Error("Failed to get review dashboard side panel");
+    }
+  }
+
   static async updateApplicantRecordStatus(
     id: string,
     status: ApplicationStatus,
