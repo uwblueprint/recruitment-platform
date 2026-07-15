@@ -118,6 +118,14 @@ export type ReviewedApplicantsByUserIdQueryVariables = Exact<{
 
 export type ReviewedApplicantsByUserIdQuery = { reviewedApplicantsByUserId: Array<{ applicantRecordId: string, reviewStatus: Types.ReviewStatus, applicantFirstName: string, applicantLastName: string }> };
 
+export type UpdateApplicantRecordStatusMutationVariables = Exact<{
+  id: string | number;
+  status: Types.ApplicationStatus;
+}>;
+
+
+export type UpdateApplicantRecordStatusMutation = { updateApplicantRecordStatus: { id: string, status: Types.ApplicationStatus } };
+
 export type UpdateInterviewGroupMutationVariables = Exact<{
   id: string | number;
   interviewGroup: Types.UpdateInterviewGroupDto;

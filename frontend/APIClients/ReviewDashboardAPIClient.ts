@@ -1,10 +1,14 @@
 import { client } from "@/client";
 import {
+  ApplicationStatus,
   ReviewDashboardDocument,
+  UpdateApplicantRecordStatusDocument,
   type ReviewDashboardQuery,
   type ReviewDashboardQueryVariables,
   type ReviewDashboardResult,
   type ReviewDashboardSortBy,
+  type UpdateApplicantRecordStatusMutation,
+  type UpdateApplicantRecordStatusMutationVariables,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -35,6 +39,31 @@ class ReviewDashboardAPIClient {
       return data.reviewDashboard;
     } catch {
       throw new Error("Failed to get review dashboard");
+    }
+  }
+
+  static async updateApplicantRecordStatus(
+    id: string,
+    status: ApplicationStatus,
+  ): Promise<ApplicationStatus> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.mutate<
+        UpdateApplicantRecordStatusMutation,
+        UpdateApplicantRecordStatusMutationVariables
+      >({
+        mutation: UpdateApplicantRecordStatusDocument,
+        variables: { id, status },
+      });
+
+      const updatedStatus = data?.updateApplicantRecordStatus?.status;
+      if (!updatedStatus) {
+        throw new Error("No status returned");
+      }
+      return updatedStatus;
+    } catch {
+      throw new Error("Failed to update applicant status");
     }
   }
 }
