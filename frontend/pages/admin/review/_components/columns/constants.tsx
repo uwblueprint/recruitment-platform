@@ -26,10 +26,20 @@ const reviewerName = (row: ReviewDashboardResult, index: number) => {
   return reviewer ? applicantName(reviewer.firstName, reviewer.lastName) : "-";
 };
 
-export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
-  ReviewDashboardResult,
-  unknown
->[] = [
+type ReviewDashboardReviewer = NonNullable<
+  ReviewDashboardResult["reviewers"][number]
+>;
+
+type ReviewDashboardColumnsOptions = {
+  onReviewerClick: (
+    row: ReviewDashboardResult,
+    reviewer: ReviewDashboardReviewer,
+  ) => void;
+};
+
+export const createReviewDashboardColumns = ({
+  onReviewerClick,
+}: ReviewDashboardColumnsOptions): ColumnDef<ReviewDashboardResult, unknown>[] => [
   {
     id: "select",
     size: 40,
@@ -77,7 +87,15 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
     header: "Reviewer 1",
     enableSorting: true,
     cell: ({ row }) => (
-      <ReviewerCell reviewerName={reviewerName(row.original, 0)} />
+      <ReviewerCell
+        reviewerName={reviewerName(row.original, 0)}
+        onClick={() => {
+          const reviewer = row.original.reviewers[0];
+          if (reviewer) {
+            onReviewerClick(row.original, reviewer);
+          }
+        }}
+      />
     ),
   },
   {
@@ -86,7 +104,15 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
     header: "Reviewer 2",
     enableSorting: true,
     cell: ({ row }) => (
-      <ReviewerCell reviewerName={reviewerName(row.original, 1)} />
+      <ReviewerCell
+        reviewerName={reviewerName(row.original, 1)}
+        onClick={() => {
+          const reviewer = row.original.reviewers[1];
+          if (reviewer) {
+            onReviewerClick(row.original, reviewer);
+          }
+        }}
+      />
     ),
   },
   {

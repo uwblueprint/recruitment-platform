@@ -1,27 +1,35 @@
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import {
-  OnChangeFn,
-  RowSelectionState,
-  SortingState,
-} from "@tanstack/react-table";
+  InterviewStatus,
+  type ReviewDashboardResult,
+} from "@/graphql/typeUtils";
+import { RowSelectionState, SortingState } from "@tanstack/react-table";
 import { useRouter } from "next/router";
-import { ReactElement, useState } from "react";
+import { ReactElement, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
 import {
   COLUMN_ID_TO_SORT_BY,
-  REVIEW_DASHBOARD_COLUMNS,
+  createReviewDashboardColumns,
 } from "./_components/columns";
+import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
+type ReviewerReassignmentTarget = {
+  applicantRecordId: string;
+  position: string;
+  reviewerId: string;
+  reviewerName: string;
+};
+
 const AdminReviewPage: NextPageWithLayout = () => {
   const router = useRouter();
-  const position = typeof router.query.position === "string" ? router.query.position : null;
+  const position =
+    typeof router.query.position === "string" ? router.query.position : null;
 
   const [pageNumber, setPageNumber] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(
@@ -32,6 +40,8 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [activeRow, setActiveRow] = useState<ReviewDashboardResult | null>(
     null,
   );
+  const [reassignmentTarget, setReassignmentTarget] =
+    useState<ReviewerReassignmentTarget | null>(null);
 
   // The table is single-sort, so only the first SortingState entry is used.
   // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
@@ -40,11 +50,26 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort && !activeSort.desc;
 
-  const { rows, isLoading, error } = useReviewDashboard(
+  const { rows, isLoading, error, refetch } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
     sortBy,
     sortAscending,
+  );
+
+  const columns = useMemo(
+    () =>
+      createReviewDashboardColumns({
+        onReviewerClick: (row, reviewer) => {
+          setReassignmentTarget({
+            applicantRecordId: row.applicantRecordId,
+            position: row.position,
+            reviewerId: reviewer.id,
+            reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+          });
+        },
+      }),
+    [],
   );
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
@@ -54,7 +79,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
   };
 
   // Changing the sort can shrink the result set, so return to the first page.
-  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
+  const handleSortingChange = (
+    updater: SortingState | ((old: SortingState) => SortingState),
+  ) => {
     setSorting(updater);
     setPageNumber(1);
     setRowSelection({});
@@ -79,7 +106,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
         <DashboardTable
           data={rows}
-          columns={REVIEW_DASHBOARD_COLUMNS}
+          columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
@@ -106,6 +133,20 @@ const AdminReviewPage: NextPageWithLayout = () => {
             : "Applicant details"
         }
       />
+      {reassignmentTarget ? (
+        <ReassignReviewerDialogue
+          open={!!reassignmentTarget}
+          applicantRecordId={reassignmentTarget.applicantRecordId}
+          position={reassignmentTarget.position}
+          currentReviewerId={reassignmentTarget.reviewerId}
+          currentReviewerName={reassignmentTarget.reviewerName}
+          onClose={() => setReassignmentTarget(null)}
+          onUpdated={() => {
+            setReassignmentTarget(null);
+            refetch();
+          }}
+        />
+      ) : null}
     </div>
   );
 };
