@@ -25,7 +25,7 @@ export const ReviewEndSuccessStage = ({ name }: Props) => {
           submitted!
         </h4>
         <div className="flex flex-col items-center">
-          <Button size="sm" href="/admin" className="mb-2">
+          <Button size="sm" href="/" className="mb-2">
             All Done!
           </Button>
           <Button

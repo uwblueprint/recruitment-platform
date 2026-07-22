@@ -21,7 +21,7 @@ export const InterviewNavPanel = ({
   return (
     <nav className="flex flex-col">
       <Link
-        href="/admin"
+        href="/"
         className="flex w-fit items-center justify-center gap-2 rounded-full border-2 border-blue bg-white px-4 py-2 transition-colors hover:bg-gray-50"
       >
         <ArrowLeftIcon className="h-6 w-6 text-blue" />
