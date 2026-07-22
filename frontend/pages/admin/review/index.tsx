@@ -1,89 +1,104 @@
+import { Toast } from "@/components/common/Toast";
+import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
-import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
-import {
-  OnChangeFn,
-  RowSelectionState,
-  SortingState,
-} from "@tanstack/react-table";
+import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
+import { type ReviewDashboardResult } from "@/graphql/typeUtils";
+import { OnChangeFn, RowSelectionState, SortingState } from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
-
-import {
-  COLUMN_ID_TO_SORT_BY,
-  REVIEW_DASHBOARD_COLUMNS,
-} from "./_components/columns";
+import { COLUMN_ID_TO_SORT_BY, REVIEW_DASHBOARD_COLUMNS } from "./_components/columns";
+import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
+import { type BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
+import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
 const AdminReviewPage: NextPageWithLayout = () => {
   const router = useRouter();
-  const position = typeof router.query.position === "string" ? router.query.position : null;
+  const position =
+    typeof router.query.position === "string" ? router.query.position : null;
 
   const [pageNumber, setPageNumber] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(
-    DEFAULT_RESULTS_PER_PAGE,
-  );
+  const [resultsPerPage, setResultsPerPage] = useState(DEFAULT_RESULTS_PER_PAGE);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [activeRow, setActiveRow] = useState<ReviewDashboardResult | null>(
-    null,
-  );
+  const [activeRow, setActiveRow] = useState<ReviewDashboardResult | null>(null);
 
-  // The table is single-sort, so only the first SortingState entry is used.
-  // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
-  // undefined and the backend falls back to its default order.
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
-  const sortAscending = activeSort && !activeSort.desc;
+  const sortAscending = activeSort ? !activeSort.desc : undefined;
 
-  const { rows, isLoading, error } = useReviewDashboard(
+  const { rows, isLoading, error, refetch } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
     sortBy,
     sortAscending,
   );
+  const selectedRows = rows.filter((row) => rowSelection[row.applicantRecordId]);
 
-  const handleResultsPerPageChange = (nextResultsPerPage: number) => {
-    setResultsPerPage(nextResultsPerPage);
+  const clearSelection = () => setRowSelection({});
+
+  const { dialogue, openBulkAction, toast, dismissToast } = useBulkStatusAction({
+    onSuccess: () => {
+      clearSelection();
+      refetch();
+    },
+  });
+
+  const handleResultsPerPageChange = (value: number) => {
+    setResultsPerPage(value);
     setPageNumber(1);
-    setRowSelection({});
+    clearSelection();
   };
-
-  // Changing the sort can shrink the result set, so return to the first page.
+  const handlePageChange = (value: number) => {
+    setPageNumber(value);
+    clearSelection();
+  };
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSorting(updater);
     setPageNumber(1);
-    setRowSelection({});
+    clearSelection();
   };
+
+  const handleBulkAction = (action: BulkAction) =>
+    openBulkAction(
+      action,
+      selectedRows.map((row) => ({
+        id: row.applicantRecordId,
+        name: `${row.firstName} ${row.lastName}`,
+        position: row.position,
+        totalScore: row.totalScore,
+      })),
+    );
 
   return (
     <div className="flex h-screen flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
-        <div className="shrink-0">
-          {position ? (
-            <h1 className="font-poppins text-[28px] font-semibold leading-[140%] text-blue">
-              {position} Applications
-            </h1>
-          ) : null}
-        </div>
-
+        <ReviewDashboardToolbar
+          position={position}
+          selectedCount={selectedRows.length}
+          disabled={isLoading}
+          onReject={() => handleBulkAction("reject")}
+          onSelectForInterview={() => handleBulkAction("interview")}
+        />
         {error ? (
-          <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
+          <div
+            role="alert"
+            className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText"
+          >
             Failed to load review dashboard
           </div>
         ) : null}
-
         <DashboardTable
           data={rows}
           columns={REVIEW_DASHBOARD_COLUMNS}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
-          onRowClick={(row) => setActiveRow(row)}
+          onRowClick={setActiveRow}
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={handleSortingChange}
@@ -91,12 +106,11 @@ const AdminReviewPage: NextPageWithLayout = () => {
             pageNumber,
             resultsPerPage,
             canGoNext: rows.length === resultsPerPage,
-            onPageChange: setPageNumber,
+            onPageChange: handlePageChange,
             onResultsPerPageChange: handleResultsPerPageChange,
           }}
         />
       </main>
-
       <DashboardSidePanel
         open={!!activeRow}
         onClose={() => setActiveRow(null)}
@@ -106,6 +120,8 @@ const AdminReviewPage: NextPageWithLayout = () => {
             : "Applicant details"
         }
       />
+      {dialogue ? <BulkStatusConfirmationDialogue {...dialogue} /> : null}
+      <Toast {...toast} onClose={dismissToast} />
     </div>
   );
 };
