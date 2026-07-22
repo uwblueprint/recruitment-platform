@@ -9,13 +9,6 @@ import {
   type BulkAction,
 } from "../bulkStatusActions";
 
-/**
- * Dialogue lifecycle modelled as a state machine so impossible combinations
- * (e.g. "submitting" with no pending action, or an error while closed) simply
- * cannot be represented. This replaces four independent `useState`s
- * (pendingAction / pendingApplicants / isSubmitting / dialogueError) that
- * previously had to be kept in sync by hand.
- */
 type DialogueState =
   | { status: "closed" }
   | {
@@ -45,8 +38,6 @@ const dialogueReducer = (
         applicants: event.applicants,
       };
     case "submit":
-      // Only a confirming dialogue can start submitting; this also guards
-      // against double submits.
       return state.status === "confirming"
         ? {
             status: "submitting",
@@ -64,7 +55,6 @@ const dialogueReducer = (
           }
         : state;
     case "cancel":
-      // Ignore close requests mid-flight so a submit can't be abandoned.
       return state.status === "submitting" ? state : { status: "closed" };
     case "success":
       return { status: "closed" };
@@ -77,7 +67,6 @@ type ToastState = { open: boolean; title: string; description: string };
 
 const CLOSED_TOAST: ToastState = { open: false, title: "", description: "" };
 
-/** Props ready to spread onto <BulkStatusConfirmationDialogue />. */
 export type BulkStatusDialogueProps = {
   open: true;
   title: string;
@@ -91,22 +80,16 @@ export type BulkStatusDialogueProps = {
 };
 
 type UseBulkStatusActionOptions = {
-  /** Called after a successful update, e.g. to clear selection and refetch. */
   onSuccess: () => void;
 };
 
 type UseBulkStatusActionResult = {
-  /** Non-null only while the confirmation dialogue should be shown. */
   dialogue: BulkStatusDialogueProps | null;
   openBulkAction: (action: BulkAction, applicants: BulkStatusApplicant[]) => void;
   toast: ToastState;
   dismissToast: () => void;
 };
 
-/**
- * Encapsulates the full "confirm → submit → toast" workflow for bulk status
- * updates, so the page component only has to render the dialogue and toast.
- */
 const useBulkStatusAction = ({
   onSuccess,
 }: UseBulkStatusActionOptions): UseBulkStatusActionResult => {

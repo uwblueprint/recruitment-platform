@@ -5,7 +5,6 @@ import PersonAddAltOutlined from "@mui/icons-material/PersonAddAltOutlined";
 type ReviewDashboardToolbarProps = {
   position: string | null;
   selectedCount: number;
-  /** Disables the bulk-action buttons (e.g. while the table is loading). */
   disabled?: boolean;
   onReject: () => void;
   onSelectForInterview: () => void;

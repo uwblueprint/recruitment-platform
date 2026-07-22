@@ -1,17 +1,10 @@
 import { ApplicationStatus } from "@/graphql/typeUtils";
 
-/** The two bulk operations available from the review dashboard. */
 export type BulkAction = "reject" | "interview";
 
 const pluralizeCandidates = (count: number) =>
   `${count} ${count === 1 ? "candidate" : "candidates"}`;
 
-/**
- * Static copy + config for each bulk action: the target status, the
- * confirmation-dialogue text, and the success toast. Kept separate from the
- * hook so the workflow logic and the user-facing copy can evolve
- * independently.
- */
 export const BULK_ACTIONS = {
   reject: {
     status: ApplicationStatus.Rejected,
