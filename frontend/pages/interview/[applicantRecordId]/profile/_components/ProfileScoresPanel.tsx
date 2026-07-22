@@ -3,7 +3,7 @@ import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
 
 interface ProfileScoresPanelProps {
   reviewers: ReviewedApplicantRecordWithReviewerResult[];
-  combinedReviewScore: number | null | undefined;
+  combinedReviewScore?: number;
 }
 
 const DIMENSION_ROWS: {

@@ -13,26 +13,26 @@ const getInitials = (firstName: string, lastName: string): string =>
 export const InterviewPartnerCard = ({
   className,
 }: InterviewPartnerCardProps) => {
-  const me = useAuthenticatedUser();
+  const curUser = useAuthenticatedUser();
   const [partner, setPartner] = useState<InterviewGroupMemberResult | null>(
     null,
   );
   const [interviewingNames, setInterviewingNames] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!me?.id) return;
+    if (!curUser?.id) return;
     let cancelled = false;
 
     const fetchPartner = async () => {
       try {
         const pairings =
-          await InterviewPageAPIClient.getInterviewedPairingsByUserId(me.id);
+          await InterviewPageAPIClient.getInterviewedPairingsByUserId(curUser.id);
         const foundPartner =
           pairings
             .flatMap((pairing) => pairing.groupMembers)
-            .find((member) => member.id !== me.id) ?? null;
+            .find((member) => member.id !== curUser.id);
         if (cancelled) return;
-        setPartner(foundPartner);
+        setPartner(foundPartner ?? null);
 
         if (foundPartner) {
           const applicants =
@@ -57,7 +57,7 @@ export const InterviewPartnerCard = ({
     return () => {
       cancelled = true;
     };
-  }, [me?.id]);
+  }, [curUser?.id]);
 
   if (!partner) return null;
 

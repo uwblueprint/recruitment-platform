@@ -17,14 +17,7 @@ import {
   InterviewStep as InterviewStepType,
   StepStatus,
 } from "./types";
-
-const getApplicantRecordId = (
-  raw: string | string[] | undefined,
-): string | null => {
-  if (!raw) return null;
-  if (Array.isArray(raw)) return raw[0] ?? null;
-  return raw;
-};
+import { getApplicantRecordId } from "@/pages/review/_components/utils";
 
 export const InterviewProgressContext =
   createContext<InterviewProgressState | null>(null);
@@ -53,31 +46,25 @@ export const InterviewProgressProvider = ({
   const [stepStatuses, setStepStatuses] = useState(INITIAL_STATUSES);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [reportIssueSubmitted, setReportIssueSubmitted] = useState(false);
-  const [candidateName, setCandidateName] = useState<string | null>(null);
+  const [candidateName, setCandidateName] = useState<string>();
   const [subStepsBySection, setSubStepsBySection] = useState<
-    Record<InterviewStepType, string | null>
-  >({
-    [InterviewStep.PROFILE]: null,
-    [InterviewStep.ASSESSMENT]: null,
-    [InterviewStep.REPORT]: null,
-  });
+    Partial<Record<InterviewStepType, string>>
+  >({});
 
-  const [application, setApplication] = useState<ApplicationResult | null>(
-    null,
-  );
+  const [application, setApplication] = useState<ApplicationResult>();
   const [reviewers, setReviewers] = useState<
     ReviewedApplicantRecordWithReviewerResult[]
   >([]);
-  const [combinedReviewScore, setCombinedReviewScore] = useState<number | null>(
-    null,
-  );
+  const [combinedReviewScore, setCombinedReviewScore] = useState<number>();
   const [position, setPosition] = useState("");
 
   // The record id is the path segment shared across the profile/assessment/report
   // tabs, so this provider (which lives in the persistent layout) fetches once per
   // candidate. Tab switches reuse the in-memory data instead of refetching, which
   // avoids the blank flash on navigating back to the profile.
-  const applicantRecordId = getApplicantRecordId(router.query.applicantRecordId);
+  const applicantRecordId = router.isReady
+    ? getApplicantRecordId(router.query)
+    : undefined;
 
   useEffect(() => {
     if (!applicantRecordId) return;
@@ -96,16 +83,16 @@ export const InterviewProgressProvider = ({
         setApplication(app);
         setReviewers(reviewersData.reviewedApplicantRecords ?? []);
         setCombinedReviewScore(
-          reviewersData.applicantRecord.combinedReviewScore ?? null,
+          reviewersData.applicantRecord.combinedReviewScore ?? undefined,
         );
         setPosition(reviewersData.applicantRecord.position ?? "");
         setCandidateName(`${app.firstName} ${app.lastName}`);
       } catch (error) {
         if (cancelled) return;
         console.error("Failed to load interview profile data:", error);
-        setApplication(null);
+        setApplication(undefined);
         setReviewers([]);
-        setCombinedReviewScore(null);
+        setCombinedReviewScore(undefined);
         setPosition("");
       }
     };
@@ -122,7 +109,7 @@ export const InterviewProgressProvider = ({
   // since each section has its own slot. Navigating away and back preserves sub-step state.
   const currentSubStep = subStepsBySection[currentStep];
 
-  const setCurrentSubStep = (subStep: string | null) => {
+  const setCurrentSubStep = (subStep?: string) => {
     setSubStepsBySection((prev) => ({ ...prev, [currentStep]: subStep }));
   };
 

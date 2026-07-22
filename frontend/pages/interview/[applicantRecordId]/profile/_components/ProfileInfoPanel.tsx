@@ -2,7 +2,7 @@ import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ApplicationResult } from "@/graphql/typeUtils";
 
 interface ProfileInfoPanelProps {
-  application: ApplicationResult | null;
+  application?: ApplicationResult;
   position: string;
 }
 
@@ -15,8 +15,8 @@ interface InfoRow {
 }
 
 const buildRows = (
-  application: ApplicationResult | null,
   position: string,
+  application?: ApplicationResult,
 ): InfoRow[] => {
   const email = application?.email ?? "";
   return [
@@ -49,7 +49,7 @@ export const ProfileInfoPanel = ({
   application,
   position,
 }: ProfileInfoPanelProps) => {
-  const rows = buildRows(application, position);
+  const rows = buildRows(position, application);
 
   return (
     <PanelLayout title="Basic Information">

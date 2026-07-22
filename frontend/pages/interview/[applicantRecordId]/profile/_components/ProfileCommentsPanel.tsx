@@ -11,7 +11,7 @@ const SKILL_CATEGORY_LABEL: Record<string, string> = {
   SENIOR: "Senior",
 };
 
-const formatSkillCategory = (raw: string | null | undefined): string =>
+const formatSkillCategory = (raw?: string): string =>
   raw ? (SKILL_CATEGORY_LABEL[raw] ?? raw) : "—";
 
 export const ProfileCommentsPanel = ({
@@ -40,7 +40,8 @@ export const ProfileCommentsPanel = ({
                   </p>
                   <div className="flex h-[55px] w-full items-center rounded-md border border-neutral-200 bg-white px-4 text-base leading-6 text-neutral-800">
                     {formatSkillCategory(
-                      reviewedApplicantRecord.review?.skillCategory,
+                      reviewedApplicantRecord.review?.skillCategory ??
+                        undefined,
                     )}
                   </div>
                 </div>

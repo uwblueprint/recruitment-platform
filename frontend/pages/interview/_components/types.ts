@@ -24,17 +24,17 @@ type InterviewProgressState = {
   currentStep: InterviewStep;
   stepStatuses: Record<InterviewStep, StepStatus>;
   updateStepStatus: (step: InterviewStep, status: StepStatus) => void;
-  currentSubStep: string | null;
-  setCurrentSubStep: (subStep: string | null) => void;
+  currentSubStep?: string;
+  setCurrentSubStep: (subStep?: string) => void;
   reportDialogOpen: boolean;
   setReportDialogOpen: (open: boolean) => void;
   reportIssueSubmitted: boolean;
   setReportIssueSubmitted: (submitted: boolean) => void;
-  candidateName: string | null;
-  setCandidateName: (name: string | null) => void;
-  application: ApplicationResult | null;
+  candidateName?: string;
+  setCandidateName: (name?: string) => void;
+  application?: ApplicationResult;
   reviewers: ReviewedApplicantRecordWithReviewerResult[];
-  combinedReviewScore: number | null;
+  combinedReviewScore?: number;
   position: string;
 };
 

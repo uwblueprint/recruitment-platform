@@ -84,6 +84,9 @@ export function gql(source: "query InterviewGroup($id: ID!) {\n  interviewGroup(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}"): (typeof documents)["query InterviewedApplicantsByUserId($userId: ID!) {\n  interviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    interviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "query InterviewedPairingsByUserId($userId: ID!) {\n  interviewedPairingsByUserId(userId: $userId) {\n    interviewedGroupId\n    interviewGroupStatus\n    groupMembers {\n      id\n      firstName\n      lastName\n      email\n      role\n      position\n      isArchived\n    }\n  }\n}"): (typeof documents)["query InterviewedPairingsByUserId($userId: ID!) {\n  interviewedPairingsByUserId(userId: $userId) {\n    interviewedGroupId\n    interviewGroupStatus\n    groupMembers {\n      id\n      firstName\n      lastName\n      email\n      role\n      position\n      isArchived\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
