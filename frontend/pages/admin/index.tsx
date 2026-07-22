@@ -1,10 +1,12 @@
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { ReactElement } from "react";
 import { NextPageWithLayout } from "../_app";
+import { Navbar } from "@/components/common/Navbar";
 
 const AdminPage: NextPageWithLayout = () => {
   return (
     <div className="flex h-screen flex-col bg-white">
+      <Navbar />
       <main className="flex min-h-0 flex-1 flex-col overflow-hidden" />
     </div>
   );

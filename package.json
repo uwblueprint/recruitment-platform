@@ -4,5 +4,9 @@
   "scripts": {
     "codegen": "yarn --cwd frontend generate",
     "generate": "yarn codegen"
+  },
+  "dependencies": {
+    "@apollo/client": "^4.2.7",
+    "graphql": "^16.14.2"
   }
 }

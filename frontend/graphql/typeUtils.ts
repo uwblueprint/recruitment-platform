@@ -109,6 +109,7 @@ export {
   ReportReviewConflictDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
+  LogoutDocument,
 } from "./__generated__/graphql";
 
 export type {

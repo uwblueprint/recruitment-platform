@@ -20,6 +20,7 @@ type Documents = {
     "query IsAuthorizedByRole($accessToken: String!, $roles: [Role!]!) {\n  isAuthorizedByRole(accessToken: $accessToken, roles: $roles)\n}": typeof types.IsAuthorizedByRoleDocument,
     "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": typeof types.LoginDocument,
     "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": typeof types.LoginWithGoogleDocument,
+    "mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}": typeof types.LogoutDocument,
     "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}": typeof types.RefreshDocument,
     "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": typeof types.ReportReviewConflictDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupDocument,
@@ -32,6 +33,7 @@ const documents: Documents = {
     "query IsAuthorizedByRole($accessToken: String!, $roles: [Role!]!) {\n  isAuthorizedByRole(accessToken: $accessToken, roles: $roles)\n}": types.IsAuthorizedByRoleDocument,
     "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": types.LoginDocument,
     "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": types.LoginWithGoogleDocument,
+    "mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}": types.LogoutDocument,
     "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}": types.RefreshDocument,
     "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": types.ReportReviewConflictDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupDocument,
@@ -76,6 +78,10 @@ export function gql(source: "mutation Login($email: String!, $password: String!)
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}"): (typeof documents)["mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}"): (typeof documents)["mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
