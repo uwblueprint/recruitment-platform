@@ -103,6 +103,7 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
 export {
   ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
+  InterviewedPairingsByUserIdDocument,
   InterviewDashboardDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
@@ -117,7 +118,6 @@ export {
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
   ReviewedApplicantsByUserIdDocument,
-  InterviewedPairingsByUserIdDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -127,6 +127,8 @@ export type {
   InterviewGroupQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
+  InterviewedPairingsByUserIdQuery,
+  InterviewedPairingsByUserIdQueryVariables,
   InterviewDashboardQuery,
   InterviewDashboardQueryVariables,
   InterviewersByGroupIdQuery,
@@ -155,8 +157,6 @@ export type {
   UpdateInterviewGroupSchedulingLinkMutationVariables,
   ReviewedApplicantsByUserIdQuery,
   ReviewedApplicantsByUserIdQueryVariables,
-  InterviewedPairingsByUserIdQuery,
-  InterviewedPairingsByUserIdQueryVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -192,6 +192,15 @@ export type InterviewerResult = ArrayElement<
     Operations.InterviewersByGroupIdQuery,
     "interviewersByGroupId"
   >
+>;
+export type InterviewPairingResult = ArrayElement<
+  OperationField<
+    Operations.InterviewedPairingsByUserIdQuery,
+    "interviewedPairingsByUserId"
+  >
+>;
+export type InterviewGroupMemberResult = ArrayElement<
+  InterviewPairingResult["groupMembers"]
 >;
 export type UpdateInterviewGroupResult = OperationField<
   Operations.UpdateInterviewGroupMutation,

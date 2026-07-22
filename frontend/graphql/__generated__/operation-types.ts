@@ -38,7 +38,7 @@ export type InterviewedPairingsByUserIdQueryVariables = Exact<{
 }>;
 
 
-export type InterviewedPairingsByUserIdQuery = { interviewedPairingsByUserId: Array<{ interviewedGroupId: string, interviewGroupStatus: Types.InterviewGroupStatus, groupMembers: Array<{ id: string, firstName: string, lastName: string }> }> };
+export type InterviewedPairingsByUserIdQuery = { interviewedPairingsByUserId: Array<{ interviewedGroupId: string, interviewGroupStatus: Types.InterviewGroupStatus, groupMembers: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }> }> };
 
 export type InterviewersByGroupIdQueryVariables = Exact<{
   groupId: string | number;
