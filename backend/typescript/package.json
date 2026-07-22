@@ -18,7 +18,7 @@
     "seed:down:all": "node seed.js down --to 0",
     "db:up": "node migrate.js up && node seed.js up",
     "db:down:all": "node seed.js down --to 0 && node migrate.js down --to 0",
-    "postinstall": "tsc && cp -R emails/templates build/emails/"
+    "postinstall": "tsc"
   },
   "keywords": [],
   "author": "",
@@ -41,7 +41,6 @@
     "graphql": "^15.5.0",
     "graphql-middleware": "^6.0.6",
     "graphql-upload": "^12.0.0",
-    "handlebars": "^4.7.9",
     "json2csv": "^5.0.6",
     "lodash": "^4.17.21",
     "mongoose": "^6.13.9",

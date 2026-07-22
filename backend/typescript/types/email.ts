@@ -8,14 +8,3 @@ export type NodemailerConfig = {
     refreshToken: string;
   };
 };
-
-export type BulkEmailMessage = {
-  to: string;
-  subject: string;
-  htmlBody: string;
-};
-
-export type BulkEmailResult = {
-  sent: string[];
-  failed: { to: string; error: string }[];
-};
