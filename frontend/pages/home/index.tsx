@@ -25,6 +25,7 @@ import {
   INTERVIEW_GROUP_STATUS_VARIANT,
 } from "./_components/constants";
 import { Button } from "@/components/common/Button";
+import { ArrowRightIcon } from "@/components/icons/arrow-right.icon";
 import StatusBadge from "./_components/StatusBadge";
 import HomeTable from "./_components/HomeTable";
 
@@ -84,19 +85,23 @@ const HomePage: NextPageWithLayout = () => {
     reviewedApplicants.length + interviewedApplicants.length + interviewedPairings.length;
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto p-10">
-      <h1 className="font-poppins text-2xl font-bold text-neutral-900">
+    <div className="flex h-full flex-col overflow-y-auto p-10 gap-[74px]">
+      <div>
+      <h1 className="font-poppins text-[28px] font-semibold leading-[140%] tracking-normal text-neutral-900">
         Welcome{" "}
         <span className="text-blue">
           {user?.firstName} {user?.lastName}
         </span>
         !
       </h1>
-      <p className="mt-2 font-source text-base text-neutral-700">
+      <p className="mt-2 font-poppins text-[20px] font-normal leading-[140%] tracking-normal text-neutral-700">
         You have{" "}
         <span className="font-semibold text-blue">{totalApplications}</span>{" "}
         applications to review and complete.
       </p>
+      </div>
+
+      <div>
 
       <Tabs
         tabs={TABS}
@@ -112,11 +117,8 @@ const HomePage: NextPageWithLayout = () => {
           ) : (
             <HomeTable headers={["Name", "Status", "View application"]}>
               {reviewedApplicants.map((applicant) => (
-                <tr
-                  key={applicant.applicantRecordId}
-                  className="border-b border-neutral-100 last:border-b-0"
-                >
-                  <td className="px-4 py-4 font-source text-sm text-neutral-800">
+                <tr key={applicant.applicantRecordId}>
+                  <td className="px-4 py-4 font-source text-[16px] font-normal leading-[140%] tracking-normal text-neutral-800">
                     {applicant.applicantFirstName} {applicant.applicantLastName}
                   </td>
                   <td className="px-4 py-4">
@@ -125,9 +127,10 @@ const HomePage: NextPageWithLayout = () => {
                       label={REVIEW_STATUS_LABEL[applicant.reviewStatus]}
                     />
                   </td>
-                  <td className="px-4 py-4 text-right">
-                    <Button variant="secondary" size="sm" onClick={() => router.push(`/review/${applicant.applicantRecordId}`)}>
-                      Review application →
+                  <td className="w-0 whitespace-nowrap px-4 py-4">
+                    <Button variant="secondary" size="sm" onClick={() => router.push(`/review/${applicant.applicantRecordId}`)} className="inline-flex items-center gap-1.5">
+                      Review application
+                      <ArrowRightIcon className="h-4 w-4" />
                     </Button>
                   </td>
                 </tr>
@@ -141,11 +144,8 @@ const HomePage: NextPageWithLayout = () => {
           ) : (
             <HomeTable headers={["Name", "Status", "View application"]}>
               {interviewedApplicants.map((applicant) => (
-                <tr
-                  key={applicant.applicantRecordId}
-                  className="border-b border-neutral-100 last:border-b-0"
-                >
-                  <td className="px-4 py-4 font-source text-sm text-neutral-800">
+                <tr key={applicant.applicantRecordId}>
+                  <td className="px-4 py-4 font-source text-[16px] font-normal leading-[140%] tracking-normal text-neutral-800">
                     {applicant.applicantFirstName} {applicant.applicantLastName}
                   </td>
                   <td className="px-4 py-4">
@@ -154,9 +154,10 @@ const HomePage: NextPageWithLayout = () => {
                       label={INTERVIEW_STATUS_LABEL[applicant.interviewStatus]}
                     />
                   </td>
-                  <td className="px-4 py-4 text-right">
-                    <Button variant="secondary" size="sm" onClick={() => router.push(`/interview/${applicant.applicantRecordId}`)}>
-                      Review application →
+                  <td className="w-0 whitespace-nowrap px-4 py-4">
+                    <Button variant="secondary" size="sm" onClick={() => router.push(`/interview/${applicant.applicantRecordId}/profile`)} className="inline-flex items-center gap-1.5">
+                      Review application
+                      <ArrowRightIcon className="h-4 w-4" />
                     </Button>
                   </td>
                 </tr>
@@ -170,15 +171,13 @@ const HomePage: NextPageWithLayout = () => {
           ) : (
             <HomeTable headers={["Interview Partner", "Status", "View details"]}>
               {interviewedPairings.map((pairing) => (
-                <tr
-                  key={pairing.interviewedGroupId}
-                  className="border-b border-neutral-100 last:border-b-0"
-                >
-                  <td className="px-4 py-4 font-source text-sm text-neutral-800">
+                <tr key={pairing.interviewedGroupId}>
+                  <td className="px-4 py-4 font-source text-[16px] font-normal leading-[140%] tracking-normal text-neutral-800">
                     {pairing.groupMembers
-                      .filter((m) => String(m.id) !== String(user?.id))
-                      .map((m) => `${m.firstName} ${m.lastName}`)
-                      .join(", ")}
+                      .filter((m) => String(m.id) !== String(user?.id)).length ? pairing.groupMembers
+                        .filter((m) => String(m.id) !== String(user?.id))
+                        .map((m) => `${m.firstName} ${m.lastName}`)
+                        .join(", ") : "-- No partner assigned --"}
                   </td>
                   <td className="px-4 py-4">
                     <StatusBadge
@@ -186,9 +185,10 @@ const HomePage: NextPageWithLayout = () => {
                       label={INTERVIEW_GROUP_STATUS_LABEL[pairing.interviewGroupStatus]}
                     />
                   </td>
-                  <td className="px-4 py-4 text-right">
-                    <Button variant="secondary" size="sm" onClick={() => router.push(`/interview-groups/${pairing.interviewedGroupId}`)}>
-                      View details →
+                  <td className="w-0 whitespace-nowrap px-4 py-4">
+                    <Button variant="secondary" size="sm" onClick={() => router.push(`/interview-groups/${pairing.interviewedGroupId}`)} className="inline-flex items-center gap-1.5">
+                      View details
+                      <ArrowRightIcon className="h-4 w-4" />
                     </Button>
                   </td>
                 </tr>
@@ -196,7 +196,9 @@ const HomePage: NextPageWithLayout = () => {
             </HomeTable>
           ))}
       </div>
+      </div>
     </div>
+    
   );
 };
 
