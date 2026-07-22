@@ -9,6 +9,7 @@ type UseReviewDashboardResult = {
   rows: ReviewDashboardResult[];
   isLoading: boolean;
   error: boolean;
+  refetch: () => void;
 };
 
 const useReviewDashboard = (
@@ -17,13 +18,16 @@ const useReviewDashboard = (
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
 ): UseReviewDashboardResult => {
-  const [state, setState] = useState<UseReviewDashboardResult>({
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [state, setState] = useState<Omit<UseReviewDashboardResult, "refetch">>({
     rows: [],
     isLoading: false,
     error: false,
   });
 
   useEffect(() => {
+    let ignore = false;
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setState((prev) => ({ ...prev, isLoading: true, error: false }));
 
@@ -34,14 +38,22 @@ const useReviewDashboard = (
       sortAscending,
     )
       .then((rows) => {
-        setState({ rows, isLoading: false, error: false });
+        if (!ignore) {
+          setState({ rows, isLoading: false, error: false });
+        }
       })
       .catch(() => {
-        setState({ rows: [], isLoading: false, error: true });
+        if (!ignore) {
+          setState({ rows: [], isLoading: false, error: true });
+        }
       });
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending]);
 
-  return state;
+    return () => {
+      ignore = true;
+    };
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending, refreshKey]);
+
+  return { ...state, refetch: () => setRefreshKey((key) => key + 1) };
 };
 
 export default useReviewDashboard;

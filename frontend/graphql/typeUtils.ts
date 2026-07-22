@@ -102,6 +102,7 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  */
 export {
   ApplicationDocument,
+  BulkUpdateApplicantRecordsStatusDocument,
   InterviewedApplicantsByUserIdDocument,
   InterviewedPairingsByUserIdDocument,
   InterviewDashboardDocument,
@@ -123,6 +124,8 @@ export {
 export type {
   ApplicationQuery,
   ApplicationQueryVariables,
+  BulkUpdateApplicantRecordsStatusMutation,
+  BulkUpdateApplicantRecordsStatusMutationVariables,
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
   InterviewedApplicantsByUserIdQuery,
