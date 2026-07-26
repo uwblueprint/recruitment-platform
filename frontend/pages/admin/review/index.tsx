@@ -16,6 +16,8 @@ import {
   REVIEW_DASHBOARD_COLUMNS,
 } from "./_components/columns";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
+import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
+import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
@@ -29,9 +31,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [activeRow, setActiveRow] = useState<ReviewDashboardResult | null>(
-    null,
-  );
+  const [activeId, setActiveId] = useState<string | undefined>(undefined);
 
   // The table is single-sort, so only the first SortingState entry is used.
   // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
@@ -47,10 +47,43 @@ const AdminReviewPage: NextPageWithLayout = () => {
     sortAscending,
   );
 
+  // Every applicant record id in display order, so the side panel can walk the
+  // whole dashboard instead of only the page currently loaded in `rows`.
+  const applicantRecordIds = useReviewDashboardApplicantRecordIds();
+
+  // The active row is only available while the active applicant's page is
+  // loaded; navigating to another page leaves it undefined until the page
+  // fetch settles.
+  const activeRow = rows.find((row) => row.applicantRecordId === activeId);
+
+  const { details, isLoading: isDetailsLoading } = useReviewDashboardSidePanel(
+    activeId,
+  );
+
+  const activeNavigationIndex =
+    activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
+
+  // Jumps the side panel to the applicant at `index` and keeps the table on
+  // the page that applicant lives on.
+  const goToApplicant = (index: number) => {
+    const applicantRecordId = applicantRecordIds[index];
+    if (!applicantRecordId) {
+      return;
+    }
+    setActiveId(applicantRecordId);
+    setPageNumber(Math.floor(index / resultsPerPage) + 1);
+  };
+
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
     setRowSelection({});
+    setActiveId(undefined);
+  };
+
+  const handlePageChange = (nextPageNumber: number) => {
+    setPageNumber(nextPageNumber);
+    setActiveId(undefined);
   };
 
   // Changing the sort can shrink the result set, so return to the first page.
@@ -83,7 +116,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
-          onRowClick={(row) => setActiveRow(row)}
+          onRowClick={(row) => setActiveId(row.applicantRecordId)}
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={handleSortingChange}
@@ -91,19 +124,29 @@ const AdminReviewPage: NextPageWithLayout = () => {
             pageNumber,
             resultsPerPage,
             canGoNext: rows.length === resultsPerPage,
-            onPageChange: setPageNumber,
+            onPageChange: handlePageChange,
             onResultsPerPageChange: handleResultsPerPageChange,
           }}
         />
       </main>
 
       <DashboardSidePanel
-        open={!!activeRow}
-        onClose={() => setActiveRow(null)}
-        title={
-          activeRow
-            ? `${activeRow.firstName} ${activeRow.lastName}`
-            : "Applicant details"
+        open={activeId !== undefined}
+        onClose={() => setActiveId(undefined)}
+        row={activeRow}
+        details={details}
+        isLoading={isDetailsLoading}
+        navigation={
+          activeNavigationIndex >= 0
+            ? {
+                current: activeNavigationIndex + 1,
+                total: applicantRecordIds.length,
+                canPrev: activeNavigationIndex > 0,
+                canNext: activeNavigationIndex < applicantRecordIds.length - 1,
+                onPrev: () => goToApplicant(activeNavigationIndex - 1),
+                onNext: () => goToApplicant(activeNavigationIndex + 1),
+              }
+            : undefined
         }
       />
     </div>

@@ -356,7 +356,7 @@ export const ReviewEndStage = ({
   onReportConflict,
   viewOnly = false,
   reviewers = [],
-  combinedReviewScore,
+  combinedReviewScore = null,
 }: Props) => {
   const [validationError, setValidationError] = useState(false);
 

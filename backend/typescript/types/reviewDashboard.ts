@@ -39,6 +39,7 @@ export type ReviewDashboardSidePanelDTO = {
   lastName: string;
   position: string;
   program: string;
+  academicYear: string;
   resumeUrl: string;
   applicationStatus: ApplicationStatus;
   skillCategory: SkillCategory | null;
