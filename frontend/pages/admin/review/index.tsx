@@ -1,20 +1,27 @@
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
+import {
+  FilterChips,
+  FilterMenu,
+  SearchBar,
+  type SelectedFilters,
+} from "@/components/dashboard/filters";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
   RowSelectionState,
   SortingState,
 } from "@tanstack/react-table";
 import { useRouter } from "next/router";
-import { ReactElement, useState } from "react";
+import { ReactElement, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
 import {
   COLUMN_ID_TO_SORT_BY,
   REVIEW_DASHBOARD_COLUMNS,
 } from "./_components/columns";
+import { filterReviewDashboardRows } from "./_components/filters/applyFilters";
+import { REVIEW_FILTER_CATEGORIES } from "./_components/filters/constants";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
@@ -32,6 +39,8 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
+  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const [search, setSearch] = useState("");
 
   // The table is single-sort, so only the first SortingState entry is used.
   // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
@@ -93,6 +102,41 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setRowSelection({});
   };
 
+  const handleFilterCategoryChange = (categoryKey: string, values: string[]) => {
+    setSelectedFilters((prev) => ({ ...prev, [categoryKey]: values }));
+    setPageNumber(1);
+    setRowSelection({});
+  };
+
+  const handleRemoveFilter = (categoryKey: string, value: string) => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [categoryKey]: (prev[categoryKey] ?? []).filter(
+        (selectedValue) => selectedValue !== value,
+      ),
+    }));
+    setPageNumber(1);
+    setRowSelection({});
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPageNumber(1);
+    setRowSelection({});
+  };
+
+  // Filtering/searching only apply to the page of rows already fetched from
+  // the server, since reviewDashboard doesn't yet accept filter params.
+  const visibleRows = useMemo(() => {
+    const trimmedSearch = search.trim().toLowerCase();
+    const searchedRows = trimmedSearch
+      ? rows.filter((row) =>
+          `${row.firstName} ${row.lastName}`.toLowerCase().includes(trimmedSearch),
+        )
+      : rows;
+    return filterReviewDashboardRows(searchedRows, selectedFilters);
+  }, [rows, search, selectedFilters]);
+
   return (
     <div className="flex h-screen flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
@@ -104,6 +148,22 @@ const AdminReviewPage: NextPageWithLayout = () => {
           ) : null}
         </div>
 
+        <div className="flex shrink-0 flex-col gap-3">
+          <div className="flex items-center gap-3">
+            <FilterMenu
+              categories={REVIEW_FILTER_CATEGORIES}
+              selected={selectedFilters}
+              onChange={handleFilterCategoryChange}
+            />
+            <SearchBar value={search} onChange={handleSearchChange} />
+          </div>
+          <FilterChips
+            categories={REVIEW_FILTER_CATEGORIES}
+            selected={selectedFilters}
+            onRemove={handleRemoveFilter}
+          />
+        </div>
+
         {error ? (
           <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
             Failed to load review dashboard
@@ -111,7 +171,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         ) : null}
 
         <DashboardTable
-          data={rows}
+          data={visibleRows}
           columns={REVIEW_DASHBOARD_COLUMNS}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
