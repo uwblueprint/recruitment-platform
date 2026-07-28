@@ -2,7 +2,6 @@ import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { DashboardView } from "@/graphql/typeUtils";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
   RowSelectionState,
@@ -74,6 +73,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // Update the count for the current view whenever rows change
   useEffect(() => {
     if (!isLoading) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTabCounts((prev) => ({ ...prev, [activeView]: rows.length }));
     }
   }, [rows, isLoading, activeView]);
