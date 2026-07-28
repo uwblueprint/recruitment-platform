@@ -1,39 +1,53 @@
-import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { NextPageWithLayout } from "@/pages/_app";
-import {
-  useInterviewProgress,
-  PROFILE_HEADER_STEPS,
-  InterviewHeaderStep,
-} from "../../_components";
 import {
   getInterviewLayout,
   InterviewHeader,
-  InterviewFooter,
 } from "../../_components/layout";
+import {
+  PROFILE_HEADER_STEPS,
+  InterviewHeaderStep,
+} from "../../_components/constants";
+import { useInterviewProgress } from "../../_components";
+import {
+  ProfileCommentsPanel,
+  ProfileFooter,
+  ProfileInfoPanel,
+  ProfileScoresPanel,
+} from "./_components";
 
 const InterviewProfilePage: NextPageWithLayout = () => {
-  const { currentStep, stepStatuses } = useInterviewProgress();
+  const {
+    currentSubStep,
+    application,
+    reviewers,
+    combinedReviewScore,
+    position,
+  } = useInterviewProgress();
 
-  return (
-    <PanelLayout
-      title="Applicant Profile"
-      subtitle="Percy Jackson's Application"
-    >
-      <p>
-        Current step: {currentStep}, Status: {stepStatuses[currentStep]}
-      </p>
-    </PanelLayout>
-  );
+  const subStep = currentSubStep ?? InterviewHeaderStep.INFO;
+
+  switch (subStep) {
+    case InterviewHeaderStep.SCORING:
+      return (
+        <ProfileScoresPanel
+          reviewers={reviewers}
+          combinedReviewScore={combinedReviewScore}
+        />
+      );
+    case InterviewHeaderStep.COMMENTS:
+      return <ProfileCommentsPanel reviewers={reviewers} />;
+    case InterviewHeaderStep.INFO:
+    default:
+      return <ProfileInfoPanel application={application} position={position} />;
+  }
 };
 
-// TODO: footer buttons and currentStep will update as the user moves through
-// INFO → SCORING → COMMENTS sub-steps once sub-step state is wired up.
 InterviewProfilePage.getLayout = getInterviewLayout(
   <InterviewHeader
     steps={PROFILE_HEADER_STEPS}
     currentStep={InterviewHeaderStep.INFO}
   />,
-  <InterviewFooter onBack={() => {}} onContinue={() => {}} />,
+  <ProfileFooter />,
 );
 
 export default InterviewProfilePage;

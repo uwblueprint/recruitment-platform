@@ -3,6 +3,7 @@ import {
   Column,
   DataType,
   HasMany,
+  HasOne,
   Model,
   Table,
 } from "sequelize-typescript";
@@ -16,6 +17,8 @@ import {
 import Applicant from "./applicant.model";
 // eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import ReviewedApplicantRecord from "./reviewedApplicantRecord.model";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
+import InterviewedApplicantRecord from "./interviewedApplicantRecord.model";
 
 @Table({ tableName: "applicant_records" })
 export default class ApplicantRecord extends Model {
@@ -87,4 +90,9 @@ export default class ApplicantRecord extends Model {
     foreignKey: "applicant_record_id",
   })
   reviewed_applicant_records!: ReviewedApplicantRecord[];
+
+  @HasOne(() => InterviewedApplicantRecord, {
+    foreignKey: "applicant_record_id",
+  })
+  interviewed_applicant_record?: InterviewedApplicantRecord;
 }

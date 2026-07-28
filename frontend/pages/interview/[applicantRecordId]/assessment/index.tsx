@@ -59,7 +59,7 @@ const AssessmentSubmitted = () => {
 
 const InterviewAssessmentPage: NextPageWithLayout = () => {
   const { currentSubStep, setCurrentSubStep } = useInterviewProgress();
-  if (currentSubStep === null) setCurrentSubStep(SCORES);
+  if (currentSubStep === undefined) setCurrentSubStep(SCORES);
   switch (currentSubStep) {
     case SUBMITTED:
       return <AssessmentSubmitted />;

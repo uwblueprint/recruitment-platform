@@ -1,11 +1,20 @@
 import {
   InterviewDelegationDTO,
+  InterviewDashboardRowDTO,
   InterviewedApplicantsDTO,
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
 
 interface IInterviewCompositeService {
+  /**
+   * Fetches paginated applicants for the admin interview dashboard.
+   */
+  getInterviewDashboard(
+    pageNumber: number,
+    resultsPerPage: number,
+  ): Promise<InterviewDashboardRowDTO[]>;
+
   /**
    * Delegates interviewers to interview applicants.
    */

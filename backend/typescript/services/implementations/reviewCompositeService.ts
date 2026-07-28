@@ -32,6 +32,64 @@ const Logger = logger(__filename);
 
 const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
 
+/**
+ * Builds the ORDER BY clause shared by the review dashboard queries so the
+ * paginated rows and the full applicant-record-id list walk the same order.
+ *
+ * Reviewers are a hasMany loaded via `separate: true`, so their names are
+ * not in the main query and a plain ORDER BY can't reference them. Instead,
+ * order by the Nth reviewer's "last first" name via a correlated subquery
+ * (LIMIT 1 OFFSET idx mirrors how reviewers[idx] is picked in the DTO).
+ * Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows
+ * land on each page — sorting the returned page in JS would only order
+ * within a page, since the DB would already have chosen the page by id.
+ * COALESCE(...,'') keeps records missing that reviewer ordered as empty
+ * strings (first on ASC, last on DESC), and id is a stable tiebreak.
+ */
+function buildReviewDashboardOrder(
+  sortBy?: ReviewDashboardSortBy,
+  sortAscending?: boolean,
+): Order {
+  const direction = sortAscending === false ? "DESC" : "ASC";
+
+  const sortColumnMap: Record<
+    Exclude<ReviewDashboardSortBy, "REVIEWER_1" | "REVIEWER_2">,
+    OrderItem
+  > = {
+    FIRST_NAME: [col("applicant.first_name"), direction],
+    LAST_NAME: [col("applicant.last_name"), direction],
+    TIMES_APPLIED: [col("applicant.times_applied"), direction],
+    CHOICE: ["choice", direction],
+    TOTAL_SCORE: ["combined_review_score", direction],
+    APPLICATION_STATUS: ["status", direction],
+  };
+
+  if (
+    sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ||
+    sortBy === ReviewDashboardSortByEnum.REVIEWER_2
+  ) {
+    const idx = sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ? 0 : 1;
+    return [
+      [
+        literal(`COALESCE((
+          SELECT u."last_name" || ' ' || u."first_name"
+          FROM "reviewed_applicant_records" AS r
+          JOIN "users" AS u ON u."id" = r."reviewer_id"
+          WHERE r."applicant_record_id" = "ApplicantRecord"."id"
+          ORDER BY r."createdAt" ASC, r."reviewer_id" ASC
+          LIMIT 1 OFFSET ${idx}
+        ), '')`),
+        direction,
+      ],
+      ["id", "ASC"],
+    ];
+  }
+  if (sortBy) {
+    return [sortColumnMap[sortBy], ["id", "ASC"]];
+  }
+  return [["id", "ASC"]];
+}
+
 class ReviewCompositeService implements IReviewCompositeService {
   /* eslint-disable class-methods-use-this */
 
@@ -113,54 +171,7 @@ class ReviewCompositeService implements IReviewCompositeService {
         : 1;
       const offsetRow = (currentPage - 1) * perPage;
 
-      const direction = sortAscending === false ? "DESC" : "ASC";
-
-      const sortColumnMap: Record<
-        Exclude<ReviewDashboardSortBy, "REVIEWER_1" | "REVIEWER_2">,
-        OrderItem
-      > = {
-        FIRST_NAME: [col("applicant.first_name"), direction],
-        LAST_NAME: [col("applicant.last_name"), direction],
-        TIMES_APPLIED: [col("applicant.times_applied"), direction],
-        CHOICE: ["choice", direction],
-        TOTAL_SCORE: ["combined_review_score", direction],
-        APPLICATION_STATUS: ["status", direction],
-      };
-
-      // Reviewers are a hasMany loaded via `separate: true`, so their names are
-      // not in this query and a plain ORDER BY can't reference them. Instead,
-      // order by the Nth reviewer's "last first" name via a correlated subquery
-      // (LIMIT 1 OFFSET idx mirrors how reviewers[idx] is picked in the DTO).
-      // Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows
-      // land on each page — sorting the returned page in JS would only order
-      // within a page, since the DB would already have chosen the page by id.
-      // COALESCE(...,'') keeps records missing that reviewer ordered as empty
-      // strings (first on ASC, last on DESC), and id is a stable tiebreak.
-      let order: Order;
-      if (
-        sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ||
-        sortBy === ReviewDashboardSortByEnum.REVIEWER_2
-      ) {
-        const idx = sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ? 0 : 1;
-        order = [
-          [
-            literal(`COALESCE((
-              SELECT u."last_name" || ' ' || u."first_name"
-              FROM "reviewed_applicant_records" AS r
-              JOIN "users" AS u ON u."id" = r."reviewer_id"
-              WHERE r."applicant_record_id" = "ApplicantRecord"."id"
-              ORDER BY r."createdAt" ASC, r."reviewer_id" ASC
-              LIMIT 1 OFFSET ${idx}
-            ), '')`),
-            direction,
-          ],
-          ["id", "ASC"],
-        ];
-      } else if (sortBy) {
-        order = [sortColumnMap[sortBy], ["id", "ASC"]];
-      } else {
-        order = [["id", "ASC"]];
-      }
+      const order = buildReviewDashboardOrder(sortBy, sortAscending);
 
       // get applicant_record
       // JOIN applicant ON applicant_id
@@ -214,6 +225,34 @@ class ReviewCompositeService implements IReviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to get dashboard. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getReviewDashboardApplicantRecordIds(
+    sortBy?: ReviewDashboardSortBy,
+    sortAscending?: boolean,
+  ): Promise<string[]> {
+    try {
+      const applicantRecords = await ApplicantRecord.findAll({
+        attributes: ["id"],
+        include: [
+          {
+            // Joined with no attributes so the ORDER BY can reference
+            // applicant columns without fetching them.
+            attributes: [],
+            model: Applicant,
+          },
+        ],
+        order: buildReviewDashboardOrder(sortBy, sortAscending),
+      });
+      return applicantRecords.map((applicantRecord) => applicantRecord.id);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get review dashboard applicant record ids. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }

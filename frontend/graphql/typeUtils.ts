@@ -15,6 +15,7 @@ export {
   InterviewConflict,
   InterviewGroupStatus,
   InterviewStatus,
+  ReviewDashboardSortBy,
   ReviewStatus,
   Role,
   SimpleEntityEnum,
@@ -103,6 +104,8 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
 export {
   ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
+  InterviewedPairingsByUserIdDocument,
+  InterviewDashboardDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   IsAuthorizedByRoleDocument,
@@ -111,9 +114,13 @@ export {
   ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
   ReviewedApplicantRecordsByApplicantRecordIdDocument,
+  ReviewDashboardApplicantRecordIdsDocument,
   ReviewDashboardDocument,
+  ReviewDashboardSidePanelDocument,
+  UpdateApplicantRecordStatusDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
+  ReviewedApplicantsByUserIdDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -123,6 +130,10 @@ export type {
   InterviewGroupQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
+  InterviewedPairingsByUserIdQuery,
+  InterviewedPairingsByUserIdQueryVariables,
+  InterviewDashboardQuery,
+  InterviewDashboardQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
   IsAuthorizedByRoleQuery,
@@ -139,12 +150,20 @@ export type {
   ReportReviewConflictMutationVariables,
   ReviewedApplicantRecordsByApplicantRecordIdQuery,
   ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
+  ReviewDashboardApplicantRecordIdsQuery,
+  ReviewDashboardApplicantRecordIdsQueryVariables,
   ReviewDashboardQuery,
   ReviewDashboardQueryVariables,
+  ReviewDashboardSidePanelQuery,
+  ReviewDashboardSidePanelQueryVariables,
+  UpdateApplicantRecordStatusMutation,
+  UpdateApplicantRecordStatusMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
   UpdateInterviewGroupSchedulingLinkMutationVariables,
+  ReviewedApplicantsByUserIdQuery,
+  ReviewedApplicantsByUserIdQueryVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -172,11 +191,23 @@ export type InterviewedApplicantResult = ArrayElement<
     "interviewedApplicantsByUserId"
   >
 >;
+export type InterviewDashboardResult = ArrayElement<
+  OperationField<Operations.InterviewDashboardQuery, "interviewDashboard">
+>;
 export type InterviewerResult = ArrayElement<
   OperationField<
     Operations.InterviewersByGroupIdQuery,
     "interviewersByGroupId"
   >
+>;
+export type InterviewPairingResult = ArrayElement<
+  OperationField<
+    Operations.InterviewedPairingsByUserIdQuery,
+    "interviewedPairingsByUserId"
+  >
+>;
+export type InterviewGroupMemberResult = ArrayElement<
+  InterviewPairingResult["groupMembers"]
 >;
 export type UpdateInterviewGroupResult = OperationField<
   Operations.UpdateInterviewGroupMutation,
@@ -207,4 +238,23 @@ export type ReportInterviewConflictResult = OperationField<
 >;
 export type ReviewDashboardResult = ArrayElement<
   OperationField<Operations.ReviewDashboardQuery, "reviewDashboard">
+>;
+export type ReviewDashboardSidePanelResult = OperationField<
+  Operations.ReviewDashboardSidePanelQuery,
+  "reviewDashboardSidePanel"
+>;
+export type ReviewDashboardSidePanelReviewDetail = ArrayElement<
+  ReviewDashboardSidePanelResult["reviewDetails"]
+ >;
+export type ReviewedApplicantResult = ArrayElement<
+  OperationField<
+    Operations.ReviewedApplicantsByUserIdQuery,
+    "reviewedApplicantsByUserId"
+  >
+>;
+export type InterviewedPairingResult = ArrayElement<
+  OperationField<
+    Operations.InterviewedPairingsByUserIdQuery,
+    "interviewedPairingsByUserId"
+  >
 >;

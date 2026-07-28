@@ -34,6 +34,21 @@ const reviewDashboardResolvers = {
         view,
       );
     },
+    reviewDashboardApplicantRecordIds: async (
+      _parent: undefined,
+      {
+        sortBy,
+        sortAscending,
+      }: {
+        sortBy?: ReviewDashboardSortBy;
+        sortAscending?: boolean;
+      },
+    ): Promise<string[]> => {
+      return reviewCompositeService.getReviewDashboardApplicantRecordIds(
+        sortBy,
+        sortAscending,
+      );
+    },
     reviewDashboardSidePanel: async (
       _parent: undefined,
       { applicantRecordId }: { applicantRecordId: string },
