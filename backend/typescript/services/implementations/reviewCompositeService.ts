@@ -113,7 +113,8 @@ class ReviewCompositeService implements IReviewCompositeService {
       // NULLS LAST keeps records missing the sort value at the bottom of the
       // list regardless of direction. Postgres otherwise defaults to NULLS
       // FIRST on DESC, which would float those rows to the top.
-      const direction = sortAscending === false ? "DESC NULLS LAST" : "ASC NULLS LAST";
+      const direction =
+        sortAscending === false ? "DESC NULLS LAST" : "ASC NULLS LAST";
 
       const sortColumnMap: Record<
         Exclude<ReviewDashboardSortBy, "REVIEWER_1" | "REVIEWER_2">,
