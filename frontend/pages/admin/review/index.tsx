@@ -8,7 +8,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { useRouter } from "next/router";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
 import {
@@ -19,6 +19,7 @@ import { DashboardTabs } from "./_components/DashboardTabs";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
+import useTabCounts from "./_components/hooks/useTabCounts";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
@@ -32,12 +33,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
-  // Track the last-known count for each view so tab counts stay stable while switching
-  const [tabCounts, setTabCounts] = useState<Record<DashboardView, number>>({
-    [DashboardView.All]: 0,
-    [DashboardView.Shortlisted]: 0,
-    [DashboardView.Conflicts]: 0,
-  });
 
   // The table is single-sort, so only the first SortingState entry is used.
   // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
@@ -70,13 +65,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const activeNavigationIndex =
     activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
 
-  // Update the count for the current view whenever rows change
-  useEffect(() => {
-    if (!isLoading) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTabCounts((prev) => ({ ...prev, [activeView]: rows.length }));
-    }
-  }, [rows, isLoading, activeView]);
+  const tabCounts = useTabCounts(rows, isLoading, activeView);
 
   // Jumps the side panel to the applicant at `index` and keeps the table on
   // the page that applicant lives on.
@@ -115,7 +104,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setRowSelection({});
   };
 
-  const selectedCount = Object.values(rowSelection).filter(Boolean).length;
+  const selectedCount = Object.keys(rowSelection).length;
 
   return (
     <div className="flex h-screen flex-col bg-white">
