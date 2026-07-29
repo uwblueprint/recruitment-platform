@@ -1,5 +1,7 @@
 import ReviewCompositeService from "../../services/implementations/reviewCompositeService";
 import {
+  ReviewDashboardFilterOptionsDTO,
+  ReviewDashboardFilters,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -16,11 +18,13 @@ const reviewDashboardResolvers = {
         resultsPerPage,
         sortBy,
         sortAscending,
+        filters,
       }: {
         pageNumber: number;
         resultsPerPage: number;
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
+        filters?: ReviewDashboardFilters;
       },
     ): Promise<ReviewDashboardRowDTO[]> => {
       return reviewCompositeService.getReviewDashboard(
@@ -28,6 +32,7 @@ const reviewDashboardResolvers = {
         resultsPerPage,
         sortBy,
         sortAscending,
+        filters,
       );
     },
     reviewDashboardApplicantRecordIds: async (
@@ -52,6 +57,12 @@ const reviewDashboardResolvers = {
       return reviewCompositeService.getReviewDashboardSidePanel(
         applicantRecordId,
       );
+    },
+    reviewDashboardFilterOptions: async (
+      _parent: undefined,
+      { department }: { department?: string },
+    ): Promise<ReviewDashboardFilterOptionsDTO> => {
+      return reviewCompositeService.getReviewDashboardFilterOptions(department);
     },
   },
   Mutation: {

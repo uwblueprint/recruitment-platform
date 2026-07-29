@@ -1,5 +1,7 @@
 import {
   ApplicantRecordWithReviewersDTO,
+  ReviewDashboardFilterOptionsDTO,
+  ReviewDashboardFilters,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -31,12 +33,14 @@ interface IReviewCompositeService {
    * @Param resultsPerPage the number of results per page
    * @Param sortBy the field to sort results by
    * @Param sortAscending whether to sort ascending; defaults to true
+   * @Param filters optional filters to apply to the dashboard
    */
   getReviewDashboard(
     page: number,
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
   ): Promise<ReviewDashboardRowDTO[]>;
 
   /**
@@ -65,6 +69,15 @@ interface IReviewCompositeService {
   getReviewDashboardSidePanel(
     applicantId: string,
   ): Promise<ReviewDashboardSidePanelDTO>;
+
+  /**
+   * Fetches all filter options for the review dashboard
+   * @param department optional department to scope position options
+   * @returns ReviewDashboardFilterOptionsDTO with all filter options
+   */
+  getReviewDashboardFilterOptions(
+    department?: string,
+  ): Promise<ReviewDashboardFilterOptionsDTO>;
 }
 
 export default IReviewCompositeService;

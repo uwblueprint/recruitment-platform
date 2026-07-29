@@ -1,11 +1,14 @@
-import { Op, Order, OrderItem, col, literal } from "sequelize";
+import { Op, Order, OrderItem, col, literal, WhereOptions } from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
 import User from "../../models/user.model";
 import {
   ApplicantRecordWithReviewersDTO,
+  ApplicationStatusEnum,
   CreateReviewedApplicantRecordDTO,
+  ReviewDashboardFilterOptionsDTO,
+  ReviewDashboardFilters,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -13,6 +16,7 @@ import {
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
   ReviewStatusEnum,
+  SkillCategoryEnum,
 } from "../../types";
 import {
   toApplicantRecordDTO,
@@ -25,6 +29,7 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IReviewCompositeService from "../interfaces/IReviewCompositeService";
 import ReviewedApplicantRecordService from "./reviewedApplicantRecordService";
+import Position from "../../models/position.model";
 
 const Logger = logger(__filename);
 
@@ -86,6 +91,61 @@ function buildReviewDashboardOrder(
     return [sortColumnMap[sortBy], ["id", "ASC"]];
   }
   return [["id", "ASC"]];
+}
+
+const YEAR_TO_ACADEMIC_YEARS: Record<string, string[]> = {
+  "1st year": ["1A", "1B"],
+  "2nd year": ["2A", "2B"],
+  "3rd year": ["3A", "3B"],
+  "4th year": ["4A", "4B"],
+  "5th year": ["5A", "5B"],
+};
+
+function buildApplicantRecordWhere(
+  filters?: ReviewDashboardFilters,
+): WhereOptions {
+  const where: WhereOptions = {};
+
+  if (filters?.positions?.length) {
+    where.position = { [Op.in]: filters.positions };
+  }
+  if (filters?.applicationStatuses?.length) {
+    where.status = { [Op.in]: filters.applicationStatuses };
+  }
+  if (filters?.skillCategories?.length) {
+    where.skill_category = { [Op.in]: filters.skillCategories };
+  }
+  if (filters?.bookmarked !== undefined) {
+    where.is_applicant_flagged = filters.bookmarked;
+  }
+  if (filters?.scoreRanges?.length) {
+    const scoreConditions = filters.scoreRanges.map((range) => {
+      if (range === "gt_25") return { combined_review_score: { [Op.gt]: 25 } };
+      if (range === "20_25")
+        return { combined_review_score: { [Op.between]: [20, 25] } };
+      if (range === "15_20")
+        return { combined_review_score: { [Op.between]: [15, 20] } };
+      if (range === "lt_15") return { combined_review_score: { [Op.lt]: 15 } };
+      return {};
+    });
+    where[(Op.or as unknown) as string] = scoreConditions;
+  }
+
+  return where;
+}
+
+function buildApplicantWhere(filters?: ReviewDashboardFilters): WhereOptions {
+  const where: WhereOptions = {};
+  if (filters?.years?.length) {
+    const academicYears = filters.years.flatMap(
+      (year) => YEAR_TO_ACADEMIC_YEARS[year] ?? [],
+    );
+    if (academicYears.length) {
+      where.academic_year = { [Op.in]: academicYears };
+    }
+  }
+
+  return where;
 }
 
 class ReviewCompositeService implements IReviewCompositeService {
@@ -158,6 +218,7 @@ class ReviewCompositeService implements IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
   ): Promise<ReviewDashboardRowDTO[]> {
     try {
       const perPage = Number.isFinite(Number(resultsPerPage))
@@ -180,6 +241,7 @@ class ReviewCompositeService implements IReviewCompositeService {
       // ORDER BY reference the "applicant" table directly.
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: { exclude: ["createdAt", "updatedAt"] },
+        where: buildApplicantRecordWhere(filters),
         include: [
           {
             attributes: { exclude: ["updatedAt"] },
@@ -199,6 +261,7 @@ class ReviewCompositeService implements IReviewCompositeService {
           {
             attributes: { exclude: ["createdAt", "updatedAt"] },
             model: Applicant,
+            where: buildApplicantWhere(filters),
           },
         ],
         order,
@@ -280,6 +343,71 @@ class ReviewCompositeService implements IReviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to get review dashboard side panel for applicant record ${applicantRecordId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async getReviewDashboardFilterOptions(
+    // department filtering not yet supported — reserved for future use
+    _department?: string,
+  ): Promise<ReviewDashboardFilterOptionsDTO> {
+    try {
+      const positionRecords = await Position.findAll({
+        where: {
+          is_archived: false,
+        },
+      });
+
+      const positions = positionRecords.map((p) => ({
+        value: p.title,
+        label: p.title,
+      }));
+
+      const applicationStatuses = Object.values(ApplicationStatusEnum).map(
+        (status) => ({
+          value: status,
+          label: status
+            .replace(/_/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, (c) => c.toUpperCase()),
+        }),
+      );
+
+      const skillCategories = Object.values(SkillCategoryEnum).map(
+        (category) => ({
+          value: category,
+          label: category.charAt(0) + category.slice(1).toLowerCase(),
+        }),
+      );
+
+      const scoreRanges = [
+        { value: "gt_25", label: "> 25" },
+        { value: "20_25", label: "20 - 25" },
+        { value: "15_20", label: "15 - 20" },
+        { value: "lt_15", label: "< 15" },
+      ];
+
+      const years = [
+        { value: "1st year", label: "1st year" },
+        { value: "2nd year", label: "2nd year" },
+        { value: "3rd year", label: "3rd year" },
+        { value: "4th year", label: "4th year" },
+        { value: "5th year", label: "5th year" },
+      ];
+
+      return {
+        positions,
+        applicationStatuses,
+        skillCategories,
+        scoreRanges,
+        years,
+      };
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get review dashboard filter options. Reason = ${getErrorMessage(
           error,
         )}`,
       );
