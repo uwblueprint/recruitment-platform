@@ -16,6 +16,11 @@ import {
   type ReviewDashboardSortBy,
   type UpdateApplicantRecordStatusMutation,
   type UpdateApplicantRecordStatusMutationVariables,
+  ReviewDashboardFilterOptionsDocument,
+  type ReviewDashboardFilterOptionsQuery,
+  type ReviewDashboardFilterOptionsQueryVariables,
+  type ReviewDashboardFilterOptionsResult,
+  type ReviewDashboardFilters,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -26,6 +31,7 @@ class ReviewDashboardAPIClient {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
   ): Promise<ReviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
@@ -35,7 +41,7 @@ class ReviewDashboardAPIClient {
         ReviewDashboardQueryVariables
       >({
         query: ReviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage, sortBy, sortAscending },
+        variables: { pageNumber, resultsPerPage, sortBy, sortAscending, filters },
         fetchPolicy: "network-only",
       });
 
@@ -46,6 +52,31 @@ class ReviewDashboardAPIClient {
       return data.reviewDashboard;
     } catch {
       throw new Error("Failed to get review dashboard");
+    }
+  }
+
+  static async getReviewDashboardFilterOptions(
+    department?: string,
+  ): Promise<ReviewDashboardFilterOptionsResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ReviewDashboardFilterOptionsQuery,
+        ReviewDashboardFilterOptionsQueryVariables
+      >({
+        query: ReviewDashboardFilterOptionsDocument,
+        variables: { department },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.reviewDashboardFilterOptions) {
+        throw new Error("No data returned");
+      }
+
+      return data.reviewDashboardFilterOptions;
+    } catch {
+      throw new Error("Failed to get review dashboard filter options");
     }
   }
 

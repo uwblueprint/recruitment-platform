@@ -398,12 +398,15 @@ class ReviewCompositeService implements IReviewCompositeService {
         { value: "5th year", label: "5th year" },
       ];
 
+      const bookmarked = [{value: "true", label: "Bookmarked"}];
+
       return {
         positions,
         applicationStatuses,
         skillCategories,
         scoreRanges,
         years,
+        bookmarked,
       };
     } catch (error: unknown) {
       Logger.error(

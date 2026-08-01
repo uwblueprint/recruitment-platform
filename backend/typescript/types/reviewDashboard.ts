@@ -57,6 +57,7 @@ export type ReviewDashboardFilterOptionsDTO = {
   skillCategories: FilterOption[];
   scoreRanges: FilterOption[];
   years: FilterOption[];
+  bookmarked: FilterOption[];
 };
 
 export type ReviewDashboardFilters = {

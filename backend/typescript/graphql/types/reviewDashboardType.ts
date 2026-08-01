@@ -42,6 +42,7 @@ const reviewDashboardType = gql`
     skillCategories: [FilterOption!]!
     scoreRanges: [FilterOption!]!
     years: [FilterOption!]!
+    bookmarked: [FilterOption!]!
   }
 
   input ReviewDashboardFilters {

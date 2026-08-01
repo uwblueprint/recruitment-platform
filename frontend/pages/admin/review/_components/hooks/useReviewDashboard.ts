@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
 import type {
+  ReviewDashboardFilters,
   ReviewDashboardResult,
   ReviewDashboardSortBy,
 } from "@/graphql/typeUtils";
@@ -9,6 +10,7 @@ type UseReviewDashboardResult = {
   rows: ReviewDashboardResult[];
   isLoading: boolean;
   error: boolean;
+  refetch: () => void;
 };
 
 const useReviewDashboard = (
@@ -16,15 +18,18 @@ const useReviewDashboard = (
   resultsPerPage: number,
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
+  filters?: ReviewDashboardFilters,
 ): UseReviewDashboardResult => {
-  const [state, setState] = useState<UseReviewDashboardResult>({
-    rows: [],
-    isLoading: false,
-    error: false,
-  });
+  const [state, setState] = useState<Omit<UseReviewDashboardResult, "refetch">>(
+    {
+      rows: [],
+      isLoading: false,
+      error: false,
+    },
+  );
+  const [fetchCount, setFetchCount] = useState(0);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setState((prev) => ({ ...prev, isLoading: true, error: false }));
 
     ReviewDashboardAPIClient.getReviewDashboard(
@@ -32,6 +37,7 @@ const useReviewDashboard = (
       resultsPerPage,
       sortBy,
       sortAscending,
+      filters,
     )
       .then((rows) => {
         setState({ rows, isLoading: false, error: false });
@@ -39,9 +45,12 @@ const useReviewDashboard = (
       .catch(() => {
         setState({ rows: [], isLoading: false, error: true });
       });
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending]);
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending, filters, fetchCount]);
 
-  return state;
+  return {
+    ...state,
+    refetch: () => setFetchCount((c) => c + 1),
+  };
 };
 
 export default useReviewDashboard;
