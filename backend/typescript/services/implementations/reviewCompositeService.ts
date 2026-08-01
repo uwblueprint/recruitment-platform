@@ -398,7 +398,7 @@ class ReviewCompositeService implements IReviewCompositeService {
         { value: "5th year", label: "5th year" },
       ];
 
-      const bookmarked = [{value: "true", label: "Bookmarked"}];
+      const bookmarked = [{ value: "true", label: "Bookmarked" }];
 
       return {
         positions,

@@ -715,6 +715,7 @@ export type Review = {
 export type ReviewDashboardFilterOptionsDto = {
   __typename?: 'ReviewDashboardFilterOptionsDTO';
   applicationStatuses: Array<FilterOption>;
+  bookmarked: Array<FilterOption>;
   positions: Array<FilterOption>;
   scoreRanges: Array<FilterOption>;
   skillCategories: Array<FilterOption>;

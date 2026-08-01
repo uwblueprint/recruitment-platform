@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
+import { useQuery } from "@apollo/client/react";
 import type {
   ReviewDashboardFilters,
+  ReviewDashboardQuery,
+  ReviewDashboardQueryVariables,
   ReviewDashboardResult,
   ReviewDashboardSortBy,
 } from "@/graphql/typeUtils";
+import { ReviewDashboardDocument } from "@/graphql/typeUtils";
 
 type UseReviewDashboardResult = {
   rows: ReviewDashboardResult[];
@@ -20,36 +22,22 @@ const useReviewDashboard = (
   sortAscending?: boolean,
   filters?: ReviewDashboardFilters,
 ): UseReviewDashboardResult => {
-  const [state, setState] = useState<Omit<UseReviewDashboardResult, "refetch">>(
-    {
-      rows: [],
-      isLoading: false,
-      error: false,
-    },
-  );
-  const [fetchCount, setFetchCount] = useState(0);
-
-  useEffect(() => {
-    setState((prev) => ({ ...prev, isLoading: true, error: false }));
-
-    ReviewDashboardAPIClient.getReviewDashboard(
-      pageNumber,
-      resultsPerPage,
-      sortBy,
-      sortAscending,
-      filters,
-    )
-      .then((rows) => {
-        setState({ rows, isLoading: false, error: false });
-      })
-      .catch(() => {
-        setState({ rows: [], isLoading: false, error: true });
-      });
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending, filters, fetchCount]);
+  const { data, loading, error, refetch } = useQuery<
+    ReviewDashboardQuery,
+    ReviewDashboardQueryVariables
+  >(ReviewDashboardDocument, {
+    variables: { pageNumber, resultsPerPage, sortBy, sortAscending, filters },
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+  });
 
   return {
-    ...state,
-    refetch: () => setFetchCount((c) => c + 1),
+    rows: data?.reviewDashboard ?? [],
+    isLoading: loading,
+    error: !!error,
+    refetch: () => {
+      void refetch();
+    },
   };
 };
 

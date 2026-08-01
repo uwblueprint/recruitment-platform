@@ -118,7 +118,7 @@ export type ReviewDashboardFilterOptionsQueryVariables = Exact<{
 }>;
 
 
-export type ReviewDashboardFilterOptionsQuery = { reviewDashboardFilterOptions: { positions: Array<{ value: string, label: string }>, applicationStatuses: Array<{ value: string, label: string }>, skillCategories: Array<{ value: string, label: string }>, scoreRanges: Array<{ value: string, label: string }>, years: Array<{ value: string, label: string }> } };
+export type ReviewDashboardFilterOptionsQuery = { reviewDashboardFilterOptions: { positions: Array<{ value: string, label: string }>, applicationStatuses: Array<{ value: string, label: string }>, skillCategories: Array<{ value: string, label: string }>, scoreRanges: Array<{ value: string, label: string }>, years: Array<{ value: string, label: string }>, bookmarked: Array<{ value: string, label: string }> } };
 
 export type ReviewDashboardSidePanelQueryVariables = Exact<{
   applicantRecordId: string | number;

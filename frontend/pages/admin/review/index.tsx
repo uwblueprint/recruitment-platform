@@ -28,8 +28,6 @@ import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardS
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
-const BOOKMARKED_OPTIONS = [{ value: "true", label: "Bookmarked" }];
-
 const AdminReviewPage: NextPageWithLayout = () => {
   const router = useRouter();
   const position =
@@ -68,7 +66,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
       },
       { key: "scoreRange", label: "Score", options: filterOptions.scoreRanges },
       { key: "year", label: "Year", options: filterOptions.years },
-      { key: "bookmarked", label: "Bookmarked", options: BOOKMARKED_OPTIONS },
+      { key: "bookmarked", label: "Bookmarked", options: filterOptions.bookmarked },
     ];
   }, [filterOptions]);
 

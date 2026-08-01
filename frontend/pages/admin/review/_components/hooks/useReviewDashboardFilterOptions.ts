@@ -1,6 +1,10 @@
-import { useEffect, useState } from "react";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import type { ReviewDashboardFilterOptionsResult } from "@/graphql/typeUtils";
+import { useQuery } from "@apollo/client/react";
+import type {
+  ReviewDashboardFilterOptionsQuery,
+  ReviewDashboardFilterOptionsQueryVariables,
+  ReviewDashboardFilterOptionsResult,
+} from "@/graphql/typeUtils";
+import { ReviewDashboardFilterOptionsDocument } from "@/graphql/typeUtils";
 
 type UseReviewDashboardFilterOptionsResult = {
   filterOptions: ReviewDashboardFilterOptionsResult | null;
@@ -11,25 +15,19 @@ type UseReviewDashboardFilterOptionsResult = {
 const useReviewDashboardFilterOptions = (
   department?: string,
 ): UseReviewDashboardFilterOptionsResult => {
-  const [state, setState] = useState<UseReviewDashboardFilterOptionsResult>({
-    filterOptions: null,
-    isLoading: false,
-    error: false,
+  const { data, loading, error } = useQuery<
+    ReviewDashboardFilterOptionsQuery,
+    ReviewDashboardFilterOptionsQueryVariables
+  >(ReviewDashboardFilterOptionsDocument, {
+    variables: { department },
+    fetchPolicy: "network-only",
   });
 
-  useEffect(() => {
-    setState((prev) => ({ ...prev, isLoading: true, error: false }));
-
-    ReviewDashboardAPIClient.getReviewDashboardFilterOptions(department)
-      .then((filterOptions) => {
-        setState({ filterOptions, isLoading: false, error: false });
-      })
-      .catch(() => {
-        setState({ filterOptions: null, isLoading: false, error: true });
-      });
-  }, [department]);
-
-  return state;
+  return {
+    filterOptions: data?.reviewDashboardFilterOptions ?? null,
+    isLoading: loading,
+    error: !!error,
+  };
 };
 
 export default useReviewDashboardFilterOptions;
