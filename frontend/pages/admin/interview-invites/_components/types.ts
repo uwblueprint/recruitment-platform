@@ -4,7 +4,7 @@ type Interviewee = {
 };
 
 type InterviewInvite = {
-  id: number;
+  id: string;
   interviewers: string[];
   interviewees: Interviewee[];
   interviewType: string

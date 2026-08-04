@@ -17,7 +17,7 @@ type InterviewInviteListProps = {
 export const InterviewInviteList = ({ invites }: InterviewInviteListProps) => {
   const [activeTab, setActiveTab] = useState<TabValue>("ready");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const readyInvites = invites.filter((i) => READY_STATUSES.has(i.status));
   const sentInvites = invites.filter((i) => !READY_STATUSES.has(i.status));
@@ -47,7 +47,7 @@ export const InterviewInviteList = ({ invites }: InterviewInviteListProps) => {
     });
   };
 
-  const toggleSelect = (id: number, checked: boolean) => {
+  const toggleSelect = (id: string, checked: boolean) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       checked ? next.add(id) : next.delete(id);

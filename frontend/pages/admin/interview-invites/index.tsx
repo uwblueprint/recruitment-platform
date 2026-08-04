@@ -8,8 +8,8 @@ import useInterviewInvites from "./_components/hooks/useInterviewInvites";
 const InterviewInvites: NextPageWithLayout = () => {
   const { invites: rawInvites, isLoading, error } = useInterviewInvites();
 
-  const invites: InterviewInvite[] = rawInvites.map((invite, idx) => ({
-    id: idx,
+  const invites: InterviewInvite[] = rawInvites.map((invite) => ({
+    id: invite.id,
     interviewers: invite.interviewers.map(
       (u) => `${u.firstName} ${u.lastName}`,
     ),

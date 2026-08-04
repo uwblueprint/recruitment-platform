@@ -1,37 +1,23 @@
-import { gql } from "@apollo/client";
 import { client } from "@/client";
-import type { InterviewInviteResult } from "@/graphql/typeUtils";
+import {
+  InterviewInvitesDocument,
+  type InterviewInvitesQuery,
+  type InterviewInvitesQueryVariables,
+  type InterviewInviteResult,
+} from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
-
-const INTERVIEW_INVITES_QUERY = gql`
-  query InterviewInvites {
-    interviewInvites {
-      id
-      interviewers {
-        id
-        firstName
-        lastName
-      }
-      interviewees {
-        firstName
-        lastName
-        position
-      }
-      position
-      schedulingLink
-      status
-    }
-  }
-`;
 
 class InterviewInvitesAPIClient {
   static async getInterviewInvites(): Promise<InterviewInviteResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
-      const { data } = await client.query({
-        query: INTERVIEW_INVITES_QUERY,
+      const { data } = await client.query<
+        InterviewInvitesQuery,
+        InterviewInvitesQueryVariables
+      >({
+        query: InterviewInvitesDocument,
         fetchPolicy: "network-only",
       });
 
