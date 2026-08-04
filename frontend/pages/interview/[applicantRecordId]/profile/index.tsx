@@ -15,6 +15,7 @@ import {
   ProfileScoresPanel,
 } from "./_components";
 
+
 const InterviewProfilePage: NextPageWithLayout = () => {
   const {
     currentSubStep,
