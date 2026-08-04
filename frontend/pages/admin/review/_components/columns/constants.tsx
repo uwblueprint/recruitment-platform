@@ -30,16 +30,20 @@ type ReviewDashboardReviewer = NonNullable<
   ReviewDashboardResult["reviewers"][number]
 >;
 
-type ReviewDashboardColumnsOptions = {
-  onReviewerClick: (
-    row: ReviewDashboardResult,
-    reviewer: ReviewDashboardReviewer,
-  ) => void;
-};
+declare module "@tanstack/react-table" {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  interface TableMeta<TData> {
+    onReviewerClick?: (
+      row: ReviewDashboardResult,
+      reviewer: ReviewDashboardReviewer,
+    ) => void;
+  }
+}
 
-export const createReviewDashboardColumns = ({
-  onReviewerClick,
-}: ReviewDashboardColumnsOptions): ColumnDef<ReviewDashboardResult, unknown>[] => [
+export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
+  ReviewDashboardResult,
+  unknown
+>[] = [
   {
     id: "select",
     size: 40,
@@ -53,7 +57,10 @@ export const createReviewDashboardColumns = ({
     enableSorting: true,
     cell: ({ row }) => (
       <ApplicationCell
-        applicantName={applicantName(row.original.firstName, row.original.lastName)}
+        applicantName={applicantName(
+          row.original.firstName,
+          row.original.lastName,
+        )}
       />
     ),
   },
@@ -86,34 +93,38 @@ export const createReviewDashboardColumns = ({
     accessorFn: (row) => reviewerName(row, 0),
     header: "Reviewer 1",
     enableSorting: true,
-    cell: ({ row }) => (
-      <ReviewerCell
-        reviewerName={reviewerName(row.original, 0)}
-        onClick={() => {
-          const reviewer = row.original.reviewers[0];
-          if (reviewer) {
-            onReviewerClick(row.original, reviewer);
+    cell: ({ row, table }) => {
+      const reviewer = row.original.reviewers[0];
+      return (
+        <ReviewerCell
+          reviewerName={reviewerName(row.original, 0)}
+          onClick={
+            reviewer
+              ? () => table.options.meta?.onReviewerClick?.(row.original, reviewer)
+              : undefined
           }
-        }}
-      />
-    ),
+        />
+      );
+    },
   },
   {
     id: "reviewer2",
     accessorFn: (row) => reviewerName(row, 1),
     header: "Reviewer 2",
     enableSorting: true,
-    cell: ({ row }) => (
-      <ReviewerCell
-        reviewerName={reviewerName(row.original, 1)}
-        onClick={() => {
-          const reviewer = row.original.reviewers[1];
-          if (reviewer) {
-            onReviewerClick(row.original, reviewer);
+    cell: ({ row, table }) => {
+      const reviewer = row.original.reviewers[1];
+      return (
+        <ReviewerCell
+          reviewerName={reviewerName(row.original, 1)}
+          onClick={
+            reviewer
+              ? () => table.options.meta?.onReviewerClick?.(row.original, reviewer)
+              : undefined
           }
-        }}
-      />
-    ),
+        />
+      );
+    },
   },
   {
     id: "totalScore",

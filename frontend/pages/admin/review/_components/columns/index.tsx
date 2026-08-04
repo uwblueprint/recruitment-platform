@@ -1,4 +1,4 @@
 export {
 	COLUMN_ID_TO_SORT_BY,
-	createReviewDashboardColumns,
+	REVIEW_DASHBOARD_COLUMNS,
 } from "./constants";

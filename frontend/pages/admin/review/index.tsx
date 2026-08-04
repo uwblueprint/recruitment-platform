@@ -7,12 +7,12 @@ import {
 } from "@/graphql/typeUtils";
 import { RowSelectionState, SortingState } from "@tanstack/react-table";
 import { useRouter } from "next/router";
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
 import {
   COLUMN_ID_TO_SORT_BY,
-  createReviewDashboardColumns,
+  REVIEW_DASHBOARD_COLUMNS,
 } from "./_components/columns";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
@@ -57,21 +57,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
     sortAscending,
   );
 
-  const columns = useMemo(
-    () =>
-      createReviewDashboardColumns({
-        onReviewerClick: (row, reviewer) => {
-          setReassignmentTarget({
-            applicantRecordId: row.applicantRecordId,
-            position: row.position,
-            reviewerId: reviewer.id,
-            reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
-          });
-        },
-      }),
-    [],
-  );
-
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
@@ -106,11 +91,21 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
         <DashboardTable
           data={rows}
-          columns={columns}
+          columns={REVIEW_DASHBOARD_COLUMNS}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           onRowClick={(row) => setActiveRow(row)}
+          meta={{
+            onReviewerClick: (row, reviewer) => {
+              setReassignmentTarget({
+                applicantRecordId: row.applicantRecordId,
+                position: row.position,
+                reviewerId: reviewer.id,
+                reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+              });
+            },
+          }}
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={handleSortingChange}

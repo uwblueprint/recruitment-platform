@@ -1,8 +1,10 @@
 import {
   ColumnDef,
   OnChangeFn,
+  RowData,
   RowSelectionState,
   SortingState,
+  TableMeta,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -22,13 +24,14 @@ export type DashboardPaginationState = {
   onResultsPerPageChange: (resultsPerPage: number) => void;
 };
 
-type DashboardTableProps<TData> = {
+type DashboardTableProps<TData extends RowData> = {
   data: TData[];
   columns: ColumnDef<TData, unknown>[];
   getRowId: (row: TData) => string;
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
   onRowClick?: (row: TData) => void;
+  meta?: TableMeta<TData>;
   pagination: DashboardPaginationState;
   sorting?: SortingState;
   onSortingChange?: OnChangeFn<SortingState>;
@@ -36,13 +39,14 @@ type DashboardTableProps<TData> = {
   isLoading?: boolean;
 };
 
-export const DashboardTable = <TData,>({
+export const DashboardTable = <TData extends RowData>({
   data,
   columns,
   getRowId,
   rowSelection,
   onRowSelectionChange,
   onRowClick,
+  meta,
   pagination,
   sorting,
   onSortingChange,
@@ -58,6 +62,7 @@ export const DashboardTable = <TData,>({
     getRowId,
     enableRowSelection: true,
     manualSorting: true,
+    meta,
     state: {
       rowSelection,
       ...(sorting && { sorting }),
