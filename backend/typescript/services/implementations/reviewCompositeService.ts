@@ -93,14 +93,6 @@ function buildReviewDashboardOrder(
   return [["id", "ASC"]];
 }
 
-const YEAR_TO_ACADEMIC_YEARS: Record<string, string[]> = {
-  "1st year": ["1A", "1B"],
-  "2nd year": ["2A", "2B"],
-  "3rd year": ["3A", "3B"],
-  "4th year": ["4A", "4B"],
-  "5th year": ["5A", "5B"],
-};
-
 function buildApplicantRecordWhere(
   filters?: ReviewDashboardFilters,
 ): WhereOptions {
@@ -137,12 +129,7 @@ function buildApplicantRecordWhere(
 function buildApplicantWhere(filters?: ReviewDashboardFilters): WhereOptions {
   const where: WhereOptions = {};
   if (filters?.years?.length) {
-    const academicYears = filters.years.flatMap(
-      (year) => YEAR_TO_ACADEMIC_YEARS[year] ?? [],
-    );
-    if (academicYears.length) {
-      where.academic_year = { [Op.in]: academicYears };
-    }
+    where.academic_year = { [Op.in]: filters.years };
   }
 
   return where;
@@ -391,11 +378,17 @@ class ReviewCompositeService implements IReviewCompositeService {
       ];
 
       const years = [
-        { value: "1st year", label: "1st year" },
-        { value: "2nd year", label: "2nd year" },
-        { value: "3rd year", label: "3rd year" },
-        { value: "4th year", label: "4th year" },
-        { value: "5th year", label: "5th year" },
+        { value: "1A", label: "1A" },
+        { value: "1B", label: "1B" },
+        { value: "2A", label: "2A" },
+        { value: "2B", label: "2B" },
+        { value: "3A", label: "3A" },
+        { value: "3B", label: "3B" },
+        { value: "4A", label: "4A" },
+        { value: "4B", label: "4B" },
+        { value: "5A", label: "5A" },
+        { value: "5B", label: "5B" },
+        { value: "Graduate student", label: "Graduate student" },
       ];
 
       const bookmarked = [{ value: "true", label: "Bookmarked" }];
