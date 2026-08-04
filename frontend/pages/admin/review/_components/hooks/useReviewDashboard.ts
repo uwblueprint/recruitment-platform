@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
+import { DashboardView } from "@/graphql/typeUtils";
 import type {
   ReviewDashboardResult,
   ReviewDashboardSortBy,
@@ -16,6 +17,7 @@ const useReviewDashboard = (
   resultsPerPage: number,
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
+  view?: DashboardView,
 ): UseReviewDashboardResult => {
   const [state, setState] = useState<UseReviewDashboardResult>({
     rows: [],
@@ -32,6 +34,7 @@ const useReviewDashboard = (
       resultsPerPage,
       sortBy,
       sortAscending,
+      view,
     )
       .then((rows) => {
         setState({ rows, isLoading: false, error: false });
@@ -39,7 +42,7 @@ const useReviewDashboard = (
       .catch(() => {
         setState({ rows: [], isLoading: false, error: true });
       });
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending]);
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending, view]);
 
   return state;
 };

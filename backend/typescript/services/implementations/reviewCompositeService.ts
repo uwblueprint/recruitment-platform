@@ -1,4 +1,4 @@
-import { Op, Order, OrderItem, col, literal } from "sequelize";
+import { Op, Order, OrderItem, WhereOptions, col, literal } from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
@@ -6,6 +6,8 @@ import User from "../../models/user.model";
 import {
   ApplicantRecordWithReviewersDTO,
   CreateReviewedApplicantRecordDTO,
+  DashboardView,
+  DashboardViewEnum,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -158,6 +160,7 @@ class ReviewCompositeService implements IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]> {
     try {
       const perPage = Number.isFinite(Number(resultsPerPage))
@@ -178,8 +181,21 @@ class ReviewCompositeService implements IReviewCompositeService {
       // separate: true runs the hasMany as a second query, so the main query is a
       // plain BelongsTo join — Sequelize won't wrap it in a subquery, which lets
       // ORDER BY reference the "applicant" table directly.
+      const viewWhere: WhereOptions = {};
+      if (view === DashboardViewEnum.SHORTLISTED) {
+        viewWhere.is_shortlisted_for_interview = true;
+      } else if (view === DashboardViewEnum.CONFLICTS) {
+        viewWhere.id = {
+          [Op.in]: literal(`(
+            SELECT applicant_record_id FROM reviewed_applicant_records
+            WHERE reviewer_has_conflict = true
+          )`),
+        };
+      }
+
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: { exclude: ["createdAt", "updatedAt"] },
+        where: viewWhere,
         include: [
           {
             attributes: { exclude: ["updatedAt"] },

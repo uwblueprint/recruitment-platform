@@ -42,12 +42,19 @@ const reviewDashboardType = gql`
     APPLICATION_STATUS
   }
 
+  enum DashboardView {
+    ALL
+    SHORTLISTED
+    CONFLICTS
+  }
+
   extend type Query {
     reviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
       sortBy: ReviewDashboardSortBy
       sortAscending: Boolean
+      view: DashboardView
     ): [ReviewDashboardRowDTO!]!
 
     reviewDashboardApplicantRecordIds(
