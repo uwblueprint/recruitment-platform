@@ -13,6 +13,7 @@ export {
   DashboardView,
   Enum,
   InterviewConflict,
+  InterviewDashboardSortBy,
   InterviewGroupStatus,
   InterviewStatus,
   ReviewDashboardSortBy,

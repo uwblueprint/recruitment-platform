@@ -1,5 +1,15 @@
-query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {
-  interviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {
+query InterviewDashboard(
+  $pageNumber: Int!
+  $resultsPerPage: Int!
+  $sortBy: InterviewDashboardSortBy
+  $sortAscending: Boolean
+) {
+  interviewDashboard(
+    pageNumber: $pageNumber
+    resultsPerPage: $resultsPerPage
+    sortBy: $sortBy
+    sortAscending: $sortAscending
+  ) {
     applicantRecordId
     firstName
     lastName

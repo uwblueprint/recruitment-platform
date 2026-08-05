@@ -182,6 +182,16 @@ export type InterviewDashboardRowDto = {
   position: Scalars['String']['output'];
 };
 
+export enum InterviewDashboardSortBy {
+  ApplicationStatus = 'APPLICATION_STATUS',
+  FirstName = 'FIRST_NAME',
+  Interviewer_1 = 'INTERVIEWER_1',
+  Interviewer_2 = 'INTERVIEWER_2',
+  InterviewScore = 'INTERVIEW_SCORE',
+  LastName = 'LAST_NAME',
+  Position = 'POSITION'
+}
+
 export type InterviewDelegationDto = {
   __typename?: 'InterviewDelegationDTO';
   groupId: Scalars['ID']['output'];
@@ -593,6 +603,8 @@ export type QueryFileArgs = {
 export type QueryInterviewDashboardArgs = {
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
+  sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
+  sortBy?: InputMaybe<InterviewDashboardSortBy>;
 };
 
 
