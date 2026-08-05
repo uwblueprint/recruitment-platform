@@ -2,10 +2,13 @@ import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import {
-  InterviewStatus,
   type ReviewDashboardResult,
 } from "@/graphql/typeUtils";
-import { RowSelectionState, SortingState } from "@tanstack/react-table";
+import {
+  OnChangeFn,
+  RowSelectionState,
+  SortingState,
+} from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
@@ -64,9 +67,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   };
 
   // Changing the sort can shrink the result set, so return to the first page.
-  const handleSortingChange = (
-    updater: SortingState | ((old: SortingState) => SortingState),
-  ) => {
+  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSorting(updater);
     setPageNumber(1);
     setRowSelection({});

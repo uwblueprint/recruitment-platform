@@ -4,6 +4,7 @@ import { CreateUserDTO, Role, UpdateUserDTO, UserDTO } from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import User from "../../models/user.model";
+import { toUserDTO } from "../../utilities/dtoUtils";
 
 const Logger = logger(__filename);
 
@@ -112,35 +113,11 @@ class UserService implements IUserService {
   }
 
   async getUsersByPosition(position: string): Promise<Array<UserDTO>> {
-    let userDtos: Array<UserDTO> = [];
     try {
       const users: Array<User> = await User.findAll({
         where: { position },
       });
-
-      userDtos = await Promise.all(
-        users.map(async (user) => {
-          let firebaseUser: firebaseAdmin.auth.UserRecord;
-          try {
-            firebaseUser = await firebaseAdmin.auth().getUser(user.auth_id);
-          } catch (error) {
-            Logger.error(
-              `user with authId ${user.auth_id} could not be fetched from Firebase`,
-            );
-            throw error;
-          }
-
-          return {
-            id: String(user.id),
-            firstName: user.first_name,
-            lastName: user.last_name,
-            email: firebaseUser.email ?? "",
-            role: user.role,
-            position: user.position,
-            isArchived: user.is_archived,
-          };
-        }),
-      );
+      return users.map(toUserDTO);
     } catch (error: unknown) {
       Logger.error(
         `Failed to get get users of position ${position}. Reason = ${getErrorMessage(
@@ -149,8 +126,6 @@ class UserService implements IUserService {
       );
       throw error;
     }
-
-    return userDtos;
   }
 
   async getUsers(): Promise<Array<UserDTO>> {

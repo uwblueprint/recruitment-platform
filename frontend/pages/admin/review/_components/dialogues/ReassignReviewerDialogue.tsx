@@ -158,10 +158,13 @@ export const ReassignReviewerDialogue = ({
                   fontFamily: "var(--font-source)",
                 },
                 "& .MuiAutocomplete-option:hover": {
-                  backgroundColor: theme.colors.S10,
+                  backgroundColor: `${theme.colors.S10} !important`,
                 },
                 "& .MuiAutocomplete-option.Mui-focused": {
-                  backgroundColor: theme.colors.S10,
+                  backgroundColor: `${theme.colors.S10} !important`,
+                },
+                "& .MuiAutocomplete-option[aria-selected='true']": {
+                  backgroundColor: `${theme.colors.S10} !important`,
                 },
               },
             },
