@@ -1,4 +1,4 @@
-import { Op, Order, OrderItem, col, literal } from "sequelize";
+import { Op, Order, OrderItem, WhereOptions, col, literal } from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
@@ -6,6 +6,8 @@ import User from "../../models/user.model";
 import {
   ApplicantRecordWithReviewersDTO,
   CreateReviewedApplicantRecordDTO,
+  DashboardView,
+  DashboardViewEnum,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -41,14 +43,19 @@ const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
  * Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows
  * land on each page — sorting the returned page in JS would only order
  * within a page, since the DB would already have chosen the page by id.
- * COALESCE(...,'') keeps records missing that reviewer ordered as empty
- * strings (first on ASC, last on DESC), and id is a stable tiebreak.
+ * Records missing that reviewer yield a NULL from the subquery, which the
+ * NULLS LAST direction keeps at the bottom; id is a stable tiebreak.
+ *
+ * NULLS LAST keeps records missing the sort value at the bottom of the
+ * list regardless of direction. Postgres otherwise defaults to NULLS
+ * FIRST on DESC, which would float those rows to the top.
  */
 function buildReviewDashboardOrder(
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
 ): Order {
-  const direction = sortAscending === false ? "DESC" : "ASC";
+  const direction =
+    sortAscending === false ? "DESC NULLS LAST" : "ASC NULLS LAST";
 
   const sortColumnMap: Record<
     Exclude<ReviewDashboardSortBy, "REVIEWER_1" | "REVIEWER_2">,
@@ -69,14 +76,14 @@ function buildReviewDashboardOrder(
     const idx = sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ? 0 : 1;
     return [
       [
-        literal(`COALESCE((
+        literal(`(
           SELECT u."last_name" || ' ' || u."first_name"
           FROM "reviewed_applicant_records" AS r
           JOIN "users" AS u ON u."id" = r."reviewer_id"
           WHERE r."applicant_record_id" = "ApplicantRecord"."id"
           ORDER BY r."createdAt" ASC, r."reviewer_id" ASC
           LIMIT 1 OFFSET ${idx}
-        ), '')`),
+        )`),
         direction,
       ],
       ["id", "ASC"],
@@ -158,6 +165,7 @@ class ReviewCompositeService implements IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]> {
     try {
       const perPage = Number.isFinite(Number(resultsPerPage))
@@ -178,8 +186,21 @@ class ReviewCompositeService implements IReviewCompositeService {
       // separate: true runs the hasMany as a second query, so the main query is a
       // plain BelongsTo join — Sequelize won't wrap it in a subquery, which lets
       // ORDER BY reference the "applicant" table directly.
+      const viewWhere: WhereOptions = {};
+      if (view === DashboardViewEnum.SHORTLISTED) {
+        viewWhere.is_shortlisted_for_interview = true;
+      } else if (view === DashboardViewEnum.CONFLICTS) {
+        viewWhere.id = {
+          [Op.in]: literal(`(
+            SELECT applicant_record_id FROM reviewed_applicant_records
+            WHERE reviewer_has_conflict = true
+          )`),
+        };
+      }
+
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: { exclude: ["createdAt", "updatedAt"] },
+        where: viewWhere,
         include: [
           {
             attributes: { exclude: ["updatedAt"] },

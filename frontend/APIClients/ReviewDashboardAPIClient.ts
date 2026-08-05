@@ -1,5 +1,6 @@
 import { client } from "@/client";
 import {
+  DashboardView,
   ReviewDashboardApplicantRecordIdsDocument,
   ReviewDashboardDocument,
   ReviewDashboardSidePanelDocument,
@@ -26,6 +27,7 @@ class ReviewDashboardAPIClient {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    view?: DashboardView,
   ): Promise<ReviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
@@ -35,7 +37,7 @@ class ReviewDashboardAPIClient {
         ReviewDashboardQueryVariables
       >({
         query: ReviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage, sortBy, sortAscending },
+        variables: { pageNumber, resultsPerPage, sortBy, sortAscending, view },
         fetchPolicy: "network-only",
       });
 

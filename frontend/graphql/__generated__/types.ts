@@ -120,6 +120,12 @@ export type CreateUserDto = {
   role: Role;
 };
 
+export enum DashboardView {
+  All = 'ALL',
+  Conflicts = 'CONFLICTS',
+  Shortlisted = 'SHORTLISTED'
+}
+
 export type EntityRequestDto = {
   boolField: Scalars['Boolean']['input'];
   contentType?: InputMaybe<Scalars['String']['input']>;
@@ -647,6 +653,7 @@ export type QueryReviewDashboardArgs = {
   resultsPerPage: Scalars['Int']['input'];
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<ReviewDashboardSortBy>;
+  view?: InputMaybe<DashboardView>;
 };
 
 

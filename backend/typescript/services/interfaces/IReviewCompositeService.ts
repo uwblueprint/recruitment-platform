@@ -1,5 +1,6 @@
 import {
   ApplicantRecordWithReviewersDTO,
+  DashboardView,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -37,6 +38,7 @@ interface IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]>;
 
   /**

@@ -1,4 +1,6 @@
-import { useQuery } from "@apollo/client/react";
+import { useEffect, useState } from "react";
+import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
+import { DashboardView } from "@/graphql/typeUtils";
 import type {
   ReviewDashboardResult,
   ReviewDashboardSortBy,
@@ -19,6 +21,7 @@ const useReviewDashboard = (
   resultsPerPage: number,
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
+  view?: DashboardView,
 ): UseReviewDashboardResult => {
   const { data, loading, error, refetch } = useQuery<
     ReviewDashboardQuery,
@@ -29,19 +32,17 @@ const useReviewDashboard = (
       resultsPerPage,
       sortBy,
       sortAscending,
-    },
-    fetchPolicy: "network-only",
-    notifyOnNetworkStatusChange: true,
-  });
+      view,
+    )
+      .then((rows) => {
+        setState({ rows, isLoading: false, error: false });
+      })
+      .catch(() => {
+        setState({ rows: [], isLoading: false, error: true });
+      });
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending, view]);
 
-  return {
-    rows: data?.reviewDashboard ?? [],
-    isLoading: loading,
-    error: !!error,
-    refetch: () => {
-      void refetch();
-    },
-  };
+  return state;
 };
 
 export default useReviewDashboard;
