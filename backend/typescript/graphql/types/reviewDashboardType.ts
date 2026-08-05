@@ -24,6 +24,7 @@ const reviewDashboardType = gql`
     lastName: String!
     position: String!
     program: String!
+    academicYear: String!
     resumeUrl: String!
     applicationStatus: ApplicationStatus!
     skillCategory: SkillCategory
@@ -48,6 +49,11 @@ const reviewDashboardType = gql`
       sortBy: ReviewDashboardSortBy
       sortAscending: Boolean
     ): [ReviewDashboardRowDTO!]!
+
+    reviewDashboardApplicantRecordIds(
+      sortBy: ReviewDashboardSortBy
+      sortAscending: Boolean
+    ): [ID!]!
 
     reviewDashboardSidePanel(
       applicantRecordId: ID!

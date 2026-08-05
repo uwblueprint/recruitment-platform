@@ -8,7 +8,7 @@ export enum ReviewStage {
     END_SUCCESS = "END_SUCCESS",
   }
   
-  export const BACK_TO_HOME_HREF = "/admin";
+  export const BACK_TO_HOME_HREF = "/";
   
   export const REVIEW_STAGES = [
     ReviewStage.INFO,

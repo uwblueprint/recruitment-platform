@@ -103,6 +103,7 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
 export {
   ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
+  InterviewedPairingsByUserIdDocument,
   InterviewDashboardDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
@@ -113,7 +114,9 @@ export {
   ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
   ReviewedApplicantRecordsByApplicantRecordIdDocument,
+  ReviewDashboardApplicantRecordIdsDocument,
   ReviewDashboardDocument,
+  ReviewDashboardSidePanelDocument,
   UpdateApplicantRecordStatusDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
@@ -129,6 +132,8 @@ export type {
   InterviewGroupQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
+  InterviewedPairingsByUserIdQuery,
+  InterviewedPairingsByUserIdQueryVariables,
   InterviewDashboardQuery,
   InterviewDashboardQueryVariables,
   InterviewersByGroupIdQuery,
@@ -149,8 +154,12 @@ export type {
   ReportReviewConflictMutationVariables,
   ReviewedApplicantRecordsByApplicantRecordIdQuery,
   ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
+  ReviewDashboardApplicantRecordIdsQuery,
+  ReviewDashboardApplicantRecordIdsQueryVariables,
   ReviewDashboardQuery,
   ReviewDashboardQueryVariables,
+  ReviewDashboardSidePanelQuery,
+  ReviewDashboardSidePanelQueryVariables,
   UpdateApplicantRecordStatusMutation,
   UpdateApplicantRecordStatusMutationVariables,
   UpdateInterviewGroupMutation,
@@ -199,6 +208,15 @@ export type InterviewerResult = ArrayElement<
     "interviewersByGroupId"
   >
 >;
+export type InterviewPairingResult = ArrayElement<
+  OperationField<
+    Operations.InterviewedPairingsByUserIdQuery,
+    "interviewedPairingsByUserId"
+  >
+>;
+export type InterviewGroupMemberResult = ArrayElement<
+  InterviewPairingResult["groupMembers"]
+>;
 export type UpdateInterviewGroupResult = OperationField<
   Operations.UpdateInterviewGroupMutation,
   "updateInterviewGroup"
@@ -229,6 +247,13 @@ export type ReportInterviewConflictResult = OperationField<
 export type ReviewDashboardResult = ArrayElement<
   OperationField<Operations.ReviewDashboardQuery, "reviewDashboard">
 >;
+export type ReviewDashboardSidePanelResult = OperationField<
+  Operations.ReviewDashboardSidePanelQuery,
+  "reviewDashboardSidePanel"
+>;
+export type ReviewDashboardSidePanelReviewDetail = ArrayElement<
+  ReviewDashboardSidePanelResult["reviewDetails"]
+ >;
 export type ReviewedApplicantResult = ArrayElement<
   OperationField<
     Operations.ReviewedApplicantsByUserIdQuery,

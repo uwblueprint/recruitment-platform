@@ -1,78 +1,214 @@
-import Image from "next/image";
-import { Geist, Geist_Mono } from "next/font/google";
+import { ReactElement, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
+import { SplitPanelLayout } from "@/components/layouts/SplitPageLayout";
+import { InterviewHeader } from "@/pages/interview/_components/layout";
+import HomeAPIClient from "@/APIClients/HomeAPIClient";
+import {
+  type InterviewedApplicantsDTO,
+  type InterviewedPairingResult,
+  type ReviewedApplicantResult,
+} from "@/graphql/typeUtils";
+import { NextPageWithLayout } from "./_app";
+import IllustrationPanel from "./home/_components/IllustrationPanel";
+import Tabs from "@/components/common/Tabs";
+import {
+  Tab,
+  HomeTab,
+  TABS,
+  REVIEW_STATUS_LABEL,
+  REVIEW_STATUS_VARIANT,
+  INTERVIEW_STATUS_LABEL,
+  INTERVIEW_STATUS_VARIANT,
+  INTERVIEW_GROUP_STATUS_LABEL,
+  INTERVIEW_GROUP_STATUS_VARIANT,
+} from "./home/_components/constants";
+import { Button } from "@/components/common/Button";
+import { ArrowRightIcon } from "@/components/icons/arrow-right.icon";
+import StatusBadge from "./home/_components/StatusBadge";
+import HomeTable from "./home/_components/HomeTable";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-export default function Home() {
-  return (
-    <div
-      className={`${geistSans.className} ${geistMono.className} flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
+const EmptyState = ({ message }: { message: string }) => (
+  <div className="flex flex-col items-center justify-center py-16 text-neutral-500">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className="mb-3 h-12 w-12 text-black"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      strokeWidth={1.5}
     >
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the index.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs/pages/getting-started?utm_source=create-next-app&utm_medium=default-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+      />
+    </svg>
+    <p className="font-source text-sm">{message}</p>
+  </div>
+);
+
+const HomePage: NextPageWithLayout = () => {
+  const router = useRouter();
+  const user = useAuthenticatedUser();
+
+  const [activeTab, setActiveTab] = useState<Tab>(HomeTab.APPLICATION_REVIEW);
+  const [reviewedApplicants, setReviewedApplicants] = useState<ReviewedApplicantResult[]>([]);
+  const [interviewedApplicants, setInterviewedApplicants] = useState<InterviewedApplicantsDTO[]>([]);
+  const [interviewedPairings, setInterviewedPairings] = useState<InterviewedPairingResult[]>([]);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchData = async () => {
+      try {
+        const [reviewed, interviewed, pairings] = await Promise.all([
+          HomeAPIClient.getReviewedApplicantsByUserId(user.id),
+          HomeAPIClient.getInterviewedApplicantsByUserId(user.id),
+          HomeAPIClient.getInterviewedPairingsByUserId(user.id),
+        ]);
+        setReviewedApplicants(reviewed);
+        setInterviewedApplicants(interviewed);
+        setInterviewedPairings(pairings);
+      } catch {}
+    };
+    fetchData();
+  }, [user?.id]);
+
+  const tabCounts: Record<Tab, number> = {
+    [HomeTab.APPLICATION_REVIEW]: reviewedApplicants.length,
+    [HomeTab.INTERVIEW_REVIEW]: interviewedApplicants.length,
+    [HomeTab.INTERVIEW_PAIRING]: interviewedPairings.length,
+  };
+
+  const totalApplications =
+    reviewedApplicants.length + interviewedApplicants.length + interviewedPairings.length;
+
+  return (
+    <div className="flex h-full flex-col overflow-y-auto p-10 gap-[74px]">
+      <div>
+      <h1 className="font-poppins text-[28px] font-semibold leading-[140%] tracking-normal text-neutral-900">
+        Welcome{" "}
+        <span className="text-blue">
+          {user?.firstName} {user?.lastName}
+        </span>
+        !
+      </h1>
+      <p className="mt-2 font-poppins text-[20px] font-normal leading-[140%] tracking-normal text-neutral-700">
+        You have{" "}
+        <span className="font-semibold text-blue">{totalApplications}</span>{" "}
+        applications to review and complete.
+      </p>
+      </div>
+
+      <div>
+
+      <Tabs
+        tabs={TABS}
+        activeTab={activeTab}
+        onChange={setActiveTab}
+        counts={tabCounts}
+      />
+
+      <div className="mt-6">
+        {activeTab === HomeTab.APPLICATION_REVIEW &&
+          (reviewedApplicants.length === 0 ? (
+            <EmptyState message="No applicants assigned." />
+          ) : (
+            <HomeTable headers={["Name", "Status", "View application"]}>
+              {reviewedApplicants.map((applicant) => (
+                <tr key={applicant.applicantRecordId}>
+                  <td className="px-4 py-4 font-source text-[16px] font-normal leading-[140%] tracking-normal text-neutral-800">
+                    {applicant.applicantFirstName} {applicant.applicantLastName}
+                  </td>
+                  <td className="px-4 py-4">
+                    <StatusBadge
+                      variant={REVIEW_STATUS_VARIANT[applicant.reviewStatus]}
+                      label={REVIEW_STATUS_LABEL[applicant.reviewStatus]}
+                    />
+                  </td>
+                  <td className="w-0 whitespace-nowrap px-4 py-4">
+                    <Button variant="secondary" size="sm" onClick={() => router.push(`/review/${applicant.applicantRecordId}`)} className="inline-flex items-center gap-1.5">
+                      Review application
+                      <ArrowRightIcon className="h-4 w-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </HomeTable>
+          ))}
+
+        {activeTab === HomeTab.INTERVIEW_REVIEW &&
+          (interviewedApplicants.length === 0 ? (
+            <EmptyState message="No applicants assigned." />
+          ) : (
+            <HomeTable headers={["Name", "Status", "View application"]}>
+              {interviewedApplicants.map((applicant) => (
+                <tr key={applicant.applicantRecordId}>
+                  <td className="px-4 py-4 font-source text-[16px] font-normal leading-[140%] tracking-normal text-neutral-800">
+                    {applicant.applicantFirstName} {applicant.applicantLastName}
+                  </td>
+                  <td className="px-4 py-4">
+                    <StatusBadge
+                      variant={INTERVIEW_STATUS_VARIANT[applicant.interviewStatus]}
+                      label={INTERVIEW_STATUS_LABEL[applicant.interviewStatus]}
+                    />
+                  </td>
+                  <td className="w-0 whitespace-nowrap px-4 py-4">
+                    <Button variant="secondary" size="sm" onClick={() => router.push(`/interview/${applicant.applicantRecordId}/profile`)} className="inline-flex items-center gap-1.5">
+                      Review application
+                      <ArrowRightIcon className="h-4 w-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </HomeTable>
+          ))}
+
+        {activeTab === HomeTab.INTERVIEW_PAIRING &&
+          (interviewedPairings.length === 0 ? (
+            <EmptyState message="Interview pairs have not been released yet." />
+          ) : (
+            <HomeTable headers={["Interview Partner", "Status", "View details"]}>
+              {interviewedPairings.map((pairing) => (
+                <tr key={pairing.interviewedGroupId}>
+                  <td className="px-4 py-4 font-source text-[16px] font-normal leading-[140%] tracking-normal text-neutral-800">
+                    {pairing.groupMembers
+                      .filter((m) => String(m.id) !== String(user?.id)).length ? pairing.groupMembers
+                        .filter((m) => String(m.id) !== String(user?.id))
+                        .map((m) => `${m.firstName} ${m.lastName}`)
+                        .join(", ") : "-- No partner assigned --"}
+                  </td>
+                  <td className="px-4 py-4">
+                    <StatusBadge
+                      variant={INTERVIEW_GROUP_STATUS_VARIANT[pairing.interviewGroupStatus]}
+                      label={INTERVIEW_GROUP_STATUS_LABEL[pairing.interviewGroupStatus]}
+                    />
+                  </td>
+                  <td className="w-0 whitespace-nowrap px-4 py-4">
+                    <Button variant="secondary" size="sm" onClick={() => router.push(`/interview-groups/${pairing.interviewedGroupId}`)} className="inline-flex items-center gap-1.5">
+                      View details
+                      <ArrowRightIcon className="h-4 w-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </HomeTable>
+          ))}
+      </div>
+      </div>
     </div>
+    
   );
-}
+};
+
+HomePage.getLayout = (page: ReactElement) => (
+  <ProtectedRoute allowedRoles={["Admin", "User"]}>
+    <SplitPanelLayout header={<InterviewHeader steps={[]} />}>
+      <IllustrationPanel />
+      {page}
+    </SplitPanelLayout>
+  </ProtectedRoute>
+);
+
+export default HomePage;
