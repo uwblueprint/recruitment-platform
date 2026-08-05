@@ -121,7 +121,6 @@ export {
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
   ReviewedApplicantsByUserIdDocument,
-  InterviewedPairingsByUserIdDocument,
   UsersByPositionDocument,
 } from "./__generated__/graphql";
 
@@ -168,8 +167,6 @@ export type {
   UpdateInterviewGroupSchedulingLinkMutationVariables,
   ReviewedApplicantsByUserIdQuery,
   ReviewedApplicantsByUserIdQueryVariables,
-  InterviewedPairingsByUserIdQuery,
-  InterviewedPairingsByUserIdQueryVariables,
   UsersByPositionQuery,
   UsersByPositionQueryVariables,
 } from "./__generated__/operation-types";
