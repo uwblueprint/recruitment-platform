@@ -16,6 +16,7 @@ import {
   REVIEW_DASHBOARD_COLUMNS,
 } from "./_components/columns";
 import { DashboardTabs } from "./_components/DashboardTabs";
+import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
@@ -23,9 +24,17 @@ import useTabCounts from "./_components/hooks/useTabCounts";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
+type ReviewerReassignmentTarget = {
+  applicantRecordId: string;
+  position: string;
+  reviewerId: string;
+  reviewerName: string;
+};
+
 const AdminReviewPage: NextPageWithLayout = () => {
   const router = useRouter();
-  const position = typeof router.query.position === "string" ? router.query.position : null;
+  const position =
+    typeof router.query.position === "string" ? router.query.position : null;
 
   const [activeView, setActiveView] = useState<DashboardView>(DashboardView.All);
   const [pageNumber, setPageNumber] = useState(1);
@@ -33,15 +42,14 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
+  const [reassignmentTarget, setReassignmentTarget] =
+    useState<ReviewerReassignmentTarget | null>(null);
 
-  // The table is single-sort, so only the first SortingState entry is used.
-  // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
-  // undefined and the backend falls back to its default order.
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort && !activeSort.desc;
 
-  const { rows, isLoading, error } = useReviewDashboard(
+  const { rows, isLoading, error, refetch } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
     sortBy,
@@ -49,19 +57,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
     activeView,
   );
 
-  // Every applicant record id in display order, so the side panel can walk the
-  // whole dashboard instead of only the page currently loaded in `rows`.
   const applicantRecordIds = useReviewDashboardApplicantRecordIds();
-
-  // The active row is only available while the active applicant's page is
-  // loaded; navigating to another page leaves it undefined until the page
-  // fetch settles.
   const activeRow = rows.find((row) => row.applicantRecordId === activeId);
-
-  const { details, isLoading: isDetailsLoading } = useReviewDashboardSidePanel(
-    activeId,
-  );
-
+  const { details, isLoading: isDetailsLoading } =
+    useReviewDashboardSidePanel(activeId);
   const activeNavigationIndex =
     activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
 
@@ -71,9 +70,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // the page that applicant lives on.
   const goToApplicant = (index: number) => {
     const applicantRecordId = applicantRecordIds[index];
-    if (!applicantRecordId) {
-      return;
-    }
+    if (!applicantRecordId) return;
     setActiveId(applicantRecordId);
     setPageNumber(Math.floor(index / resultsPerPage) + 1);
   };
@@ -97,7 +94,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setActiveId(undefined);
   };
 
-  // Changing the sort can shrink the result set, so return to the first page.
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSorting(updater);
     setPageNumber(1);
@@ -138,6 +134,16 @@ const AdminReviewPage: NextPageWithLayout = () => {
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           onRowClick={(row) => setActiveId(row.applicantRecordId)}
+          meta={{
+            onReviewerClick: (row, reviewer) => {
+              setReassignmentTarget({
+                applicantRecordId: row.applicantRecordId,
+                position: row.position,
+                reviewerId: reviewer.id,
+                reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+              });
+            },
+          }}
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={handleSortingChange}
@@ -170,6 +176,21 @@ const AdminReviewPage: NextPageWithLayout = () => {
             : undefined
         }
       />
+
+      {reassignmentTarget ? (
+        <ReassignReviewerDialogue
+          open={!!reassignmentTarget}
+          applicantRecordId={reassignmentTarget.applicantRecordId}
+          position={reassignmentTarget.position}
+          currentReviewerId={reassignmentTarget.reviewerId}
+          currentReviewerName={reassignmentTarget.reviewerName}
+          onClose={() => setReassignmentTarget(null)}
+          onUpdated={() => {
+            setReassignmentTarget(null);
+            refetch();
+          }}
+        />
+      ) : null}
     </div>
   );
 };

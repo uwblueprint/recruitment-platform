@@ -4,6 +4,7 @@ import { CreateUserDTO, Role, UpdateUserDTO, UserDTO } from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import User from "../../models/user.model";
+import { toUserDTO } from "../../utilities/dtoUtils";
 
 const Logger = logger(__filename);
 
@@ -107,6 +108,22 @@ class UserService implements IUserService {
       return user.auth_id;
     } catch (error: unknown) {
       Logger.error(`Failed to get authId. Reason = ${getErrorMessage(error)}`);
+      throw error;
+    }
+  }
+
+  async getUsersByPosition(position: string): Promise<Array<UserDTO>> {
+    try {
+      const users: Array<User> = await User.findAll({
+        where: { position },
+      });
+      return users.map(toUserDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get get users of position ${position}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
       throw error;
     }
   }

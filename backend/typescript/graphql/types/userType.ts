@@ -39,6 +39,7 @@ const userType = gql`
   extend type Query {
     userById(id: ID!): UserDTO!
     userByEmail(email: String!): UserDTO!
+    usersByPosition(position: String!): [UserDTO]!
     users: [UserDTO!]!
     usersCSV: String!
   }

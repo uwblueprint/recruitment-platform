@@ -275,6 +275,7 @@ export type Mutation = {
   login: AuthDto;
   loginWithGoogle: AuthDto;
   logout?: Maybe<Scalars['ID']['output']>;
+  reassignReviewer: ReviewedApplicantRecordDto;
   refresh: Scalars['String']['output'];
   register: AuthDto;
   reportInterviewConflict: InterviewedApplicantRecord;
@@ -434,6 +435,13 @@ export type MutationLogoutArgs = {
 };
 
 
+export type MutationReassignReviewerArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+  newReviewerId: Scalars['ID']['input'];
+  oldReviewerId: Scalars['ID']['input'];
+};
+
+
 export type MutationRefreshArgs = {
   refreshToken: Scalars['String']['input'];
 };
@@ -561,6 +569,7 @@ export type Query = {
   userByEmail: UserDto;
   userById: UserDto;
   users: Array<UserDto>;
+  usersByPosition: Array<Maybe<UserDto>>;
   usersCSV: Scalars['String']['output'];
 };
 
@@ -687,6 +696,11 @@ export type QueryUserByEmailArgs = {
 
 export type QueryUserByIdArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryUsersByPositionArgs = {
+  position: Scalars['String']['input'];
 };
 
 export type RegisterUserDto = {

@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import {
   ReviewedApplicantRecordDTO,
   CreateReviewedApplicantRecordDTO,
@@ -18,9 +19,11 @@ interface IReviewApplicantRecordService {
   /**
    * Creates a single reviewed applicant record entry
    * @Param createReviewedApplicantRecordDTO data to create reviewed applicant record
+   * @Param transaction optional sequelize transaction
    */
   createReviewedApplicantRecord(
     reviewedApplicantRecord: CreateReviewedApplicantRecordDTO,
+    transaction?: Transaction,
   ): Promise<ReviewedApplicantRecordDTO>;
 
   /**
@@ -35,10 +38,12 @@ interface IReviewApplicantRecordService {
    * Deletes a single reviewed applicant record entry
    * @Param applicantRecordId the ID of applicant record to delete
    * @Param reviewerId the ID of the reviewer
+   * @Param transaction optional sequelize transaction
    */
   deleteReviewedApplicantRecordByPk(
     applicantRecordId: string,
     reviewerId: string,
+    transaction?: Transaction,
   ): Promise<ReviewedApplicantRecordDTO>;
 
   /**

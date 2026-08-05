@@ -23,6 +23,7 @@ type Documents = {
     "query IsAuthorizedByRole($accessToken: String!, $roles: [Role!]!) {\n  isAuthorizedByRole(accessToken: $accessToken, roles: $roles)\n}": typeof types.IsAuthorizedByRoleDocument,
     "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": typeof types.LoginDocument,
     "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": typeof types.LoginWithGoogleDocument,
+    "mutation ReassignReviewer($applicantRecordId: ID!, $oldReviewerId: ID!, $newReviewerId: ID!) {\n  reassignReviewer(\n    applicantRecordId: $applicantRecordId\n    oldReviewerId: $oldReviewerId\n    newReviewerId: $newReviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n  }\n}": typeof types.ReassignReviewerDocument,
     "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}": typeof types.RefreshDocument,
     "mutation ReportInterviewConflict($interviewedApplicantRecordId: ID!, $interviewerId: ID!, $interviewHasConflict: InterviewConflict!) {\n  reportInterviewConflict(\n    interviewedApplicantRecordId: $interviewedApplicantRecordId\n    interviewerId: $interviewerId\n    interviewHasConflict: $interviewHasConflict\n  ) {\n    id\n    status\n  }\n}": typeof types.ReportInterviewConflictDocument,
     "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": typeof types.ReportReviewConflictDocument,
@@ -34,6 +35,7 @@ type Documents = {
     "mutation UpdateApplicantRecordStatus($id: ID!, $status: ApplicationStatus!) {\n  updateApplicantRecordStatus(id: $id, status: $status) {\n    id\n    status\n  }\n}": typeof types.UpdateApplicantRecordStatusDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupDocument,
     "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupSchedulingLinkDocument,
+    "query UsersByPosition($position: String!) {\n  usersByPosition(position: $position) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": typeof types.UsersByPositionDocument,
 };
 const documents: Documents = {
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": types.ApplicationDocument,
@@ -45,6 +47,7 @@ const documents: Documents = {
     "query IsAuthorizedByRole($accessToken: String!, $roles: [Role!]!) {\n  isAuthorizedByRole(accessToken: $accessToken, roles: $roles)\n}": types.IsAuthorizedByRoleDocument,
     "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": types.LoginDocument,
     "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": types.LoginWithGoogleDocument,
+    "mutation ReassignReviewer($applicantRecordId: ID!, $oldReviewerId: ID!, $newReviewerId: ID!) {\n  reassignReviewer(\n    applicantRecordId: $applicantRecordId\n    oldReviewerId: $oldReviewerId\n    newReviewerId: $newReviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n  }\n}": types.ReassignReviewerDocument,
     "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}": types.RefreshDocument,
     "mutation ReportInterviewConflict($interviewedApplicantRecordId: ID!, $interviewerId: ID!, $interviewHasConflict: InterviewConflict!) {\n  reportInterviewConflict(\n    interviewedApplicantRecordId: $interviewedApplicantRecordId\n    interviewerId: $interviewerId\n    interviewHasConflict: $interviewHasConflict\n  ) {\n    id\n    status\n  }\n}": types.ReportInterviewConflictDocument,
     "mutation ReportReviewConflict($applicantRecordId: ID!, $reviewerId: ID!) {\n  reportReviewConflict(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": types.ReportReviewConflictDocument,
@@ -56,6 +59,7 @@ const documents: Documents = {
     "mutation UpdateApplicantRecordStatus($id: ID!, $status: ApplicationStatus!) {\n  updateApplicantRecordStatus(id: $id, status: $status) {\n    id\n    status\n  }\n}": types.UpdateApplicantRecordStatusDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupDocument,
     "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupSchedulingLinkDocument,
+    "query UsersByPosition($position: String!) {\n  usersByPosition(position: $position) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": types.UsersByPositionDocument,
 };
 
 /**
@@ -111,6 +115,10 @@ export function gql(source: "mutation LoginWithGoogle($idToken: String!) {\n  lo
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "mutation ReassignReviewer($applicantRecordId: ID!, $oldReviewerId: ID!, $newReviewerId: ID!) {\n  reassignReviewer(\n    applicantRecordId: $applicantRecordId\n    oldReviewerId: $oldReviewerId\n    newReviewerId: $newReviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n  }\n}"): (typeof documents)["mutation ReassignReviewer($applicantRecordId: ID!, $oldReviewerId: ID!, $newReviewerId: ID!) {\n  reassignReviewer(\n    applicantRecordId: $applicantRecordId\n    oldReviewerId: $oldReviewerId\n    newReviewerId: $newReviewerId\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}"): (typeof documents)["mutation Refresh($refreshToken: String!) {\n  refresh(refreshToken: $refreshToken)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -152,6 +160,10 @@ export function gql(source: "mutation UpdateInterviewGroup($id: ID!, $interviewG
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}"): (typeof documents)["mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query UsersByPosition($position: String!) {\n  usersByPosition(position: $position) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}"): (typeof documents)["query UsersByPosition($position: String!) {\n  usersByPosition(position: $position) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

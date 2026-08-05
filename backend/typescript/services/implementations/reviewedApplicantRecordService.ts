@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import { sequelize } from "../../models";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
@@ -58,6 +59,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
 
   async createReviewedApplicantRecord(
     reviewedApplicantRecord: CreateReviewedApplicantRecordDTO,
+    transaction?: Transaction,
   ): Promise<ReviewedApplicantRecordDTO> {
     try {
       const createdReviewedApplicantRecord = await ReviewedApplicantRecord.create(
@@ -66,6 +68,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
           reviewer_id: Number(reviewedApplicantRecord.reviewerId),
           status: reviewedApplicantRecord.status,
         },
+        { transaction },
       );
       return toReviewedApplicantRecordDTO(createdReviewedApplicantRecord);
     } catch (error: unknown) {
@@ -109,6 +112,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
   async deleteReviewedApplicantRecordByPk(
     applicantRecordId: string,
     reviewerId: string,
+    transaction?: Transaction,
   ): Promise<ReviewedApplicantRecordDTO> {
     try {
       const record = await ReviewedApplicantRecord.findOne({
@@ -116,13 +120,14 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
           applicant_record_id: applicantRecordId,
           reviewer_id: Number(reviewerId),
         },
+        transaction,
       });
 
       if (!record) {
         throw new Error("ReviewedApplicantRecord not found, delete failed");
       }
 
-      await record.destroy();
+      await record.destroy({ transaction });
       return toReviewedApplicantRecordDTO(record);
     } catch (error: unknown) {
       Logger.error(

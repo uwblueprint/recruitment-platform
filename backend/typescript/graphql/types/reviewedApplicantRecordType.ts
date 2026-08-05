@@ -84,6 +84,12 @@ const reviewedApplicantRecordTypes = gql`
       reviewerId: ID!
       reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!
     ): ReviewedApplicantRecordDTO!
+
+    reassignReviewer(
+      applicantRecordId: ID!
+      oldReviewerId: ID!
+      newReviewerId: ID!
+    ): ReviewedApplicantRecordDTO!
   }
 `;
 
