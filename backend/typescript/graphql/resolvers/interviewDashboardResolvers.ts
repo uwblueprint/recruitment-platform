@@ -1,6 +1,10 @@
 import InterviewCompositeService from "../../services/implementations/interviewCompositeService";
 import IInterviewCompositeService from "../../services/interfaces/IInterviewCompositeService";
-import { InterviewDashboardRowDTO, InterviewDelegationDTO } from "../../types";
+import {
+  InterviewDashboardRowDTO,
+  InterviewDashboardSidePanelDTO,
+  InterviewDelegationDTO,
+} from "../../types";
 
 const interviewCompositeService: IInterviewCompositeService = new InterviewCompositeService();
 
@@ -19,6 +23,14 @@ const interviewDashboardResolvers = {
       return interviewCompositeService.getInterviewDashboard(
         pageNumber,
         resultsPerPage,
+      );
+    },
+    interviewDashboardSidePanel: async (
+      _parent: undefined,
+      { applicantRecordId }: { applicantRecordId: string },
+    ): Promise<InterviewDashboardSidePanelDTO> => {
+      return interviewCompositeService.getInterviewDashboardSidePanel(
+        applicantRecordId,
       );
     },
   },

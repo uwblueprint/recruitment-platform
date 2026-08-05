@@ -9,6 +9,7 @@ import {
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   InterviewDashboardRowDTO,
+  InterviewDashboardSidePanelDTO,
   Review,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
@@ -255,6 +256,34 @@ export function toInterviewDashboardRowDTO(
       interviewedApplicantRecord?.interview_delegations ?? []
     ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),
     interviewScore: interviewedApplicantRecord?.score ?? null,
+  };
+}
+
+export function toInterviewDashboardSidePanelDTO(
+  applicantRecord: ApplicantRecord,
+): InterviewDashboardSidePanelDTO {
+  const interviewedApplicantRecord =
+    applicantRecord.interviewed_applicant_record;
+
+  return {
+    firstName: applicantRecord.applicant.first_name,
+    lastName: applicantRecord.applicant.last_name,
+    term: applicantRecord.applicant.term,
+    program: applicantRecord.applicant.program,
+    position: applicantRecord.position,
+    resumeUrl: applicantRecord.applicant.resume_url,
+    applicationStatus: applicantRecord.status,
+    skillCategory: (applicantRecord.skill_category as SkillCategory) ?? null,
+    isApplicantFlagged: applicantRecord.is_applicant_flagged,
+    isShortlistedForOffer: applicantRecord.is_shortlisted_for_offer,
+    interviewers: (
+      interviewedApplicantRecord?.interview_delegations ?? []
+    ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),
+    interview: interviewedApplicantRecord?.interview_json ?? null,
+    interviewStatus: interviewedApplicantRecord?.status ?? null,
+    interviewScore: interviewedApplicantRecord?.score ?? null,
+    interviewNotesId: interviewedApplicantRecord?.interview_notes_id ?? null,
+    interviewDate: interviewedApplicantRecord?.interview_date ?? null,
   };
 }
 
