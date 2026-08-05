@@ -7,10 +7,8 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import ArrowDownward from "@mui/icons-material/ArrowDownward";
-import ArrowUpward from "@mui/icons-material/ArrowUpward";
-import UnfoldMore from "@mui/icons-material/UnfoldMore";
 
+import { DashboardSortIndicator } from "./DashboardSortIndicator";
 import { DashboardTablePagination } from "./DashboardTablePagination";
 import { DashboardTableRow } from "./DashboardTableRow";
 
@@ -75,34 +73,48 @@ export const DashboardTable = <TData,>({
           <thead className="sticky top-0 z-10 bg-sky-200">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th
-                    key={header.id}
-                    className="h-11 whitespace-nowrap px-4 text-xs font-normal text-neutral-800"
-                    style={{ width: header.getSize() }}
-                  >
-                    {header.isPlaceholder ? null : header.column.getCanSort() ? (
-                      <button
-                        className="flex w-full items-center justify-between gap-2 hover:text-blue"
-                        onClick={header.column.getToggleSortingHandler()}
-                        type="button"
-                      >
-                        {flexRender(header.column.columnDef.header, header.getContext())}
-                        <span className="text-neutral-400">
-                          {header.column.getIsSorted() === "asc" ? (
-                            <ArrowUpward sx={{ fontSize: 14 }} />
-                          ) : header.column.getIsSorted() === "desc" ? (
-                            <ArrowDownward sx={{ fontSize: 14 }} />
-                          ) : (
-                            <UnfoldMore sx={{ fontSize: 14 }} />
-                          )}
-                        </span>
-                      </button>
-                    ) : (
-                      flexRender(header.column.columnDef.header, header.getContext())
-                    )}
-                  </th>
-                ))}
+                {headerGroup.headers.map((header) => {
+                  const sorted = header.column.getIsSorted();
+
+                  return (
+                    <th
+                      key={header.id}
+                      className="h-11 whitespace-nowrap px-4 text-xs font-normal text-neutral-800"
+                      style={{ width: header.getSize() }}
+                    >
+                      {header.isPlaceholder ? null : header.column.getCanSort() ? (
+                        // The label and each half of the indicator are separate
+                        // buttons, so they sit side by side rather than nested.
+                        <div className="flex w-full items-center justify-between gap-2">
+                          <button
+                            className="flex flex-1 items-center text-left hover:text-blue"
+                            onClick={header.column.getToggleSortingHandler()}
+                            type="button"
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </button>
+                          <DashboardSortIndicator
+                            sorted={sorted}
+                            // Clicking the active direction clears the sort;
+                            // clicking the other one switches to it.
+                            onSortAscending={() =>
+                              sorted === "asc"
+                                ? header.column.clearSorting()
+                                : header.column.toggleSorting(false)
+                            }
+                            onSortDescending={() =>
+                              sorted === "desc"
+                                ? header.column.clearSorting()
+                                : header.column.toggleSorting(true)
+                            }
+                          />
+                        </div>
+                      ) : (
+                        flexRender(header.column.columnDef.header, header.getContext())
+                      )}
+                    </th>
+                  );
+                })}
               </tr>
             ))}
           </thead>
