@@ -3,25 +3,21 @@ import { ArrowRightIcon } from "@/components/icons/arrow-right.icon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { INTERVIEW_NAV_ITEMS } from "../constants";
+import { useInterviewProgress } from "../InterviewProgressContext";
+import { InterviewPartnerCard } from "./InterviewPartnerCard";
 
-interface InterviewNavPanelProps {
-  candidateName: string;
-}
-
-export const InterviewNavPanel = ({
-  candidateName,
-}: InterviewNavPanelProps) => {
+export const InterviewNavPanel = () => {
   const router = useRouter();
+  const { candidateName } = useInterviewProgress();
 
   const { applicantRecordId } = router.query;
   const isActive = (path: string) => router.pathname === path;
-
-  console.log("applicantRecordId:", applicantRecordId);
+  const displayName = candidateName ?? "Candidate";
 
   return (
-    <nav className="flex flex-col">
+    <nav className="flex min-h-full flex-col">
       <Link
-        href="/admin"
+        href="/"
         className="flex w-fit items-center justify-center gap-2 rounded-full border-2 border-blue bg-white px-4 py-2 transition-colors hover:bg-gray-50"
       >
         <ArrowLeftIcon className="h-6 w-6 text-blue" />
@@ -31,7 +27,7 @@ export const InterviewNavPanel = ({
       </Link>
 
       <h2 className="mt-5 font-poppins text-[28px] font-semibold leading-[140%] text-neutral-800">
-        {candidateName}&apos;s Interview Review
+        {displayName}&apos;s Interview Review
       </h2>
 
       <hr className="my-8 border-neutral-200" />
@@ -65,6 +61,8 @@ export const InterviewNavPanel = ({
           );
         })}
       </ul>
+
+      <InterviewPartnerCard className="mt-auto pt-12" />
     </nav>
   );
 };

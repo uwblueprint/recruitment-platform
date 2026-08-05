@@ -14,6 +14,9 @@ interface PanelLayoutProps {
   /** When false, hides subtitle (e.g. for INFO stage) */
   showApplicationTitle?: boolean;
   contentClassName?: string;
+  /** When true (with contentClassName), the content wrapper fills available
+   * height so children can pin to the bottom (e.g. via mt-auto). */
+  fillContent?: boolean;
   children: ReactNode;
 }
 
@@ -35,6 +38,7 @@ export const PanelLayout = ({
   header,
   showApplicationTitle = true,
   contentClassName,
+  fillContent = false,
   children,
 }: PanelLayoutProps) => {
   const bg =
@@ -105,7 +109,9 @@ export const PanelLayout = ({
           <div
             className={
               contentClassName
-                ? "box-border w-full px-9"
+                ? `box-border w-full px-9 ${
+                    fillContent ? "flex min-h-full flex-1 flex-col" : ""
+                  }`
                 : "box-border flex min-h-full w-full flex-col items-start gap-8 px-9"
             }
           >

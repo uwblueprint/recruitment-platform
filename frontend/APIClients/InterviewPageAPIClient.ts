@@ -3,12 +3,16 @@ import { client } from "@/client";
 import BaseAPIClient from "./BaseAPIClient";
 import {
   InterviewedApplicantsByUserIdDocument,
+  InterviewedPairingsByUserIdDocument,
   InterviewersByGroupIdDocument,
   type InterviewedApplicantsByUserIdQuery,
   type InterviewedApplicantsByUserIdQueryVariables,
+  type InterviewedPairingsByUserIdQuery,
+  type InterviewedPairingsByUserIdQueryVariables,
   type InterviewersByGroupIdQuery,
   type InterviewersByGroupIdQueryVariables,
   type InterviewedApplicantsDTO,
+  type InterviewPairingResult,
   type UserDTO,
   type ReportInterviewConflictMutation,
   type ReportInterviewConflictMutationVariables,
@@ -40,6 +44,31 @@ class InterviewPageAPIClient {
       return data.interviewedApplicantsByUserId;
     } catch {
       throw new Error("Failed to get interviewed applicants");
+    }
+  }
+
+  static async getInterviewedPairingsByUserId(
+    userId: string,
+  ): Promise<InterviewPairingResult[]> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        InterviewedPairingsByUserIdQuery,
+        InterviewedPairingsByUserIdQueryVariables
+      >({
+        query: InterviewedPairingsByUserIdDocument,
+        variables: { userId },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.interviewedPairingsByUserId) {
+        throw new Error("No data returned");
+      }
+
+      return data.interviewedPairingsByUserId;
+    } catch {
+      throw new Error("Failed to get interviewed pairings");
     }
   }
 

@@ -120,6 +120,12 @@ export type CreateUserDto = {
   role: Role;
 };
 
+export enum DashboardView {
+  All = 'ALL',
+  Conflicts = 'CONFLICTS',
+  Shortlisted = 'SHORTLISTED'
+}
+
 export type EntityRequestDto = {
   boolField: Scalars['Boolean']['input'];
   contentType?: InputMaybe<Scalars['String']['input']>;
@@ -544,6 +550,7 @@ export type Query = {
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewDashboard: Array<ReviewDashboardRowDto>;
+  reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
   reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
@@ -637,6 +644,13 @@ export type QueryReviewDashboardArgs = {
   resultsPerPage: Scalars['Int']['input'];
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<ReviewDashboardSortBy>;
+  view?: InputMaybe<DashboardView>;
+};
+
+
+export type QueryReviewDashboardApplicantRecordIdsArgs = {
+  sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
+  sortBy?: InputMaybe<ReviewDashboardSortBy>;
 };
 
 
@@ -714,6 +728,7 @@ export type ReviewDashboardRowDto = {
 
 export type ReviewDashboardSidePanelDto = {
   __typename?: 'ReviewDashboardSidePanelDTO';
+  academicYear: Scalars['String']['output'];
   applicationStatus: ApplicationStatus;
   firstName: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
