@@ -1,10 +1,12 @@
-import { Op } from "sequelize";
+import { Op, Order, OrderItem, col, literal } from "sequelize";
 import User from "../../models/user.model";
 import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.model";
 import {
   CreateInterviewDelegationDTO,
   ApplicationStatusEnum,
   InterviewDashboardRowDTO,
+  InterviewDashboardSortBy,
+  InterviewDashboardSortByEnum,
   InterviewDelegationDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
@@ -70,11 +72,71 @@ function dedupeUsersById(users: User[]): User[] {
   });
 }
 
+/**
+ * Builds the ORDER BY clause for the interview dashboard query.
+ *
+ * Interviewers are a hasMany loaded via `separate: true`, so their names are
+ * not in the main query and a plain ORDER BY can't reference them. Instead,
+ * order by the Nth interviewer's "last first" name via a correlated subquery
+ * (LIMIT 1 OFFSET idx mirrors how interviewers[idx] is picked in the DTO).
+ * Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows land
+ * on each page — sorting the returned page in JS would only order within a
+ * page, since the DB would already have chosen the page by id.
+ * COALESCE(...,'') keeps records missing that interviewer ordered as empty
+ * strings (first on ASC, last on DESC), and id is a stable tiebreak.
+ */
+function buildInterviewDashboardOrder(
+  sortBy?: InterviewDashboardSortBy,
+  sortAscending?: boolean,
+): Order {
+  const direction = sortAscending === false ? "DESC" : "ASC";
+
+  const sortColumnMap: Record<
+    Exclude<InterviewDashboardSortBy, "INTERVIEWER_1" | "INTERVIEWER_2">,
+    OrderItem
+  > = {
+    FIRST_NAME: [col("applicant.first_name"), direction],
+    LAST_NAME: [col("applicant.last_name"), direction],
+    POSITION: ["position", direction],
+    INTERVIEW_SCORE: [col("interviewed_applicant_record.score"), direction],
+    APPLICATION_STATUS: ["status", direction],
+  };
+
+  if (
+    sortBy === InterviewDashboardSortByEnum.INTERVIEWER_1 ||
+    sortBy === InterviewDashboardSortByEnum.INTERVIEWER_2
+  ) {
+    const idx = sortBy === InterviewDashboardSortByEnum.INTERVIEWER_1 ? 0 : 1;
+    return [
+      [
+        literal(`COALESCE((
+          SELECT u."last_name" || ' ' || u."first_name"
+          FROM "interviewed_applicant_records" AS iar
+          JOIN "interview_delegations" AS d
+            ON d."interviewed_applicant_record_id" = iar."id"
+          JOIN "users" AS u ON u."id" = d."interviewer_id"
+          WHERE iar."applicant_record_id" = "ApplicantRecord"."id"
+          ORDER BY d."createdAt" ASC, d."interviewer_id" ASC
+          LIMIT 1 OFFSET ${idx}
+        ), '')`),
+        direction,
+      ],
+      ["id", "ASC"],
+    ];
+  }
+  if (sortBy) {
+    return [sortColumnMap[sortBy], ["id", "ASC"]];
+  }
+  return [["id", "ASC"]];
+}
+
 class InterviewCompositeService implements IInterviewCompositeService {
   /* eslint-disable class-methods-use-this */
   async getInterviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    sortBy?: InterviewDashboardSortBy,
+    sortAscending?: boolean,
   ): Promise<InterviewDashboardRowDTO[]> {
     try {
       if (
@@ -113,9 +175,22 @@ class InterviewCompositeService implements IInterviewCompositeService {
                 attributes: [
                   "interviewed_applicant_record_id",
                   "interviewer_id",
+                  "createdAt",
                 ],
                 model: InterviewDelegation,
                 as: "interview_delegations",
+                // separate: true runs the hasMany as its own query, so the main
+                // query is left with plain single-row joins — Sequelize won't
+                // wrap it in a subquery, which lets ORDER BY reference the
+                // "applicant" and "interviewed_applicant_record" tables
+                // directly. This order must stay in sync with the correlated
+                // subquery in buildInterviewDashboardOrder so that
+                // "interviewer N" means the same row in both places.
+                separate: true,
+                order: [
+                  ["createdAt", "ASC"],
+                  ["interviewer_id", "ASC"],
+                ] as Order,
                 include: [
                   {
                     attributes: [
@@ -135,27 +210,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
             ],
           },
         ],
-        order: [
-          ["id", "ASC"],
-          [
-            {
-              model: InterviewedApplicantRecord,
-              as: "interviewed_applicant_record",
-            },
-            { model: InterviewDelegation, as: "interview_delegations" },
-            "createdAt",
-            "ASC",
-          ],
-          [
-            {
-              model: InterviewedApplicantRecord,
-              as: "interviewed_applicant_record",
-            },
-            { model: InterviewDelegation, as: "interview_delegations" },
-            "interviewer_id",
-            "ASC",
-          ],
-        ],
+        order: buildInterviewDashboardOrder(sortBy, sortAscending),
         limit: resultsPerPage,
         offset: (pageNumber - 1) * resultsPerPage,
       });

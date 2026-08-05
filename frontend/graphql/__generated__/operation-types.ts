@@ -14,6 +14,8 @@ export type ApplicationQuery = { application: { id: string, academicOrCoop: stri
 export type InterviewDashboardQueryVariables = Exact<{
   pageNumber: number;
   resultsPerPage: number;
+  sortBy?: Types.InterviewDashboardSortBy | null | undefined;
+  sortAscending?: boolean | null | undefined;
 }>;
 
 

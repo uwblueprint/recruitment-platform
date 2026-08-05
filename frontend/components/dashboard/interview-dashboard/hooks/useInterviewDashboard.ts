@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import InterviewDashboardAPIClient from "@/APIClients/InterviewDashboardAPIClient";
-import type { InterviewDashboardResult } from "@/graphql/typeUtils";
+import type {
+  InterviewDashboardResult,
+  InterviewDashboardSortBy,
+} from "@/graphql/typeUtils";
 
 type UseInterviewDashboardResult = {
   rows: InterviewDashboardResult[];
@@ -11,6 +14,8 @@ type UseInterviewDashboardResult = {
 const useInterviewDashboard = (
   pageNumber: number,
   resultsPerPage: number,
+  sortBy?: InterviewDashboardSortBy,
+  sortAscending?: boolean,
 ): UseInterviewDashboardResult => {
   const [state, setState] = useState<UseInterviewDashboardResult>({
     rows: [],
@@ -31,6 +36,8 @@ const useInterviewDashboard = (
     InterviewDashboardAPIClient.getInterviewDashboard(
       pageNumber,
       resultsPerPage,
+      sortBy,
+      sortAscending,
     )
       .then((rows) => {
         if (isCurrentRequest) {
@@ -46,7 +53,7 @@ const useInterviewDashboard = (
     return () => {
       isCurrentRequest = false;
     };
-  }, [pageNumber, resultsPerPage]);
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending]);
 
   return state;
 };

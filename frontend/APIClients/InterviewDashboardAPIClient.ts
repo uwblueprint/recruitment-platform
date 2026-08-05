@@ -4,6 +4,7 @@ import {
   type InterviewDashboardQuery,
   type InterviewDashboardQueryVariables,
   type InterviewDashboardResult,
+  type InterviewDashboardSortBy,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -12,6 +13,8 @@ class InterviewDashboardAPIClient {
   static async getInterviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    sortBy?: InterviewDashboardSortBy,
+    sortAscending?: boolean,
   ): Promise<InterviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
@@ -21,7 +24,7 @@ class InterviewDashboardAPIClient {
         InterviewDashboardQueryVariables
       >({
         query: InterviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage },
+        variables: { pageNumber, resultsPerPage, sortBy, sortAscending },
         fetchPolicy: "network-only",
       });
 
