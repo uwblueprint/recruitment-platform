@@ -43,14 +43,19 @@ const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
  * Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows
  * land on each page — sorting the returned page in JS would only order
  * within a page, since the DB would already have chosen the page by id.
- * COALESCE(...,'') keeps records missing that reviewer ordered as empty
- * strings (first on ASC, last on DESC), and id is a stable tiebreak.
+ * Records missing that reviewer yield a NULL from the subquery, which the
+ * NULLS LAST direction keeps at the bottom; id is a stable tiebreak.
+ *
+ * NULLS LAST keeps records missing the sort value at the bottom of the
+ * list regardless of direction. Postgres otherwise defaults to NULLS
+ * FIRST on DESC, which would float those rows to the top.
  */
 function buildReviewDashboardOrder(
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
 ): Order {
-  const direction = sortAscending === false ? "DESC" : "ASC";
+  const direction =
+    sortAscending === false ? "DESC NULLS LAST" : "ASC NULLS LAST";
 
   const sortColumnMap: Record<
     Exclude<ReviewDashboardSortBy, "REVIEWER_1" | "REVIEWER_2">,
@@ -71,14 +76,14 @@ function buildReviewDashboardOrder(
     const idx = sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ? 0 : 1;
     return [
       [
-        literal(`COALESCE((
+        literal(`(
           SELECT u."last_name" || ' ' || u."first_name"
           FROM "reviewed_applicant_records" AS r
           JOIN "users" AS u ON u."id" = r."reviewer_id"
           WHERE r."applicant_record_id" = "ApplicantRecord"."id"
           ORDER BY r."createdAt" ASC, r."reviewer_id" ASC
           LIMIT 1 OFFSET ${idx}
-        ), '')`),
+        )`),
         direction,
       ],
       ["id", "ASC"],
