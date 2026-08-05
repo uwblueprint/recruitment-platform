@@ -248,37 +248,6 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
       throw error;
     }
   }
-
-  async reassignReviewer(
-    applicantRecordId: string,
-    oldReviewerId: string,
-    newReviewerId: string,
-  ): Promise<ReviewedApplicantRecordDTO> {
-    const transaction = await sequelize.transaction();
-    try {
-      await this.deleteReviewedApplicantRecordByPk(
-        applicantRecordId,
-        oldReviewerId,
-        transaction,
-      );
-      const newRecord = await this.createReviewedApplicantRecord(
-        {
-          applicantRecordId,
-          reviewerId: newReviewerId,
-          status: "TODO",
-        },
-        transaction,
-      );
-      await transaction.commit();
-      return newRecord;
-    } catch (error: unknown) {
-      await transaction.rollback();
-      Logger.error(
-        `Failed to reassign reviewer. Reason = ${getErrorMessage(error)}`,
-      );
-      throw error;
-    }
-  }
 }
 
 export default ReviewedApplicantRecordService;

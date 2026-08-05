@@ -56,18 +56,6 @@ interface IReviewApplicantRecordService {
     reviewerId: string,
     reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO,
   ): Promise<ReviewedApplicantRecordDTO>;
-
-  /**
-   * Reassigns a reviewer for a given applicant record
-   * @param applicantRecordId the ID of the applicant record to update reviewer
-   * @param oldReviewerId the ID of the reviewer to replace
-   * @param newReviewerId the ID of the new reviewer
-   */
-  reassignReviewer(
-    applicantRecordId: string,
-    oldReviewerId: string,
-    newReviewerId: string,
-  ): Promise<ReviewedApplicantRecordDTO>;
 }
 
 export default IReviewApplicantRecordService;
