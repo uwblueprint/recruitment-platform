@@ -64,9 +64,19 @@ const AdminReviewPage: NextPageWithLayout = () => {
         label: "Skill Category",
         options: filterOptions.skillCategories,
       },
-      { key: "scoreRange", label: "Score", options: filterOptions.scoreRanges },
+      {
+        key: "scoreRange",
+        label: "Score",
+        options: filterOptions.scoreRanges,
+        chipPrefix: "Score",
+      },
       { key: "year", label: "Year", options: filterOptions.years },
-      { key: "bookmarked", label: "Bookmarked", options: filterOptions.bookmarked },
+      {
+        key: "bookmarked",
+        label: "Bookmarked",
+        options: filterOptions.bookmarked,
+        variant: "toggle" as const,
+      },
     ];
   }, [filterOptions]);
 
@@ -101,7 +111,11 @@ const AdminReviewPage: NextPageWithLayout = () => {
     backendFilters,
   );
 
-  const applicantRecordIds = useReviewDashboardApplicantRecordIds();
+  const applicantRecordIds = useReviewDashboardApplicantRecordIds(
+    sortBy,
+    sortAscending,
+    backendFilters,
+  );
   const activeRow = rows.find((row) => row.applicantRecordId === activeId);
   const { details, isLoading: isDetailsLoading } =
     useReviewDashboardSidePanel(activeId);
@@ -179,15 +193,13 @@ const AdminReviewPage: NextPageWithLayout = () => {
           ) : null}
         </div>
 
-        <div className="flex shrink-0 flex-col gap-3">
-          <div className="flex items-center gap-3">
-            <FilterMenu
-              categories={filterCategories}
-              selected={selectedFilters}
-              onChange={handleFilterCategoryChange}
-            />
-            <SearchBar value={search} onChange={handleSearchChange} />
-          </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-3">
+          <SearchBar value={search} onChange={handleSearchChange} />
+          <FilterMenu
+            categories={filterCategories}
+            selected={selectedFilters}
+            onChange={handleFilterCategoryChange}
+          />
           <FilterChips
             categories={filterCategories}
             selected={selectedFilters}

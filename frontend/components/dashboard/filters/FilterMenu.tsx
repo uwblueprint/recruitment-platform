@@ -1,7 +1,8 @@
 import { useState } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import { Checkbox, FormControlLabel, FormGroup, Menu, MenuItem } from "@mui/material";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { Checkbox, Popover } from "@mui/material";
 
 import type { FilterCategory, SelectedFilters } from "./types";
 
@@ -11,98 +12,134 @@ type FilterMenuProps = {
   onChange: (categoryKey: string, values: string[]) => void;
 };
 
-export const FilterMenu = ({ categories, selected, onChange }: FilterMenuProps) => {
+export const FilterMenu = ({
+  categories,
+  selected,
+  onChange,
+}: FilterMenuProps) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [categoryAnchorEl, setCategoryAnchorEl] = useState<HTMLElement | null>(null);
-  const [activeCategoryKey, setActiveCategoryKey] = useState<string | null>(null);
+  // Categories are independently collapsible, so more than one can be open.
+  const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
-  const activeCategory = categories.find((category) => category.key === activeCategoryKey) ?? null;
+  const hasSelection = Object.values(selected).some(
+    (values) => values.length > 0,
+  );
 
-  const closeAll = () => {
-    setAnchorEl(null);
-    setCategoryAnchorEl(null);
-    setActiveCategoryKey(null);
+  const toggleExpanded = (categoryKey: string) => {
+    setExpandedKeys((previous) =>
+      previous.includes(categoryKey)
+        ? previous.filter((key) => key !== categoryKey)
+        : [...previous, categoryKey],
+    );
   };
 
   const toggleOption = (categoryKey: string, value: string) => {
     const current = selected[categoryKey] ?? [];
-    const next = current.includes(value)
-      ? current.filter((selectedValue) => selectedValue !== value)
-      : [...current, value];
-    onChange(categoryKey, next);
+    onChange(
+      categoryKey,
+      current.includes(value)
+        ? current.filter((selectedValue) => selectedValue !== value)
+        : [...current, value],
+    );
   };
-
-  const totalSelected = Object.values(selected).reduce(
-    (sum, values) => sum + values.length,
-    0,
-  );
 
   return (
     <>
       <button
         type="button"
         onClick={(event) => setAnchorEl(event.currentTarget)}
-        className="flex h-9 items-center gap-2 rounded border border-neutral-200 px-3 font-source text-sm text-neutral-800 hover:bg-neutral-50"
+        aria-haspopup="true"
+        aria-expanded={!!anchorEl}
+        className={`flex h-9 items-center gap-2 rounded px-3 font-source text-sm ${
+          hasSelection
+            ? "bg-blue text-white hover:bg-blue-600"
+            : "border border-neutral-200 text-neutral-800 hover:bg-neutral-50"
+        }`}
       >
-        <FilterListIcon sx={{ fontSize: 18 }} />
         Filters
-        {totalSelected > 0 ? (
-          <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-blue px-1 font-source text-xs text-white">
-            {totalSelected}
-          </span>
-        ) : null}
+        <FilterListIcon sx={{ fontSize: 18 }} />
       </button>
 
-      <Menu anchorEl={anchorEl} open={!!anchorEl} onClose={closeAll}>
-        {categories.map((category) => {
-          const count = (selected[category.key] ?? []).length;
-          return (
-            <MenuItem
-              key={category.key}
-              onClick={(event) => {
-                setCategoryAnchorEl(event.currentTarget);
-                setActiveCategoryKey(category.key);
-              }}
-              className="flex min-w-[200px] items-center justify-between gap-6 font-source text-sm"
-            >
-              <span>{category.label}</span>
-              <span className="flex items-center gap-1 text-neutral-500">
-                {count > 0 ? `${count} selected` : ""}
-                <ChevronRightIcon sx={{ fontSize: 16 }} />
-              </span>
-            </MenuItem>
-          );
-        })}
-      </Menu>
-
-      <Menu
-        anchorEl={categoryAnchorEl}
-        open={!!categoryAnchorEl}
-        onClose={() => {
-          setCategoryAnchorEl(null);
-          setActiveCategoryKey(null);
-        }}
-        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      <Popover
+        anchorEl={anchorEl}
+        open={!!anchorEl}
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
+        slotProps={{ paper: { className: "mt-1 w-56 rounded" } }}
       >
-        {activeCategory ? (
-          <FormGroup className="px-3 py-1">
-            {activeCategory.options.map((option) => (
-              <FormControlLabel
-                key={option.value}
-                control={
+        <div className="py-2">
+          <p className="px-4 pb-2 font-source text-sm font-semibold text-neutral-800">
+            Filters
+          </p>
+
+          {categories.map((category) => {
+            const selectedValues = selected[category.key] ?? [];
+
+            if (category.variant === "toggle") {
+              const [option] = category.options;
+              if (!option) return null;
+              return (
+                <label
+                  key={category.key}
+                  className="flex cursor-pointer items-center justify-between border-t border-neutral-100 px-4 py-1 font-source text-sm text-neutral-800"
+                >
+                  {category.label}
                   <Checkbox
                     size="small"
-                    checked={(selected[activeCategory.key] ?? []).includes(option.value)}
-                    onChange={() => toggleOption(activeCategory.key, option.value)}
+                    checked={selectedValues.includes(option.value)}
+                    onChange={() => toggleOption(category.key, option.value)}
                   />
-                }
-                label={<span className="font-source text-sm">{option.label}</span>}
-              />
-            ))}
-          </FormGroup>
-        ) : null}
-      </Menu>
+                </label>
+              );
+            }
+
+            const isExpanded = expandedKeys.includes(category.key);
+
+            return (
+              <div
+                key={category.key}
+                className="border-t border-neutral-100 first:border-t-0"
+              >
+                <button
+                  type="button"
+                  onClick={() => toggleExpanded(category.key)}
+                  aria-expanded={isExpanded}
+                  className="flex w-full items-center justify-between px-4 py-2 font-source text-sm text-neutral-800 hover:bg-neutral-50"
+                >
+                  {category.label}
+                  {isExpanded ? (
+                    <ExpandLessIcon sx={{ fontSize: 18 }} />
+                  ) : (
+                    <ExpandMoreIcon sx={{ fontSize: 18 }} />
+                  )}
+                </button>
+
+                {isExpanded ? (
+                  <div className="pb-1">
+                    {category.options.map((option) => (
+                      <label
+                        key={option.value}
+                        className="flex cursor-pointer items-center gap-2 px-4 py-1 pl-6 font-source text-sm text-neutral-800 hover:bg-neutral-50"
+                      >
+                        <Checkbox
+                          size="small"
+                          sx={{ padding: 0 }}
+                          checked={selectedValues.includes(option.value)}
+                          onChange={() =>
+                            toggleOption(category.key, option.value)
+                          }
+                        />
+                        {option.label}
+                      </label>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      </Popover>
     </>
   );
 };
