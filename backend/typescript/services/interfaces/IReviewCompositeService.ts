@@ -56,10 +56,13 @@ interface IReviewCompositeService {
    * navigate across pages.
    * @Param sortBy the field to sort results by
    * @Param sortAscending whether to sort ascending; defaults to true
+   * @Param filters the same filters applied to getReviewDashboard, so the
+   *        navigable set matches what the table is showing
    */
   getReviewDashboardApplicantRecordIds(
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
   ): Promise<string[]>;
 
   /**

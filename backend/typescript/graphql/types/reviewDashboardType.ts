@@ -77,6 +77,7 @@ const reviewDashboardType = gql`
     reviewDashboardApplicantRecordIds(
       sortBy: ReviewDashboardSortBy
       sortAscending: Boolean
+      filters: ReviewDashboardFilters
     ): [ID!]!
 
     reviewDashboardSidePanel(

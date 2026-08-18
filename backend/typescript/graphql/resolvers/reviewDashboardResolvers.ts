@@ -40,14 +40,17 @@ const reviewDashboardResolvers = {
       {
         sortBy,
         sortAscending,
+        filters,
       }: {
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
+        filters?: ReviewDashboardFilters;
       },
     ): Promise<string[]> => {
       return reviewCompositeService.getReviewDashboardApplicantRecordIds(
         sortBy,
         sortAscending,
+        filters,
       );
     },
     reviewDashboardSidePanel: async (

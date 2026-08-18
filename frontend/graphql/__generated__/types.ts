@@ -650,6 +650,7 @@ export type QueryReviewDashboardArgs = {
 
 
 export type QueryReviewDashboardApplicantRecordIdsArgs = {
+  filters?: InputMaybe<ReviewDashboardFilters>;
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<ReviewDashboardSortBy>;
 };

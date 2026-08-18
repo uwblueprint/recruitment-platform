@@ -41,7 +41,13 @@ class ReviewDashboardAPIClient {
         ReviewDashboardQueryVariables
       >({
         query: ReviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage, sortBy, sortAscending, filters },
+        variables: {
+          pageNumber,
+          resultsPerPage,
+          sortBy,
+          sortAscending,
+          filters,
+        },
         fetchPolicy: "network-only",
       });
 
@@ -80,7 +86,11 @@ class ReviewDashboardAPIClient {
     }
   }
 
-  static async getReviewDashboardApplicantRecordIds(): Promise<string[]> {
+  static async getReviewDashboardApplicantRecordIds(
+    sortBy?: ReviewDashboardSortBy,
+    sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
+  ): Promise<string[]> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
@@ -89,7 +99,7 @@ class ReviewDashboardAPIClient {
         ReviewDashboardApplicantRecordIdsQueryVariables
       >({
         query: ReviewDashboardApplicantRecordIdsDocument,
-        variables: {},
+        variables: { sortBy, sortAscending, filters },
         fetchPolicy: "network-only",
       });
 

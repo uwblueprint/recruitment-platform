@@ -108,6 +108,7 @@ export type ReviewDashboardQuery = { reviewDashboard: Array<{ applicantRecordId:
 export type ReviewDashboardApplicantRecordIdsQueryVariables = Exact<{
   sortBy?: Types.ReviewDashboardSortBy | null | undefined;
   sortAscending?: boolean | null | undefined;
+  filters?: Types.ReviewDashboardFilters | null | undefined;
 }>;
 
 

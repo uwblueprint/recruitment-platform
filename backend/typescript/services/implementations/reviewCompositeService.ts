@@ -267,16 +267,21 @@ class ReviewCompositeService implements IReviewCompositeService {
   async getReviewDashboardApplicantRecordIds(
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
   ): Promise<string[]> {
     try {
+      // NOTE: the where clauses must stay identical to getReviewDashboard so
+      //       side panel navigation walks exactly the rows the table shows.
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: ["id"],
+        where: buildApplicantRecordWhere(filters),
         include: [
           {
             // Joined with no attributes so the ORDER BY can reference
             // applicant columns without fetching them.
             attributes: [],
             model: Applicant,
+            where: buildApplicantWhere(filters),
           },
         ],
         order: buildReviewDashboardOrder(sortBy, sortAscending),
