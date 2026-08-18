@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client/react";
 import type {
+  DashboardView,
   ReviewDashboardFilters,
   ReviewDashboardQuery,
   ReviewDashboardQueryVariables,
@@ -21,12 +22,20 @@ const useReviewDashboard = (
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
   filters?: ReviewDashboardFilters,
+  view?: DashboardView,
 ): UseReviewDashboardResult => {
   const { data, loading, error, refetch } = useQuery<
     ReviewDashboardQuery,
     ReviewDashboardQueryVariables
   >(ReviewDashboardDocument, {
-    variables: { pageNumber, resultsPerPage, sortBy, sortAscending, filters },
+    variables: {
+      pageNumber,
+      resultsPerPage,
+      sortBy,
+      sortAscending,
+      filters,
+      view,
+    },
     fetchPolicy: "network-only",
     notifyOnNetworkStatusChange: true,
   });

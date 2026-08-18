@@ -4,6 +4,7 @@ query ReviewDashboard(
   $sortBy: ReviewDashboardSortBy
   $sortAscending: Boolean
   $filters: ReviewDashboardFilters
+  $view: DashboardView
 ) {
   reviewDashboard(
     pageNumber: $pageNumber
@@ -11,6 +12,7 @@ query ReviewDashboard(
     sortBy: $sortBy
     sortAscending: $sortAscending
     filters: $filters
+    view: $view
   ) {
     applicantRecordId
     firstName

@@ -1,5 +1,6 @@
 import { client } from "@/client";
 import {
+  DashboardView,
   ReviewDashboardApplicantRecordIdsDocument,
   ReviewDashboardDocument,
   ReviewDashboardSidePanelDocument,
@@ -32,6 +33,7 @@ class ReviewDashboardAPIClient {
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
     filters?: ReviewDashboardFilters,
+    view?: DashboardView,
   ): Promise<ReviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
@@ -47,6 +49,7 @@ class ReviewDashboardAPIClient {
           sortBy,
           sortAscending,
           filters,
+          view,
         },
         fetchPolicy: "network-only",
       });

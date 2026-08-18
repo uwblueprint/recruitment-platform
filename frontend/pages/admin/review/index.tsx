@@ -7,6 +7,7 @@ import {
   type SelectedFilters,
 } from "@/components/dashboard/filters";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import { DashboardView } from "@/graphql/typeUtils";
 import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
@@ -21,10 +22,12 @@ import {
   COLUMN_ID_TO_SORT_BY,
   REVIEW_DASHBOARD_COLUMNS,
 } from "./_components/columns";
+import { DashboardTabs } from "./_components/DashboardTabs";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardFilterOptions from "./_components/hooks/useReviewDashboardFilterOptions";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
+import useTabCounts from "./_components/hooks/useTabCounts";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
@@ -33,10 +36,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const position =
     typeof router.query.position === "string" ? router.query.position : null;
 
+  const [activeView, setActiveView] = useState<DashboardView>(DashboardView.All);
   const [pageNumber, setPageNumber] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(
-    DEFAULT_RESULTS_PER_PAGE,
-  );
+  const [resultsPerPage, setResultsPerPage] = useState(DEFAULT_RESULTS_PER_PAGE);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
@@ -109,6 +111,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     sortBy,
     sortAscending,
     backendFilters,
+    activeView,
   );
 
   const applicantRecordIds = useReviewDashboardApplicantRecordIds(
@@ -122,11 +125,22 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const activeNavigationIndex =
     activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
 
+  const tabCounts = useTabCounts(rows, isLoading, activeView);
+
+  // Jumps the side panel to the applicant at `index` and keeps the table on
+  // the page that applicant lives on.
   const goToApplicant = (index: number) => {
     const applicantRecordId = applicantRecordIds[index];
     if (!applicantRecordId) return;
     setActiveId(applicantRecordId);
     setPageNumber(Math.floor(index / resultsPerPage) + 1);
+  };
+
+  const handleViewChange = (view: DashboardView) => {
+    setActiveView(view);
+    setPageNumber(1);
+    setRowSelection({});
+    setActiveId(undefined);
   };
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
@@ -181,6 +195,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         )
       : rows;
   }, [rows, search]);
+  const selectedCount = Object.keys(rowSelection).length;
 
   return (
     <div className="flex h-screen flex-col bg-white">
@@ -192,6 +207,14 @@ const AdminReviewPage: NextPageWithLayout = () => {
             </h1>
           ) : null}
         </div>
+
+        <DashboardTabs
+          activeView={activeView}
+          onViewChange={handleViewChange}
+          counts={tabCounts}
+          selectedCount={selectedCount}
+          onClearAll={() => setRowSelection({})}
+        />
 
         <div className="flex shrink-0 flex-wrap items-center gap-3">
           <SearchBar value={search} onChange={handleSearchChange} />

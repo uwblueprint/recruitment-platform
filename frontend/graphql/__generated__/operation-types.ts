@@ -100,6 +100,7 @@ export type ReviewDashboardQueryVariables = Exact<{
   sortBy?: Types.ReviewDashboardSortBy | null | undefined;
   sortAscending?: boolean | null | undefined;
   filters?: Types.ReviewDashboardFilters | null | undefined;
+  view?: Types.DashboardView | null | undefined;
 }>;
 
 
