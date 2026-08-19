@@ -99,6 +99,7 @@ export type ReviewDashboardQueryVariables = Exact<{
   resultsPerPage: number;
   sortBy?: Types.ReviewDashboardSortBy | null | undefined;
   sortAscending?: boolean | null | undefined;
+  filters?: Types.ReviewDashboardFilters | null | undefined;
   view?: Types.DashboardView | null | undefined;
 }>;
 
@@ -108,10 +109,18 @@ export type ReviewDashboardQuery = { reviewDashboard: Array<{ applicantRecordId:
 export type ReviewDashboardApplicantRecordIdsQueryVariables = Exact<{
   sortBy?: Types.ReviewDashboardSortBy | null | undefined;
   sortAscending?: boolean | null | undefined;
+  filters?: Types.ReviewDashboardFilters | null | undefined;
 }>;
 
 
 export type ReviewDashboardApplicantRecordIdsQuery = { reviewDashboardApplicantRecordIds: Array<string> };
+
+export type ReviewDashboardFilterOptionsQueryVariables = Exact<{
+  department?: string | null | undefined;
+}>;
+
+
+export type ReviewDashboardFilterOptionsQuery = { reviewDashboardFilterOptions: { positions: Array<{ value: string, label: string }>, applicationStatuses: Array<{ value: string, label: string }>, skillCategories: Array<{ value: string, label: string }>, scoreRanges: Array<{ value: string, label: string }>, years: Array<{ value: string, label: string }>, bookmarked: Array<{ value: string, label: string }> } };
 
 export type ReviewDashboardSidePanelQueryVariables = Exact<{
   applicantRecordId: string | number;

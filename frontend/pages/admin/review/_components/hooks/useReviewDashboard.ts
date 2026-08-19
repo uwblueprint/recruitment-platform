@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import { DashboardView } from "@/graphql/typeUtils";
+import { useQuery } from "@apollo/client/react";
 import type {
+  DashboardView,
+  ReviewDashboardFilters,
+  ReviewDashboardQuery,
+  ReviewDashboardQueryVariables,
   ReviewDashboardResult,
   ReviewDashboardSortBy,
 } from "@/graphql/typeUtils";
+import { ReviewDashboardDocument } from "@/graphql/typeUtils";
 
 type UseReviewDashboardResult = {
   rows: ReviewDashboardResult[];
   isLoading: boolean;
   error: boolean;
+  refetch: () => void;
 };
 
 const useReviewDashboard = (
@@ -17,34 +21,33 @@ const useReviewDashboard = (
   resultsPerPage: number,
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
+  filters?: ReviewDashboardFilters,
   view?: DashboardView,
 ): UseReviewDashboardResult => {
-  const [state, setState] = useState<UseReviewDashboardResult>({
-    rows: [],
-    isLoading: false,
-    error: false,
-  });
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState((prev) => ({ ...prev, isLoading: true, error: false }));
-
-    ReviewDashboardAPIClient.getReviewDashboard(
+  const { data, loading, error, refetch } = useQuery<
+    ReviewDashboardQuery,
+    ReviewDashboardQueryVariables
+  >(ReviewDashboardDocument, {
+    variables: {
       pageNumber,
       resultsPerPage,
       sortBy,
       sortAscending,
+      filters,
       view,
-    )
-      .then((rows) => {
-        setState({ rows, isLoading: false, error: false });
-      })
-      .catch(() => {
-        setState({ rows: [], isLoading: false, error: true });
-      });
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending, view]);
+    },
+    fetchPolicy: "network-only",
+    notifyOnNetworkStatusChange: true,
+  });
 
-  return state;
+  return {
+    rows: data?.reviewDashboard ?? [],
+    isLoading: loading,
+    error: !!error,
+    refetch: () => {
+      void refetch();
+    },
+  };
 };
 
 export default useReviewDashboard;

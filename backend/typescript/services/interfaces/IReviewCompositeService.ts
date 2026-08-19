@@ -1,6 +1,8 @@
 import {
   ApplicantRecordWithReviewersDTO,
   DashboardView,
+  ReviewDashboardFilterOptionsDTO,
+  ReviewDashboardFilters,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -32,12 +34,14 @@ interface IReviewCompositeService {
    * @Param resultsPerPage the number of results per page
    * @Param sortBy the field to sort results by
    * @Param sortAscending whether to sort ascending; defaults to true
+   * @Param filters optional filters to apply to the dashboard
    */
   getReviewDashboard(
     page: number,
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
     view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]>;
 
@@ -54,10 +58,13 @@ interface IReviewCompositeService {
    * navigate across pages.
    * @Param sortBy the field to sort results by
    * @Param sortAscending whether to sort ascending; defaults to true
+   * @Param filters the same filters applied to getReviewDashboard, so the
+   *        navigable set matches what the table is showing
    */
   getReviewDashboardApplicantRecordIds(
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
   ): Promise<string[]>;
 
   /**
@@ -67,6 +74,15 @@ interface IReviewCompositeService {
   getReviewDashboardSidePanel(
     applicantId: string,
   ): Promise<ReviewDashboardSidePanelDTO>;
+
+  /**
+   * Fetches all filter options for the review dashboard
+   * @param department optional department to scope position options
+   * @returns ReviewDashboardFilterOptionsDTO with all filter options
+   */
+  getReviewDashboardFilterOptions(
+    department?: string,
+  ): Promise<ReviewDashboardFilterOptionsDTO>;
 }
 
 export default IReviewCompositeService;

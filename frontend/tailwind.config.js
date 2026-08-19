@@ -99,6 +99,7 @@ module.exports = {
         status: {
           interviewed: "#DAD7E9",
         },
+        chip: "#848AA5",
         surface: {
           grey: "#F3F4F6",
           muted: "#FAFAFA",

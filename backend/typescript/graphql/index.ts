@@ -115,6 +115,7 @@ const graphQLMiddlewares = {
     interviewersByGroupId: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
+    reviewDashboardFilterOptions: authorizedByAdmin(),
     interviewDashboard: authorizedByAdmin(),
   },
   Mutation: {

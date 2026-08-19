@@ -17,6 +17,11 @@ import {
   type ReviewDashboardSortBy,
   type UpdateApplicantRecordStatusMutation,
   type UpdateApplicantRecordStatusMutationVariables,
+  ReviewDashboardFilterOptionsDocument,
+  type ReviewDashboardFilterOptionsQuery,
+  type ReviewDashboardFilterOptionsQueryVariables,
+  type ReviewDashboardFilterOptionsResult,
+  type ReviewDashboardFilters,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -27,6 +32,7 @@ class ReviewDashboardAPIClient {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
     view?: DashboardView,
   ): Promise<ReviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
@@ -37,7 +43,14 @@ class ReviewDashboardAPIClient {
         ReviewDashboardQueryVariables
       >({
         query: ReviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage, sortBy, sortAscending, view },
+        variables: {
+          pageNumber,
+          resultsPerPage,
+          sortBy,
+          sortAscending,
+          filters,
+          view,
+        },
         fetchPolicy: "network-only",
       });
 
@@ -51,7 +64,36 @@ class ReviewDashboardAPIClient {
     }
   }
 
-  static async getReviewDashboardApplicantRecordIds(): Promise<string[]> {
+  static async getReviewDashboardFilterOptions(
+    department?: string,
+  ): Promise<ReviewDashboardFilterOptionsResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ReviewDashboardFilterOptionsQuery,
+        ReviewDashboardFilterOptionsQueryVariables
+      >({
+        query: ReviewDashboardFilterOptionsDocument,
+        variables: { department },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.reviewDashboardFilterOptions) {
+        throw new Error("No data returned");
+      }
+
+      return data.reviewDashboardFilterOptions;
+    } catch {
+      throw new Error("Failed to get review dashboard filter options");
+    }
+  }
+
+  static async getReviewDashboardApplicantRecordIds(
+    sortBy?: ReviewDashboardSortBy,
+    sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
+  ): Promise<string[]> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
@@ -60,7 +102,7 @@ class ReviewDashboardAPIClient {
         ReviewDashboardApplicantRecordIdsQueryVariables
       >({
         query: ReviewDashboardApplicantRecordIdsDocument,
-        variables: {},
+        variables: { sortBy, sortAscending, filters },
         fetchPolicy: "network-only",
       });
 

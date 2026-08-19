@@ -53,3 +53,26 @@ export type ReviewDashboardSidePanelDTO = {
   skillCategory: SkillCategory | null;
   reviewDetails: ReviewDetails[];
 };
+
+export type FilterOption = {
+  value: string;
+  label: string;
+};
+
+export type ReviewDashboardFilterOptionsDTO = {
+  positions: FilterOption[];
+  applicationStatuses: FilterOption[];
+  skillCategories: FilterOption[];
+  scoreRanges: FilterOption[];
+  years: FilterOption[];
+  bookmarked: FilterOption[];
+};
+
+export type ReviewDashboardFilters = {
+  positions?: string[];
+  applicationStatuses?: ApplicationStatus[];
+  skillCategories?: SkillCategory[];
+  scoreRanges?: string[];
+  years?: string[];
+  bookmarked?: boolean;
+};
