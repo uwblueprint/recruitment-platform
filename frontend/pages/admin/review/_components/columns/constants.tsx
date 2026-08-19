@@ -1,5 +1,8 @@
 import { ReviewDashboardSortBy } from "@/graphql/typeUtils";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
+import type {
+  ApplicationStatus,
+  ReviewDashboardResult,
+} from "@/graphql/typeUtils";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { ApplicationCell } from "./ApplicationCell";
@@ -26,10 +29,30 @@ const reviewerName = (row: ReviewDashboardResult, index: number) => {
   return reviewer ? applicantName(reviewer.firstName, reviewer.lastName) : "-";
 };
 
-export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
+type ReviewDashboardColumnOptions = {
+  /**
+   * Persists a status chip selection; owned by the dashboard page.
+   * `previousStatus` is the value the chip was rendering, so the page can roll
+   * back when the update fails.
+   */
+  onStatusChange: (
+    applicantRecordId: string,
+    nextStatus: ApplicationStatus,
+    previousStatus: ApplicationStatus,
+  ) => void;
+};
+
+/**
+ * Builds the review dashboard column definitions. This is a factory rather
+ * than a constant so the status column can close over the page's status
+ * handler.
+ */
+export const createReviewDashboardColumns = ({
+  onStatusChange,
+}: ReviewDashboardColumnOptions): ColumnDef<
   ReviewDashboardResult,
   unknown
->[] = [
+>[] => [
   {
     id: "select",
     size: 40,
@@ -110,6 +133,7 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
       <ReviewStatusCell
         applicantRecordId={row.original.applicantRecordId}
         status={row.original.applicationStatus}
+        onChange={onStatusChange}
       />
     ),
   },

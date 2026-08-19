@@ -3,38 +3,30 @@ import {
   DashboardStatusChip,
 } from "@/components/dashboard/common";
 import { ApplicationStatus } from "@/graphql/typeUtils";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import { useState } from "react";
 
 type ReviewStatusCellProps = {
   applicantRecordId: string;
   status: ApplicationStatus;
+  onChange: (
+    applicantRecordId: string,
+    nextStatus: ApplicationStatus,
+    previousStatus: ApplicationStatus,
+  ) => void;
 };
 
+/**
+ * Controlled status chip for the dashboard table. The dashboard page owns the
+ * status and persists it, so this cell stays purely presentational and always
+ * renders whatever the row currently holds.
+ */
 export const ReviewStatusCell = ({
   applicantRecordId,
   status,
-}: ReviewStatusCellProps) => {
-  const [selectedStatus, setSelectedStatus] = useState(status);
-
-  const handleChange = async (newStatus: ApplicationStatus) => {
-    setSelectedStatus(newStatus);
-    try {
-      const confirmedStatus = await ReviewDashboardAPIClient.updateApplicantRecordStatus(
-        applicantRecordId,
-        newStatus,
-      );
-      setSelectedStatus(confirmedStatus);
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
-  };
-
-  return (
-    <DashboardStatusChip
-      value={selectedStatus}
-      options={APPLICATION_STATUS_OPTIONS}
-      onChange={handleChange}
-    />
-  );
-};
+  onChange,
+}: ReviewStatusCellProps) => (
+  <DashboardStatusChip
+    value={status}
+    options={APPLICATION_STATUS_OPTIONS}
+    onChange={(newStatus) => onChange(applicantRecordId, newStatus, status)}
+  />
+);

@@ -1,1 +1,4 @@
-export { REVIEW_DASHBOARD_COLUMNS, COLUMN_ID_TO_SORT_BY } from "./constants";
+export {
+  COLUMN_ID_TO_SORT_BY,
+  createReviewDashboardColumns,
+} from "./constants";

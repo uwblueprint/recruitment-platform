@@ -1,19 +1,20 @@
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import type { ReviewDashboardResult } from "@/graphql/typeUtils";
+import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
+import type { ApplicationStatus } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
   RowSelectionState,
   SortingState,
 } from "@tanstack/react-table";
 import { useRouter } from "next/router";
-import { ReactElement, useState } from "react";
+import { ReactElement, useCallback, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
 import {
   COLUMN_ID_TO_SORT_BY,
-  REVIEW_DASHBOARD_COLUMNS,
+  createReviewDashboardColumns,
 } from "./_components/columns";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
@@ -40,7 +41,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort && !activeSort.desc;
 
-  const { rows, isLoading, error } = useReviewDashboard(
+  const [statusError, setStatusError] = useState(false);
+
+  const { rows, isLoading, error, setRowStatus } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
     sortBy,
@@ -73,6 +76,42 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setActiveId(applicantRecordId);
     setPageNumber(Math.floor(index / resultsPerPage) + 1);
   };
+
+  // Writes the new status straight into `rows` so the table chip and the side
+  // panel chip both move at once, then reconciles with what the server echoes
+  // back. A failed update rolls the chip back to `previousStatus` rather than
+  // leaving the UI showing a status that was never saved. Callers pass the
+  // status they were rendering, which keeps this handler stable.
+  const handleStatusChange = useCallback(
+    async (
+      applicantRecordId: string,
+      nextStatus: ApplicationStatus,
+      previousStatus: ApplicationStatus,
+    ) => {
+      setStatusError(false);
+      setRowStatus(applicantRecordId, nextStatus);
+
+      try {
+        const confirmedStatus =
+          await ReviewDashboardAPIClient.updateApplicantRecordStatus(
+            applicantRecordId,
+            nextStatus,
+          );
+        setRowStatus(applicantRecordId, confirmedStatus);
+      } catch {
+        setRowStatus(applicantRecordId, previousStatus);
+        setStatusError(true);
+      }
+    },
+    [setRowStatus],
+  );
+
+  // TanStack Table expects a stable `columns` reference, so build it once from
+  // the stable status handler.
+  const columns = useMemo(
+    () => createReviewDashboardColumns({ onStatusChange: handleStatusChange }),
+    [handleStatusChange],
+  );
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
@@ -110,9 +149,15 @@ const AdminReviewPage: NextPageWithLayout = () => {
           </div>
         ) : null}
 
+        {statusError ? (
+          <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
+            Failed to update applicant status
+          </div>
+        ) : null}
+
         <DashboardTable
           data={rows}
-          columns={REVIEW_DASHBOARD_COLUMNS}
+          columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
