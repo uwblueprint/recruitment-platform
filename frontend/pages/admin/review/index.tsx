@@ -23,6 +23,7 @@ import {
   REVIEW_DASHBOARD_COLUMNS,
 } from "./_components/columns";
 import { DashboardTabs } from "./_components/DashboardTabs";
+import useDebouncedValue from "./_components/hooks/useDebouncedValue";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardFilterOptions from "./_components/hooks/useReviewDashboardFilterOptions";
@@ -30,6 +31,7 @@ import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardS
 import useTabCounts from "./_components/hooks/useTabCounts";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
+const SEARCH_DEBOUNCE_MS = 500;
 
 const AdminReviewPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -44,6 +46,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const [search, setSearch] = useState("");
+
+  // The query fires on the settled text; the input keeps the raw value.
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
 
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
@@ -85,6 +90,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // convert SelectedFilters to ReviewDashboardFilters for the backend
   const backendFilters = useMemo(
     (): ReviewDashboardFilters => ({
+      search: debouncedSearch.trim() ? debouncedSearch : undefined,
       positions: selectedFilters.position?.length
         ? selectedFilters.position
         : undefined,
@@ -102,7 +108,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         ? true
         : undefined,
     }),
-    [selectedFilters],
+    [selectedFilters, debouncedSearch],
   );
 
   const { rows, isLoading, error } = useReviewDashboard(
@@ -185,16 +191,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setRowSelection({});
   };
 
-  const visibleRows = useMemo(() => {
-    const trimmedSearch = search.trim().toLowerCase();
-    return trimmedSearch
-      ? rows.filter((row) =>
-          `${row.firstName} ${row.lastName}`
-            .toLowerCase()
-            .includes(trimmedSearch),
-        )
-      : rows;
-  }, [rows, search]);
   const selectedCount = Object.keys(rowSelection).length;
 
   return (
@@ -237,7 +233,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         ) : null}
 
         <DashboardTable
-          data={visibleRows}
+          data={rows}
           columns={REVIEW_DASHBOARD_COLUMNS}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}

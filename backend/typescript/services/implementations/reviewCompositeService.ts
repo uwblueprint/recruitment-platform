@@ -1,4 +1,13 @@
-import { Op, Order, OrderItem, WhereOptions, col, literal } from "sequelize";
+import {
+  Op,
+  Order,
+  OrderItem,
+  WhereOptions,
+  col,
+  fn,
+  literal,
+  where as whereFn,
+} from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
@@ -133,10 +142,27 @@ function buildApplicantRecordWhere(
   return where;
 }
 
+/** Escapes the LIKE wildcards so a searched "%" matches a literal percent sign. */
+function escapeLikeWildcards(term: string): string {
+  return term.replace(/[\\%_]/g, (character) => `\\${character}`);
+}
+
 function buildApplicantWhere(filters?: ReviewDashboardFilters): WhereOptions {
   const where: WhereOptions = {};
   if (filters?.years?.length) {
     where.academic_year = { [Op.in]: filters.years };
+  }
+
+  // First and last names are separate columns, so the term is matched against
+  // them joined, letting "jane doe" hit as readily as "jane" or "doe".
+  const search = filters?.search?.trim().replace(/\s+/g, " ");
+  if (search) {
+    where[(Op.and as unknown) as string] = whereFn(
+      // Qualified because "users" also has first_name/last_name; leaving these
+      // bare would go ambiguous the moment the reviewer join stops being separate.
+      fn("concat_ws", " ", col("applicant.first_name"), col("applicant.last_name")),
+      { [Op.iLike]: `%${escapeLikeWildcards(search)}%` },
+    );
   }
 
   return where;
