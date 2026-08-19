@@ -1,0 +1,10 @@
+query AdminCommentsByApplicantRecordId($applicantRecordId: ID!) {
+  adminCommentsByApplicantRecordId(applicantRecordId: $applicantRecordId) {
+    id
+    userId
+    applicantRecordId
+    comment
+    createdAt
+    updatedAt
+  }
+}

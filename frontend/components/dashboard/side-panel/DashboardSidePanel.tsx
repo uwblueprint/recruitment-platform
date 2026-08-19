@@ -21,6 +21,7 @@ import {
   DashboardStatusChip,
   SKILL_CATEGORY_OPTIONS,
 } from "../common";
+import { AdminCommentsSection } from "./admin-comments";
 import { SidePanelReviewerColumn } from "./SidePanelReviewerColumn";
 
 /** Maximum combined review score: 4 criteria × 5 points × 2 reviewers. */
@@ -131,6 +132,8 @@ export const DashboardSidePanel = ({
               Loading…
             </p>
           ) : null}
+
+          <AdminCommentsSection applicantRecordId={row.applicantRecordId} />
         </div>
       ) : null}
 

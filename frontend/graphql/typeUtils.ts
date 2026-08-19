@@ -102,6 +102,10 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
 export {
+  AdminCommentsByApplicantRecordIdDocument,
+  CreateAdminCommentDocument,
+  UpdateAdminCommentDocument,
+  DeleteAdminCommentByIdDocument,
   ApplicationDocument,
   InterviewedApplicantsByUserIdDocument,
   InterviewedPairingsByUserIdDocument,
@@ -124,6 +128,14 @@ export {
 } from "./__generated__/graphql";
 
 export type {
+  AdminCommentsByApplicantRecordIdQuery,
+  AdminCommentsByApplicantRecordIdQueryVariables,
+  CreateAdminCommentMutation,
+  CreateAdminCommentMutationVariables,
+  UpdateAdminCommentMutation,
+  UpdateAdminCommentMutationVariables,
+  DeleteAdminCommentByIdMutation,
+  DeleteAdminCommentByIdMutationVariables,
   ApplicationQuery,
   ApplicationQueryVariables,
   InterviewGroupQuery,
@@ -256,5 +268,11 @@ export type InterviewedPairingResult = ArrayElement<
   OperationField<
     Operations.InterviewedPairingsByUserIdQuery,
     "interviewedPairingsByUserId"
+  >
+>;
+export type AdminCommentResult = ArrayElement<
+  OperationField<
+    Operations.AdminCommentsByApplicantRecordIdQuery,
+    "adminCommentsByApplicantRecordId"
   >
 >;
