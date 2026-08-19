@@ -180,6 +180,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         onClose={() => setActiveId(undefined)}
         row={activeRow}
         details={details}
+        onStatusChange={handleStatusChange}
         isLoading={isDetailsLoading}
         navigation={
           activeNavigationIndex >= 0
