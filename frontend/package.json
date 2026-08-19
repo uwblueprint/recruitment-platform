@@ -33,7 +33,7 @@
     "@types/uuid": "^8.3.4",
     "dayjs": "^1.11.7",
     "eslint-plugin-react-hooks": "^4.6.0",
-    "firebase": "^9.12.1",
+    "firebase": "^10.9.0",
     "formik": "^2.2.9",
     "mui-datatables": "^3.8.2",
     "prop-types": "^15.8.1",
