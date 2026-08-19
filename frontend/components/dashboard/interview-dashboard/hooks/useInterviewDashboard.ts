@@ -37,7 +37,9 @@ const useInterviewDashboard = (
           setState({ rows, isLoading: false, hasError: false });
         }
       })
-      .catch(() => {
+      .catch((e) => {
+        // eslint-disable-next-line no-console
+        console.error("useInterviewDashboard error:", e);
         if (isCurrentRequest) {
           setState({ rows: [], isLoading: false, hasError: true });
         }

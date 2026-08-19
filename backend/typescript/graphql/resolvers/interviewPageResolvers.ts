@@ -2,19 +2,28 @@ import { sequelize } from "../../models";
 import InterviewCompositeService from "../../services/implementations/interviewCompositeService";
 import InterviewDelegationService from "../../services/implementations/interviewDelegationService";
 import InterviewedApplicantRecordsService from "../../services/implementations/interviewedApplicantRecordService";
+import FirebaseFileService from "../../services/implementations/firebaseFileService";
+import FileStorageService from "../../services/implementations/fileStorageService";
 import {
   InterviewConflict,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
+  InterviewNotesDTO,
   InterviewPairingsDTO,
   InterviewStatusEnum,
   UserDTO,
 } from "../../types";
+import { toInterviewNotesDTO } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 
 const interviewCompositeService = new InterviewCompositeService();
 const interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
 const interviewDelegationsService = new InterviewDelegationService();
+
+const defaultBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
+const firebaseFileService = new FirebaseFileService(
+  new FileStorageService(defaultBucket),
+);
 
 const interviewPageResolvers = {
   Query: {
@@ -35,6 +44,16 @@ const interviewPageResolvers = {
       { groupId }: { groupId: string },
     ): Promise<UserDTO[]> => {
       return interviewCompositeService.getInterviewersByGroupId(groupId);
+    },
+    interviewNotes: async (
+      _parent: undefined,
+      { fileId }: { fileId: string },
+    ): Promise<InterviewNotesDTO> => {
+      const file = await firebaseFileService.getFirebaseFileById(fileId);
+      const signedUrl = await firebaseFileService.getSignedUrl(
+        file.storagePath,
+      );
+      return toInterviewNotesDTO(file, signedUrl);
     },
   },
   Mutation: {

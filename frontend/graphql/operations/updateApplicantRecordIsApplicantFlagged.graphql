@@ -1,0 +1,6 @@
+mutation UpdateApplicantRecordIsApplicantFlagged($id: ID!, $flagValue: Boolean!) {
+  updateApplicantRecordIsApplicantFlagged(id: $id, flagValue: $flagValue) {
+    id
+    isApplicantFlagged
+  }
+}

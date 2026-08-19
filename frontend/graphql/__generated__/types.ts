@@ -176,6 +176,26 @@ export type InterviewDashboardRowDto = {
   position: Scalars['String']['output'];
 };
 
+export type InterviewDashboardSidePanelDto = {
+  __typename?: 'InterviewDashboardSidePanelDTO';
+  applicationStatus: ApplicationStatus;
+  firstName: Scalars['String']['output'];
+  interview?: Maybe<Interview>;
+  interviewDate?: Maybe<Scalars['String']['output']>;
+  interviewNotesId?: Maybe<Scalars['String']['output']>;
+  interviewScore?: Maybe<Scalars['Int']['output']>;
+  interviewStatus?: Maybe<InterviewStatus>;
+  interviewers: Array<UserDto>;
+  isApplicantFlagged: Scalars['Boolean']['output'];
+  isShortlistedForOffer: Scalars['Boolean']['output'];
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
+  program: Scalars['String']['output'];
+  resumeUrl: Scalars['String']['output'];
+  skillCategory?: Maybe<SkillCategory>;
+  term: Scalars['String']['output'];
+};
+
 export type InterviewDelegationDto = {
   __typename?: 'InterviewDelegationDTO';
   groupId: Scalars['ID']['output'];
@@ -204,6 +224,13 @@ export type InterviewInput = {
   skill?: InputMaybe<Scalars['Int']['input']>;
   skillCategory?: InputMaybe<SkillCategory>;
   teamPlayer?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type InterviewNotes = {
+  __typename?: 'InterviewNotes';
+  fileId: Scalars['ID']['output'];
+  fileName: Scalars['String']['output'];
+  signedUrl: Scalars['String']['output'];
 };
 
 export type InterviewPairingsDto = {
@@ -535,8 +562,10 @@ export type Query = {
   entity: EntityResponseDto;
   file: Scalars['String']['output'];
   interviewDashboard: Array<InterviewDashboardRowDto>;
+  interviewDashboardSidePanel: InterviewDashboardSidePanelDto;
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
+  interviewNotes: InterviewNotes;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
   interviewedPairingsByUserId: Array<InterviewPairingsDto>;
@@ -589,6 +618,11 @@ export type QueryInterviewDashboardArgs = {
 };
 
 
+export type QueryInterviewDashboardSidePanelArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryInterviewDelegationArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
   interviewerId: Scalars['ID']['input'];
@@ -597,6 +631,11 @@ export type QueryInterviewDelegationArgs = {
 
 export type QueryInterviewGroupArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewNotesArgs = {
+  fileId: Scalars['ID']['input'];
 };
 
 

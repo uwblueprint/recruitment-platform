@@ -23,11 +23,13 @@ import {
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
 import ApplicantRecord from "../models/applicantRecord.model";
+import FirebaseFile from "../models/firebaseFile.model";
 import InterviewDelegation from "../models/interviewDelegation.model";
 import InterviewGroup from "../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 import User from "../models/user.model";
+import { FirebaseFileDTO, InterviewNotesDTO } from "../types/firebaseFile";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -295,5 +297,24 @@ export function toInterviewedApplicantDTO(
     interviewStatus: model.status,
     applicantFirstName: model.applicant_record.applicant.first_name,
     applicantLastName: model.applicant_record.applicant.last_name,
+  };
+}
+
+export function toFirebaseFileDTO(model: FirebaseFile): FirebaseFileDTO {
+  return {
+    id: model.id,
+    storagePath: model.storage_path,
+    originalFileName: model.original_file_name,
+  };
+}
+
+export function toInterviewNotesDTO(
+  file: FirebaseFileDTO,
+  signedUrl: string,
+): InterviewNotesDTO {
+  return {
+    fileId: file.id,
+    fileName: file.originalFileName,
+    signedUrl,
   };
 }

@@ -1,7 +1,12 @@
+import {
+  DashboardSidePanel,
+  InterviewSidePanelContent,
+} from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { INTERVIEW_DASHBOARD_COLUMNS } from "@/components/dashboard/interview-dashboard/columns";
 import useInterviewDashboard from "@/components/dashboard/interview-dashboard/hooks/useInterviewDashboard";
+import type { InterviewDashboardResult } from "@/graphql/typeUtils";
 import { RowSelectionState } from "@tanstack/react-table";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
@@ -14,16 +19,21 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     DEFAULT_RESULTS_PER_PAGE,
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const { rows, isLoading, hasError } = useInterviewDashboard(
     pageNumber,
     resultsPerPage,
   );
 
+  const activeRow: InterviewDashboardResult | null =
+    activeIndex !== null ? rows[activeIndex] ?? null : null;
+
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
     setRowSelection({});
+    setActiveIndex(null);
   };
 
   return (
@@ -45,6 +55,9 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
+          onRowClick={(row) =>
+            setActiveIndex(rows.findIndex((r) => r.applicantRecordId === row.applicantRecordId))
+          }
           isLoading={isLoading}
           emptyMessage="No interviewed applicants found."
           pagination={{
@@ -56,6 +69,28 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           }}
         />
       </main>
+
+      <DashboardSidePanel
+        open={activeRow !== null}
+        onClose={() => setActiveIndex(null)}
+        pagination={
+          activeIndex !== null
+            ? {
+                currentIndex: activeIndex,
+                totalCount: rows.length,
+                onPrevious: () => setActiveIndex((i) => Math.max((i ?? 0) - 1, 0)),
+                onNext: () =>
+                  setActiveIndex((i) => Math.min((i ?? 0) + 1, rows.length - 1)),
+              }
+            : undefined
+        }
+      >
+        {activeRow ? (
+          <InterviewSidePanelContent
+            applicantRecordId={activeRow.applicantRecordId}
+          />
+        ) : null}
+      </DashboardSidePanel>
     </div>
   );
 };

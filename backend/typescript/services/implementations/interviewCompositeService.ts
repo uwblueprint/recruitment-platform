@@ -118,6 +118,12 @@ class InterviewCompositeService implements IInterviewCompositeService {
                 ],
                 model: InterviewDelegation,
                 as: "interview_delegations",
+                // NOTE: fetched in its own query. Joining this deep generates column
+                //       aliases longer than Postgres' 63 character identifier limit
+                //       (e.g. `interviewed_applicant_record.interview_delegations.interviewer.first_name`),
+                //       which get truncated and leave the interviewer unmapped.
+                separate: true,
+                order: [["interviewer_id", "ASC"]],
                 include: [
                   {
                     attributes: [
@@ -137,27 +143,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
             ],
           },
         ],
-        order: [
-          ["id", "ASC"],
-          [
-            {
-              model: InterviewedApplicantRecord,
-              as: "interviewed_applicant_record",
-            },
-            { model: InterviewDelegation, as: "interview_delegations" },
-            "createdAt",
-            "ASC",
-          ],
-          [
-            {
-              model: InterviewedApplicantRecord,
-              as: "interviewed_applicant_record",
-            },
-            { model: InterviewDelegation, as: "interview_delegations" },
-            "interviewer_id",
-            "ASC",
-          ],
-        ],
+        order: [["id", "ASC"]],
         limit: resultsPerPage,
         offset: (pageNumber - 1) * resultsPerPage,
       });

@@ -14,10 +14,17 @@ const interviewPageType = gql`
     groupMembers: [UserDTO!]!
   }
 
+  type InterviewNotes {
+    fileId: ID!
+    fileName: String!
+    signedUrl: String!
+  }
+
   extend type Query {
     interviewedApplicantsByUserId(userId: ID!): [InterviewedApplicantsDTO!]!
     interviewedPairingsByUserId(userId: ID!): [InterviewPairingsDTO!]!
     interviewersByGroupId(groupId: ID!): [UserDTO!]!
+    interviewNotes(fileId: ID!): InterviewNotes!
   }
 
   extend type Mutation {

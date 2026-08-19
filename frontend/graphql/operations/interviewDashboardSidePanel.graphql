@@ -1,0 +1,29 @@
+query InterviewDashboardSidePanel($applicantRecordId: ID!) {
+  interviewDashboardSidePanel(applicantRecordId: $applicantRecordId) {
+    firstName
+    lastName
+    term
+    program
+    position
+    resumeUrl
+    applicationStatus
+    skillCategory
+    isApplicantFlagged
+    isShortlistedForOffer
+    interviewers {
+      firstName
+      lastName
+    }
+    interview {
+      skill
+      passionFSG
+      teamPlayer
+      desireToLearn
+      comments
+    }
+    interviewStatus
+    interviewScore
+    interviewNotesId
+    interviewDate
+  }
+}

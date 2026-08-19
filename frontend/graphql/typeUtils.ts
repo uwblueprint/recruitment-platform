@@ -102,10 +102,12 @@ export type UpdateUserDTO = Schema.UpdateUserDto;
  */
 export {
   ApplicationDocument,
+  InterviewDashboardSidePanelDocument,
   InterviewedApplicantsByUserIdDocument,
   InterviewDashboardDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
+  InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
   RefreshDocument,
@@ -118,6 +120,7 @@ export {
   UpdateInterviewGroupSchedulingLinkDocument,
   ReviewedApplicantsByUserIdDocument,
   InterviewedPairingsByUserIdDocument,
+  UpdateApplicantRecordIsApplicantFlaggedDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -129,8 +132,12 @@ export type {
   InterviewedApplicantsByUserIdQueryVariables,
   InterviewDashboardQuery,
   InterviewDashboardQueryVariables,
+  InterviewDashboardSidePanelQuery,
+  InterviewDashboardSidePanelQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
+  InterviewNotesQuery,
+  InterviewNotesQueryVariables,
   IsAuthorizedByRoleQuery,
   IsAuthorizedByRoleQueryVariables,
   LoginMutation,
@@ -157,6 +164,8 @@ export type {
   ReviewedApplicantsByUserIdQueryVariables,
   InterviewedPairingsByUserIdQuery,
   InterviewedPairingsByUserIdQueryVariables,
+  UpdateApplicantRecordIsApplicantFlaggedMutation,
+  UpdateApplicantRecordIsApplicantFlaggedMutationVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -186,6 +195,18 @@ export type InterviewedApplicantResult = ArrayElement<
 >;
 export type InterviewDashboardResult = ArrayElement<
   OperationField<Operations.InterviewDashboardQuery, "interviewDashboard">
+>;
+export type InterviewDashboardSidePanelResult = OperationField<
+  Operations.InterviewDashboardSidePanelQuery,
+  "interviewDashboardSidePanel"
+>;
+export type InterviewNotesResult = OperationField<
+  Operations.InterviewNotesQuery,
+  "interviewNotes"
+>;
+export type UpdateApplicantRecordIsApplicantFlaggedResult = OperationField<
+  Operations.UpdateApplicantRecordIsApplicantFlaggedMutation,
+  "updateApplicantRecordIsApplicantFlagged"
 >;
 export type InterviewerResult = ArrayElement<
   OperationField<
