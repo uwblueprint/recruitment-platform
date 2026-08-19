@@ -116,6 +116,7 @@ const graphQLMiddlewares = {
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
     interviewDashboard: authorizedByAdmin(),
+    interviewInvites: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),

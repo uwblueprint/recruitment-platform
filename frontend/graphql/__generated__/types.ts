@@ -212,6 +212,23 @@ export type InterviewInput = {
   teamPlayer?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type InterviewInviteDto = {
+  __typename?: 'InterviewInviteDTO';
+  id: Scalars['ID']['output'];
+  interviewees: Array<InterviewInviteeDto>;
+  interviewers: Array<UserDto>;
+  position: Scalars['String']['output'];
+  schedulingLink?: Maybe<Scalars['String']['output']>;
+  status: InterviewGroupStatus;
+};
+
+export type InterviewInviteeDto = {
+  __typename?: 'InterviewInviteeDTO';
+  firstName: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
+};
+
 export type InterviewPairingsDto = {
   __typename?: 'InterviewPairingsDTO';
   groupMembers: Array<UserDto>;
@@ -543,6 +560,7 @@ export type Query = {
   interviewDashboard: Array<InterviewDashboardRowDto>;
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
+  interviewInvites: Array<InterviewInviteDto>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
   interviewedPairingsByUserId: Array<InterviewPairingsDto>;

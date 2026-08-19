@@ -47,6 +47,11 @@ export type InterviewGroupQueryVariables = Exact<{
 
 export type InterviewGroupQuery = { interviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
 
+export type InterviewInvitesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InterviewInvitesQuery = { interviewInvites: Array<{ id: string, position: string, schedulingLink: string | null, status: Types.InterviewGroupStatus, interviewers: Array<{ id: string, firstName: string, lastName: string }>, interviewees: Array<{ firstName: string, lastName: string, position: string }> }> };
+
 export type InterviewedApplicantsByUserIdQueryVariables = Exact<{
   userId: string | number;
 }>;
