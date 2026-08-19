@@ -735,6 +735,7 @@ export type ReviewDashboardFilters = {
   bookmarked?: InputMaybe<Scalars['Boolean']['input']>;
   positions?: InputMaybe<Array<Scalars['String']['input']>>;
   scoreRanges?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
   skillCategories?: InputMaybe<Array<SkillCategory>>;
   years?: InputMaybe<Array<Scalars['String']['input']>>;
 };

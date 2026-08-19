@@ -69,6 +69,8 @@ export type ReviewDashboardFilterOptionsDTO = {
 };
 
 export type ReviewDashboardFilters = {
+  /** Free text matched case-insensitively against the applicant's full name. */
+  search?: string;
   positions?: string[];
   applicationStatuses?: ApplicationStatus[];
   skillCategories?: SkillCategory[];

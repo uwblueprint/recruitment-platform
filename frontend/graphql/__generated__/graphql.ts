@@ -40,6 +40,7 @@ export type ReviewDashboardFilters = {
   bookmarked?: boolean | null | undefined;
   positions?: Array<string> | null | undefined;
   scoreRanges?: Array<string> | null | undefined;
+  search?: string | null | undefined;
   skillCategories?: Array<SkillCategory> | null | undefined;
   years?: Array<string> | null | undefined;
 };
