@@ -12,7 +12,7 @@ interface Props {
   className?: string;
 }
 
-export function ReviewScoreInput({
+export function ScoreInput({
   id,
   value,
   min,

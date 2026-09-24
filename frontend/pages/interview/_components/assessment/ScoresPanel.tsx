@@ -8,7 +8,7 @@ import {
   type ScoreKey,
 } from "./constants";
 import { SkillCategory } from "@/graphql/typeUtils";
-import { ReviewScoreInput } from "@/components/common/ReviewScoreInput";
+import { ScoreInput } from "@/components/common/ScoreInput";
 
 function computeTotal(form: ScoreFormState): number {
   return INTERVIEW_SCORE_FIELDS.reduce((sum, { key }) => {
@@ -61,7 +61,7 @@ export const ScoresPanel = ({ form, onChange }: ScoresPanelProps) => {
               <span className="font-poppins text-sm text-neutral-800">
                 {label}
               </span>
-              <ReviewScoreInput
+              <ScoreInput
                 id={key}
                 value={form[key]}
                 min={MIN_INTERVIEW_SCORE}
