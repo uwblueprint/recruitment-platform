@@ -110,6 +110,15 @@ export type LoginWithGoogleMutationVariables = Exact<{
 
 export type LoginWithGoogleMutation = { loginWithGoogle: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean, accessToken: string, refreshToken: string } };
 
+export type ReassignReviewerMutationVariables = Exact<{
+  applicantRecordId: string | number;
+  oldReviewerId: string | number;
+  newReviewerId: string | number;
+}>;
+
+
+export type ReassignReviewerMutation = { reassignReviewer: { applicantRecordId: string, reviewerId: string, status: string } };
+
 export type RefreshMutationVariables = Exact<{
   refreshToken: string;
 }>;
@@ -221,3 +230,10 @@ export type UploadInterviewNotesMutationVariables = Exact<{
 
 
 export type UploadInterviewNotesMutation = { uploadInterviewNotes: { fileId: string, fileName: string, signedUrl: string } };
+
+export type UsersByPositionQueryVariables = Exact<{
+  position: string;
+}>;
+
+
+export type UsersByPositionQuery = { usersByPosition: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean } | null> };

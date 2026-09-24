@@ -116,6 +116,7 @@ export {
   InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
+  ReassignReviewerDocument,
   RefreshDocument,
   ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
@@ -128,6 +129,7 @@ export {
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
   ReviewedApplicantsByUserIdDocument,
+  UsersByPositionDocument,
   UploadInterviewNotesDocument,
 } from "./__generated__/graphql";
 
@@ -164,6 +166,8 @@ export type {
   LoginMutationVariables,
   LoginWithGoogleMutation,
   LoginWithGoogleMutationVariables,
+  ReassignReviewerMutation,
+  ReassignReviewerMutationVariables,
   RefreshMutation,
   RefreshMutationVariables,
   ReportInterviewConflictMutation,
@@ -188,6 +192,8 @@ export type {
   UpdateInterviewGroupSchedulingLinkMutationVariables,
   ReviewedApplicantsByUserIdQuery,
   ReviewedApplicantsByUserIdQueryVariables,
+  UsersByPositionQuery,
+  UsersByPositionQueryVariables,
   UploadInterviewNotesMutation,
   UploadInterviewNotesMutationVariables,
 } from "./__generated__/operation-types";
@@ -299,6 +305,16 @@ export type InterviewedPairingResult = ArrayElement<
     Operations.InterviewedPairingsByUserIdQuery,
     "interviewedPairingsByUserId"
   >
+>;
+
+export type ReassignReviewerResult = OperationField<
+  Operations.ReassignReviewerMutation,
+  "reassignReviewer"
+>;
+
+export type UsersByPositionResult = OperationField<
+  Operations.UsersByPositionQuery,
+  "usersByPosition"
 >;
 export type InterviewInviteResult = ArrayElement<
   OperationField<Operations.InterviewInvitesQuery, "interviewInvites">
