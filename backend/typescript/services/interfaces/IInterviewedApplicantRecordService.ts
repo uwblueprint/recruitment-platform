@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import {
   CreateInterviewedApplicantRecordDTO,
   InterviewedApplicantRecordDTO,
@@ -37,7 +38,7 @@ interface IInterviewedApplicantRecordsService {
   updateInterviewedApplicantRecord(
     id: string,
     interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO,
-    transaction?: any,
+    transaction?: Transaction,
   ): Promise<InterviewedApplicantRecordDTO>;
 
   /**

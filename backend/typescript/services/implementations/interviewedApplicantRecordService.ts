@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import {
   CreateInterviewedApplicantRecordDTO,
   Interview,
@@ -97,11 +98,12 @@ class InterviewedApplicantRecordsService
   async updateInterviewedApplicantRecord(
     id: string,
     interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO,
-    t?: any,
+    transaction?: Transaction,
   ): Promise<InterviewedApplicantRecordDTO> {
     try {
       const record: InterviewedApplicantRecord | null = await InterviewedApplicantRecord.findByPk(
         id,
+        { transaction },
       );
       if (!record) {
         throw new Error(`No interviewed applicant record with id ${id} found.`);
@@ -135,13 +137,16 @@ class InterviewedApplicantRecordsService
       if (skill) calculatedScore += skill;
       const updatedScore = calculatedScore > 0 ? calculatedScore : null;
 
-      await record.update({
-        score: updatedScore,
-        interview_json: updatedInterviewJson,
-        status: interviewedApplicantRecord.status,
-        interview_notes_id: interviewedApplicantRecord.interviewNotesId,
-        interview_date: interviewedApplicantRecord.interviewDate,
-      });
+      await record.update(
+        {
+          score: updatedScore,
+          interview_json: updatedInterviewJson,
+          status: interviewedApplicantRecord.status,
+          interview_notes_id: interviewedApplicantRecord.interviewNotesId,
+          interview_date: interviewedApplicantRecord.interviewDate,
+        },
+        { transaction },
+      );
       return toInterviewedApplicantRecordDTO(record);
     } catch (error: unknown) {
       Logger.error(
