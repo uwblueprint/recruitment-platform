@@ -33,7 +33,7 @@ const LoginPage: NextPage = () => {
         role: result.role,
         position: result.position,
       });
-      await router.push("/admin");
+      await router.push("/");
     } catch (e) {
       console.error(e);
     }

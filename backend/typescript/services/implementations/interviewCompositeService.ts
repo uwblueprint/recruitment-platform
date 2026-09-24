@@ -9,8 +9,12 @@ import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.
 import User from "../../models/user.model";
 import {
   CreateInterviewDelegationDTO,
+  ApplicationStatusEnum,
+  InterviewDashboardRowDTO,
   Interview,
   InterviewDelegationDTO,
+  InterviewInviteDTO,
+  InterviewInviteeDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
@@ -20,7 +24,11 @@ import {
 } from "../../types";
 import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 import InterviewedApplicantRecordsService from "./interviewedApplicantRecordService";
-import { toInterviewedApplicantDTO, toInterviewNotesDTO, toUserDTO } from "../../utilities/dtoUtils";
+import {
+  toInterviewDashboardRowDTO,
+  toInterviewedApplicantDTO,
+  toInterviewNotesDTO, toUserDTO,
+} from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";
@@ -99,6 +107,103 @@ class InterviewCompositeService implements IInterviewCompositeService {
   private interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
 
   /* eslint-disable class-methods-use-this */
+  async getInterviewDashboard(
+    pageNumber: number,
+    resultsPerPage: number,
+  ): Promise<InterviewDashboardRowDTO[]> {
+    try {
+      if (
+        !Number.isInteger(pageNumber) ||
+        pageNumber < 1 ||
+        !Number.isInteger(resultsPerPage) ||
+        resultsPerPage < 1
+      ) {
+        throw new Error(
+          "pageNumber and resultsPerPage must be positive integers",
+        );
+      }
+
+      const applicantRecords = await ApplicantRecord.findAll({
+        attributes: ["id", "position", "status"],
+        where: {
+          status: {
+            [Op.in]: [
+              ApplicationStatusEnum.INTERVIEWED,
+              ApplicationStatusEnum.SELECTED,
+            ],
+          },
+        },
+        include: [
+          {
+            attributes: ["first_name", "last_name"],
+            model: Applicant,
+            required: true,
+          },
+          {
+            attributes: ["id", "applicant_record_id", "score"],
+            model: InterviewedApplicantRecord,
+            as: "interviewed_applicant_record",
+            include: [
+              {
+                attributes: [
+                  "interviewed_applicant_record_id",
+                  "interviewer_id",
+                ],
+                model: InterviewDelegation,
+                as: "interview_delegations",
+                include: [
+                  {
+                    attributes: [
+                      "id",
+                      "first_name",
+                      "last_name",
+                      "email",
+                      "position",
+                      "role",
+                      "is_archived",
+                    ],
+                    model: User,
+                    as: "interviewer",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        order: [
+          ["id", "ASC"],
+          [
+            {
+              model: InterviewedApplicantRecord,
+              as: "interviewed_applicant_record",
+            },
+            { model: InterviewDelegation, as: "interview_delegations" },
+            "createdAt",
+            "ASC",
+          ],
+          [
+            {
+              model: InterviewedApplicantRecord,
+              as: "interviewed_applicant_record",
+            },
+            { model: InterviewDelegation, as: "interview_delegations" },
+            "interviewer_id",
+            "ASC",
+          ],
+        ],
+        limit: resultsPerPage,
+        offset: (pageNumber - 1) * resultsPerPage,
+      });
+
+      return applicantRecords.map(toInterviewDashboardRowDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get interview dashboard. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
   async getInterviewedApplicantsByUserId(
     userId: string,
   ): Promise<InterviewedApplicantsDTO[]> {
@@ -340,6 +445,92 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to delegate interviewers. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getInterviewInvites(): Promise<InterviewInviteDTO[]> {
+    try {
+      // Query 1: groups with interviewers only (avoids deep join collision)
+      const groups = await InterviewGroup.findAll({
+        include: [
+          {
+            model: InterviewDelegation,
+            as: "interview_delegations",
+            required: false,
+            separate: true,
+            include: [{ model: User, as: "interviewer" }],
+          },
+        ],
+      });
+
+      // Collect all interviewed_applicant_record_ids across all delegations
+      const allIarIds = [
+        ...new Set(
+          groups.flatMap((g) =>
+            (g.interview_delegations ?? []).map(
+              (d) => d.interviewed_applicant_record_id,
+            ),
+          ),
+        ),
+      ];
+
+      // Query 2: load interviewee data for those records
+      const iarByRecordId = new Map<string, InterviewedApplicantRecord>();
+      if (allIarIds.length > 0) {
+        const iars = await InterviewedApplicantRecord.findAll({
+          where: { id: { [Op.in]: allIarIds } },
+          include: [
+            {
+              model: ApplicantRecord,
+              include: [{ model: Applicant }],
+            },
+          ],
+        });
+        iars.forEach((iar) => iarByRecordId.set(iar.id, iar));
+      }
+
+      return groups.map((group) => {
+        const delegations = group.interview_delegations ?? [];
+
+        const interviewers = dedupeUsersById(
+          delegations.map((d) => d.interviewer).filter((u): u is User => !!u),
+        ).map((user) => toUserDTO(user));
+
+        const seenApplicantRecordIds = new Set<string>();
+        const interviewees: InterviewInviteeDTO[] = delegations
+          .map((d) => iarByRecordId.get(d.interviewed_applicant_record_id))
+          .filter(
+            (iar): iar is InterviewedApplicantRecord =>
+              !!iar?.applicant_record?.applicant,
+          )
+          .filter((iar) => {
+            if (seenApplicantRecordIds.has(iar.applicant_record_id))
+              return false;
+            seenApplicantRecordIds.add(iar.applicant_record_id);
+            return true;
+          })
+          .map((iar) => ({
+            firstName: iar.applicant_record.applicant.first_name,
+            lastName: iar.applicant_record.applicant.last_name,
+            position: iar.applicant_record.position,
+          }));
+
+        const position = interviewees[0]?.position ?? "";
+
+        return {
+          id: group.id,
+          interviewers,
+          interviewees,
+          position,
+          schedulingLink: group.scheduling_link,
+          status: group.status,
+        };
+      });
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to fetch interview invites. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     }

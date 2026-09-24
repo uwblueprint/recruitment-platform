@@ -120,6 +120,12 @@ export type CreateUserDto = {
   role: Role;
 };
 
+export enum DashboardView {
+  All = 'ALL',
+  Conflicts = 'CONFLICTS',
+  Shortlisted = 'SHORTLISTED'
+}
+
 export type EntityRequestDto = {
   boolField: Scalars['Boolean']['input'];
   contentType?: InputMaybe<Scalars['String']['input']>;
@@ -165,6 +171,17 @@ export enum InterviewConflict {
   PartnerNoResponse = 'PARTNER_NO_RESPONSE'
 }
 
+export type InterviewDashboardRowDto = {
+  __typename?: 'InterviewDashboardRowDTO';
+  applicantRecordId: Scalars['ID']['output'];
+  applicationStatus: ApplicationStatus;
+  firstName: Scalars['String']['output'];
+  interviewScore?: Maybe<Scalars['Int']['output']>;
+  interviewers: Array<UserDto>;
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
+};
+
 export type InterviewDelegationDto = {
   __typename?: 'InterviewDelegationDTO';
   groupId: Scalars['ID']['output'];
@@ -195,11 +212,21 @@ export type InterviewInput = {
   teamPlayer?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export type InterviewNotes = {
-  __typename?: 'InterviewNotes';
-  fileId: Scalars['ID']['output'];
-  fileName: Scalars['String']['output'];
-  signedUrl: Scalars['String']['output'];
+export type InterviewInviteDto = {
+  __typename?: 'InterviewInviteDTO';
+  id: Scalars['ID']['output'];
+  interviewees: Array<InterviewInviteeDto>;
+  interviewers: Array<UserDto>;
+  position: Scalars['String']['output'];
+  schedulingLink?: Maybe<Scalars['String']['output']>;
+  status: InterviewGroupStatus;
+};
+
+export type InterviewInviteeDto = {
+  __typename?: 'InterviewInviteeDTO';
+  firstName: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
 };
 
 export type InterviewPairingsDto = {
@@ -544,9 +571,10 @@ export type Query = {
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
   file: Scalars['String']['output'];
+  interviewDashboard: Array<InterviewDashboardRowDto>;
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
-  interviewNotes?: Maybe<InterviewNotes>;
+  interviewInvites: Array<InterviewInviteDto>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
   interviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
@@ -555,6 +583,7 @@ export type Query = {
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewDashboard: Array<ReviewDashboardRowDto>;
+  reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
   reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
@@ -591,6 +620,12 @@ export type QueryEntityArgs = {
 
 export type QueryFileArgs = {
   fileUUID: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewDashboardArgs = {
+  pageNumber: Scalars['Int']['input'];
+  resultsPerPage: Scalars['Int']['input'];
 };
 
 
@@ -650,6 +685,13 @@ export type QueryIsAuthorizedToReviewArgs = {
 export type QueryReviewDashboardArgs = {
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
+  sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
+  sortBy?: InputMaybe<ReviewDashboardSortBy>;
+  view?: InputMaybe<DashboardView>;
+};
+
+
+export type QueryReviewDashboardApplicantRecordIdsArgs = {
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<ReviewDashboardSortBy>;
 };
@@ -729,6 +771,7 @@ export type ReviewDashboardRowDto = {
 
 export type ReviewDashboardSidePanelDto = {
   __typename?: 'ReviewDashboardSidePanelDTO';
+  academicYear: Scalars['String']['output'];
   applicationStatus: ApplicationStatus;
   firstName: Scalars['String']['output'];
   lastName: Scalars['String']['output'];

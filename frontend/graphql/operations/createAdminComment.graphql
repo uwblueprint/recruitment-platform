@@ -1,0 +1,10 @@
+mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {
+  createAdminComment(adminComment: $adminComment) {
+    id
+    userId
+    applicantRecordId
+    comment
+    createdAt
+    updatedAt
+  }
+}

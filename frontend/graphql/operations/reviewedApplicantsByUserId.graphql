@@ -1,0 +1,8 @@
+query ReviewedApplicantsByUserId($userId: ID!) {
+  reviewedApplicantsByUserId(userId: $userId) {
+    applicantRecordId
+    reviewStatus
+    applicantFirstName
+    applicantLastName
+  }
+}

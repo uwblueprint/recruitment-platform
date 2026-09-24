@@ -1,6 +1,8 @@
 import {
   Interview,
   InterviewDelegationDTO,
+  InterviewDashboardRowDTO,
+  InterviewInviteDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   InterviewNotesDTO,
@@ -10,6 +12,14 @@ import {
 import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 
 interface IInterviewCompositeService {
+  /**
+   * Fetches paginated applicants for the admin interview dashboard.
+   */
+  getInterviewDashboard(
+    pageNumber: number,
+    resultsPerPage: number,
+  ): Promise<InterviewDashboardRowDTO[]>;
+
   /**
    * Delegates interviewers to interview applicants.
    */
@@ -35,6 +45,11 @@ interface IInterviewCompositeService {
    * @param groupId the interview group id
    */
   getInterviewersByGroupId(groupId: string): Promise<UserDTO[]>;
+
+  /**
+   * Fetches all interview groups with their interviewers and interviewees for the admin interview invites page.
+   */
+  getInterviewInvites(): Promise<InterviewInviteDTO[]>;
 
   /**
    * Upload (or replace) the PDF interview notes for an interviewed applicant
