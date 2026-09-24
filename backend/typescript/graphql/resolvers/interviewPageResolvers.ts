@@ -73,7 +73,9 @@ const interviewPageResolvers = {
       const file = await firebaseFileService.getFirebaseFileById(
         record.interviewNotesId,
       );
-      const signedUrl = await firebaseFileService.getSignedUrl(file.storagePath);
+      const signedUrl = await firebaseFileService.getSignedUrl(
+        file.storagePath,
+      );
       return { fileId: file.id, fileName: file.originalFileName, signedUrl };
     },
   },

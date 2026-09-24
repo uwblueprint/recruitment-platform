@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import { sequelize } from "../../models";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
@@ -11,11 +11,9 @@ import {
   CreateInterviewDelegationDTO,
   ApplicationStatusEnum,
   InterviewDashboardRowDTO,
-  Interview,
   InterviewDelegationDTO,
   InterviewInviteDTO,
   InterviewInviteeDTO,
-  InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
   InterviewNotesDTO,
@@ -27,7 +25,8 @@ import InterviewedApplicantRecordsService from "./interviewedApplicantRecordServ
 import {
   toInterviewDashboardRowDTO,
   toInterviewedApplicantDTO,
-  toInterviewNotesDTO, toUserDTO,
+  toInterviewNotesDTO,
+  toUserDTO,
 } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
@@ -61,7 +60,9 @@ const interviewGroupService: IInterviewGroupService = new InterviewGroupService(
 // `entityResolvers.ts`). The upload code path will hit firebase at runtime;
 // confirm with partner before merging.
 const interviewNotesBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
-const interviewNotesFileStorageService = new FileStorageService(interviewNotesBucket);
+const interviewNotesFileStorageService = new FileStorageService(
+  interviewNotesBucket,
+);
 const firebaseFileService: IFirebaseFileService = new FirebaseFileService(
   interviewNotesFileStorageService,
 );
@@ -540,29 +541,36 @@ class InterviewCompositeService implements IInterviewCompositeService {
     interviewedApplicantRecordId: string,
     upload: CreateFirebaseFileDTO,
   ): Promise<InterviewNotesDTO> {
-    if (
-      upload.contentType !== INTERVIEW_NOTES_ACCEPTED_MIME_TYPE ||
-      !upload.originalFileName
-        .toLowerCase()
-        .endsWith(INTERVIEW_NOTES_ACCEPTED_EXTENSION)
-    ) {
-      throw new Error("Only PDF files are accepted for interview notes.");
-    }
+    let transaction: Transaction | undefined;
+    let uploadedStoragePath: string | undefined;
+    let committed = false;
 
-    const record = await interviewedApplicantRecordsService.getInterviewedApplicantRecordById(
-      interviewedApplicantRecordId,
-    );
-    const previousNotesId = record.interviewNotesId;
-
-    // One transaction covers both the new FirebaseFile row and the FK update
-    // on the interviewed-applicant record so they succeed or fail atomically.
-    // Storage upload is non-transactional and happens after commit.
-    const transaction = await sequelize.transaction();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    let fileRow!: any;
-    let storagePath!: string;
     try {
-      fileRow = await FirebaseFile.create(
+      if (
+        upload.contentType !== INTERVIEW_NOTES_ACCEPTED_MIME_TYPE ||
+        !upload.originalFileName
+          .toLowerCase()
+          .endsWith(INTERVIEW_NOTES_ACCEPTED_EXTENSION)
+      ) {
+        throw new Error("Only PDF files are accepted for interview notes.");
+      }
+
+      // Keep the previous notes linked until the replacement is ready. The row
+      // lock also serializes concurrent uploads for the same applicant record.
+      transaction = await sequelize.transaction();
+      const record = await InterviewedApplicantRecord.findByPk(
+        interviewedApplicantRecordId,
+        { transaction, lock: transaction.LOCK.UPDATE },
+      );
+      if (!record) {
+        throw new Error(
+          `No interviewed applicant record with id ${interviewedApplicantRecordId} found.`,
+        );
+      }
+
+      const previousNotesId = record.interview_notes_id;
+
+      const fileRow = await FirebaseFile.create(
         {
           original_file_name: upload.originalFileName,
           uploaded_user_id: upload.uploadedUserId,
@@ -571,18 +579,70 @@ class InterviewCompositeService implements IInterviewCompositeService {
         },
         { transaction },
       );
-      storagePath = `${INTERVIEW_NOTES_STORAGE_PREFIX}/${fileRow.id}`;
+      const storagePath = `${INTERVIEW_NOTES_STORAGE_PREFIX}/${fileRow.id}`;
       await fileRow.update({ storage_path: storagePath }, { transaction });
+
+      // Track the path before uploading in case storage writes the object
+      // but the upload request fails before receiving its response.
+      uploadedStoragePath = storagePath;
+      await interviewNotesFileStorageService.createFile(
+        storagePath,
+        upload.localFilePath,
+        upload.contentType,
+      );
+      const signedUrl = await firebaseFileService.getSignedUrl(storagePath);
 
       await interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
         interviewedApplicantRecordId,
         { interviewNotesId: fileRow.id },
         transaction,
       );
-
       await transaction.commit();
+      committed = true;
+
+      if (previousNotesId) {
+        try {
+          // Delete the previous notes file from storage and the database.
+          // If this fails, log the error but don't throw, since the new notes are already committed.
+          await firebaseFileService.deleteFirebaseFileById(previousNotesId);
+        } catch (cleanupError: unknown) {
+          Logger.error(
+            `Failed to delete previous interview notes file ${previousNotesId} for record ${interviewedApplicantRecordId}. Reason = ${getErrorMessage(
+              cleanupError,
+            )}`,
+          );
+        }
+      }
+
+      return toInterviewNotesDTO(fileRow, signedUrl);
     } catch (error: unknown) {
-      await transaction.rollback();
+      // If not commited, roll back the transaction
+      if (transaction && !committed) {
+        try {
+          await transaction.rollback();
+        } catch (rollbackError: unknown) {
+          Logger.error(
+            `Failed to roll back interview notes upload. Reason = ${getErrorMessage(
+              rollbackError,
+            )}`,
+          );
+        }
+      }
+
+      // If not committed and a storage path was uploaded, attempt to clean up the uploaded file.
+      if (uploadedStoragePath && !committed) {
+        try {
+          await interviewNotesFileStorageService.deleteFile(
+            uploadedStoragePath,
+          );
+        } catch (cleanupError: unknown) {
+          Logger.error(
+            `Failed to clean up interview notes file ${uploadedStoragePath}. Reason = ${getErrorMessage(
+              cleanupError,
+            )}`,
+          );
+        }
+      }
       Logger.error(
         `Failed to upload interview notes for record ${interviewedApplicantRecordId}. Reason = ${getErrorMessage(
           error,
@@ -590,27 +650,6 @@ class InterviewCompositeService implements IInterviewCompositeService {
       );
       throw error;
     }
-
-    await interviewNotesFileStorageService.createFile(
-      storagePath,
-      upload.localFilePath,
-      upload.contentType,
-    );
-
-    if (previousNotesId) {
-      try {
-        await firebaseFileService.deleteFirebaseFileById(previousNotesId);
-      } catch (cleanupError: unknown) {
-        Logger.error(
-          `Failed to delete previous interview notes file ${previousNotesId} for record ${interviewedApplicantRecordId}. Reason = ${getErrorMessage(
-            cleanupError,
-          )}`,
-        );
-      }
-    }
-
-    const signedUrl = await firebaseFileService.getSignedUrl(storagePath);
-    return toInterviewNotesDTO(fileRow, signedUrl);
   }
 }
 
