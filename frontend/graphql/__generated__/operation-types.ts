@@ -52,6 +52,20 @@ export type InterviewInvitesQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type InterviewInvitesQuery = { interviewInvites: Array<{ id: string, position: string, schedulingLink: string | null, status: Types.InterviewGroupStatus, interviewers: Array<{ id: string, firstName: string, lastName: string }>, interviewees: Array<{ firstName: string, lastName: string, position: string }> }> };
 
+export type InterviewNotesQueryVariables = Exact<{
+  interviewedApplicantRecordId: string | number;
+}>;
+
+
+export type InterviewNotesQuery = { interviewNotes: { fileId: string, fileName: string, signedUrl: string } | null };
+
+export type InterviewedApplicantRecordByApplicantRecordIdQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type InterviewedApplicantRecordByApplicantRecordIdQuery = { interviewedApplicantRecordByApplicantRecordId: { id: string, applicantRecordId: string, score: number | null, status: Types.InterviewStatus, interviewNotesId: string | null, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
+
 export type InterviewedApplicantsByUserIdQueryVariables = Exact<{
   userId: string | number;
 }>;
@@ -159,6 +173,14 @@ export type ReviewedApplicantsByUserIdQueryVariables = Exact<{
 
 
 export type ReviewedApplicantsByUserIdQuery = { reviewedApplicantsByUserId: Array<{ applicantRecordId: string, reviewStatus: Types.ReviewStatus, applicantFirstName: string, applicantLastName: string }> };
+
+export type SubmitInterviewScoresMutationVariables = Exact<{
+  id: string | number;
+  interviewJson: Types.InterviewInput;
+}>;
+
+
+export type SubmitInterviewScoresMutation = { submitInterviewScores: { id: string, score: number | null, status: Types.InterviewStatus, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
 
 export type UpdateAdminCommentMutationVariables = Exact<{
   id: string | number;

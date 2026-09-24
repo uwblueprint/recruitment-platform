@@ -229,6 +229,13 @@ export type InterviewInviteeDto = {
   position: Scalars['String']['output'];
 };
 
+export type InterviewNotes = {
+  __typename?: 'InterviewNotes';
+  fileId: Scalars['ID']['output'];
+  fileName: Scalars['String']['output'];
+  signedUrl: Scalars['String']['output'];
+};
+
 export type InterviewPairingsDto = {
   __typename?: 'InterviewPairingsDTO';
   groupMembers: Array<UserDto>;
@@ -575,6 +582,7 @@ export type Query = {
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
   interviewInvites: Array<InterviewInviteDto>;
+  interviewNotes?: Maybe<InterviewNotes>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
   interviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
