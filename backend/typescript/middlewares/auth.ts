@@ -21,6 +21,30 @@ export const getAccessToken = (req: Request): string | null => {
   return null;
 };
 
+/**
+ * Use this when a resolver needs the caller's `users.id` itself (e.g. to
+ * record `uploaded_user_id` on a new row). For yes/no auth checks, prefer
+ * the `isAuthorizedBy*` middlewares below or in `graphql/index.ts`.
+ */
+export const getUserIdFromContext = async (
+  context: ExpressContext,
+): Promise<number> => {
+  const accessToken = getAccessToken(context.req);
+  if (!accessToken) {
+    throw new AuthenticationError("Missing bearer access token.");
+  }
+  try {
+    return await authService.getUserIdByAccessToken(accessToken);
+  } catch {
+    // Collapse all downstream failures (invalid/revoked token, missing user
+    // row, Firebase outage) into a single user-facing message. The real
+    // reason was already logged inside authService.
+    throw new AuthenticationError(
+      "Failed to resolve current user from access token.",
+    );
+  }
+};
+
 /* Determine if request is authorized based on accessToken validity and role of client */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */

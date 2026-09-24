@@ -1,0 +1,13 @@
+mutation UploadInterviewNotes(
+  $interviewedApplicantRecordId: ID!
+  $file: Upload!
+) {
+  uploadInterviewNotes(
+    interviewedApplicantRecordId: $interviewedApplicantRecordId
+    file: $file
+  ) {
+    fileId
+    fileName
+    signedUrl
+  }
+}

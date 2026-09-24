@@ -96,9 +96,6 @@ export type UpdateReviewedApplicantRecordDTO =
 export type UpdateUserDTO = Schema.UpdateUserDto;
 
 /**
- * Re-export generated operation result and variable types from one stable place.
- */
-/**
  * Re-export typed GraphQL documents from the client preset artifact.
  *
  * Import documents from this file instead of `__generated__/graphql` directly.
@@ -112,9 +109,11 @@ export {
   InterviewedApplicantsByUserIdDocument,
   InterviewedPairingsByUserIdDocument,
   InterviewDashboardDocument,
+  InterviewedApplicantRecordByApplicantRecordIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
   InterviewInvitesDocument,
+  InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
   RefreshDocument,
@@ -125,9 +124,11 @@ export {
   ReviewDashboardDocument,
   ReviewDashboardSidePanelDocument,
   UpdateApplicantRecordStatusDocument,
+  SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
   ReviewedApplicantsByUserIdDocument,
+  UploadInterviewNotesDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -145,6 +146,8 @@ export type {
   InterviewGroupQueryVariables,
   InterviewInvitesQuery,
   InterviewInvitesQueryVariables,
+  InterviewedApplicantRecordByApplicantRecordIdQuery,
+  InterviewedApplicantRecordByApplicantRecordIdQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
   InterviewedPairingsByUserIdQuery,
@@ -153,6 +156,8 @@ export type {
   InterviewDashboardQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
+  InterviewNotesQuery,
+  InterviewNotesQueryVariables,
   IsAuthorizedByRoleQuery,
   IsAuthorizedByRoleQueryVariables,
   LoginMutation,
@@ -175,12 +180,16 @@ export type {
   ReviewDashboardSidePanelQueryVariables,
   UpdateApplicantRecordStatusMutation,
   UpdateApplicantRecordStatusMutationVariables,
+  SubmitInterviewScoresMutation,
+  SubmitInterviewScoresMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
   UpdateInterviewGroupSchedulingLinkMutationVariables,
   ReviewedApplicantsByUserIdQuery,
   ReviewedApplicantsByUserIdQueryVariables,
+  UploadInterviewNotesMutation,
+  UploadInterviewNotesMutationVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -241,6 +250,22 @@ export type ApplicationResult = OperationField<
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export type InterviewedApplicantRecordResult = OperationField<
+  Operations.InterviewedApplicantRecordByApplicantRecordIdQuery,
+  "interviewedApplicantRecordByApplicantRecordId"
+>;
+export type SubmitInterviewScoresResult = OperationField<
+  Operations.SubmitInterviewScoresMutation,
+  "submitInterviewScores"
+>;
+export type InterviewNotesResult = OperationField<
+  Operations.InterviewNotesQuery,
+  "interviewNotes"
+>;
+export type UploadInterviewNotesResult = OperationField<
+  Operations.UploadInterviewNotesMutation,
+  "uploadInterviewNotes"
 >;
 export type ApplicantRecordWithReviewersResult = OperationField<
   Operations.ReviewedApplicantRecordsByApplicantRecordIdQuery,
