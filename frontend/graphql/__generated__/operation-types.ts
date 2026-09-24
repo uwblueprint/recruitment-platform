@@ -183,12 +183,21 @@ export type ReviewedApplicantsByUserIdQueryVariables = Exact<{
 
 export type ReviewedApplicantsByUserIdQuery = { reviewedApplicantsByUserId: Array<{ applicantRecordId: string, reviewStatus: Types.ReviewStatus, applicantFirstName: string, applicantLastName: string }> };
 
-export type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables = Exact<{
-  applicantRecordId: string | number;
+export type SubmitInterviewScoresMutationVariables = Exact<{
+  id: string | number;
+  interviewJson: Types.InterviewInput;
 }>;
 
 
-export type ReviewedApplicantRecordsByApplicantRecordIdQuery = { reviewedApplicantRecordsByApplicantRecordId: { applicantRecord: { id: string, position: string, combinedReviewScore: number | null }, reviewedApplicantRecords: Array<{ reviewer: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }, reviewedApplicantRecord: { status: string, score: number | null, reviewerHasConflict: boolean, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } }> } };
+export type SubmitInterviewScoresMutation = { submitInterviewScores: { id: string, score: number | null, status: Types.InterviewStatus, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
+
+export type UpdateAdminCommentMutationVariables = Exact<{
+  id: string | number;
+  adminComment: Types.UpdateAdminCommentDto;
+}>;
+
+
+export type UpdateAdminCommentMutation = { updateAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
 
 export type UpdateApplicantRecordStatusMutationVariables = Exact<{
   id: string | number;
@@ -213,6 +222,14 @@ export type UpdateInterviewGroupSchedulingLinkMutationVariables = Exact<{
 
 
 export type UpdateInterviewGroupSchedulingLinkMutation = { updateInterviewGroupSchedulingLink: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
+
+export type UploadInterviewNotesMutationVariables = Exact<{
+  interviewedApplicantRecordId: string | number;
+  file: File;
+}>;
+
+
+export type UploadInterviewNotesMutation = { uploadInterviewNotes: { fileId: string, fileName: string, signedUrl: string } };
 
 export type UsersByPositionQueryVariables = Exact<{
   position: string;
