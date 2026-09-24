@@ -55,10 +55,12 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (!applicantRecordId) return;
-    InterviewAssessmentAPIClient.getInterviewedApplicantRecordByApplicantRecordId(
-      applicantRecordId,
-    )
-      .then((record) => {
+    const fetchAssessmentRecord = async () => {
+      try {
+        const record =
+          await InterviewAssessmentAPIClient.getInterviewedApplicantRecordByApplicantRecordId(
+            applicantRecordId,
+          );
         setRecordId(record.id);
         const j = record.interviewJson;
         if (j) {
@@ -71,12 +73,14 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
             comments: j.comments ?? "",
           });
         }
-      })
-      .catch((e) => {
+      } catch (e) {
         console.error("Failed to load assessment record:", e);
         const detail = e instanceof Error ? e.message : String(e);
         setError(`Failed to load assessment record. ${detail}`);
-      });
+      }
+    };
+
+    fetchAssessmentRecord();
   }, [applicantRecordId]);
 
   const submitScores = useCallback(async () => {
@@ -122,4 +126,3 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
     </AssessmentContext.Provider>
   );
 };
-

@@ -5,7 +5,9 @@ import { ValueOf } from "next/dist/shared/lib/constants";
 import InterviewAssessmentAPIClient from "@/APIClients/InterviewAssessmentAPIClient";
 import { Button } from "@/components/common/Button";
 import { CloudUploadIcon } from "@/components/icons/cloud-upload.icon";
-import { CheckCircleFilledIcon } from "@/components/icons/check-circle-filled.icon";
+import { CheckIcon } from "@/components/icons/check.icon";
+import { PdfBadgeIcon } from "@/components/icons/pdf-badge.icon";
+import { CloseXIcon } from "@/components/icons/close-x.icon";
 import type { InterviewNotesResult } from "@/graphql/typeUtils";
 
 import {
@@ -39,43 +41,6 @@ const formatBytes = (bytes: number): string => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-// ---- Inline icons ---------------------------------------------------------
-
-const PdfBadgeIcon = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-  >
-    <path
-      d="M3 1.5h6L13 5.5v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1v-12a1 1 0 0 1 1-1Z"
-      fill="#3B82F6"
-    />
-    <path d="M9 1.5v4h4" stroke="white" strokeWidth="1" fill="none" />
-  </svg>
-);
-
-const CloseXIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 14 14"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-  >
-    <path
-      d="m3.5 3.5 7 7m0-7-7 7"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
 // ---- Shared sub-components ------------------------------------------------
 
 const OrDivider = () => (
@@ -100,28 +65,29 @@ export const NotesUploader = ({
     onUploadingChange?.(isUploading);
   }, [isUploading, onUploadingChange]);
 
-  // Initial fetch of any existing notes file. setState happens only inside
-  // async callbacks (allowed by react-hooks/set-state-in-effect) — the
-  // visible "loading" state is derived below by comparing the stamped
-  // `recordId` on `remote` against the current prop.
+  // Fetch existing notes asynchronously. The loading state is derived below
+  // by comparing the recordId on remote against the current prop.
   useEffect(() => {
     if (!interviewedApplicantRecordId) return;
     const recordId = interviewedApplicantRecordId;
     let cancelled = false;
-    InterviewAssessmentAPIClient.getInterviewNotes(recordId)
-      .then((notes) => {
+    const fetchNotes = async () => {
+      try {
+        const notes = await InterviewAssessmentAPIClient.getInterviewNotes(recordId);
         if (cancelled) return;
         setRemote(
           notes
             ? { kind: RemoteStateKind.FILLED, recordId, notes }
             : { kind: RemoteStateKind.EMPTY, recordId },
         );
-      })
-      .catch((e) => {
+      } catch (e) {
         if (cancelled) return;
         const detail = e instanceof Error ? e.message : String(e);
         setRemote({ kind: RemoteStateKind.ERROR, recordId, message: detail });
-      });
+      }
+    };
+
+    fetchNotes();
     return () => {
       cancelled = true;
     };
@@ -203,7 +169,9 @@ export const NotesUploader = ({
     <div className="flex w-full flex-col gap-4">
       {isFilled && (
         <div className="-mb-1">
-          <CheckCircleFilledIcon />
+          <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-green-500 bg-green-500">
+            <CheckIcon className="h-5 w-5 text-white" />
+          </span>
         </div>
       )}
       <h2 className="font-poppins text-[28px] font-semibold leading-[140%] text-neutral-800">
