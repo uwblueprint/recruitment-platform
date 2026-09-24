@@ -1,0 +1,15 @@
+mutation SubmitInterviewScores($id: ID!, $interviewJson: InterviewInput!) {
+  submitInterviewScores(id: $id, interviewJson: $interviewJson) {
+    id
+    score
+    status
+    interviewJson {
+      passionFSG
+      teamPlayer
+      desireToLearn
+      skill
+      skillCategory
+      comments
+    }
+  }
+}

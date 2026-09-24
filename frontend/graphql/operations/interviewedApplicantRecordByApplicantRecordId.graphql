@@ -1,0 +1,17 @@
+query InterviewedApplicantRecordByApplicantRecordId($applicantRecordId: ID!) {
+  interviewedApplicantRecordByApplicantRecordId(applicantRecordId: $applicantRecordId) {
+    id
+    applicantRecordId
+    score
+    status
+    interviewNotesId
+    interviewJson {
+      passionFSG
+      teamPlayer
+      desireToLearn
+      skill
+      skillCategory
+      comments
+    }
+  }
+}

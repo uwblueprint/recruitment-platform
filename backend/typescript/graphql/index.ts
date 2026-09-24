@@ -1,5 +1,6 @@
 import { makeExecutableSchema, gql } from "apollo-server-express";
 import { applyMiddleware } from "graphql-middleware";
+import { GraphQLUpload } from "graphql-upload";
 import { merge } from "lodash";
 
 import {
@@ -68,6 +69,7 @@ const executableSchema = makeExecutableSchema({
     userType,
   ],
   resolvers: merge(
+    { Upload: GraphQLUpload },
     adminCommentResolvers,
     applicantRecordResolvers,
     authResolvers,
@@ -114,9 +116,11 @@ const graphQLMiddlewares = {
     interviewedApplicantsByUserId: authorizedByAllRoles(),
     interviewedPairingsByUserId: authorizedByAllRoles(),
     interviewersByGroupId: authorizedByAllRoles(),
+    interviewNotes: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
     interviewDashboard: authorizedByAdmin(),
+    interviewInvites: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),
@@ -159,6 +163,8 @@ const graphQLMiddlewares = {
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
     delegateInterviewers: authorizedBySuperAdmin(),
+    submitInterviewScores: authorizedByAllRoles(),
+    uploadInterviewNotes: authorizedByAllRoles(),
   },
 };
 
