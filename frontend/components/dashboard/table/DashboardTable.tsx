@@ -4,7 +4,6 @@ import {
   RowData,
   RowSelectionState,
   SortingState,
-  TableMeta,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -31,7 +30,6 @@ type DashboardTableProps<TData extends RowData> = {
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
   onRowClick?: (row: TData) => void;
-  meta?: TableMeta<TData>;
   pagination: DashboardPaginationState;
   sorting?: SortingState;
   onSortingChange?: OnChangeFn<SortingState>;
@@ -46,7 +44,6 @@ export const DashboardTable = <TData extends RowData>({
   rowSelection,
   onRowSelectionChange,
   onRowClick,
-  meta,
   pagination,
   sorting,
   onSortingChange,
@@ -62,7 +59,6 @@ export const DashboardTable = <TData extends RowData>({
     getRowId,
     enableRowSelection: true,
     manualSorting: true,
-    meta,
     state: {
       rowSelection,
       ...(sorting && { sorting }),

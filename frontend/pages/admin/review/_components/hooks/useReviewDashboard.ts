@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
 import { DashboardView } from "@/graphql/typeUtils";
 import type {
@@ -25,10 +25,7 @@ const useReviewDashboard = (
     isLoading: false,
     error: false,
   });
-  const [fetchCount, setFetchCount] = useState(0);
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const refetch = useCallback(() => {
     setState((prev) => ({ ...prev, isLoading: true, error: false }));
     ReviewDashboardAPIClient.getReviewDashboard(
       pageNumber,
@@ -43,11 +40,16 @@ const useReviewDashboard = (
       .catch(() => {
         setState({ rows: [], isLoading: false, error: true });
       });
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending, view, fetchCount]);
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending, view]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refetch();
+  }, [refetch]);
 
   return {
     ...state,
-    refetch: () => setFetchCount((c) => c + 1),
+    refetch,
   };
 };
 

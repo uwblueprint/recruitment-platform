@@ -121,7 +121,9 @@ export const ReassignReviewerDialogue = ({
       errorText={errorText ?? undefined}
       width="340px"
       className="!p-8 gap-4"
-      content={
+      actionsClassName="!mt-2 !h-auto"
+    >
+      <div className="flex w-full flex-col gap-[52px]">
         <Autocomplete
           options={users}
           value={selectedUser}
@@ -147,7 +149,9 @@ export const ReassignReviewerDialogue = ({
           getOptionLabel={(option) => getUserLabel(option)}
           isOptionEqualToValue={(option, value) => option.id === value.id}
           noOptionsText={
-            isLoadingUsers ? "Loading reviewers..." : "No reviewers found"
+            isLoadingUsers
+              ? "Loading reviewers..."
+              : `No reviewers found for ${position} role`
           }
           slotProps={{
             paper: {
@@ -200,31 +204,30 @@ export const ReassignReviewerDialogue = ({
             </div>
           )}
         />
-      }
-    >
-      <div className="flex w-full gap-4">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={onClose}
-          disabled={isSubmitting}
-          className="flex-1 min-w-0 !m-0 flex items-center justify-center whitespace-nowrap px-8 py-[13px]"
-        >
-          <span className="font-poppins text-[16px] font-medium">Cancel</span>
-        </Button>
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={() => {
-            void handleUpdate();
-          }}
-          disabled={!selectedUser || isSubmitting}
-          className="flex-1 min-w-0 !m-0 flex items-center justify-center whitespace-nowrap px-8 py-[13px] disabled:!bg-neutral-200 disabled:border-transparent"
-        >
-          <span className="font-poppins text-[16px] font-medium">
-            {isSubmitting ? "Updating..." : "Update"}
-          </span>
-        </Button>
+        <div className="flex w-full gap-4">
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onClose}
+            disabled={isSubmitting}
+            className="flex-1 min-w-0 !m-0 flex items-center justify-center whitespace-nowrap px-8 py-[13px]"
+          >
+            <span className="font-poppins text-[16px] font-medium">Cancel</span>
+          </Button>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => {
+              void handleUpdate();
+            }}
+            disabled={!selectedUser || isSubmitting}
+            className="flex-1 min-w-0 !m-0 flex items-center justify-center whitespace-nowrap px-8 py-[13px] disabled:!bg-neutral-200 disabled:border-transparent"
+          >
+            <span className="font-poppins text-[16px] font-medium">
+              {isSubmitting ? "Updating..." : "Update"}
+            </span>
+          </Button>
+        </div>
       </div>
     </Dialogue>
   );

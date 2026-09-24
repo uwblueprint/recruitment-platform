@@ -9,9 +9,9 @@ type DialogueProps = {
   text: string;
   errorText?: string;
   children?: ReactNode;
-  content?: ReactNode;
   width?: string;
   className?: string;
+  actionsClassName?: string;
 };
 
 export const Dialogue = ({
@@ -20,9 +20,9 @@ export const Dialogue = ({
   text,
   errorText,
   children,
-  content,
   width = "310px",
   className = "",
+  actionsClassName = "",
 }: DialogueProps) => {
   return (
     <Dialog
@@ -50,13 +50,11 @@ export const Dialogue = ({
           </div>
         </div>
 
-        {content ? <div className="mt-2 w-full">{content}</div> : null}
-
-        {children ? (
-          <DialogActions className="mt-9 h-[36px] w-full !p-0">
-            {children}
-          </DialogActions>
-        ) : null}
+        <DialogActions
+          className={`mt-9 h-[36px] w-full !p-0 ${actionsClassName}`}
+        >
+          {children}
+        </DialogActions>
       </div>
     </Dialog>
   );

@@ -8,12 +8,12 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { useRouter } from "next/router";
-import { ReactElement, useState } from "react";
+import { ReactElement, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
 import {
   COLUMN_ID_TO_SORT_BY,
-  REVIEW_DASHBOARD_COLUMNS,
+  createReviewDashboardColumns,
 } from "./_components/columns";
 import { DashboardTabs } from "./_components/DashboardTabs";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
@@ -42,8 +42,21 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
-  const [reassignmentTarget, setReassignmentTarget] =
+  const [reviewerReassignmentTarget, setReviewerReassignmentTarget] =
     useState<ReviewerReassignmentTarget | null>(null);
+
+  const columns = useMemo(
+    () =>
+      createReviewDashboardColumns((row, reviewer) => {
+        setReviewerReassignmentTarget({
+          applicantRecordId: row.applicantRecordId,
+          position: row.position,
+          reviewerId: reviewer.id,
+          reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+        });
+      }),
+    [],
+  );
 
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
@@ -129,21 +142,11 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
         <DashboardTable
           data={rows}
-          columns={REVIEW_DASHBOARD_COLUMNS}
+          columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           onRowClick={(row) => setActiveId(row.applicantRecordId)}
-          meta={{
-            onReviewerClick: (row, reviewer) => {
-              setReassignmentTarget({
-                applicantRecordId: row.applicantRecordId,
-                position: row.position,
-                reviewerId: reviewer.id,
-                reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
-              });
-            },
-          }}
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={handleSortingChange}
@@ -177,16 +180,16 @@ const AdminReviewPage: NextPageWithLayout = () => {
         }
       />
 
-      {reassignmentTarget ? (
+      {reviewerReassignmentTarget ? (
         <ReassignReviewerDialogue
-          open={!!reassignmentTarget}
-          applicantRecordId={reassignmentTarget.applicantRecordId}
-          position={reassignmentTarget.position}
-          currentReviewerId={reassignmentTarget.reviewerId}
-          currentReviewerName={reassignmentTarget.reviewerName}
-          onClose={() => setReassignmentTarget(null)}
+          open={!!reviewerReassignmentTarget}
+          applicantRecordId={reviewerReassignmentTarget.applicantRecordId}
+          position={reviewerReassignmentTarget.position}
+          currentReviewerId={reviewerReassignmentTarget.reviewerId}
+          currentReviewerName={reviewerReassignmentTarget.reviewerName}
+          onClose={() => setReviewerReassignmentTarget(null)}
           onUpdated={() => {
-            setReassignmentTarget(null);
+            setReviewerReassignmentTarget(null);
             refetch();
           }}
         />
