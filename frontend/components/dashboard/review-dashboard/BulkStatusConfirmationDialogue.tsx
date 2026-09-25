@@ -1,4 +1,5 @@
 import { Button } from "@/components/common/Button";
+import type { DialogueProps } from "@/components/common/Dialogue";
 import Dialog from "@mui/material/Dialog";
 
 export type BulkStatusApplicant = {
@@ -8,22 +9,20 @@ export type BulkStatusApplicant = {
   totalScore: number | null;
 };
 
-type BulkStatusConfirmationDialogueProps = {
-  open: boolean;
-  title: string;
-  description: string;
+export type BulkStatusConfirmationDialogueProps = Pick<
+  DialogueProps,
+  "open" | "onClose" | "errorText" | "header" | "text"
+> & {
   applicants: BulkStatusApplicant[];
   confirmLabel: string;
   isSubmitting: boolean;
-  errorText?: string;
-  onClose: () => void;
   onConfirm: () => void;
 };
 
 export const BulkStatusConfirmationDialogue = ({
   open,
-  title,
-  description,
+  header,
+  text,
   applicants,
   confirmLabel,
   isSubmitting,
@@ -41,10 +40,10 @@ export const BulkStatusConfirmationDialogue = ({
   >
     <div className="flex flex-col px-7 py-8">
       <h2 id="bulk-status-dialogue-title" className="text-center font-poppins text-xl font-medium text-blue">
-        {title}
+        {header}
       </h2>
       <p id="bulk-status-dialogue-description" className="mt-2 text-center font-source text-sm text-neutral-800">
-        {description}
+        {text}
       </p>
       <div className="mt-6 max-h-64 space-y-2 overflow-y-auto pr-1">
         {applicants.map((applicant) => (

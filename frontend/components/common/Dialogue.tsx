@@ -2,7 +2,7 @@ import { DialogActions } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import { ReactNode } from "react";
 
-type DialogueProps = {
+export type DialogueProps = {
   open: boolean;
   onClose: () => void;
   header: string;

@@ -1,7 +1,7 @@
 import { useReducer, useState } from "react";
 
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import type { BulkStatusApplicant } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
+import type { BulkStatusApplicant, BulkStatusConfirmationDialogueProps } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 
 import {
   BULK_ACTIONS,
@@ -91,16 +91,8 @@ type ToastState = { open: boolean; title: string; description: string };
 
 const CLOSED_TOAST: ToastState = { open: false, title: "", description: "" };
 
-export type BulkStatusDialogueProps = {
+export type BulkStatusDialogueProps = BulkStatusConfirmationDialogueProps & {
   open: true;
-  title: string;
-  description: string;
-  applicants: BulkStatusApplicant[];
-  confirmLabel: string;
-  isSubmitting: boolean;
-  errorText?: string;
-  onClose: () => void;
-  onConfirm: () => void;
 };
 
 type UseBulkStatusActionOptions = {
@@ -160,8 +152,8 @@ const useBulkStatusAction = ({
       ? null
       : {
           open: true,
-          title: BULK_ACTIONS[state.action].title,
-          description: BULK_ACTIONS[state.action].description,
+          header: BULK_ACTIONS[state.action].title,
+          text: BULK_ACTIONS[state.action].description,
           confirmLabel: BULK_ACTIONS[state.action].confirmLabel,
           applicants: state.applicants,
           isSubmitting: state.status === DialogueStatus.Submitting,
