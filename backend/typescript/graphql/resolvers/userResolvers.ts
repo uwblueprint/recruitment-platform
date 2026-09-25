@@ -26,6 +26,12 @@ const userResolvers = {
     ): Promise<UserDTO> => {
       return userService.getUserByEmail(email);
     },
+    usersByPosition: async (
+      _parent: undefined,
+      { position }: { position: string },
+    ): Promise<Array<UserDTO>> => {
+      return userService.getUsersByPosition(position);
+    },
     users: async (): Promise<UserDTO[]> => {
       return userService.getUsers();
     },

@@ -46,6 +46,8 @@ export type InterviewDTO = WithoutTypename<Schema.Interview>;
 export type InterviewDelegationDTO =
   WithoutTypename<Schema.InterviewDelegationDto>;
 export type InterviewGroupDTO = WithoutTypename<Schema.InterviewGroupDto>;
+export type InterviewInviteeDTO = WithoutTypename<Schema.InterviewInviteeDto>;
+export type InterviewInviteDTO = WithoutTypename<Schema.InterviewInviteDto>;
 export type InterviewPairingsDTO = WithoutTypename<Schema.InterviewPairingsDto>;
 export type InterviewedApplicantRecordDTO =
   WithoutTypename<Schema.InterviewedApplicantRecord>;
@@ -97,22 +99,28 @@ export type UpdateReviewedApplicantRecordDTO =
 export type UpdateUserDTO = Schema.UpdateUserDto;
 
 /**
- * Re-export generated operation result and variable types from one stable place.
- */
-/**
  * Re-export typed GraphQL documents from the client preset artifact.
  *
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
 export {
+  AdminCommentsByApplicantRecordIdDocument,
+  CreateAdminCommentDocument,
+  UpdateAdminCommentDocument,
+  DeleteAdminCommentByIdDocument,
   ApplicationDocument,
+  BulkUpdateApplicantRecordsStatusDocument,
   InterviewedApplicantsByUserIdDocument,
   InterviewedPairingsByUserIdDocument,
   InterviewDashboardDocument,
+  InterviewedApplicantRecordByApplicantRecordIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
+  InterviewInvitesDocument,
+  InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
+  ReassignReviewerDocument,
   RefreshDocument,
   ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
@@ -122,16 +130,33 @@ export {
   ReviewDashboardSidePanelDocument,
   ReviewDashboardFilterOptionsDocument,
   UpdateApplicantRecordStatusDocument,
+  SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
   ReviewedApplicantsByUserIdDocument,
+  UsersByPositionDocument,
+  UploadInterviewNotesDocument,
 } from "./__generated__/graphql";
 
 export type {
+  AdminCommentsByApplicantRecordIdQuery,
+  AdminCommentsByApplicantRecordIdQueryVariables,
+  CreateAdminCommentMutation,
+  CreateAdminCommentMutationVariables,
+  UpdateAdminCommentMutation,
+  UpdateAdminCommentMutationVariables,
+  DeleteAdminCommentByIdMutation,
+  DeleteAdminCommentByIdMutationVariables,
   ApplicationQuery,
   ApplicationQueryVariables,
+  BulkUpdateApplicantRecordsStatusMutation,
+  BulkUpdateApplicantRecordsStatusMutationVariables,
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
+  InterviewInvitesQuery,
+  InterviewInvitesQueryVariables,
+  InterviewedApplicantRecordByApplicantRecordIdQuery,
+  InterviewedApplicantRecordByApplicantRecordIdQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
   InterviewedPairingsByUserIdQuery,
@@ -140,12 +165,16 @@ export type {
   InterviewDashboardQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
+  InterviewNotesQuery,
+  InterviewNotesQueryVariables,
   IsAuthorizedByRoleQuery,
   IsAuthorizedByRoleQueryVariables,
   LoginMutation,
   LoginMutationVariables,
   LoginWithGoogleMutation,
   LoginWithGoogleMutationVariables,
+  ReassignReviewerMutation,
+  ReassignReviewerMutationVariables,
   RefreshMutation,
   RefreshMutationVariables,
   ReportInterviewConflictMutation,
@@ -164,12 +193,18 @@ export type {
   ReviewDashboardFilterOptionsQueryVariables,
   UpdateApplicantRecordStatusMutation,
   UpdateApplicantRecordStatusMutationVariables,
+  SubmitInterviewScoresMutation,
+  SubmitInterviewScoresMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
   UpdateInterviewGroupSchedulingLinkMutationVariables,
   ReviewedApplicantsByUserIdQuery,
   ReviewedApplicantsByUserIdQueryVariables,
+  UsersByPositionQuery,
+  UsersByPositionQueryVariables,
+  UploadInterviewNotesMutation,
+  UploadInterviewNotesMutationVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -228,6 +263,22 @@ export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
 >;
+export type InterviewedApplicantRecordResult = OperationField<
+  Operations.InterviewedApplicantRecordByApplicantRecordIdQuery,
+  "interviewedApplicantRecordByApplicantRecordId"
+>;
+export type SubmitInterviewScoresResult = OperationField<
+  Operations.SubmitInterviewScoresMutation,
+  "submitInterviewScores"
+>;
+export type InterviewNotesResult = OperationField<
+  Operations.InterviewNotesQuery,
+  "interviewNotes"
+>;
+export type UploadInterviewNotesResult = OperationField<
+  Operations.UploadInterviewNotesMutation,
+  "uploadInterviewNotes"
+>;
 export type ApplicantRecordWithReviewersResult = OperationField<
   Operations.ReviewedApplicantRecordsByApplicantRecordIdQuery,
   "reviewedApplicantRecordsByApplicantRecordId"
@@ -265,5 +316,24 @@ export type InterviewedPairingResult = ArrayElement<
   OperationField<
     Operations.InterviewedPairingsByUserIdQuery,
     "interviewedPairingsByUserId"
+  >
+>;
+
+export type ReassignReviewerResult = OperationField<
+  Operations.ReassignReviewerMutation,
+  "reassignReviewer"
+>;
+
+export type UsersByPositionResult = OperationField<
+  Operations.UsersByPositionQuery,
+  "usersByPosition"
+>;
+export type InterviewInviteResult = ArrayElement<
+  OperationField<Operations.InterviewInvitesQuery, "interviewInvites">
+>;
+export type AdminCommentResult = ArrayElement<
+  OperationField<
+    Operations.AdminCommentsByApplicantRecordIdQuery,
+    "adminCommentsByApplicantRecordId"
   >
 >;

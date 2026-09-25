@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client/react";
+import { useCallback, useQuery } from "@apollo/client/react";
 import type {
   DashboardView,
   ReviewDashboardFilters,
@@ -14,6 +14,7 @@ type UseReviewDashboardResult = {
   isLoading: boolean;
   error: boolean;
   refetch: () => void;
+  refetch: () => void;
 };
 
 const useReviewDashboard = (
@@ -24,6 +25,14 @@ const useReviewDashboard = (
   filters?: ReviewDashboardFilters,
   view?: DashboardView,
 ): UseReviewDashboardResult => {
+  const [state, setState] = useState<Omit<UseReviewDashboardResult, "refetch">>({
+    rows: [],
+    isLoading: false,
+    error: false,
+  });
+  const refetch = useCallback(() => {
+    setState((prev) => ({ ...prev, isLoading: true, error: false }));
+    ReviewDashboardAPIClient.getReviewDashboard(
   const { data, loading, error, refetch } = useQuery<
     ReviewDashboardQuery,
     ReviewDashboardQueryVariables

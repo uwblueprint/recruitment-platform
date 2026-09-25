@@ -10,15 +10,38 @@ import {
   InterviewFooter,
 } from "../../_components/layout";
 import { Button } from "@/components/common/Button";
-import { NextPageWithLayout } from "@/pages/_app";
+import { NextPageWithLayout } from "../../../_app";
+import { ScoresPanel } from "../../_components/assessment/ScoresPanel";
+import NotesUploader from "../../_components/assessment/NotesUploader";
+import {
+  AssessmentProvider,
+  useInterviewAssessment,
+} from "./AssessmentContext";
+import { isScoreFormComplete } from "../../_components/assessment/constants";
 
-// Sub-step constants: drive the header bubble (via context) and footer button state.
 const SCORES = AssessmentHeaderStep.SCORES;
 const NOTES = AssessmentHeaderStep.NOTES;
 const SUBMITTED = "SUBMITTED";
 
+// ---------------------------------------------------------------------------
+// Footer — reads from both InterviewProgressContext and AssessmentContext
+// ---------------------------------------------------------------------------
+
 const AssessmentFooter = () => {
   const { currentSubStep, setCurrentSubStep } = useInterviewProgress();
+  const { form, isSubmitting, isUploadingNotes, submitScores } =
+    useInterviewAssessment();
+
+  const formComplete = isScoreFormComplete(form);
+
+  const handleSubmitAndContinue = async () => {
+    try {
+      await submitScores();
+      setCurrentSubStep(NOTES);
+    } catch {
+      // error already set in context, stay on SCORES
+    }
+  };
 
   switch (currentSubStep) {
     case SUBMITTED:
@@ -29,24 +52,28 @@ const AssessmentFooter = () => {
           onBack={() => setCurrentSubStep(SCORES)}
           backLabel="Previous Page"
           onContinue={() => setCurrentSubStep(SUBMITTED)}
-          continueLabel="Submit & Finish"
+          continueLabel={isUploadingNotes ? "Uploading…" : "Submit & Finish"}
+          continueDisabled={isUploadingNotes}
         />
       );
     default:
       return (
         <InterviewFooter
           onBack={() => {}}
-          onContinue={() => setCurrentSubStep(NOTES)}
-          continueLabel="Submit & Continue"
+          onContinue={handleSubmitAndContinue}
+          continueLabel={isSubmitting ? "Submitting..." : "Submit & Continue"}
+          continueDisabled={!formComplete || isSubmitting}
         />
       );
   }
 };
 
-// TODO: replace with final designed submitted UI
+// ---------------------------------------------------------------------------
+// Submitted state
+// ---------------------------------------------------------------------------
+
 const AssessmentSubmitted = () => {
   const { setCurrentSubStep } = useInterviewProgress();
-
   return (
     <div className="flex flex-col items-center justify-center h-full gap-4">
       <p>Assessment Submitted!</p>
@@ -57,36 +84,48 @@ const AssessmentSubmitted = () => {
   );
 };
 
+// ---------------------------------------------------------------------------
+// Page component
+// ---------------------------------------------------------------------------
+
 const InterviewAssessmentPage: NextPageWithLayout = () => {
-  const { currentSubStep, setCurrentSubStep } = useInterviewProgress();
-  if (currentSubStep === undefined) setCurrentSubStep(SCORES);
+  const { currentSubStep } = useInterviewProgress();
+  const { form, setForm, recordId, error, setIsUploadingNotes } =
+    useInterviewAssessment();
+
   switch (currentSubStep) {
     case SUBMITTED:
       return <AssessmentSubmitted />;
     case NOTES:
       return (
-        <PanelLayout
-          title="Interview Assessment"
-          subtitle="Score the candidate"
-        >
-          <p>Assessment Notes content goes here.</p>
+        <PanelLayout>
+          <NotesUploader
+            interviewedApplicantRecordId={recordId}
+            onUploadingChange={setIsUploadingNotes}
+          />
         </PanelLayout>
       );
     default:
       return (
-        <PanelLayout
-          title="Interview Assessment"
-          subtitle="Score the candidate"
-        >
-          <p>Application Scores content goes here.</p>
+        <PanelLayout>
+          {error && (
+            <p className="mb-4 font-poppins text-sm text-error">{error}</p>
+          )}
+          <ScoresPanel form={form} onChange={setForm} />
         </PanelLayout>
       );
   }
 };
 
-InterviewAssessmentPage.getLayout = getInterviewLayout(
-  <InterviewHeader steps={ASSESSMENT_HEADER_STEPS} />,
-  <AssessmentFooter />,
+// Wrap the entire layout in AssessmentProvider so both the page body and the
+// footer (which sits outside the page slot in SplitPanelLayout) share state.
+InterviewAssessmentPage.getLayout = (page) => (
+  <AssessmentProvider>
+    {getInterviewLayout(
+      <InterviewHeader steps={ASSESSMENT_HEADER_STEPS} />,
+      <AssessmentFooter />,
+    )(page)}
+  </AssessmentProvider>
 );
 
 export default InterviewAssessmentPage;

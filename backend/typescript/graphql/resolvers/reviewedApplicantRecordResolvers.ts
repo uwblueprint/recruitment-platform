@@ -1,3 +1,4 @@
+import { sequelize } from "../../models";
 import ReviewedApplicantRecordService from "../../services/implementations/reviewedApplicantRecordService";
 import {
   ReviewedApplicantRecordDTO,
@@ -79,6 +80,41 @@ const reviewedApplicantRecordResolvers = {
           reviewerHasConflict: reviewedApplicantRecord.reviewerHasConflict,
         },
       );
+    },
+    reassignReviewer: async (
+      _parent: undefined,
+      {
+        applicantRecordId,
+        oldReviewerId,
+        newReviewerId,
+      }: {
+        applicantRecordId: string;
+        oldReviewerId: string;
+        newReviewerId: string;
+      },
+    ): Promise<ReviewedApplicantRecordDTO> => {
+      const transaction = await sequelize.transaction();
+      try {
+        await reviewedApplicantRecordService.deleteReviewedApplicantRecordByPk(
+          applicantRecordId,
+          oldReviewerId,
+          transaction,
+        );
+
+        const newRecord = await reviewedApplicantRecordService.createReviewedApplicantRecord(
+          {
+            applicantRecordId,
+            reviewerId: newReviewerId,
+            status: "TODO",
+          },
+          transaction,
+        );
+        await transaction.commit();
+        return newRecord;
+      } catch (error: unknown) {
+        await transaction.rollback();
+        throw error;
+      }
     },
   },
 };

@@ -1,0 +1,18 @@
+query InterviewInvites {
+  interviewInvites {
+    id
+    interviewers {
+      id
+      firstName
+      lastName
+    }
+    interviewees {
+      firstName
+      lastName
+      position
+    }
+    position
+    schedulingLink
+    status
+  }
+}
