@@ -1,9 +1,11 @@
 query ReviewDashboardApplicantRecordIds(
   $sortBy: ReviewDashboardSortBy
   $sortAscending: Boolean
+  $filters: ReviewDashboardFilters
 ) {
   reviewDashboardApplicantRecordIds(
     sortBy: $sortBy
     sortAscending: $sortAscending
+    filters: $filters
   )
 }

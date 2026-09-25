@@ -4,6 +4,9 @@ import {
 } from "@/components/dashboard/common";
 import { ApplicationStatus } from "@/graphql/typeUtils";
 
+import { RejectApplicantDialogue } from "../dialogues/RejectApplicantDialogue";
+import useReviewStatusAction from "../hooks/useReviewStatusAction";
+
 type ReviewStatusCellProps = {
   applicantRecordId: string;
   status: ApplicationStatus;
@@ -23,10 +26,19 @@ export const ReviewStatusCell = ({
   applicantRecordId,
   status,
   onChange,
-}: ReviewStatusCellProps) => (
-  <DashboardStatusChip
-    value={status}
-    options={APPLICATION_STATUS_OPTIONS}
-    onChange={(newStatus) => onChange(applicantRecordId, newStatus, status)}
-  />
-);
+}: ReviewStatusCellProps) => {
+  const { selectedStatus, handleChange, isSubmitting, dialogue, errorText } =
+    useReviewStatusAction({ applicantRecordId, status });
+
+  return (
+    <div role="presentation" onClick={(event) => event.stopPropagation()}>
+      <DashboardStatusChip
+        value={selectedStatus}
+        options={APPLICATION_STATUS_OPTIONS}
+        onChange={(newStatus) => onChange(applicantRecordId, newStatus, status)}
+      />
+      {errorText && <p role="alert" className="text-xs text-red-500">{errorText}</p>}
+      {dialogue && <RejectApplicantDialogue {...dialogue} />}
+    </div>
+  );
+};

@@ -1,0 +1,10 @@
+mutation UpdateAdminComment($id: ID!, $adminComment: UpdateAdminCommentDTO!) {
+  updateAdminComment(id: $id, adminComment: $adminComment) {
+    id
+    userId
+    applicantRecordId
+    comment
+    createdAt
+    updatedAt
+  }
+}

@@ -1,0 +1,28 @@
+query ReviewDashboardFilterOptions($department: String) {
+  reviewDashboardFilterOptions(department: $department) {
+    positions {
+      value
+      label
+    }
+    applicationStatuses {
+      value
+      label
+    }
+    skillCategories {
+      value
+      label
+    }
+    scoreRanges {
+      value
+      label
+    }
+    years {
+      value
+      label
+    }
+    bookmarked {
+      value
+      label
+    }
+  }
+}

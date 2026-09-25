@@ -1,11 +1,25 @@
-import { Op, Order, OrderItem, col, literal } from "sequelize";
+import {
+  Op,
+  Order,
+  OrderItem,
+  WhereOptions,
+  col,
+  fn,
+  literal,
+  where as whereFn,
+} from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
 import User from "../../models/user.model";
 import {
   ApplicantRecordWithReviewersDTO,
+  ApplicationStatusEnum,
   CreateReviewedApplicantRecordDTO,
+  DashboardView,
+  DashboardViewEnum,
+  ReviewDashboardFilterOptionsDTO,
+  ReviewDashboardFilters,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -13,6 +27,7 @@ import {
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
   ReviewStatusEnum,
+  SkillCategoryEnum,
 } from "../../types";
 import {
   toApplicantRecordDTO,
@@ -25,6 +40,7 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IReviewCompositeService from "../interfaces/IReviewCompositeService";
 import ReviewedApplicantRecordService from "./reviewedApplicantRecordService";
+import Position from "../../models/position.model";
 
 const Logger = logger(__filename);
 
@@ -41,14 +57,19 @@ const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
  * Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows
  * land on each page — sorting the returned page in JS would only order
  * within a page, since the DB would already have chosen the page by id.
- * COALESCE(...,'') keeps records missing that reviewer ordered as empty
- * strings (first on ASC, last on DESC), and id is a stable tiebreak.
+ * Records missing that reviewer yield a NULL from the subquery, which the
+ * NULLS LAST direction keeps at the bottom; id is a stable tiebreak.
+ *
+ * NULLS LAST keeps records missing the sort value at the bottom of the
+ * list regardless of direction. Postgres otherwise defaults to NULLS
+ * FIRST on DESC, which would float those rows to the top.
  */
 function buildReviewDashboardOrder(
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
 ): Order {
-  const direction = sortAscending === false ? "DESC" : "ASC";
+  const direction =
+    sortAscending === false ? "DESC NULLS LAST" : "ASC NULLS LAST";
 
   const sortColumnMap: Record<
     Exclude<ReviewDashboardSortBy, "REVIEWER_1" | "REVIEWER_2">,
@@ -69,14 +90,14 @@ function buildReviewDashboardOrder(
     const idx = sortBy === ReviewDashboardSortByEnum.REVIEWER_1 ? 0 : 1;
     return [
       [
-        literal(`COALESCE((
+        literal(`(
           SELECT u."last_name" || ' ' || u."first_name"
           FROM "reviewed_applicant_records" AS r
           JOIN "users" AS u ON u."id" = r."reviewer_id"
           WHERE r."applicant_record_id" = "ApplicantRecord"."id"
           ORDER BY r."createdAt" ASC, r."reviewer_id" ASC
           LIMIT 1 OFFSET ${idx}
-        ), '')`),
+        )`),
         direction,
       ],
       ["id", "ASC"],
@@ -86,6 +107,70 @@ function buildReviewDashboardOrder(
     return [sortColumnMap[sortBy], ["id", "ASC"]];
   }
   return [["id", "ASC"]];
+}
+
+function buildApplicantRecordWhere(
+  filters?: ReviewDashboardFilters,
+): WhereOptions {
+  const where: WhereOptions = {};
+
+  if (filters?.positions?.length) {
+    where.position = { [Op.in]: filters.positions };
+  }
+  if (filters?.applicationStatuses?.length) {
+    where.status = { [Op.in]: filters.applicationStatuses };
+  }
+  if (filters?.skillCategories?.length) {
+    where.skill_category = { [Op.in]: filters.skillCategories };
+  }
+  if (filters?.bookmarked !== undefined) {
+    where.is_applicant_flagged = filters.bookmarked;
+  }
+  if (filters?.scoreRanges?.length) {
+    const scoreConditions = filters.scoreRanges.map((range) => {
+      if (range === "gt_25") return { combined_review_score: { [Op.gt]: 25 } };
+      if (range === "20_25")
+        return { combined_review_score: { [Op.between]: [20, 25] } };
+      if (range === "15_20")
+        return { combined_review_score: { [Op.between]: [15, 20] } };
+      if (range === "lt_15") return { combined_review_score: { [Op.lt]: 15 } };
+      return {};
+    });
+    where[(Op.or as unknown) as string] = scoreConditions;
+  }
+
+  return where;
+}
+
+/** Escapes the LIKE wildcards so a searched "%" matches a literal percent sign. */
+function escapeLikeWildcards(term: string): string {
+  return term.replace(/[\\%_]/g, (character) => `\\${character}`);
+}
+
+function buildApplicantWhere(filters?: ReviewDashboardFilters): WhereOptions {
+  const where: WhereOptions = {};
+  if (filters?.years?.length) {
+    where.academic_year = { [Op.in]: filters.years };
+  }
+
+  // First and last names are separate columns, so the term is matched against
+  // them joined, letting "jane doe" hit as readily as "jane" or "doe".
+  const search = filters?.search?.trim().replace(/\s+/g, " ");
+  if (search) {
+    where[(Op.and as unknown) as string] = whereFn(
+      // Qualified because "users" also has first_name/last_name; leaving these
+      // bare would go ambiguous the moment the reviewer join stops being separate.
+      fn(
+        "concat_ws",
+        " ",
+        col("applicant.first_name"),
+        col("applicant.last_name"),
+      ),
+      { [Op.iLike]: `%${escapeLikeWildcards(search)}%` },
+    );
+  }
+
+  return where;
 }
 
 class ReviewCompositeService implements IReviewCompositeService {
@@ -158,6 +243,8 @@ class ReviewCompositeService implements IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
+    view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]> {
     try {
       const perPage = Number.isFinite(Number(resultsPerPage))
@@ -178,8 +265,21 @@ class ReviewCompositeService implements IReviewCompositeService {
       // separate: true runs the hasMany as a second query, so the main query is a
       // plain BelongsTo join — Sequelize won't wrap it in a subquery, which lets
       // ORDER BY reference the "applicant" table directly.
+      const viewWhere: WhereOptions = {};
+      if (view === DashboardViewEnum.SHORTLISTED) {
+        viewWhere.is_shortlisted_for_interview = true;
+      } else if (view === DashboardViewEnum.CONFLICTS) {
+        viewWhere.id = {
+          [Op.in]: literal(`(
+            SELECT applicant_record_id FROM reviewed_applicant_records
+            WHERE reviewer_has_conflict = true
+          )`),
+        };
+      }
+
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: { exclude: ["createdAt", "updatedAt"] },
+        where: { ...buildApplicantRecordWhere(filters), ...viewWhere },
         include: [
           {
             attributes: { exclude: ["updatedAt"] },
@@ -199,6 +299,7 @@ class ReviewCompositeService implements IReviewCompositeService {
           {
             attributes: { exclude: ["createdAt", "updatedAt"] },
             model: Applicant,
+            where: buildApplicantWhere(filters),
           },
         ],
         order,
@@ -217,16 +318,21 @@ class ReviewCompositeService implements IReviewCompositeService {
   async getReviewDashboardApplicantRecordIds(
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    filters?: ReviewDashboardFilters,
   ): Promise<string[]> {
     try {
+      // NOTE: the where clauses must stay identical to getReviewDashboard so
+      //       side panel navigation walks exactly the rows the table shows.
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: ["id"],
+        where: buildApplicantRecordWhere(filters),
         include: [
           {
             // Joined with no attributes so the ORDER BY can reference
             // applicant columns without fetching them.
             attributes: [],
             model: Applicant,
+            where: buildApplicantWhere(filters),
           },
         ],
         order: buildReviewDashboardOrder(sortBy, sortAscending),
@@ -280,6 +386,81 @@ class ReviewCompositeService implements IReviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to get review dashboard side panel for applicant record ${applicantRecordId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async getReviewDashboardFilterOptions(
+    // department filtering not yet supported — reserved for future use
+    _department?: string,
+  ): Promise<ReviewDashboardFilterOptionsDTO> {
+    try {
+      const positionRecords = await Position.findAll({
+        where: {
+          is_archived: false,
+          department: _department ?? { [Op.ne]: null },
+        },
+      });
+
+      const positions = positionRecords.map((p) => ({
+        value: p.title,
+        label: p.title,
+      }));
+
+      const applicationStatuses = Object.values(ApplicationStatusEnum).map(
+        (status) => ({
+          value: status,
+          label: status
+            .replace(/_/g, " ")
+            .toLowerCase()
+            .replace(/\b\w/g, (c) => c.toUpperCase()),
+        }),
+      );
+
+      const skillCategories = Object.values(SkillCategoryEnum).map(
+        (category) => ({
+          value: category,
+          label: category.charAt(0) + category.slice(1).toLowerCase(),
+        }),
+      );
+
+      const scoreRanges = [
+        { value: "gt_25", label: "> 25" },
+        { value: "20_25", label: "20 - 25" },
+        { value: "15_20", label: "15 - 20" },
+        { value: "lt_15", label: "< 15" },
+      ];
+
+      const years = [
+        { value: "1A", label: "1A" },
+        { value: "1B", label: "1B" },
+        { value: "2A", label: "2A" },
+        { value: "2B", label: "2B" },
+        { value: "3A", label: "3A" },
+        { value: "3B", label: "3B" },
+        { value: "4A", label: "4A" },
+        { value: "4B", label: "4B" },
+        { value: "5A", label: "5A" },
+        { value: "5B", label: "5B" },
+        { value: "Graduate student", label: "Graduate student" },
+      ];
+
+      const bookmarked = [{ value: "true", label: "Bookmarked" }];
+
+      return {
+        positions,
+        applicationStatuses,
+        skillCategories,
+        scoreRanges,
+        years,
+        bookmarked,
+      };
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get review dashboard filter options. Reason = ${getErrorMessage(
           error,
         )}`,
       );

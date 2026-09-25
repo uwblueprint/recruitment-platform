@@ -31,6 +31,30 @@ const reviewDashboardType = gql`
     reviewDetails: [ReviewDashboardReviewDetails!]!
   }
 
+  type FilterOption {
+    value: String!
+    label: String!
+  }
+
+  type ReviewDashboardFilterOptionsDTO {
+    positions: [FilterOption!]!
+    applicationStatuses: [FilterOption!]!
+    skillCategories: [FilterOption!]!
+    scoreRanges: [FilterOption!]!
+    years: [FilterOption!]!
+    bookmarked: [FilterOption!]!
+  }
+
+  input ReviewDashboardFilters {
+    search: String
+    positions: [String!]
+    applicationStatuses: [ApplicationStatus!]
+    skillCategories: [SkillCategory!]
+    scoreRanges: [String!]
+    years: [String!]
+    bookmarked: Boolean
+  }
+
   enum ReviewDashboardSortBy {
     FIRST_NAME
     LAST_NAME
@@ -42,22 +66,35 @@ const reviewDashboardType = gql`
     APPLICATION_STATUS
   }
 
+  enum DashboardView {
+    ALL
+    SHORTLISTED
+    CONFLICTS
+  }
+
   extend type Query {
     reviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
       sortBy: ReviewDashboardSortBy
       sortAscending: Boolean
+      filters: ReviewDashboardFilters
+      view: DashboardView
     ): [ReviewDashboardRowDTO!]!
 
     reviewDashboardApplicantRecordIds(
       sortBy: ReviewDashboardSortBy
       sortAscending: Boolean
+      filters: ReviewDashboardFilters
     ): [ID!]!
 
     reviewDashboardSidePanel(
       applicantRecordId: ID!
     ): ReviewDashboardSidePanelDTO!
+
+    reviewDashboardFilterOptions(
+      department: String
+    ): ReviewDashboardFilterOptionsDTO!
   }
 
   extend type Mutation {
