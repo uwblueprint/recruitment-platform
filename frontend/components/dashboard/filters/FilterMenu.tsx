@@ -70,7 +70,7 @@ export const FilterMenu = ({
         slotProps={{
           paper: {
             className: "mt-1 w-56 rounded",
-            sx: { maxHeight: 800 },
+            sx: { maxHeight: 650 },
           },
         }}
       >
