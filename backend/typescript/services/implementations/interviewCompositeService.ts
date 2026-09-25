@@ -116,14 +116,17 @@ function dedupeUsersById(users: User[]): User[] {
  * Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows land
  * on each page — sorting the returned page in JS would only order within a
  * page, since the DB would already have chosen the page by id.
- * COALESCE(...,'') keeps records missing that interviewer ordered as empty
- * strings (first on ASC, last on DESC), and id is a stable tiebreak.
+ * Records missing that interviewer yield a NULL from the subquery, which the
+ * NULLS LAST direction keeps at the bottom; id is a stable tiebreak.
+ * NULLS LAST also keeps missing scores at the bottom in either direction,
+ * matching the review dashboard.
  */
 function buildInterviewDashboardOrder(
   sortBy?: InterviewDashboardSortBy,
   sortAscending?: boolean,
 ): Order {
-  const direction = sortAscending === false ? "DESC" : "ASC";
+  const direction =
+    sortAscending === false ? "DESC NULLS LAST" : "ASC NULLS LAST";
 
   const sortColumnMap: Record<
     Exclude<InterviewDashboardSortBy, "INTERVIEWER_1" | "INTERVIEWER_2">,
@@ -143,7 +146,7 @@ function buildInterviewDashboardOrder(
     const idx = sortBy === InterviewDashboardSortByEnum.INTERVIEWER_1 ? 0 : 1;
     return [
       [
-        literal(`COALESCE((
+        literal(`(
           SELECT u."last_name" || ' ' || u."first_name"
           FROM "interviewed_applicant_records" AS iar
           JOIN "interview_delegations" AS d
@@ -152,7 +155,7 @@ function buildInterviewDashboardOrder(
           WHERE iar."applicant_record_id" = "ApplicantRecord"."id"
           ORDER BY d."createdAt" ASC, d."interviewer_id" ASC
           LIMIT 1 OFFSET ${idx}
-        ), '')`),
+        )`),
         direction,
       ],
       ["id", "ASC"],

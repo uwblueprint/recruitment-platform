@@ -28,7 +28,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   // undefined and the backend falls back to its default order.
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
-  const sortAscending = activeSort && !activeSort.desc;
+  const sortAscending = activeSort ? !activeSort.desc : undefined;
 
   const { rows, isLoading, hasError } = useInterviewDashboard(
     pageNumber,
