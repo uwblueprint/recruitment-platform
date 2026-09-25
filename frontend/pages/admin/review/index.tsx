@@ -1,12 +1,7 @@
 import { Toast } from "@/components/common/Toast";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
-import {
-  FilterChips,
-  FilterMenu,
-  SearchBar,
-  type SelectedFilters,
-} from "@/components/dashboard/filters";
+import type { SelectedFilters } from "@/components/dashboard/filters";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { DashboardView } from "@/graphql/typeUtils";
 import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
@@ -17,7 +12,6 @@ import {
 } from "@tanstack/react-table";
 import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 import { useRouter } from "next/router";
-import { ReactElement, useMemo, useState } from "react";
 import { ReactElement, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import {
@@ -152,10 +146,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     sortAscending,
     backendFilters,
   );
-  const applicantRecordIds = useReviewDashboardApplicantRecordIds();
   const activeRow = rows.find((row) => row.applicantRecordId === activeId);
-  const { details, isLoading: isDetailsLoading } =
-    useReviewDashboardSidePanel(activeId);
   const { details, isLoading: isDetailsLoading } =
     useReviewDashboardSidePanel(activeId);
   const activeNavigationIndex =
@@ -167,7 +158,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // the page that applicant lives on.
   const goToApplicant = (index: number) => {
     const applicantRecordId = applicantRecordIds[index];
-    if (!applicantRecordId) return;
     if (!applicantRecordId) return;
     setActiveId(applicantRecordId);
     setPageNumber(Math.floor(index / resultsPerPage) + 1);
@@ -243,6 +233,16 @@ const AdminReviewPage: NextPageWithLayout = () => {
     clearSelection();
   };
 
+  const visibleRows = useMemo(() => {
+    const trimmedSearch = search.trim().toLowerCase();
+    return trimmedSearch
+      ? rows.filter((row) =>
+          `${row.firstName} ${row.lastName}`
+            .toLowerCase()
+            .includes(trimmedSearch),
+        )
+      : rows;
+  }, [rows, search]);
   const selectedCount = Object.keys(rowSelection).length;
 
   const handleBulkAction = (action: BulkAction) =>
@@ -267,26 +267,21 @@ const AdminReviewPage: NextPageWithLayout = () => {
           onClearAll={() => setRowSelection({})}
         />
 
-        <div className="flex shrink-0 flex-wrap items-center gap-3">
-          <SearchBar value={search} onChange={handleSearchChange} />
-          <FilterMenu
-            categories={filterCategories}
-            selected={selectedFilters}
-            onChange={handleFilterCategoryChange}
-          />
-          <FilterChips
-            categories={filterCategories}
-            selected={selectedFilters}
-            onRemove={handleRemoveFilter}
-          />
-        </div>
-
         <ReviewDashboardToolbar
           position={position}
-          selectedCount={selectedRows.length}
-          disabled={isLoading}
-          onReject={() => handleBulkAction(BulkAction.Reject)}
-          onSelectForInterview={() => handleBulkAction(BulkAction.Interview)}
+          search={{ value: search, onChange: handleSearchChange }}
+          filters={{
+            categories: filterCategories,
+            selected: selectedFilters,
+            onChange: handleFilterCategoryChange,
+            onRemove: handleRemoveFilter,
+          }}
+          bulkActions={{
+            selectedCount: selectedRows.length,
+            disabled: isLoading,
+            onReject: () => handleBulkAction(BulkAction.Reject),
+            onSelectForInterview: () => handleBulkAction(BulkAction.Interview),
+          }}
         />
         {error ? (
           <div
