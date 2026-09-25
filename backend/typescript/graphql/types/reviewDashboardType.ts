@@ -79,7 +79,6 @@ const reviewDashboardType = gql`
       sortBy: ReviewDashboardSortBy
       sortAscending: Boolean
       filters: ReviewDashboardFilters
-      filters: ReviewDashboardFilters
       view: DashboardView
     ): [ReviewDashboardRowDTO!]!
 
@@ -87,16 +86,11 @@ const reviewDashboardType = gql`
       sortBy: ReviewDashboardSortBy
       sortAscending: Boolean
       filters: ReviewDashboardFilters
-      filters: ReviewDashboardFilters
     ): [ID!]!
 
     reviewDashboardSidePanel(
       applicantRecordId: ID!
     ): ReviewDashboardSidePanelDTO!
-
-    reviewDashboardFilterOptions(
-      department: String
-    ): ReviewDashboardFilterOptionsDTO!
 
     reviewDashboardFilterOptions(
       department: String

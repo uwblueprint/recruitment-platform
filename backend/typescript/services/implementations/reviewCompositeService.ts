@@ -15,12 +15,9 @@ import User from "../../models/user.model";
 import {
   ApplicantRecordWithReviewersDTO,
   ApplicationStatusEnum,
-  ApplicationStatusEnum,
   CreateReviewedApplicantRecordDTO,
   DashboardView,
   DashboardViewEnum,
-  ReviewDashboardFilterOptionsDTO,
-  ReviewDashboardFilters,
   ReviewDashboardFilterOptionsDTO,
   ReviewDashboardFilters,
   ReviewDashboardRowDTO,
@@ -30,7 +27,6 @@ import {
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
   ReviewStatusEnum,
-  SkillCategoryEnum,
   SkillCategoryEnum,
 } from "../../types";
 import {
@@ -44,7 +40,6 @@ import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IReviewCompositeService from "../interfaces/IReviewCompositeService";
 import ReviewedApplicantRecordService from "./reviewedApplicantRecordService";
-import Position from "../../models/position.model";
 import Position from "../../models/position.model";
 
 const Logger = logger(__filename);
@@ -165,7 +160,12 @@ function buildApplicantWhere(filters?: ReviewDashboardFilters): WhereOptions {
     where[(Op.and as unknown) as string] = whereFn(
       // Qualified because "users" also has first_name/last_name; leaving these
       // bare would go ambiguous the moment the reviewer join stops being separate.
-      fn("concat_ws", " ", col("applicant.first_name"), col("applicant.last_name")),
+      fn(
+        "concat_ws",
+        " ",
+        col("applicant.first_name"),
+        col("applicant.last_name"),
+      ),
       { [Op.iLike]: `%${escapeLikeWildcards(search)}%` },
     );
   }
@@ -244,7 +244,6 @@ class ReviewCompositeService implements IReviewCompositeService {
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
     filters?: ReviewDashboardFilters,
-    filters?: ReviewDashboardFilters,
     view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]> {
     try {
@@ -281,7 +280,6 @@ class ReviewCompositeService implements IReviewCompositeService {
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: { exclude: ["createdAt", "updatedAt"] },
         where: { ...buildApplicantRecordWhere(filters), ...viewWhere },
-        where: { ...buildApplicantRecordWhere(filters), ...viewWhere },
         include: [
           {
             attributes: { exclude: ["updatedAt"] },
@@ -302,7 +300,6 @@ class ReviewCompositeService implements IReviewCompositeService {
             attributes: { exclude: ["createdAt", "updatedAt"] },
             model: Applicant,
             where: buildApplicantWhere(filters),
-            where: buildApplicantWhere(filters),
           },
         ],
         order,
@@ -322,16 +319,12 @@ class ReviewCompositeService implements IReviewCompositeService {
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
     filters?: ReviewDashboardFilters,
-    filters?: ReviewDashboardFilters,
   ): Promise<string[]> {
     try {
       // NOTE: the where clauses must stay identical to getReviewDashboard so
       //       side panel navigation walks exactly the rows the table shows.
-      // NOTE: the where clauses must stay identical to getReviewDashboard so
-      //       side panel navigation walks exactly the rows the table shows.
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: ["id"],
-        where: buildApplicantRecordWhere(filters),
         where: buildApplicantRecordWhere(filters),
         include: [
           {
@@ -339,7 +332,6 @@ class ReviewCompositeService implements IReviewCompositeService {
             // applicant columns without fetching them.
             attributes: [],
             model: Applicant,
-            where: buildApplicantWhere(filters),
             where: buildApplicantWhere(filters),
           },
         ],
@@ -409,80 +401,7 @@ class ReviewCompositeService implements IReviewCompositeService {
       const positionRecords = await Position.findAll({
         where: {
           is_archived: false,
-        },
-      });
-
-      const positions = positionRecords.map((p) => ({
-        value: p.title,
-        label: p.title,
-      }));
-
-      const applicationStatuses = Object.values(ApplicationStatusEnum).map(
-        (status) => ({
-          value: status,
-          label: status
-            .replace(/_/g, " ")
-            .toLowerCase()
-            .replace(/\b\w/g, (c) => c.toUpperCase()),
-        }),
-      );
-
-      const skillCategories = Object.values(SkillCategoryEnum).map(
-        (category) => ({
-          value: category,
-          label: category.charAt(0) + category.slice(1).toLowerCase(),
-        }),
-      );
-
-      const scoreRanges = [
-        { value: "gt_25", label: "> 25" },
-        { value: "20_25", label: "20 - 25" },
-        { value: "15_20", label: "15 - 20" },
-        { value: "lt_15", label: "< 15" },
-      ];
-
-      const years = [
-        { value: "1A", label: "1A" },
-        { value: "1B", label: "1B" },
-        { value: "2A", label: "2A" },
-        { value: "2B", label: "2B" },
-        { value: "3A", label: "3A" },
-        { value: "3B", label: "3B" },
-        { value: "4A", label: "4A" },
-        { value: "4B", label: "4B" },
-        { value: "5A", label: "5A" },
-        { value: "5B", label: "5B" },
-        { value: "Graduate student", label: "Graduate student" },
-      ];
-
-      const bookmarked = [{ value: "true", label: "Bookmarked" }];
-
-      return {
-        positions,
-        applicationStatuses,
-        skillCategories,
-        scoreRanges,
-        years,
-        bookmarked,
-      };
-    } catch (error: unknown) {
-      Logger.error(
-        `Failed to get review dashboard filter options. Reason = ${getErrorMessage(
-          error,
-        )}`,
-      );
-      throw error;
-    }
-  }
-
-  async getReviewDashboardFilterOptions(
-    // department filtering not yet supported — reserved for future use
-    _department?: string,
-  ): Promise<ReviewDashboardFilterOptionsDTO> {
-    try {
-      const positionRecords = await Position.findAll({
-        where: {
-          is_archived: false,
+          department: _department ?? { [Op.ne]: null },
         },
       });
 

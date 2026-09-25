@@ -2,14 +2,11 @@ import { Toast } from "@/components/common/Toast";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import {
-  FilterChips,
-  FilterMenu,
-  SearchBar,
+  FilterCategoryVariant,
   type SelectedFilters,
 } from "@/components/dashboard/filters";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { DashboardView } from "@/graphql/typeUtils";
-import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
 import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
@@ -80,72 +77,12 @@ const AdminReviewPage: NextPageWithLayout = () => {
     []
   );
 
-  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
-  const [search, setSearch] = useState("");
-
   // The query fires on the settled text; the input keeps the raw value.
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
 
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort ? !activeSort.desc : undefined;
-
-  const { filterOptions } = useReviewDashboardFilterOptions();
-
-  // build filter categories from backend options
-  const filterCategories = useMemo(() => {
-    if (!filterOptions) return [];
-    return [
-      { key: "position", label: "Role", options: filterOptions.positions },
-      {
-        key: "applicationStatus",
-        label: "Application Status",
-        options: filterOptions.applicationStatuses,
-      },
-      {
-        key: "skillCategory",
-        label: "Skill Category",
-        options: filterOptions.skillCategories,
-      },
-      {
-        key: "scoreRange",
-        label: "Score",
-        options: filterOptions.scoreRanges,
-        chipPrefix: "Score",
-      },
-      { key: "year", label: "Year", options: filterOptions.years },
-      {
-        key: "bookmarked",
-        label: "Bookmarked",
-        options: filterOptions.bookmarked,
-        variant: "toggle" as const,
-      },
-    ];
-  }, [filterOptions]);
-
-  // convert SelectedFilters to ReviewDashboardFilters for the backend
-  const backendFilters = useMemo(
-    (): ReviewDashboardFilters => ({
-      search: debouncedSearch.trim() ? debouncedSearch : undefined,
-      positions: selectedFilters.position?.length
-        ? selectedFilters.position
-        : undefined,
-      applicationStatuses: selectedFilters.applicationStatus?.length
-        ? (selectedFilters.applicationStatus as ReviewDashboardFilters["applicationStatuses"])
-        : undefined,
-      skillCategories: selectedFilters.skillCategory?.length
-        ? (selectedFilters.skillCategory as ReviewDashboardFilters["skillCategories"])
-        : undefined,
-      scoreRanges: selectedFilters.scoreRange?.length
-        ? selectedFilters.scoreRange
-        : undefined,
-      years: selectedFilters.year?.length ? selectedFilters.year : undefined,
-      bookmarked: selectedFilters.bookmarked?.includes("true")
-        ? true
-        : undefined,
-    }),
-    [selectedFilters, debouncedSearch],
-  );
 
   const { filterOptions } = useReviewDashboardFilterOptions();
 
@@ -183,6 +120,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // convert SelectedFilters to ReviewDashboardFilters for the backend
   const backendFilters = useMemo(
     (): ReviewDashboardFilters => ({
+      search: debouncedSearch.trim() ? debouncedSearch : undefined,
       positions: selectedFilters.position?.length
         ? selectedFilters.position
         : undefined,
@@ -200,7 +138,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         ? true
         : undefined,
     }),
-    [selectedFilters],
+    [selectedFilters, debouncedSearch],
   );
 
   const { rows, isLoading, error, refetch } = useReviewDashboard(
@@ -298,70 +236,12 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setRowSelection({});
   };
 
-  const handleFilterCategoryChange = (
-    categoryKey: string,
-    values: string[],
-  ) => {
-    setSelectedFilters((prev) => ({ ...prev, [categoryKey]: values }));
-    setPageNumber(1);
-    setRowSelection({});
-  };
-
-  const handleRemoveFilter = (categoryKey: string, value: string) => {
-    setSelectedFilters((prev) => ({
-      ...prev,
-      [categoryKey]: (prev[categoryKey] ?? []).filter((v) => v !== value),
-    }));
-    setPageNumber(1);
-    setRowSelection({});
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    setPageNumber(1);
-    setRowSelection({});
-  };
-
-  const handleFilterCategoryChange = (
-    categoryKey: string,
-    values: string[],
-  ) => {
-    setSelectedFilters((prev) => ({ ...prev, [categoryKey]: values }));
-    setPageNumber(1);
-    setRowSelection({});
-  };
-
-  const handleRemoveFilter = (categoryKey: string, value: string) => {
-    setSelectedFilters((prev) => ({
-      ...prev,
-      [categoryKey]: (prev[categoryKey] ?? []).filter((v) => v !== value),
-    }));
-    setPageNumber(1);
-    setRowSelection({});
-  };
-
-  const handleSearchChange = (value: string) => {
-    setSearch(value);
-    setPageNumber(1);
-    setRowSelection({});
-  };
-
   const handleSearchChange = (value: string) => {
     setSearch(value);
     setPageNumber(1);
     clearSelection();
   };
 
-  const visibleRows = useMemo(() => {
-    const trimmedSearch = search.trim().toLowerCase();
-    return trimmedSearch
-      ? rows.filter((row) =>
-          `${row.firstName} ${row.lastName}`
-            .toLowerCase()
-            .includes(trimmedSearch),
-        )
-      : rows;
-  }, [rows, search]);
   const selectedCount = Object.keys(rowSelection).length;
 
   const handleBulkAction = (action: BulkAction) =>
@@ -385,20 +265,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
           selectedCount={selectedCount}
           onClearAll={() => setRowSelection({})}
         />
-
-        <div className="flex shrink-0 flex-wrap items-center gap-3">
-          <SearchBar value={search} onChange={handleSearchChange} />
-          <FilterMenu
-            categories={filterCategories}
-            selected={selectedFilters}
-            onChange={handleFilterCategoryChange}
-          />
-          <FilterChips
-            categories={filterCategories}
-            selected={selectedFilters}
-            onRemove={handleRemoveFilter}
-          />
-        </div>
 
         <ReviewDashboardToolbar
           position={position}
@@ -425,7 +291,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           </div>
         ) : null}
         <DashboardTable
-          data={visibleRows}
+          data={rows}
           columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}

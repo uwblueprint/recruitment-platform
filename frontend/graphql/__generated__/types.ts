@@ -160,12 +160,6 @@ export type FilterOption = {
   value: Scalars['String']['output'];
 };
 
-export type FilterOption = {
-  __typename?: 'FilterOption';
-  label: Scalars['String']['output'];
-  value: Scalars['String']['output'];
-};
-
 export type Interview = {
   __typename?: 'Interview';
   comments?: Maybe<Scalars['String']['output']>;
@@ -613,7 +607,6 @@ export type Query = {
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
   reviewDashboardFilterOptions: ReviewDashboardFilterOptionsDto;
-  reviewDashboardFilterOptions: ReviewDashboardFilterOptionsDto;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
   reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
@@ -715,7 +708,6 @@ export type QueryIsAuthorizedToReviewArgs = {
 
 export type QueryReviewDashboardArgs = {
   filters?: InputMaybe<ReviewDashboardFilters>;
-  filters?: InputMaybe<ReviewDashboardFilters>;
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
@@ -726,14 +718,8 @@ export type QueryReviewDashboardArgs = {
 
 export type QueryReviewDashboardApplicantRecordIdsArgs = {
   filters?: InputMaybe<ReviewDashboardFilters>;
-  filters?: InputMaybe<ReviewDashboardFilters>;
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<ReviewDashboardSortBy>;
-};
-
-
-export type QueryReviewDashboardFilterOptionsArgs = {
-  department?: InputMaybe<Scalars['String']['input']>;
 };
 
 
