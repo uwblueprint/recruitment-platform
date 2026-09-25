@@ -5,6 +5,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { Checkbox, Popover } from "@mui/material";
 
 import type { FilterCategory, SelectedFilters } from "./types";
+import { FilterCategoryVariant } from "./types";
 
 type FilterMenuProps = {
   categories: FilterCategory[];
@@ -66,7 +67,12 @@ export const FilterMenu = ({
         onClose={() => setAnchorEl(null)}
         anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         transformOrigin={{ vertical: "top", horizontal: "left" }}
-        slotProps={{ paper: { className: "mt-1 w-56 rounded" } }}
+        slotProps={{
+          paper: {
+            className: "mt-1 w-56 rounded",
+            sx: { maxHeight: 650 },
+          },
+        }}
       >
         <div className="py-2">
           <p className="px-4 pb-2 font-source text-sm font-semibold text-neutral-800">
@@ -76,7 +82,7 @@ export const FilterMenu = ({
           {categories.map((category) => {
             const selectedValues = selected[category.key] ?? [];
 
-            if (category.variant === "toggle") {
+            if (category.variant === FilterCategoryVariant.Toggle) {
               const [option] = category.options;
               if (!option) return null;
               return (

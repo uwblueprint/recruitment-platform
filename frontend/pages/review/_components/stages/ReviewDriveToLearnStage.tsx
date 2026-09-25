@@ -3,7 +3,7 @@ import { ApplicationDTO } from "@/types";
 import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
 import { useContext } from "react";
 import { ReportConflictButton } from "../common/ReportConflictButton";
-import { ReviewScoreInput } from "../common/ReviewScoreInput";
+import { ScoreInput } from "@/components/common/ScoreInput";
 import { ReviewStageHeader } from "../common/ReviewStageHeader";
 import { ReviewerScoresList } from "../common/ReviewerScoresList";
 import { BACK_TO_HOME_HREF, ReviewStage } from "../constants";
@@ -85,7 +85,7 @@ export const ReviewDriveToLearnStage = ({
           <ReviewerScoresList scores={reviewerScores} />
         ) : (
           <div className="flex items-center gap-3">
-            <ReviewScoreInput
+            <ScoreInput
               id="d2l-score"
               value={scores[ReviewStage.D2L] || ""}
               min={1}
