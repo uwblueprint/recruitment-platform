@@ -2,6 +2,7 @@ import InterviewCompositeService from "../../services/implementations/interviewC
 import IInterviewCompositeService from "../../services/interfaces/IInterviewCompositeService";
 import {
   InterviewDashboardRowDTO,
+  InterviewDashboardSortBy,
   InterviewDelegationDTO,
   InterviewInviteDTO,
 } from "../../types";
@@ -15,14 +16,20 @@ const interviewDashboardResolvers = {
       {
         pageNumber,
         resultsPerPage,
+        sortBy,
+        sortAscending,
       }: {
         pageNumber: number;
         resultsPerPage: number;
+        sortBy?: InterviewDashboardSortBy;
+        sortAscending?: boolean;
       },
     ): Promise<InterviewDashboardRowDTO[]> => {
       return interviewCompositeService.getInterviewDashboard(
         pageNumber,
         resultsPerPage,
+        sortBy,
+        sortAscending,
       );
     },
     interviewInvites: async (): Promise<InterviewInviteDTO[]> => {

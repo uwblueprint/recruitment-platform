@@ -79,7 +79,7 @@ export const DashboardTable = <TData extends RowData>({
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="h-11 whitespace-nowrap px-4 text-xs font-normal text-neutral-800"
+                    className="h-11 whitespace-nowrap px-4 text-sm font-normal text-neutral-800"
                     style={{ width: header.getSize() }}
                   >
                     {header.isPlaceholder ? null : header.column.getCanSort() ? (

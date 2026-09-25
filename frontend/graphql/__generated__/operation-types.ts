@@ -43,6 +43,8 @@ export type DeleteAdminCommentByIdMutation = { deleteAdminCommentById: { id: str
 export type InterviewDashboardQueryVariables = Exact<{
   pageNumber: number;
   resultsPerPage: number;
+  sortBy?: Types.InterviewDashboardSortBy | null | undefined;
+  sortAscending?: boolean | null | undefined;
 }>;
 
 

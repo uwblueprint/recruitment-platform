@@ -1,6 +1,7 @@
 import {
   InterviewDelegationDTO,
   InterviewDashboardRowDTO,
+  InterviewDashboardSortBy,
   InterviewInviteDTO,
   InterviewedApplicantsDTO,
   InterviewNotesDTO,
@@ -12,10 +13,16 @@ import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 interface IInterviewCompositeService {
   /**
    * Fetches paginated applicants for the admin interview dashboard.
+   * @Param pageNumber the page the viewer is on
+   * @Param resultsPerPage the number of results per page
+   * @Param sortBy the dashboard column to sort results by
+   * @Param sortAscending whether to sort ascending; defaults to true
    */
   getInterviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    sortBy?: InterviewDashboardSortBy,
+    sortAscending?: boolean,
   ): Promise<InterviewDashboardRowDTO[]>;
 
   /**
