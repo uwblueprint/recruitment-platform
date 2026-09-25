@@ -7,7 +7,11 @@ export type EmailContent = {
   html: string;
 };
 
-const TEMPLATE_DIR = path.join(__dirname, "templates");
+const LOCAL_TEMPLATE_DIR = path.join(__dirname, "templates");
+// Compiled code lives in build/emails; deployments also include the source templates.
+const TEMPLATE_DIR = fs.existsSync(LOCAL_TEMPLATE_DIR)
+  ? LOCAL_TEMPLATE_DIR
+  : path.resolve(__dirname, "../../emails/templates");
 
 const compiledTemplates = new Map<string, Handlebars.TemplateDelegate>();
 

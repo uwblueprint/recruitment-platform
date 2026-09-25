@@ -132,6 +132,8 @@ const useBulkStatusAction = ({
 
     dispatch({ type: DialogueEventType.Submit });
     try {
+      // For rejections, this mutation also triggers the backend rejection mailer
+      // after committing the statuses. Its response does not confirm email delivery.
       await ReviewDashboardAPIClient.bulkUpdateApplicantRecordsStatus(
         applicants.map((applicant) => applicant.id),
         config.status

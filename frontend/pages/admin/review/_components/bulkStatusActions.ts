@@ -13,7 +13,7 @@ export const BULK_ACTIONS = {
     status: ApplicationStatus.Rejected,
     title: "Send rejection to candidates",
     description:
-      "This action will mark the applicants listed below as rejected. Please confirm your selections.",
+      "This action will mark the applicants listed below as rejected and send them rejection emails. Please confirm your selections.",
     confirmLabel: "Confirm rejection",
     toast: (count: number) => ({
       title: `${pluralizeCandidates(count)} marked as rejected`,
