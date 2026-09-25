@@ -3,6 +3,11 @@ export type FilterOption = {
   label: string;
 };
 
+export enum FilterCategoryVariant {
+  Accordion = "accordion",
+  Toggle = "toggle",
+}
+
 export type FilterCategory = {
   key: string;
   label: string;
@@ -12,7 +17,7 @@ export type FilterCategory = {
    * "toggle" renders a single checkbox row for one-option categories such as
    * Bookmarked, where a nested list would read as a redundant repeat.
    */
-  variant?: "accordion" | "toggle";
+  variant?: FilterCategoryVariant;
   /**
    * Prefixes the chip label, for categories whose values do not stand alone
    * (e.g. Score, where "> 25" alone is ambiguous).

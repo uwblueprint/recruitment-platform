@@ -35,19 +35,21 @@ export const ReviewDashboardToolbar = ({
   filters,
   bulkActions,
 }: ReviewDashboardToolbarProps) => (
-  <div className="flex shrink-0 items-center justify-between gap-4">
+  <div className="flex shrink-0 items-start justify-between gap-4">
     {position ? (
       <h1 className="font-poppins text-[28px] font-semibold leading-[140%] text-blue">
         {position} Applications
       </h1>
     ) : null}
-    <div className="flex min-w-0 flex-1 flex-wrap items-center gap-3">
+    <div className="flex shrink-0 items-center gap-3">
       <SearchBar value={search.value} onChange={search.onChange} />
       <FilterMenu
         categories={filters.categories}
         selected={filters.selected}
         onChange={filters.onChange}
       />
+    </div>
+    <div className="flex min-w-0 flex-1 flex-wrap items-start gap-3">
       <FilterChips
         categories={filters.categories}
         selected={filters.selected}

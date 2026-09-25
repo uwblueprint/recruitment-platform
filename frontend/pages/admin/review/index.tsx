@@ -1,7 +1,10 @@
 import { Toast } from "@/components/common/Toast";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
-import type { SelectedFilters } from "@/components/dashboard/filters";
+import {
+  FilterCategoryVariant,
+  type SelectedFilters,
+} from "@/components/dashboard/filters";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { DashboardView } from "@/graphql/typeUtils";
 import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
@@ -104,7 +107,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         key: "bookmarked",
         label: "Bookmarked",
         options: filterOptions.bookmarked,
-        variant: "toggle" as const,
+        variant: FilterCategoryVariant.Toggle,
       },
     ];
   }, [filterOptions]);
