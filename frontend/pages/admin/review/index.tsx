@@ -1,8 +1,13 @@
 import { Toast } from "@/components/common/Toast";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
+import {
+  FilterCategoryVariant,
+  type SelectedFilters,
+} from "@/components/dashboard/filters";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { DashboardView } from "@/graphql/typeUtils";
+import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
   RowSelectionState,
@@ -22,6 +27,7 @@ import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
 import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
+import useReviewDashboardFilterOptions from "./_components/hooks/useReviewDashboardFilterOptions";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
 import useTabCounts from "./_components/hooks/useTabCounts";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
@@ -50,6 +56,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
+  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const [search, setSearch] = useState("");
+
   const [reviewerReassignmentTarget, setReviewerReassignmentTarget] =
     useState<ReviewerReassignmentTarget | null>(null);
 
@@ -70,15 +79,76 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort ? !activeSort.desc : undefined;
 
+  const { filterOptions } = useReviewDashboardFilterOptions();
+
+  // build filter categories from backend options
+  const filterCategories = useMemo(() => {
+    if (!filterOptions) return [];
+    return [
+      { key: "position", label: "Role", options: filterOptions.positions },
+      {
+        key: "applicationStatus",
+        label: "Application Status",
+        options: filterOptions.applicationStatuses,
+      },
+      {
+        key: "skillCategory",
+        label: "Skill Category",
+        options: filterOptions.skillCategories,
+      },
+      {
+        key: "scoreRange",
+        label: "Score",
+        options: filterOptions.scoreRanges,
+        chipPrefix: "Score",
+      },
+      { key: "year", label: "Year", options: filterOptions.years },
+      {
+        key: "bookmarked",
+        label: "Bookmarked",
+        options: filterOptions.bookmarked,
+        variant: FilterCategoryVariant.Toggle,
+      },
+    ];
+  }, [filterOptions]);
+
+  // convert SelectedFilters to ReviewDashboardFilters for the backend
+  const backendFilters = useMemo(
+    (): ReviewDashboardFilters => ({
+      positions: selectedFilters.position?.length
+        ? selectedFilters.position
+        : undefined,
+      applicationStatuses: selectedFilters.applicationStatus?.length
+        ? (selectedFilters.applicationStatus as ReviewDashboardFilters["applicationStatuses"])
+        : undefined,
+      skillCategories: selectedFilters.skillCategory?.length
+        ? (selectedFilters.skillCategory as ReviewDashboardFilters["skillCategories"])
+        : undefined,
+      scoreRanges: selectedFilters.scoreRange?.length
+        ? selectedFilters.scoreRange
+        : undefined,
+      years: selectedFilters.year?.length ? selectedFilters.year : undefined,
+      bookmarked: selectedFilters.bookmarked?.includes("true")
+        ? true
+        : undefined,
+    }),
+    [selectedFilters],
+  );
+
   const { rows, isLoading, error, refetch } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
     sortBy,
     sortAscending,
+    backendFilters,
     activeView
   );
 
-  const applicantRecordIds = useReviewDashboardApplicantRecordIds();
+  const applicantRecordIds = useReviewDashboardApplicantRecordIds(
+    sortBy,
+    sortAscending,
+    backendFilters,
+  );
   const activeRow = rows.find((row) => row.applicantRecordId === activeId);
   const { details, isLoading: isDetailsLoading } =
     useReviewDashboardSidePanel(activeId);
@@ -135,12 +205,47 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setActiveId(undefined);
     clearSelection();
   };
+
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSorting(updater);
     setPageNumber(1);
     clearSelection();
   };
 
+  const handleFilterCategoryChange = (
+    categoryKey: string,
+    values: string[],
+  ) => {
+    setSelectedFilters((prev) => ({ ...prev, [categoryKey]: values }));
+    setPageNumber(1);
+    setRowSelection({});
+  };
+
+  const handleRemoveFilter = (categoryKey: string, value: string) => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [categoryKey]: (prev[categoryKey] ?? []).filter((v) => v !== value),
+    }));
+    setPageNumber(1);
+    setRowSelection({});
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPageNumber(1);
+    clearSelection();
+  };
+
+  const visibleRows = useMemo(() => {
+    const trimmedSearch = search.trim().toLowerCase();
+    return trimmedSearch
+      ? rows.filter((row) =>
+          `${row.firstName} ${row.lastName}`
+            .toLowerCase()
+            .includes(trimmedSearch),
+        )
+      : rows;
+  }, [rows, search]);
   const selectedCount = Object.keys(rowSelection).length;
 
   const handleBulkAction = (action: BulkAction) =>
@@ -167,10 +272,19 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
         <ReviewDashboardToolbar
           position={position}
-          selectedCount={selectedRows.length}
-          disabled={isLoading}
-          onReject={() => handleBulkAction(BulkAction.Reject)}
-          onSelectForInterview={() => handleBulkAction(BulkAction.Interview)}
+          search={{ value: search, onChange: handleSearchChange }}
+          filters={{
+            categories: filterCategories,
+            selected: selectedFilters,
+            onChange: handleFilterCategoryChange,
+            onRemove: handleRemoveFilter,
+          }}
+          bulkActions={{
+            selectedCount: selectedRows.length,
+            disabled: isLoading,
+            onReject: () => handleBulkAction(BulkAction.Reject),
+            onSelectForInterview: () => handleBulkAction(BulkAction.Interview),
+          }}
         />
         {error ? (
           <div
@@ -181,7 +295,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           </div>
         ) : null}
         <DashboardTable
-          data={rows}
+          data={visibleRows}
           columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}

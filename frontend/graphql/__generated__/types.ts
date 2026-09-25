@@ -154,6 +154,12 @@ export enum Enum {
   D = 'D'
 }
 
+export type FilterOption = {
+  __typename?: 'FilterOption';
+  label: Scalars['String']['output'];
+  value: Scalars['String']['output'];
+};
+
 export type Interview = {
   __typename?: 'Interview';
   comments?: Maybe<Scalars['String']['output']>;
@@ -600,6 +606,7 @@ export type Query = {
   isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
+  reviewDashboardFilterOptions: ReviewDashboardFilterOptionsDto;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
   reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
@@ -700,6 +707,7 @@ export type QueryIsAuthorizedToReviewArgs = {
 
 
 export type QueryReviewDashboardArgs = {
+  filters?: InputMaybe<ReviewDashboardFilters>;
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
@@ -709,8 +717,14 @@ export type QueryReviewDashboardArgs = {
 
 
 export type QueryReviewDashboardApplicantRecordIdsArgs = {
+  filters?: InputMaybe<ReviewDashboardFilters>;
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<ReviewDashboardSortBy>;
+};
+
+
+export type QueryReviewDashboardFilterOptionsArgs = {
+  department?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -769,6 +783,25 @@ export type Review = {
   skill?: Maybe<Scalars['Int']['output']>;
   skillCategory?: Maybe<SkillCategory>;
   teamPlayer?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ReviewDashboardFilterOptionsDto = {
+  __typename?: 'ReviewDashboardFilterOptionsDTO';
+  applicationStatuses: Array<FilterOption>;
+  bookmarked: Array<FilterOption>;
+  positions: Array<FilterOption>;
+  scoreRanges: Array<FilterOption>;
+  skillCategories: Array<FilterOption>;
+  years: Array<FilterOption>;
+};
+
+export type ReviewDashboardFilters = {
+  applicationStatuses?: InputMaybe<Array<ApplicationStatus>>;
+  bookmarked?: InputMaybe<Scalars['Boolean']['input']>;
+  positions?: InputMaybe<Array<Scalars['String']['input']>>;
+  scoreRanges?: InputMaybe<Array<Scalars['String']['input']>>;
+  skillCategories?: InputMaybe<Array<SkillCategory>>;
+  years?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type ReviewDashboardReviewDetails = {

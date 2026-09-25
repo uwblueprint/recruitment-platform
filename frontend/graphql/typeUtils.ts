@@ -65,12 +65,15 @@ export type ReviewedApplicantRecordDTO =
   WithoutTypename<Schema.ReviewedApplicantRecordDto>;
 export type ReviewedApplicantsDTO =
   WithoutTypename<Schema.ReviewedApplicantsDto>;
-export type ShortAnswerQuestionDTO = WithoutTypename<Schema.ShortAnswerQuestion>;
+export type ShortAnswerQuestionDTO =
+  WithoutTypename<Schema.ShortAnswerQuestion>;
 export type SimpleEntityRequestDTO = Schema.SimpleEntityRequestDto;
 export type SimpleEntityResponseDTO =
   WithoutTypename<Schema.SimpleEntityResponseDto>;
 export type UserDTO = WithoutTypename<Schema.UserDto>;
-export type ReviewDashboardReviewDetails = WithoutTypename<Schema.ReviewDashboardReviewDetails>;
+export type ReviewDashboardReviewDetails =
+  WithoutTypename<Schema.ReviewDashboardReviewDetails>;
+export type ReviewDashboardFilters = Schema.ReviewDashboardFilters;
 
 /**
  * Clean aliases for generated GraphQL input types.
@@ -125,6 +128,7 @@ export {
   ReviewDashboardApplicantRecordIdsDocument,
   ReviewDashboardDocument,
   ReviewDashboardSidePanelDocument,
+  ReviewDashboardFilterOptionsDocument,
   UpdateApplicantRecordStatusDocument,
   SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
@@ -185,6 +189,8 @@ export type {
   ReviewDashboardQueryVariables,
   ReviewDashboardSidePanelQuery,
   ReviewDashboardSidePanelQueryVariables,
+  ReviewDashboardFilterOptionsQuery,
+  ReviewDashboardFilterOptionsQueryVariables,
   UpdateApplicantRecordStatusMutation,
   UpdateApplicantRecordStatusMutationVariables,
   SubmitInterviewScoresMutation,
@@ -230,10 +236,7 @@ export type InterviewDashboardResult = ArrayElement<
   OperationField<Operations.InterviewDashboardQuery, "interviewDashboard">
 >;
 export type InterviewerResult = ArrayElement<
-  OperationField<
-    Operations.InterviewersByGroupIdQuery,
-    "interviewersByGroupId"
-  >
+  OperationField<Operations.InterviewersByGroupIdQuery, "interviewersByGroupId">
 >;
 export type InterviewPairingResult = ArrayElement<
   OperationField<
@@ -296,7 +299,13 @@ export type ReviewDashboardSidePanelResult = OperationField<
 >;
 export type ReviewDashboardSidePanelReviewDetail = ArrayElement<
   ReviewDashboardSidePanelResult["reviewDetails"]
- >;
+>;
+
+export type ReviewDashboardFilterOptionsResult = OperationField<
+  Operations.ReviewDashboardFilterOptionsQuery,
+  "reviewDashboardFilterOptions"
+>;
+
 export type ReviewedApplicantResult = ArrayElement<
   OperationField<
     Operations.ReviewedApplicantsByUserIdQuery,

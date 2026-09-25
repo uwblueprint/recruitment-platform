@@ -119,6 +119,7 @@ const graphQLMiddlewares = {
     interviewNotes: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
+    reviewDashboardFilterOptions: authorizedByAdmin(),
     interviewDashboard: authorizedByAdmin(),
     interviewInvites: authorizedByAdmin(),
   },

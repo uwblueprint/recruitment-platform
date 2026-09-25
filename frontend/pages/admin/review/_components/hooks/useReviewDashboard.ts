@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import { DashboardView } from "@/graphql/typeUtils";
 import type {
+  DashboardView,
+  ReviewDashboardFilters,
   ReviewDashboardResult,
   ReviewDashboardSortBy,
 } from "@/graphql/typeUtils";
@@ -18,34 +19,47 @@ const useReviewDashboard = (
   resultsPerPage: number,
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
+  filters?: ReviewDashboardFilters,
   view?: DashboardView,
 ): UseReviewDashboardResult => {
   const [state, setState] = useState<Omit<UseReviewDashboardResult, "refetch">>({
     rows: [],
-    isLoading: false,
+    isLoading: true,
     error: false,
   });
+  const [refreshKey, setRefreshKey] = useState(0);
   const refetch = useCallback(() => {
-    setState((prev) => ({ ...prev, isLoading: true, error: false }));
+    setRefreshKey((previous) => previous + 1);
+  }, []);
+
+  useEffect(() => {
+    let isCurrent = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setState((previous) => ({ ...previous, isLoading: true, error: false }));
+
     ReviewDashboardAPIClient.getReviewDashboard(
       pageNumber,
       resultsPerPage,
       sortBy,
       sortAscending,
+      filters,
       view,
     )
       .then((rows) => {
-        setState({ rows, isLoading: false, error: false });
+        if (isCurrent) {
+          setState({ rows, isLoading: false, error: false });
+        }
       })
       .catch(() => {
-        setState({ rows: [], isLoading: false, error: true });
+        if (isCurrent) {
+          setState({ rows: [], isLoading: false, error: true });
+        }
       });
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending, view]);
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    refetch();
-  }, [refetch]);
+    return () => {
+      isCurrent = false;
+    };
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending, filters, view, refreshKey]);
 
   return {
     ...state,
