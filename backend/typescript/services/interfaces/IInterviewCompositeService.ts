@@ -1,9 +1,7 @@
 import {
-  Interview,
   InterviewDelegationDTO,
   InterviewDashboardRowDTO,
   InterviewInviteDTO,
-  InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   InterviewNotesDTO,
   InterviewPairingsDTO,
