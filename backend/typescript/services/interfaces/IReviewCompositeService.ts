@@ -1,5 +1,6 @@
 import {
   ApplicantRecordWithReviewersDTO,
+  DashboardView,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -37,6 +38,7 @@ interface IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
+    view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]>;
 
   /**
@@ -45,6 +47,18 @@ interface IReviewCompositeService {
    * @Param positions the list of positions the algorithm should run on
    */
   delegateReviewers(positions: string[]): Promise<ReviewedApplicantRecordDTO[]>;
+
+  /**
+   * Fetches every applicant record id in the review dashboard, in the same
+   * order as getReviewDashboard but without pagination, so the side panel can
+   * navigate across pages.
+   * @Param sortBy the field to sort results by
+   * @Param sortAscending whether to sort ascending; defaults to true
+   */
+  getReviewDashboardApplicantRecordIds(
+    sortBy?: ReviewDashboardSortBy,
+    sortAscending?: boolean,
+  ): Promise<string[]>;
 
   /**
    * Fetch data that can fill out the review dashboard side panel for an applicant

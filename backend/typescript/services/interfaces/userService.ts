@@ -48,6 +48,13 @@ interface IUserService {
   getAuthIdById(userId: string): Promise<string>;
 
   /**
+   * Get all user information with given position
+   * @returns array of UserDTOs
+   * @param position user's position
+   */
+  getUsersByPosition(position: string): Promise<Array<UserDTO>>;
+
+  /**
    * Get all user information (possibly paginated in the future)
    * @returns array of UserDTOs
    * @throws Error if user retrieval fails

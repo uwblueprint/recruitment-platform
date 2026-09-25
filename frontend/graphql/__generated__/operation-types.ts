@@ -4,6 +4,13 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type * as Types from './types';
 
+export type AdminCommentsByApplicantRecordIdQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type AdminCommentsByApplicantRecordIdQuery = { adminCommentsByApplicantRecordId: Array<{ id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string }> };
+
 export type ApplicationQueryVariables = Exact<{
   applicantRecordId: string | number;
 }>;
@@ -33,6 +40,25 @@ export type InterviewGroupQueryVariables = Exact<{
 
 
 export type InterviewGroupQuery = { interviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
+
+export type InterviewInvitesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InterviewInvitesQuery = { interviewInvites: Array<{ id: string, position: string, schedulingLink: string | null, status: Types.InterviewGroupStatus, interviewers: Array<{ id: string, firstName: string, lastName: string }>, interviewees: Array<{ firstName: string, lastName: string, position: string }> }> };
+
+export type InterviewNotesQueryVariables = Exact<{
+  interviewedApplicantRecordId: string | number;
+}>;
+
+
+export type InterviewNotesQuery = { interviewNotes: { fileId: string, fileName: string, signedUrl: string } | null };
+
+export type InterviewedApplicantRecordByApplicantRecordIdQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type InterviewedApplicantRecordByApplicantRecordIdQuery = { interviewedApplicantRecordByApplicantRecordId: { id: string, applicantRecordId: string, score: number | null, status: Types.InterviewStatus, interviewNotesId: string | null, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
 
 export type InterviewedApplicantsByUserIdQueryVariables = Exact<{
   userId: string | number;
@@ -78,6 +104,15 @@ export type LoginWithGoogleMutationVariables = Exact<{
 
 export type LoginWithGoogleMutation = { loginWithGoogle: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean, accessToken: string, refreshToken: string } };
 
+export type ReassignReviewerMutationVariables = Exact<{
+  applicantRecordId: string | number;
+  oldReviewerId: string | number;
+  newReviewerId: string | number;
+}>;
+
+
+export type ReassignReviewerMutation = { reassignReviewer: { applicantRecordId: string, reviewerId: string, status: string } };
+
 export type RefreshMutationVariables = Exact<{
   refreshToken: string;
 }>;
@@ -107,10 +142,26 @@ export type ReviewDashboardQueryVariables = Exact<{
   resultsPerPage: number;
   sortBy?: Types.ReviewDashboardSortBy | null | undefined;
   sortAscending?: boolean | null | undefined;
+  view?: Types.DashboardView | null | undefined;
 }>;
 
 
 export type ReviewDashboardQuery = { reviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, timesApplied: string, applicationStatus: Types.ApplicationStatus, choice: number, totalScore: number | null, reviewers: Array<{ id: string, firstName: string, lastName: string, email: string, position: string | null, role: Types.Role, isArchived: boolean }> }> };
+
+export type ReviewDashboardApplicantRecordIdsQueryVariables = Exact<{
+  sortBy?: Types.ReviewDashboardSortBy | null | undefined;
+  sortAscending?: boolean | null | undefined;
+}>;
+
+
+export type ReviewDashboardApplicantRecordIdsQuery = { reviewDashboardApplicantRecordIds: Array<string> };
+
+export type ReviewDashboardSidePanelQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type ReviewDashboardSidePanelQuery = { reviewDashboardSidePanel: { firstName: string, lastName: string, position: string, program: string, academicYear: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, reviewDetails: Array<{ reviewStatus: Types.ReviewStatus, reviewer: { id: string, firstName: string, lastName: string }, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null }> } };
 
 export type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables = Exact<{
   applicantRecordId: string | number;
@@ -125,6 +176,22 @@ export type ReviewedApplicantsByUserIdQueryVariables = Exact<{
 
 
 export type ReviewedApplicantsByUserIdQuery = { reviewedApplicantsByUserId: Array<{ applicantRecordId: string, reviewStatus: Types.ReviewStatus, applicantFirstName: string, applicantLastName: string }> };
+
+export type SubmitInterviewScoresMutationVariables = Exact<{
+  id: string | number;
+  interviewJson: Types.InterviewInput;
+}>;
+
+
+export type SubmitInterviewScoresMutation = { submitInterviewScores: { id: string, score: number | null, status: Types.InterviewStatus, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
+
+export type UpdateAdminCommentMutationVariables = Exact<{
+  id: string | number;
+  adminComment: Types.UpdateAdminCommentDto;
+}>;
+
+
+export type UpdateAdminCommentMutation = { updateAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
 
 export type UpdateApplicantRecordStatusMutationVariables = Exact<{
   id: string | number;
@@ -149,3 +216,18 @@ export type UpdateInterviewGroupSchedulingLinkMutationVariables = Exact<{
 
 
 export type UpdateInterviewGroupSchedulingLinkMutation = { updateInterviewGroupSchedulingLink: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
+
+export type UploadInterviewNotesMutationVariables = Exact<{
+  interviewedApplicantRecordId: string | number;
+  file: File;
+}>;
+
+
+export type UploadInterviewNotesMutation = { uploadInterviewNotes: { fileId: string, fileName: string, signedUrl: string } };
+
+export type UsersByPositionQueryVariables = Exact<{
+  position: string;
+}>;
+
+
+export type UsersByPositionQuery = { usersByPosition: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean } | null> };

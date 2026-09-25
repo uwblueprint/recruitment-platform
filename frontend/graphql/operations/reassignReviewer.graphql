@@ -1,0 +1,15 @@
+mutation ReassignReviewer (
+    $applicantRecordId: ID!
+    $oldReviewerId: ID!
+    $newReviewerId: ID!
+) {
+    reassignReviewer(
+        applicantRecordId: $applicantRecordId
+        oldReviewerId: $oldReviewerId
+        newReviewerId: $newReviewerId
+    ) {
+        applicantRecordId
+        reviewerId
+        status
+    }
+}

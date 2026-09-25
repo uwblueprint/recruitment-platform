@@ -3,12 +3,14 @@ query ReviewDashboard(
   $resultsPerPage: Int!
   $sortBy: ReviewDashboardSortBy
   $sortAscending: Boolean
+  $view: DashboardView
 ) {
   reviewDashboard(
     pageNumber: $pageNumber
     resultsPerPage: $resultsPerPage
     sortBy: $sortBy
     sortAscending: $sortAscending
+    view: $view
   ) {
     applicantRecordId
     firstName

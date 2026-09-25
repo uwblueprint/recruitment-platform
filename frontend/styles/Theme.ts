@@ -26,6 +26,7 @@ const SCREEN_BREAKPOINTS = {
       C60: "#333333",
       C70: "#000000",
       B10: "#0573e8",
+      B15: "#3182ce",
       B20: "#135fc5",
       B30: "#003884",
       B40: "#1f3c5f",
@@ -37,6 +38,7 @@ const SCREEN_BREAKPOINTS = {
   
       greys: {
         border: "#CECECE",
+        checkbox_border: "#C4C4C4",
       },
   
       //Secondary Colours
@@ -58,6 +60,7 @@ const SCREEN_BREAKPOINTS = {
       G20: "#93c94f",
       G30: "#81b241",
       G50: "#689332",
+      V05: "#e5dcff",
       V10: "#bdaef8",
       V20: "#af8df2",
       V30: "#9e8be8",

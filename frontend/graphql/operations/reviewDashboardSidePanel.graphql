@@ -1,0 +1,28 @@
+query ReviewDashboardSidePanel($applicantRecordId: ID!) {
+  reviewDashboardSidePanel(applicantRecordId: $applicantRecordId) {
+    firstName
+    lastName
+    position
+    program
+    academicYear
+    resumeUrl
+    applicationStatus
+    skillCategory
+    reviewDetails {
+      reviewStatus
+      reviewer {
+        id
+        firstName
+        lastName
+      }
+      review {
+        passionFSG
+        teamPlayer
+        desireToLearn
+        skill
+        skillCategory
+        comments
+      }
+    }
+  }
+}

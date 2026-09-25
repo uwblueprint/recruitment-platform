@@ -24,6 +24,7 @@ const reviewDashboardType = gql`
     lastName: String!
     position: String!
     program: String!
+    academicYear: String!
     resumeUrl: String!
     applicationStatus: ApplicationStatus!
     skillCategory: SkillCategory
@@ -41,13 +42,25 @@ const reviewDashboardType = gql`
     APPLICATION_STATUS
   }
 
+  enum DashboardView {
+    ALL
+    SHORTLISTED
+    CONFLICTS
+  }
+
   extend type Query {
     reviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
       sortBy: ReviewDashboardSortBy
       sortAscending: Boolean
+      view: DashboardView
     ): [ReviewDashboardRowDTO!]!
+
+    reviewDashboardApplicantRecordIds(
+      sortBy: ReviewDashboardSortBy
+      sortAscending: Boolean
+    ): [ID!]!
 
     reviewDashboardSidePanel(
       applicantRecordId: ID!

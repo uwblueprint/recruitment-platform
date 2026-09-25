@@ -1,0 +1,11 @@
+query UsersByPosition($position: String!) {
+    usersByPosition(position: $position) {
+        id
+        firstName
+        lastName
+        email
+        role
+        position
+        isArchived
+    }
+}

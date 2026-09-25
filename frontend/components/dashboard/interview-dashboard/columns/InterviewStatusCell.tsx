@@ -1,4 +1,4 @@
-import { DashboardStatusChip } from "@/components/dashboard/table";
+import { DashboardStatusChip } from "@/components/dashboard/common";
 import { ApplicationStatus } from "@/graphql/typeUtils";
 import { useState } from "react";
 

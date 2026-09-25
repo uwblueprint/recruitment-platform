@@ -9,9 +9,10 @@ interface Props {
   placeholder: string;
   ariaLabel: string;
   onChange: (value: number) => void;
+  className?: string;
 }
 
-export function ReviewScoreInput({
+export function ScoreInput({
   id,
   value,
   min,
@@ -19,6 +20,7 @@ export function ReviewScoreInput({
   placeholder,
   ariaLabel,
   onChange,
+  className = "w-[280px]",
 }: Props): ReactElement {
   const numericValue = value === "" ? NaN : value;
   const canIncrement = Number.isNaN(numericValue) || numericValue < max;
@@ -52,7 +54,7 @@ export function ReviewScoreInput({
 
   return (
     <div
-      className="flex h-12 w-[280px] shrink-0 items-center overflow-hidden rounded-[8px] border border-neutral-200 bg-white font-source focus-within:ring-2 focus-within:ring-blue/20"
+      className={`flex h-12 shrink-0 items-center overflow-hidden rounded-[8px] border border-neutral-200 bg-white font-source focus-within:ring-2 focus-within:ring-blue/20 ${className}`}
       role="group"
     >
       <input

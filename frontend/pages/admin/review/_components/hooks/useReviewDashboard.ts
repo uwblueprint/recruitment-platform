@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
+import { DashboardView } from "@/graphql/typeUtils";
 import type {
   ReviewDashboardResult,
   ReviewDashboardSortBy,
@@ -17,25 +18,21 @@ const useReviewDashboard = (
   resultsPerPage: number,
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
+  view?: DashboardView,
 ): UseReviewDashboardResult => {
-  const [refreshKey, setRefreshKey] = useState(0);
   const [state, setState] = useState<Omit<UseReviewDashboardResult, "refetch">>({
     rows: [],
     isLoading: false,
     error: false,
   });
-
-  useEffect(() => {
-    let ignore = false;
-
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  const refetch = useCallback(() => {
     setState((prev) => ({ ...prev, isLoading: true, error: false }));
-
     ReviewDashboardAPIClient.getReviewDashboard(
       pageNumber,
       resultsPerPage,
       sortBy,
       sortAscending,
+      view,
     )
       .then((rows) => {
         if (!ignore) {
@@ -47,13 +44,17 @@ const useReviewDashboard = (
           setState({ rows: [], isLoading: false, error: true });
         }
       });
+  }, [pageNumber, resultsPerPage, sortBy, sortAscending, view]);
 
-    return () => {
-      ignore = true;
-    };
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending, refreshKey]);
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    refetch();
+  }, [refetch]);
 
-  return { ...state, refetch: () => setRefreshKey((key) => key + 1) };
+  return {
+    ...state,
+    refetch,
+  };
 };
 
 export default useReviewDashboard;
