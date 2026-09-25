@@ -1,6 +1,10 @@
 import InterviewCompositeService from "../../services/implementations/interviewCompositeService";
 import IInterviewCompositeService from "../../services/interfaces/IInterviewCompositeService";
-import { InterviewDashboardRowDTO, InterviewDelegationDTO } from "../../types";
+import {
+  InterviewDashboardRowDTO,
+  InterviewDelegationDTO,
+  InterviewInviteDTO,
+} from "../../types";
 
 const interviewCompositeService: IInterviewCompositeService = new InterviewCompositeService();
 
@@ -20,6 +24,9 @@ const interviewDashboardResolvers = {
         pageNumber,
         resultsPerPage,
       );
+    },
+    interviewInvites: async (): Promise<InterviewInviteDTO[]> => {
+      return interviewCompositeService.getInterviewInvites();
     },
   },
   Mutation: {

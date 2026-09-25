@@ -25,7 +25,7 @@ export const InterviewHeader = ({
   return (
     <header className="w-full bg-blue">
       <div className="flex items-center justify-between px-9 py-4">
-        <Link href="/admin">
+        <Link href="/">
           <BlueprintLogo />
         </Link>
 

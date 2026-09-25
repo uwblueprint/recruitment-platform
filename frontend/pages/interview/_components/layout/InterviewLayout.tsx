@@ -13,14 +13,12 @@ import { PanelLayout } from "@/components/layouts/PanelLayout";
 interface InterviewLayoutProps {
   header?: ReactNode;
   footer?: ReactNode;
-  candidateName?: string;
   children: ReactNode;
 }
 
 export const InterviewLayout = ({
   header = <InterviewHeader />,
   footer = <InterviewFooter />,
-  candidateName = "Candidate",
   children,
 }: InterviewLayoutProps) => {
   return (
@@ -32,9 +30,10 @@ export const InterviewLayout = ({
       >
         <PanelLayout
           borderRight
-          contentClassName="overflow-y-auto pt-[50px] pb-8"
+          fillContent
+          contentClassName="flex min-h-full flex-col overflow-y-auto pt-[50px] pb-8"
         >
-          <InterviewNavPanel candidateName={candidateName} />
+          <InterviewNavPanel />
         </PanelLayout>
         {children}
       </SplitPanelLayout>

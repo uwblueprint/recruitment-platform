@@ -12,12 +12,7 @@ export const getInterviewLayout =
   const InterviewPageLayout = (page: ReactElement) =>
     (
         <ProtectedRoute allowedRoles={["Admin", "User"]}>
-          {/* TODO: replace hardcoded candidateName with real data once API wiring is in scope */}
-          <InterviewLayout
-            candidateName="Percy Jackson"
-            header={header}
-            footer={footer ?? undefined}
-          >
+          <InterviewLayout header={header} footer={footer ?? undefined}>
             {page}
           </InterviewLayout>
         </ProtectedRoute>

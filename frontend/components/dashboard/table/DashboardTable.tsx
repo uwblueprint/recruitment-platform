@@ -1,6 +1,7 @@
 import {
   ColumnDef,
   OnChangeFn,
+  RowData,
   RowSelectionState,
   SortingState,
   flexRender,
@@ -22,7 +23,7 @@ export type DashboardPaginationState = {
   onResultsPerPageChange: (resultsPerPage: number) => void;
 };
 
-type DashboardTableProps<TData> = {
+type DashboardTableProps<TData extends RowData> = {
   data: TData[];
   columns: ColumnDef<TData, unknown>[];
   getRowId: (row: TData) => string;
@@ -36,7 +37,7 @@ type DashboardTableProps<TData> = {
   isLoading?: boolean;
 };
 
-export const DashboardTable = <TData,>({
+export const DashboardTable = <TData extends RowData>({
   data,
   columns,
   getRowId,
