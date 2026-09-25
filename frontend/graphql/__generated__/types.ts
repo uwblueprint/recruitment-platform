@@ -311,6 +311,7 @@ export type Mutation = {
   reportInterviewConflict: InterviewedApplicantRecord;
   reportReviewConflict: ReviewedApplicantRecordDto;
   resetPassword: Scalars['Boolean']['output'];
+  sendRejectionEmails: RejectionEmailResult;
   submitInterviewScores: InterviewedApplicantRecord;
   updateAdminComment: AdminCommentDto;
   updateApplicantRecordIsApplicantFlagged: ApplicantRecordDto;
@@ -499,6 +500,11 @@ export type MutationReportReviewConflictArgs = {
 
 export type MutationResetPasswordArgs = {
   email: Scalars['String']['input'];
+};
+
+
+export type MutationSendRejectionEmailsArgs = {
+  ids: Array<Scalars['ID']['input']>;
 };
 
 
@@ -773,6 +779,18 @@ export type RegisterUserDto = {
   firstName: Scalars['String']['input'];
   lastName: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+export type RejectionEmailFailure = {
+  __typename?: 'RejectionEmailFailure';
+  error: Scalars['String']['output'];
+  to: Scalars['String']['output'];
+};
+
+export type RejectionEmailResult = {
+  __typename?: 'RejectionEmailResult';
+  failed: Array<RejectionEmailFailure>;
+  sent: Array<Scalars['String']['output']>;
 };
 
 export type Review = {

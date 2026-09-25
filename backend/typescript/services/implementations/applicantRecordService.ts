@@ -1,5 +1,6 @@
 import {
   ApplicantRecordDTO,
+  BulkEmailResult,
   ApplicationStatusEnum,
   BulkUpdateApplicantRecordDTO,
   CreateApplicantRecordDTO,
@@ -170,15 +171,6 @@ class ApplicantRecordService implements IApplicantRecordService {
 
       await transaction.commit();
 
-      const rejectedIds = applicantRecords
-        .filter((record) => record.status === ApplicationStatusEnum.REJECTED)
-        .map((record) => record.id);
-      if (rejectedIds.length > 0) {
-        // fire-and-forget: the status update is already committed, so email
-        // failures are logged by sendRejectionEmails rather than surfaced
-        this.sendRejectionEmails(rejectedIds);
-      }
-
       return results.map(toApplicantRecordDTO);
     } catch (error: unknown) {
       await transaction.rollback();
@@ -193,22 +185,31 @@ class ApplicantRecordService implements IApplicantRecordService {
 
   /**
    * Send a templated rejection email to the applicant of each given record.
-   * Never throws: this runs after the status update has committed, so
-   * failures are logged instead of failing the caller.
+   * Called explicitly by the mail mutation, independently of status updates.
    */
-  async sendRejectionEmails(applicantRecordIds: string[]): Promise<void> {
+  async sendRejectionEmails(
+    applicantRecordIds: string[],
+  ): Promise<BulkEmailResult> {
     if (!this.emailService) {
-      Logger.error(
-        "Attempted to call sendRejectionEmails but this instance of ApplicantRecordService does not have an EmailService instance",
-      );
-      return;
+      throw new Error("Rejection email service is not configured.");
     }
 
     try {
+      const ids = [...new Set(applicantRecordIds)];
       const records = await ApplicantRecord.findAll({
-        where: { id: applicantRecordIds },
+        where: { id: ids },
         include: [Applicant],
       });
+      if (records.length !== ids.length) {
+        throw new Error("One or more applicant records were not found.");
+      }
+      if (
+        records.some(
+          (record) => record.status !== ApplicationStatusEnum.REJECTED,
+        )
+      ) {
+        throw new Error("Rejection emails require rejected applicant records.");
+      }
       const messages = records.map((record) => {
         const { subject, html } = buildRejectionEmail({
           firstName: record.applicant.first_name,
@@ -218,7 +219,8 @@ class ApplicantRecordService implements IApplicantRecordService {
         return { to: record.applicant.email, subject, htmlBody: html };
       });
 
-      const { failed } = await this.emailService.sendBulkEmail(messages);
+      const result = await this.emailService.sendBulkEmail(messages);
+      const { failed } = result;
       if (failed.length > 0) {
         Logger.error(
           `Failed to send rejection emails to: ${failed
@@ -226,10 +228,12 @@ class ApplicantRecordService implements IApplicantRecordService {
             .join(", ")}`,
         );
       }
+      return result;
     } catch (error: unknown) {
       Logger.error(
         `Failed to send rejection emails. Reason = ${getErrorMessage(error)}`,
       );
+      throw error;
     }
   }
 }

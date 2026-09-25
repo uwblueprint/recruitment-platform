@@ -3,7 +3,11 @@ import EmailService from "../../services/implementations/emailService";
 import IApplicantRecordService from "../../services/interfaces/IApplicantRecordService";
 import IEmailService from "../../services/interfaces/emailService";
 import nodemailerConfig from "../../nodemailer.config";
-import { ApplicantRecordDTO, ApplicationStatus } from "../../types";
+import {
+  ApplicantRecordDTO,
+  ApplicationStatus,
+  BulkEmailResult,
+} from "../../types";
 
 const emailService: IEmailService = new EmailService(
   nodemailerConfig,
@@ -15,6 +19,12 @@ const applicantRecordService: IApplicantRecordService = new ApplicantRecordServi
 
 const applicantRecordResolvers = {
   Mutation: {
+    sendRejectionEmails: async (
+      _parent: undefined,
+      { ids }: { ids: string[] },
+    ): Promise<BulkEmailResult> => {
+      return applicantRecordService.sendRejectionEmails(ids);
+    },
     updateApplicantRecordStatus: async (
       _parent: undefined,
       { id, status }: { id: string; status: ApplicationStatus },
