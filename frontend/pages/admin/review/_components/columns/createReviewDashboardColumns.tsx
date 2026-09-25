@@ -1,4 +1,3 @@
-import { ReviewDashboardSortBy } from "@/graphql/typeUtils";
 import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 import type { ColumnDef } from "@tanstack/react-table";
 
@@ -8,16 +7,6 @@ import { ReviewScoreCell } from "./ReviewScoreCell";
 import { ReviewStatusCell } from "./ReviewStatusCell";
 import { SelectAllHeader, SelectRowCell } from "./SelectionCell";
 
-export const COLUMN_ID_TO_SORT_BY: Record<string, ReviewDashboardSortBy> = {
-  application: ReviewDashboardSortBy.LastName,
-  choice: ReviewDashboardSortBy.Choice,
-  timesApplied: ReviewDashboardSortBy.TimesApplied,
-  reviewer1: ReviewDashboardSortBy.Reviewer_1,
-  reviewer2: ReviewDashboardSortBy.Reviewer_2,
-  totalScore: ReviewDashboardSortBy.TotalScore,
-  applicationStatus: ReviewDashboardSortBy.ApplicationStatus,
-};
-
 const applicantName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
 
@@ -26,10 +15,16 @@ const reviewerName = (row: ReviewDashboardResult, index: number) => {
   return reviewer ? applicantName(reviewer.firstName, reviewer.lastName) : "-";
 };
 
-export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
-  ReviewDashboardResult,
-  unknown
->[] = [
+type ReviewDashboardReviewer = NonNullable<
+  ReviewDashboardResult["reviewers"][number]
+>;
+
+export const createReviewDashboardColumns = (
+  onReviewerClick: (
+    row: ReviewDashboardResult,
+    reviewer: ReviewDashboardReviewer,
+  ) => void,
+): ColumnDef<ReviewDashboardResult, unknown>[] => [
   {
     id: "select",
     size: 40,
@@ -43,7 +38,10 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
     enableSorting: true,
     cell: ({ row }) => (
       <ApplicationCell
-        applicantName={applicantName(row.original.firstName, row.original.lastName)}
+        applicantName={applicantName(
+          row.original.firstName,
+          row.original.lastName,
+        )}
       />
     ),
   },
@@ -76,18 +74,38 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
     accessorFn: (row) => reviewerName(row, 0),
     header: "Reviewer 1",
     enableSorting: true,
-    cell: ({ row }) => (
-      <ReviewerCell reviewerName={reviewerName(row.original, 0)} />
-    ),
+    cell: ({ row }) => {
+      const reviewer = row.original.reviewers[0];
+      return (
+        <ReviewerCell
+          reviewerName={reviewerName(row.original, 0)}
+          onClick={
+            reviewer
+              ? () => onReviewerClick(row.original, reviewer)
+              : undefined
+          }
+        />
+      );
+    },
   },
   {
     id: "reviewer2",
     accessorFn: (row) => reviewerName(row, 1),
     header: "Reviewer 2",
     enableSorting: true,
-    cell: ({ row }) => (
-      <ReviewerCell reviewerName={reviewerName(row.original, 1)} />
-    ),
+    cell: ({ row }) => {
+      const reviewer = row.original.reviewers[1];
+      return (
+        <ReviewerCell
+          reviewerName={reviewerName(row.original, 1)}
+          onClick={
+            reviewer
+              ? () => onReviewerClick(row.original, reviewer)
+              : undefined
+          }
+        />
+      );
+    },
   },
   {
     id: "totalScore",
@@ -108,6 +126,7 @@ export const REVIEW_DASHBOARD_COLUMNS: ColumnDef<
     enableSorting: true,
     cell: ({ row }) => (
       <ReviewStatusCell
+        key={`${row.original.applicantRecordId}-${row.original.applicationStatus}`}
         applicantRecordId={row.original.applicantRecordId}
         status={row.original.applicationStatus}
       />

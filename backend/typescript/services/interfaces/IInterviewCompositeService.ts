@@ -2,10 +2,13 @@ import {
   InterviewDelegationDTO,
   InterviewDashboardRowDTO,
   InterviewDashboardSortBy,
+  InterviewInviteDTO,
   InterviewedApplicantsDTO,
+  InterviewNotesDTO,
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
+import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 
 interface IInterviewCompositeService {
   /**
@@ -47,6 +50,25 @@ interface IInterviewCompositeService {
    * @param groupId the interview group id
    */
   getInterviewersByGroupId(groupId: string): Promise<UserDTO[]>;
+
+  /**
+   * Fetches all interview groups with their interviewers and interviewees for the admin interview invites page.
+   */
+  getInterviewInvites(): Promise<InterviewInviteDTO[]>;
+
+  /**
+   * Upload (or replace) the PDF interview notes for an interviewed applicant
+   * record. If a previous file exists, it is deleted from storage + DB after
+   * the new file is successfully attached. Best-effort cleanup: cleanup
+   * failures are logged but do not fail the mutation.
+   * @throws if the file is not a PDF.
+   * @param interviewedApplicantRecordId the InterviewedApplicantRecord PK.
+   * @param upload file metadata including the local temp path and uploader id.
+   */
+  uploadInterviewNotes(
+    interviewedApplicantRecordId: string,
+    upload: CreateFirebaseFileDTO,
+  ): Promise<InterviewNotesDTO>;
 }
 
 export default IInterviewCompositeService;

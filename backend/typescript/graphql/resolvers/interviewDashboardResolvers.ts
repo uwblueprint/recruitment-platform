@@ -4,6 +4,7 @@ import {
   InterviewDashboardRowDTO,
   InterviewDashboardSortBy,
   InterviewDelegationDTO,
+  InterviewInviteDTO,
 } from "../../types";
 
 const interviewCompositeService: IInterviewCompositeService = new InterviewCompositeService();
@@ -30,6 +31,9 @@ const interviewDashboardResolvers = {
         sortBy,
         sortAscending,
       );
+    },
+    interviewInvites: async (): Promise<InterviewInviteDTO[]> => {
+      return interviewCompositeService.getInterviewInvites();
     },
   },
   Mutation: {

@@ -18,6 +18,11 @@ const config: CodegenConfig = {
     "./pages/**/*.tsx",
     "./components/**/*.tsx",
   ],
+  config: {
+    scalars: {
+      Upload: "File",
+    },
+  },
   generates: {
     "./graphql/__generated__/": {
       preset: "client",

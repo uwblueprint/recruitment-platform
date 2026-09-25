@@ -28,7 +28,18 @@ const applicantRecordType = gql`
     isApplicantFlagged: Boolean!
   }
 
+  type RejectionEmailFailure {
+    to: String!
+    error: String!
+  }
+
+  type RejectionEmailResult {
+    sent: [String!]!
+    failed: [RejectionEmailFailure!]!
+  }
+
   extend type Mutation {
+    sendRejectionEmails(ids: [ID!]!): RejectionEmailResult!
     updateApplicantRecordStatus(
       id: ID!
       status: ApplicationStatus!

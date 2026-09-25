@@ -1,67 +1,163 @@
+import { Toast } from "@/components/common/Toast";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
+import {
+  FilterCategoryVariant,
+  type SelectedFilters,
+} from "@/components/dashboard/filters";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { DashboardView } from "@/graphql/typeUtils";
+import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
   RowSelectionState,
   SortingState,
 } from "@tanstack/react-table";
+import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 import { useRouter } from "next/router";
-import { ReactElement, useState } from "react";
+import { ReactElement, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
-
 import {
   COLUMN_ID_TO_SORT_BY,
-  REVIEW_DASHBOARD_COLUMNS,
+  createReviewDashboardColumns,
 } from "./_components/columns";
 import { DashboardTabs } from "./_components/DashboardTabs";
+import useDebouncedValue from "./_components/hooks/useDebouncedValue";
+import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
+import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
+import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
+import useReviewDashboardFilterOptions from "./_components/hooks/useReviewDashboardFilterOptions";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
 import useTabCounts from "./_components/hooks/useTabCounts";
+import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
+const SEARCH_DEBOUNCE_MS = 500;
+
+type ReviewerReassignmentTarget = {
+  applicantRecordId: string;
+  position: string;
+  reviewerId: string;
+  reviewerName: string;
+};
 
 const AdminReviewPage: NextPageWithLayout = () => {
   const router = useRouter();
-  const position = typeof router.query.position === "string" ? router.query.position : null;
+  const position =
+    typeof router.query.position === "string" ? router.query.position : null;
 
-  const [activeView, setActiveView] = useState<DashboardView>(DashboardView.All);
+  const [activeView, setActiveView] = useState<DashboardView>(
+    DashboardView.All
+  );
   const [pageNumber, setPageNumber] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(DEFAULT_RESULTS_PER_PAGE);
+  const [resultsPerPage, setResultsPerPage] = useState(
+    DEFAULT_RESULTS_PER_PAGE
+  );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
+  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const [search, setSearch] = useState("");
 
-  // The table is single-sort, so only the first SortingState entry is used.
-  // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
-  // undefined and the backend falls back to its default order.
+  const [reviewerReassignmentTarget, setReviewerReassignmentTarget] =
+    useState<ReviewerReassignmentTarget | null>(null);
+
+  const columns = useMemo(
+    () =>
+      createReviewDashboardColumns((row, reviewer) => {
+        setReviewerReassignmentTarget({
+          applicantRecordId: row.applicantRecordId,
+          position: row.position,
+          reviewerId: reviewer.id,
+          reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+        });
+      }),
+    []
+  );
+
+  // The query fires on the settled text; the input keeps the raw value.
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
+
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
-  const sortAscending = activeSort && !activeSort.desc;
+  const sortAscending = activeSort ? !activeSort.desc : undefined;
 
-  const { rows, isLoading, error } = useReviewDashboard(
+  const { filterOptions } = useReviewDashboardFilterOptions();
+
+  // build filter categories from backend options
+  const filterCategories = useMemo(() => {
+    if (!filterOptions) return [];
+    return [
+      { key: "position", label: "Role", options: filterOptions.positions },
+      {
+        key: "applicationStatus",
+        label: "Application Status",
+        options: filterOptions.applicationStatuses,
+      },
+      {
+        key: "skillCategory",
+        label: "Skill Category",
+        options: filterOptions.skillCategories,
+      },
+      {
+        key: "scoreRange",
+        label: "Score",
+        options: filterOptions.scoreRanges,
+        chipPrefix: "Score",
+      },
+      { key: "year", label: "Year", options: filterOptions.years },
+      {
+        key: "bookmarked",
+        label: "Bookmarked",
+        options: filterOptions.bookmarked,
+        variant: FilterCategoryVariant.Toggle,
+      },
+    ];
+  }, [filterOptions]);
+
+  // convert SelectedFilters to ReviewDashboardFilters for the backend
+  const backendFilters = useMemo(
+    (): ReviewDashboardFilters => ({
+      search: debouncedSearch.trim() ? debouncedSearch : undefined,
+      positions: selectedFilters.position?.length
+        ? selectedFilters.position
+        : undefined,
+      applicationStatuses: selectedFilters.applicationStatus?.length
+        ? (selectedFilters.applicationStatus as ReviewDashboardFilters["applicationStatuses"])
+        : undefined,
+      skillCategories: selectedFilters.skillCategory?.length
+        ? (selectedFilters.skillCategory as ReviewDashboardFilters["skillCategories"])
+        : undefined,
+      scoreRanges: selectedFilters.scoreRange?.length
+        ? selectedFilters.scoreRange
+        : undefined,
+      years: selectedFilters.year?.length ? selectedFilters.year : undefined,
+      bookmarked: selectedFilters.bookmarked?.includes("true")
+        ? true
+        : undefined,
+    }),
+    [selectedFilters, debouncedSearch],
+  );
+
+  const { rows, isLoading, error, refetch } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
     sortBy,
     sortAscending,
+    backendFilters,
     activeView,
   );
 
-  // Every applicant record id in display order, so the side panel can walk the
-  // whole dashboard instead of only the page currently loaded in `rows`.
-  const applicantRecordIds = useReviewDashboardApplicantRecordIds();
-
-  // The active row is only available while the active applicant's page is
-  // loaded; navigating to another page leaves it undefined until the page
-  // fetch settles.
-  const activeRow = rows.find((row) => row.applicantRecordId === activeId);
-
-  const { details, isLoading: isDetailsLoading } = useReviewDashboardSidePanel(
-    activeId,
+  const applicantRecordIds = useReviewDashboardApplicantRecordIds(
+    sortBy,
+    sortAscending,
+    backendFilters,
   );
-
+  const activeRow = rows.find((row) => row.applicantRecordId === activeId);
+  const { details, isLoading: isDetailsLoading } =
+    useReviewDashboardSidePanel(activeId);
   const activeNavigationIndex =
     activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
 
@@ -71,11 +167,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // the page that applicant lives on.
   const goToApplicant = (index: number) => {
     const applicantRecordId = applicantRecordIds[index];
-    if (!applicantRecordId) {
-      return;
-    }
+    if (!applicantRecordId) return;
     setActiveId(applicantRecordId);
     setPageNumber(Math.floor(index / resultsPerPage) + 1);
+    setRowSelection({});
   };
 
   const handleViewChange = (view: DashboardView) => {
@@ -84,9 +179,28 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setRowSelection({});
     setActiveId(undefined);
   };
+  const selectedRows = rows.filter(
+    (row) => rowSelection[row.applicantRecordId]
+  );
 
-  const handleResultsPerPageChange = (nextResultsPerPage: number) => {
-    setResultsPerPage(nextResultsPerPage);
+  const clearSelection = () => setRowSelection({});
+
+  const {
+    dialogue: bulkActionDialogue,
+    openBulkAction,
+    toast: bulkActionToast,
+    dismissToast: dismissBulkActionToast,
+  } = useBulkStatusAction(
+    {
+      onSuccess: () => {
+        clearSelection();
+        refetch();
+      },
+    }
+  );
+
+  const handleResultsPerPageChange = (value: number) => {
+    setResultsPerPage(value);
     setPageNumber(1);
     setRowSelection({});
     setActiveId(undefined);
@@ -95,28 +209,55 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const handlePageChange = (nextPageNumber: number) => {
     setPageNumber(nextPageNumber);
     setActiveId(undefined);
+    clearSelection();
   };
 
-  // Changing the sort can shrink the result set, so return to the first page.
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
     setSorting(updater);
+    setPageNumber(1);
+    clearSelection();
+  };
+
+  const handleFilterCategoryChange = (
+    categoryKey: string,
+    values: string[],
+  ) => {
+    setSelectedFilters((prev) => ({ ...prev, [categoryKey]: values }));
     setPageNumber(1);
     setRowSelection({});
   };
 
+  const handleRemoveFilter = (categoryKey: string, value: string) => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [categoryKey]: (prev[categoryKey] ?? []).filter((v) => v !== value),
+    }));
+    setPageNumber(1);
+    setRowSelection({});
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    setPageNumber(1);
+    clearSelection();
+  };
+
   const selectedCount = Object.keys(rowSelection).length;
+
+  const handleBulkAction = (action: BulkAction) =>
+    openBulkAction(
+      action,
+      selectedRows.map((row) => ({
+        id: row.applicantRecordId,
+        name: `${row.firstName} ${row.lastName}`,
+        position: row.position,
+        totalScore: row.totalScore,
+      }))
+    );
 
   return (
     <div className="flex h-screen flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
-        <div className="shrink-0">
-          {position ? (
-            <h1 className="font-poppins text-[28px] font-semibold leading-[140%] text-blue">
-              {position} Applications
-            </h1>
-          ) : null}
-        </div>
-
         <DashboardTabs
           activeView={activeView}
           onViewChange={handleViewChange}
@@ -125,15 +266,33 @@ const AdminReviewPage: NextPageWithLayout = () => {
           onClearAll={() => setRowSelection({})}
         />
 
+        <ReviewDashboardToolbar
+          position={position}
+          search={{ value: search, onChange: handleSearchChange }}
+          filters={{
+            categories: filterCategories,
+            selected: selectedFilters,
+            onChange: handleFilterCategoryChange,
+            onRemove: handleRemoveFilter,
+          }}
+          bulkActions={{
+            selectedCount: selectedRows.length,
+            disabled: isLoading,
+            onReject: () => handleBulkAction(BulkAction.Reject),
+            onSelectForInterview: () => handleBulkAction(BulkAction.Interview),
+          }}
+        />
         {error ? (
-          <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
+          <div
+            role="alert"
+            className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText"
+          >
             Failed to load review dashboard
           </div>
         ) : null}
-
         <DashboardTable
           data={rows}
-          columns={REVIEW_DASHBOARD_COLUMNS}
+          columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
@@ -150,7 +309,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
           }}
         />
       </main>
-
       <DashboardSidePanel
         open={activeId !== undefined}
         onClose={() => setActiveId(undefined)}
@@ -170,6 +328,25 @@ const AdminReviewPage: NextPageWithLayout = () => {
             : undefined
         }
       />
+
+      {reviewerReassignmentTarget ? (
+        <ReassignReviewerDialogue
+          open={!!reviewerReassignmentTarget}
+          applicantRecordId={reviewerReassignmentTarget.applicantRecordId}
+          position={reviewerReassignmentTarget.position}
+          currentReviewerId={reviewerReassignmentTarget.reviewerId}
+          currentReviewerName={reviewerReassignmentTarget.reviewerName}
+          onClose={() => setReviewerReassignmentTarget(null)}
+          onUpdated={() => {
+            setReviewerReassignmentTarget(null);
+            refetch();
+          }}
+        />
+      ) : null}
+      {bulkActionDialogue ? (
+        <BulkStatusConfirmationDialogue {...bulkActionDialogue} />
+      ) : null}
+      <Toast {...bulkActionToast} onClose={dismissBulkActionToast} />
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import ReviewCompositeService from "../../services/implementations/reviewCompositeService";
 import {
   DashboardView,
+  ReviewDashboardFilterOptionsDTO,
+  ReviewDashboardFilters,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -17,12 +19,14 @@ const reviewDashboardResolvers = {
         resultsPerPage,
         sortBy,
         sortAscending,
+        filters,
         view,
       }: {
         pageNumber: number;
         resultsPerPage: number;
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
+        filters?: ReviewDashboardFilters;
         view?: DashboardView;
       },
     ): Promise<ReviewDashboardRowDTO[]> => {
@@ -31,6 +35,7 @@ const reviewDashboardResolvers = {
         resultsPerPage,
         sortBy,
         sortAscending,
+        filters,
         view,
       );
     },
@@ -39,14 +44,17 @@ const reviewDashboardResolvers = {
       {
         sortBy,
         sortAscending,
+        filters,
       }: {
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
+        filters?: ReviewDashboardFilters;
       },
     ): Promise<string[]> => {
       return reviewCompositeService.getReviewDashboardApplicantRecordIds(
         sortBy,
         sortAscending,
+        filters,
       );
     },
     reviewDashboardSidePanel: async (
@@ -56,6 +64,12 @@ const reviewDashboardResolvers = {
       return reviewCompositeService.getReviewDashboardSidePanel(
         applicantRecordId,
       );
+    },
+    reviewDashboardFilterOptions: async (
+      _parent: undefined,
+      { department }: { department?: string },
+    ): Promise<ReviewDashboardFilterOptionsDTO> => {
+      return reviewCompositeService.getReviewDashboardFilterOptions(department);
     },
   },
   Mutation: {

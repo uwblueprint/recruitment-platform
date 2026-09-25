@@ -21,6 +21,21 @@ const interviewDashboardTypes = gql`
     APPLICATION_STATUS
   }
 
+  type InterviewInviteeDTO {
+    firstName: String!
+    lastName: String!
+    position: String!
+  }
+
+  type InterviewInviteDTO {
+    id: ID!
+    interviewers: [UserDTO!]!
+    interviewees: [InterviewInviteeDTO!]!
+    position: String!
+    schedulingLink: String
+    status: InterviewGroupStatus!
+  }
+
   extend type Query {
     interviewDashboard(
       pageNumber: Int!
@@ -28,6 +43,7 @@ const interviewDashboardTypes = gql`
       sortBy: InterviewDashboardSortBy
       sortAscending: Boolean
     ): [InterviewDashboardRowDTO!]!
+    interviewInvites: [InterviewInviteDTO!]!
   }
 
   extend type Mutation {
