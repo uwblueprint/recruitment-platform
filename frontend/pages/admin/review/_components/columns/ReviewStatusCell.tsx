@@ -3,8 +3,9 @@ import {
   DashboardStatusChip,
 } from "@/components/dashboard/common";
 import { ApplicationStatus } from "@/graphql/typeUtils";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import { useState } from "react";
+
+import { RejectApplicantDialogue } from "../dialogues/RejectApplicantDialogue";
+import useReviewStatusAction from "../hooks/useReviewStatusAction";
 
 type ReviewStatusCellProps = {
   applicantRecordId: string;
@@ -15,26 +16,18 @@ export const ReviewStatusCell = ({
   applicantRecordId,
   status,
 }: ReviewStatusCellProps) => {
-  const [selectedStatus, setSelectedStatus] = useState(status);
-
-  const handleChange = async (newStatus: ApplicationStatus) => {
-    setSelectedStatus(newStatus);
-    try {
-      const confirmedStatus = await ReviewDashboardAPIClient.updateApplicantRecordStatus(
-        applicantRecordId,
-        newStatus,
-      );
-      setSelectedStatus(confirmedStatus);
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
-  };
+  const { selectedStatus, handleChange, isSubmitting, dialogue, errorText } =
+    useReviewStatusAction({ applicantRecordId, status });
 
   return (
-    <DashboardStatusChip
-      value={selectedStatus}
-      options={APPLICATION_STATUS_OPTIONS}
-      onChange={handleChange}
-    />
+    <div role="presentation" onClick={(event) => event.stopPropagation()}>
+      <DashboardStatusChip
+        value={selectedStatus}
+        options={APPLICATION_STATUS_OPTIONS}
+        onChange={isSubmitting ? undefined : handleChange}
+      />
+      {errorText && <p role="alert" className="text-xs text-red-500">{errorText}</p>}
+      {dialogue && <RejectApplicantDialogue {...dialogue} />}
+    </div>
   );
 };

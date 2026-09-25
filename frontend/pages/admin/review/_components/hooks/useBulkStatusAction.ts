@@ -1,12 +1,13 @@
-import { useReducer, useState } from "react";
+import { useReducer, useRef, useState } from "react";
 
+import EmailAPIClient from "@/APIClients/EmailAPIClient";
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
 import type { BulkStatusApplicant, BulkStatusConfirmationDialogueProps } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 
 import {
   BULK_ACTIONS,
   BULK_ACTION_SUBMIT_ERROR,
-  type BulkAction,
+  BulkAction,
 } from "../bulkStatusActions";
 
 enum DialogueStatus {
@@ -116,6 +117,7 @@ const useBulkStatusAction = ({
     status: DialogueStatus.Closed,
   });
   const [toast, setToast] = useState<ToastState>(CLOSED_TOAST);
+  const submitting = useRef(false);
 
   const openBulkAction = (
     action: BulkAction,
@@ -126,7 +128,8 @@ const useBulkStatusAction = ({
   };
 
   const confirm = async () => {
-    if (state.status !== DialogueStatus.Confirming) return;
+    if (state.status !== DialogueStatus.Confirming || submitting.current) return;
+    submitting.current = true;
     const { action, applicants } = state;
     const config = BULK_ACTIONS[action];
 
@@ -136,14 +139,35 @@ const useBulkStatusAction = ({
         applicants.map((applicant) => applicant.id),
         config.status
       );
+      let emailFailed = false;
+      if (action === BulkAction.Reject) {
+        try {
+          await EmailAPIClient.sendRejectionEmails(
+            applicants.map((applicant) => applicant.id),
+          );
+        } catch {
+          emailFailed = true;
+        }
+      }
       dispatch({ type: DialogueEventType.Success });
       onSuccess();
-      setToast({ open: true, ...config.toast(applicants.length) });
+      setToast({
+        open: true,
+        ...config.toast(applicants.length),
+        ...(emailFailed
+          ? {
+              description:
+                "Statuses were updated, but some or all rejection emails could not be confirmed. Contact an administrator before resending.",
+            }
+          : {}),
+      });
     } catch {
       dispatch({
         type: DialogueEventType.Error,
         message: BULK_ACTION_SUBMIT_ERROR,
       });
+    } finally {
+      submitting.current = false;
     }
   };
 

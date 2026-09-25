@@ -200,6 +200,13 @@ export type ReviewedApplicantsByUserIdQueryVariables = Exact<{
 
 export type ReviewedApplicantsByUserIdQuery = { reviewedApplicantsByUserId: Array<{ applicantRecordId: string, reviewStatus: Types.ReviewStatus, applicantFirstName: string, applicantLastName: string }> };
 
+export type SendRejectionEmailsMutationVariables = Exact<{
+  ids: Array<string | number> | string | number;
+}>;
+
+
+export type SendRejectionEmailsMutation = { sendRejectionEmails: { sent: Array<string>, failed: Array<{ to: string, error: string }> } };
+
 export type SubmitInterviewScoresMutationVariables = Exact<{
   id: string | number;
   interviewJson: Types.InterviewInput;

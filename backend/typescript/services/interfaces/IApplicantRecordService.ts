@@ -1,11 +1,14 @@
 import {
   ApplicantRecordDTO,
+  BulkEmailResult,
   BulkUpdateApplicantRecordDTO,
   CreateApplicantRecordDTO,
   UpdateApplicantRecordDTO,
 } from "../../types";
 
 interface IApplicantRecordService {
+  sendRejectionEmails(applicantRecordIds: string[]): Promise<BulkEmailResult>;
+
   /**
    * Get applicant record associated with id
    * @param id applicant record id
