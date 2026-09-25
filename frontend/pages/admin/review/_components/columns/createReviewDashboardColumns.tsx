@@ -126,6 +126,7 @@ export const createReviewDashboardColumns = (
     enableSorting: true,
     cell: ({ row }) => (
       <ReviewStatusCell
+        key={`${row.original.applicantRecordId}-${row.original.applicationStatus}`}
         applicantRecordId={row.original.applicantRecordId}
         status={row.original.applicationStatus}
       />

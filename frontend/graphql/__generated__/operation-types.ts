@@ -18,6 +18,14 @@ export type ApplicationQueryVariables = Exact<{
 
 export type ApplicationQuery = { application: { id: string, academicOrCoop: string, academicYear: string, email: string, firstName: string, lastName: string, heardFrom: string, locationPreference: string, program: string, pronouns: string, pronounsSpecified: string, resumeUrl: string, status: Types.ApplicationStatus, term: string, timesApplied: string, roleSpecificQuestions: Array<{ question: string, answer: string }>, shortAnswerQuestions: Array<{ question: string, answer: string }> } };
 
+export type BulkUpdateApplicantRecordsStatusMutationVariables = Exact<{
+  ids: Array<string | number> | string | number;
+  status: Types.ApplicationStatus;
+}>;
+
+
+export type BulkUpdateApplicantRecordsStatusMutation = { bulkUpdateApplicantRecordsStatus: Array<{ id: string, status: Types.ApplicationStatus }> };
+
 export type CreateAdminCommentMutationVariables = Exact<{
   adminComment: Types.CreateAdminCommentDto;
 }>;
