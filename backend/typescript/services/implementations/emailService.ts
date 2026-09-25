@@ -1,10 +1,6 @@
 import nodemailer, { Transporter } from "nodemailer";
 import IEmailService from "../interfaces/emailService";
-import {
-  BulkEmailMessage,
-  BulkEmailResult,
-  NodemailerConfig,
-} from "../../types";
+import { Email, BulkEmailResult, NodemailerConfig } from "../../types";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 
@@ -47,7 +43,7 @@ class EmailService implements IEmailService {
     }
   }
 
-  async sendBulkEmail(messages: BulkEmailMessage[]): Promise<BulkEmailResult> {
+  async sendBulkEmail(messages: Email[]): Promise<BulkEmailResult> {
     const result: BulkEmailResult = { sent: [], failed: [] };
 
     for (let i = 0; i < messages.length; i += BULK_EMAIL_BATCH_SIZE) {

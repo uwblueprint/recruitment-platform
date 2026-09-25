@@ -9,7 +9,7 @@ export type NodemailerConfig = {
   };
 };
 
-export type BulkEmailMessage = {
+export type Email = {
   to: string;
   subject: string;
   htmlBody: string;

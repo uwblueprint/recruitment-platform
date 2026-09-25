@@ -1,4 +1,4 @@
-import { BulkEmailMessage, BulkEmailResult } from "../../types";
+import { Email, BulkEmailResult } from "../../types";
 
 interface IEmailService {
   /**
@@ -16,7 +16,7 @@ interface IEmailService {
    * @returns recipients that were sent successfully and recipients that
    * failed, with the failure reason
    */
-  sendBulkEmail(messages: BulkEmailMessage[]): Promise<BulkEmailResult>;
+  sendBulkEmail(messages: Email[]): Promise<BulkEmailResult>;
 }
 
 export default IEmailService;
