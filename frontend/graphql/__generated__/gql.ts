@@ -17,6 +17,8 @@ type Documents = {
     "query AdminCommentsByApplicantRecordId($applicantRecordId: ID!) {\n  adminCommentsByApplicantRecordId(applicantRecordId: $applicantRecordId) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": typeof types.AdminCommentsByApplicantRecordIdDocument,
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": typeof types.ApplicationDocument,
     "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}": typeof types.BulkUpdateApplicantRecordsStatusDocument,
+    "mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": typeof types.CreateAdminCommentDocument,
+    "mutation DeleteAdminCommentById($id: ID!) {\n  deleteAdminCommentById(id: $id) {\n    id\n  }\n}": typeof types.DeleteAdminCommentByIdDocument,
     "query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  interviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    applicantRecordId\n    firstName\n    lastName\n    position\n    applicationStatus\n    interviewers {\n      firstName\n      lastName\n    }\n    interviewScore\n  }\n}": typeof types.InterviewDashboardDocument,
     "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.InterviewGroupDocument,
     "query InterviewInvites {\n  interviewInvites {\n    id\n    interviewers {\n      id\n      firstName\n      lastName\n    }\n    interviewees {\n      firstName\n      lastName\n      position\n    }\n    position\n    schedulingLink\n    status\n  }\n}": typeof types.InterviewInvitesDocument,
@@ -49,6 +51,8 @@ const documents: Documents = {
     "query AdminCommentsByApplicantRecordId($applicantRecordId: ID!) {\n  adminCommentsByApplicantRecordId(applicantRecordId: $applicantRecordId) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": types.AdminCommentsByApplicantRecordIdDocument,
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": types.ApplicationDocument,
     "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}": types.BulkUpdateApplicantRecordsStatusDocument,
+    "mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": types.CreateAdminCommentDocument,
+    "mutation DeleteAdminCommentById($id: ID!) {\n  deleteAdminCommentById(id: $id) {\n    id\n  }\n}": types.DeleteAdminCommentByIdDocument,
     "query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  interviewDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    applicantRecordId\n    firstName\n    lastName\n    position\n    applicationStatus\n    interviewers {\n      firstName\n      lastName\n    }\n    interviewScore\n  }\n}": types.InterviewDashboardDocument,
     "query InterviewGroup($id: ID!) {\n  interviewGroup(id: $id) {\n    id\n    schedulingLink\n    status\n  }\n}": types.InterviewGroupDocument,
     "query InterviewInvites {\n  interviewInvites {\n    id\n    interviewers {\n      id\n      firstName\n      lastName\n    }\n    interviewees {\n      firstName\n      lastName\n      position\n    }\n    position\n    schedulingLink\n    status\n  }\n}": types.InterviewInvitesDocument,
@@ -104,6 +108,14 @@ export function gql(source: "query Application($applicantRecordId: ID!) {\n  app
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}"): (typeof documents)["mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}"): (typeof documents)["mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation DeleteAdminCommentById($id: ID!) {\n  deleteAdminCommentById(id: $id) {\n    id\n  }\n}"): (typeof documents)["mutation DeleteAdminCommentById($id: ID!) {\n  deleteAdminCommentById(id: $id) {\n    id\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

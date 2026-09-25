@@ -26,9 +26,6 @@ export const ReviewDashboardToolbar = ({
       <div />
     )}
     <div className="flex items-center gap-3">
-      <span className="font-source text-sm text-neutral-500">
-        {selectedCount} selected
-      </span>
       <Button
         type="button"
         variant="secondary"

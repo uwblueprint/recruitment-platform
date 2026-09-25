@@ -1,5 +1,4 @@
 import { Toast } from "@/components/common/Toast";
-import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
@@ -10,16 +9,17 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
-import { type ReviewDashboardResult } from "@/graphql/typeUtils";
-import { OnChangeFn, RowSelectionState, SortingState } from "@tanstack/react-table";
 import { useRouter } from "next/router";
 import { ReactElement, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
-import { COLUMN_ID_TO_SORT_BY, createReviewDashboardColumns } from "./_components/columns";
+import {
+  COLUMN_ID_TO_SORT_BY,
+  createReviewDashboardColumns,
+} from "./_components/columns";
 import { DashboardTabs } from "./_components/DashboardTabs";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
-import { type BulkAction } from "./_components/bulkStatusActions";
+import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
@@ -39,12 +39,14 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const router = useRouter();
   const position =
     typeof router.query.position === "string" ? router.query.position : null;
-  const position =
-    typeof router.query.position === "string" ? router.query.position : null;
 
-  const [activeView, setActiveView] = useState<DashboardView>(DashboardView.All);
+  const [activeView, setActiveView] = useState<DashboardView>(
+    DashboardView.All
+  );
   const [pageNumber, setPageNumber] = useState(1);
-  const [resultsPerPage, setResultsPerPage] = useState(DEFAULT_RESULTS_PER_PAGE);
+  const [resultsPerPage, setResultsPerPage] = useState(
+    DEFAULT_RESULTS_PER_PAGE
+  );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [sorting, setSorting] = useState<SortingState>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
@@ -61,7 +63,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
         });
       }),
-    [],
+    []
   );
 
   const activeSort = sorting[0];
@@ -73,7 +75,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     resultsPerPage,
     sortBy,
     sortAscending,
-    activeView,
+    activeView
   );
 
   const applicantRecordIds = useReviewDashboardApplicantRecordIds();
@@ -92,6 +94,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     if (!applicantRecordId) return;
     setActiveId(applicantRecordId);
     setPageNumber(Math.floor(index / resultsPerPage) + 1);
+    setRowSelection({});
   };
 
   const handleViewChange = (view: DashboardView) => {
@@ -100,16 +103,25 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setRowSelection({});
     setActiveId(undefined);
   };
-  const selectedRows = rows.filter((row) => rowSelection[row.applicantRecordId]);
+  const selectedRows = rows.filter(
+    (row) => rowSelection[row.applicantRecordId]
+  );
 
   const clearSelection = () => setRowSelection({});
 
-  const { dialogue, openBulkAction, toast, dismissToast } = useBulkStatusAction({
-    onSuccess: () => {
-      clearSelection();
-      refetch();
-    },
-  });
+  const {
+    dialogue: bulkActionDialogue,
+    openBulkAction,
+    toast: bulkActionToast,
+    dismissToast: dismissBulkActionToast,
+  } = useBulkStatusAction(
+    {
+      onSuccess: () => {
+        clearSelection();
+        refetch();
+      },
+    }
+  );
 
   const handleResultsPerPageChange = (value: number) => {
     setResultsPerPage(value);
@@ -121,12 +133,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const handlePageChange = (nextPageNumber: number) => {
     setPageNumber(nextPageNumber);
     setActiveId(undefined);
-  };
-
-    clearSelection();
-  };
-  const handlePageChange = (value: number) => {
-    setPageNumber(value);
     clearSelection();
   };
   const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
@@ -145,20 +151,12 @@ const AdminReviewPage: NextPageWithLayout = () => {
         name: `${row.firstName} ${row.lastName}`,
         position: row.position,
         totalScore: row.totalScore,
-      })),
+      }))
     );
 
   return (
     <div className="flex h-screen flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
-        <div className="shrink-0">
-          {position ? (
-            <h1 className="font-poppins text-[28px] font-semibold leading-[140%] text-blue">
-              {position} Applications
-            </h1>
-          ) : null}
-        </div>
-
         <DashboardTabs
           activeView={activeView}
           onViewChange={handleViewChange}
@@ -171,8 +169,8 @@ const AdminReviewPage: NextPageWithLayout = () => {
           position={position}
           selectedCount={selectedRows.length}
           disabled={isLoading}
-          onReject={() => handleBulkAction("reject")}
-          onSelectForInterview={() => handleBulkAction("interview")}
+          onReject={() => handleBulkAction(BulkAction.Reject)}
+          onSelectForInterview={() => handleBulkAction(BulkAction.Interview)}
         />
         {error ? (
           <div
@@ -188,7 +186,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
-          onRowClick={setActiveRow}
+          onRowClick={(row) => setActiveId(row.applicantRecordId)}
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={handleSortingChange}
@@ -235,8 +233,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
           }}
         />
       ) : null}
-      {dialogue ? <BulkStatusConfirmationDialogue {...dialogue} /> : null}
-      <Toast {...toast} onClose={dismissToast} />
+      {bulkActionDialogue ? (
+        <BulkStatusConfirmationDialogue {...bulkActionDialogue} />
+      ) : null}
+      <Toast {...bulkActionToast} onClose={dismissBulkActionToast} />
     </div>
   );
 };

@@ -9,55 +9,79 @@ import {
   type BulkAction,
 } from "../bulkStatusActions";
 
+enum DialogueStatus {
+  Closed = "closed",
+  Confirming = "confirming",
+  Submitting = "submitting",
+}
+
+enum DialogueEventType {
+  Open = "open",
+  Cancel = "cancel",
+  Submit = "submit",
+  Success = "success",
+  Error = "error",
+}
+
 type DialogueState =
-  | { status: "closed" }
+  | { status: DialogueStatus.Closed }
   | {
-      status: "confirming";
+      status: DialogueStatus.Confirming;
       action: BulkAction;
       applicants: BulkStatusApplicant[];
       error?: string;
     }
-  | { status: "submitting"; action: BulkAction; applicants: BulkStatusApplicant[] };
+  | {
+      status: DialogueStatus.Submitting;
+      action: BulkAction;
+      applicants: BulkStatusApplicant[];
+    };
 
 type DialogueEvent =
-  | { type: "open"; action: BulkAction; applicants: BulkStatusApplicant[] }
-  | { type: "cancel" }
-  | { type: "submit" }
-  | { type: "success" }
-  | { type: "error"; message: string };
+  | {
+      type: DialogueEventType.Open;
+      action: BulkAction;
+      applicants: BulkStatusApplicant[];
+    }
+  | { type: DialogueEventType.Cancel }
+  | { type: DialogueEventType.Submit }
+  | { type: DialogueEventType.Success }
+  | { type: DialogueEventType.Error; message: string };
 
 const dialogueReducer = (
   state: DialogueState,
-  event: DialogueEvent,
+  event: DialogueEvent
 ): DialogueState => {
   switch (event.type) {
-    case "open":
+    case DialogueEventType.Open:
       return {
-        status: "confirming",
+        status: DialogueStatus.Confirming,
         action: event.action,
         applicants: event.applicants,
       };
-    case "submit":
-      return state.status === "confirming"
+    case DialogueEventType.Submit:
+      return state.status === DialogueStatus.Confirming
         ? {
-            status: "submitting",
+            status: DialogueStatus.Submitting,
             action: state.action,
             applicants: state.applicants,
           }
         : state;
-    case "error":
-      return state.status === "submitting"
+    case DialogueEventType.Error:
+      return state.status === DialogueStatus.Submitting
         ? {
-            status: "confirming",
+            status: DialogueStatus.Confirming,
             action: state.action,
             applicants: state.applicants,
             error: event.message,
           }
         : state;
-    case "cancel":
-      return state.status === "submitting" ? state : { status: "closed" };
-    case "success":
-      return { status: "closed" };
+    case DialogueEventType.Cancel:
+      return state.status === DialogueStatus.Submitting
+        ? state
+        : { status: DialogueStatus.Closed };
+    case DialogueEventType.Success:
+      return { status: DialogueStatus.Closed };
     default:
       return state;
   }
@@ -85,7 +109,10 @@ type UseBulkStatusActionOptions = {
 
 type UseBulkStatusActionResult = {
   dialogue: BulkStatusDialogueProps | null;
-  openBulkAction: (action: BulkAction, applicants: BulkStatusApplicant[]) => void;
+  openBulkAction: (
+    action: BulkAction,
+    applicants: BulkStatusApplicant[]
+  ) => void;
   toast: ToastState;
   dismissToast: () => void;
 };
@@ -93,38 +120,43 @@ type UseBulkStatusActionResult = {
 const useBulkStatusAction = ({
   onSuccess,
 }: UseBulkStatusActionOptions): UseBulkStatusActionResult => {
-  const [state, dispatch] = useReducer(dialogueReducer, { status: "closed" });
+  const [state, dispatch] = useReducer(dialogueReducer, {
+    status: DialogueStatus.Closed,
+  });
   const [toast, setToast] = useState<ToastState>(CLOSED_TOAST);
 
   const openBulkAction = (
     action: BulkAction,
-    applicants: BulkStatusApplicant[],
+    applicants: BulkStatusApplicant[]
   ) => {
     if (applicants.length === 0) return;
-    dispatch({ type: "open", action, applicants });
+    dispatch({ type: DialogueEventType.Open, action, applicants });
   };
 
   const confirm = async () => {
-    if (state.status !== "confirming") return;
+    if (state.status !== DialogueStatus.Confirming) return;
     const { action, applicants } = state;
     const config = BULK_ACTIONS[action];
 
-    dispatch({ type: "submit" });
+    dispatch({ type: DialogueEventType.Submit });
     try {
       await ReviewDashboardAPIClient.bulkUpdateApplicantRecordsStatus(
         applicants.map((applicant) => applicant.id),
-        config.status,
+        config.status
       );
-      dispatch({ type: "success" });
+      dispatch({ type: DialogueEventType.Success });
       onSuccess();
       setToast({ open: true, ...config.toast(applicants.length) });
     } catch {
-      dispatch({ type: "error", message: BULK_ACTION_SUBMIT_ERROR });
+      dispatch({
+        type: DialogueEventType.Error,
+        message: BULK_ACTION_SUBMIT_ERROR,
+      });
     }
   };
 
   const dialogue: BulkStatusDialogueProps | null =
-    state.status === "closed"
+    state.status === DialogueStatus.Closed
       ? null
       : {
           open: true,
@@ -132,9 +164,12 @@ const useBulkStatusAction = ({
           description: BULK_ACTIONS[state.action].description,
           confirmLabel: BULK_ACTIONS[state.action].confirmLabel,
           applicants: state.applicants,
-          isSubmitting: state.status === "submitting",
-          errorText: state.status === "confirming" ? state.error : undefined,
-          onClose: () => dispatch({ type: "cancel" }),
+          isSubmitting: state.status === DialogueStatus.Submitting,
+          errorText:
+            state.status === DialogueStatus.Confirming
+              ? state.error
+              : undefined,
+          onClose: () => dispatch({ type: DialogueEventType.Cancel }),
           onConfirm: confirm,
         };
 

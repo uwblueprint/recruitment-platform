@@ -35,14 +35,10 @@ const useReviewDashboard = (
       view,
     )
       .then((rows) => {
-        if (!ignore) {
-          setState({ rows, isLoading: false, error: false });
-        }
+        setState({ rows, isLoading: false, error: false });
       })
       .catch(() => {
-        if (!ignore) {
-          setState({ rows: [], isLoading: false, error: true });
-        }
+        setState({ rows: [], isLoading: false, error: true });
       });
   }, [pageNumber, resultsPerPage, sortBy, sortAscending, view]);
 

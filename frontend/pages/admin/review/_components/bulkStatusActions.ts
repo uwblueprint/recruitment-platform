@@ -1,12 +1,15 @@
 import { ApplicationStatus } from "@/graphql/typeUtils";
 
-export type BulkAction = "reject" | "interview";
+export enum BulkAction {
+  Reject = "reject",
+  Interview = "interview",
+}
 
 const pluralizeCandidates = (count: number) =>
   `${count} ${count === 1 ? "candidate" : "candidates"}`;
 
 export const BULK_ACTIONS = {
-  reject: {
+  [BulkAction.Reject]: {
     status: ApplicationStatus.Rejected,
     title: "Send rejection to candidates",
     description:
@@ -17,7 +20,7 @@ export const BULK_ACTIONS = {
       description: "The selected application statuses have been updated.",
     }),
   },
-  interview: {
+  [BulkAction.Interview]: {
     status: ApplicationStatus.Selected,
     title: "Select candidates for interview",
     description:

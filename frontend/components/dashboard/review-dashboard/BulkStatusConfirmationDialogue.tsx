@@ -48,10 +48,10 @@ export const BulkStatusConfirmationDialogue = ({
       </p>
       <div className="mt-6 max-h-64 space-y-2 overflow-y-auto pr-1">
         {applicants.map((applicant) => (
-          <div key={applicant.id} className="grid grid-cols-[1.2fr_1fr_auto] gap-4 bg-neutral-50 px-3 py-4 font-source text-sm">
-            <span>{applicant.name}</span>
-            <span>{applicant.position}</span>
-            <span className="text-green-700">{applicant.totalScore === null ? "-" : `${applicant.totalScore}/40`}</span>
+          <div key={applicant.id} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_4rem] gap-4 bg-neutral-50 px-3 py-4 font-source text-sm">
+            <span className="truncate" title={applicant.name}>{applicant.name}</span>
+            <span className="truncate" title={applicant.position}>{applicant.position}</span>
+            <span className="truncate text-green-700">{applicant.totalScore === null ? "-" : `${applicant.totalScore}/40`}</span>
           </div>
         ))}
       </div>

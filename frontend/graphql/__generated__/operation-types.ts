@@ -26,6 +26,20 @@ export type BulkUpdateApplicantRecordsStatusMutationVariables = Exact<{
 
 export type BulkUpdateApplicantRecordsStatusMutation = { bulkUpdateApplicantRecordsStatus: Array<{ id: string, status: Types.ApplicationStatus }> };
 
+export type CreateAdminCommentMutationVariables = Exact<{
+  adminComment: Types.CreateAdminCommentDto;
+}>;
+
+
+export type CreateAdminCommentMutation = { createAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
+
+export type DeleteAdminCommentByIdMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteAdminCommentByIdMutation = { deleteAdminCommentById: { id: string } };
+
 export type InterviewDashboardQueryVariables = Exact<{
   pageNumber: number;
   resultsPerPage: number;
