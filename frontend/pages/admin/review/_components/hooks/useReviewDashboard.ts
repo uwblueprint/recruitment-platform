@@ -6,6 +6,7 @@ import type {
   ReviewDashboardResult,
   ReviewDashboardSortBy,
 } from "@/graphql/typeUtils";
+import { ReviewDashboardDocument } from "@/graphql/typeUtils";
 
 type UseReviewDashboardResult = {
   rows: ReviewDashboardResult[];

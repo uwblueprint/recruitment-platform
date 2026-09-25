@@ -22,6 +22,7 @@ import {
   createReviewDashboardColumns,
 } from "./_components/columns";
 import { DashboardTabs } from "./_components/DashboardTabs";
+import useDebouncedValue from "./_components/hooks/useDebouncedValue";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
 import { BulkAction } from "./_components/bulkStatusActions";
@@ -33,6 +34,7 @@ import useTabCounts from "./_components/hooks/useTabCounts";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
+const SEARCH_DEBOUNCE_MS = 500;
 
 type ReviewerReassignmentTarget = {
   applicantRecordId: string;
@@ -75,6 +77,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
     []
   );
 
+  // The query fires on the settled text; the input keeps the raw value.
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
+
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort ? !activeSort.desc : undefined;
@@ -115,6 +120,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // convert SelectedFilters to ReviewDashboardFilters for the backend
   const backendFilters = useMemo(
     (): ReviewDashboardFilters => ({
+      search: debouncedSearch.trim() ? debouncedSearch : undefined,
       positions: selectedFilters.position?.length
         ? selectedFilters.position
         : undefined,
@@ -132,7 +138,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         ? true
         : undefined,
     }),
-    [selectedFilters],
+    [selectedFilters, debouncedSearch],
   );
 
   const { rows, isLoading, error, refetch } = useReviewDashboard(
@@ -141,7 +147,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     sortBy,
     sortAscending,
     backendFilters,
-    activeView
+    activeView,
   );
 
   const applicantRecordIds = useReviewDashboardApplicantRecordIds(
@@ -236,16 +242,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
     clearSelection();
   };
 
-  const visibleRows = useMemo(() => {
-    const trimmedSearch = search.trim().toLowerCase();
-    return trimmedSearch
-      ? rows.filter((row) =>
-          `${row.firstName} ${row.lastName}`
-            .toLowerCase()
-            .includes(trimmedSearch),
-        )
-      : rows;
-  }, [rows, search]);
   const selectedCount = Object.keys(rowSelection).length;
 
   const handleBulkAction = (action: BulkAction) =>
@@ -295,7 +291,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           </div>
         ) : null}
         <DashboardTable
-          data={visibleRows}
+          data={rows}
           columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}

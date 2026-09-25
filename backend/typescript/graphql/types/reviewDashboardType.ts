@@ -46,6 +46,7 @@ const reviewDashboardType = gql`
   }
 
   input ReviewDashboardFilters {
+    search: String
     positions: [String!]
     applicationStatuses: [ApplicationStatus!]
     skillCategories: [SkillCategory!]
