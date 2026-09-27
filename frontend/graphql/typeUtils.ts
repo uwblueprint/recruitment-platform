@@ -110,6 +110,7 @@ export {
   UpdateAdminCommentDocument,
   DeleteAdminCommentByIdDocument,
   ApplicationDocument,
+  InterviewDashboardSidePanelDocument,
   BulkUpdateApplicantRecordsStatusDocument,
   SendRejectionEmailsDocument,
   InterviewedApplicantsByUserIdDocument,
@@ -138,6 +139,7 @@ export {
   ReviewedApplicantsByUserIdDocument,
   UsersByPositionDocument,
   UploadInterviewNotesDocument,
+  UpdateApplicantRecordIsApplicantFlaggedDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -167,6 +169,8 @@ export type {
   InterviewedPairingsByUserIdQueryVariables,
   InterviewDashboardQuery,
   InterviewDashboardQueryVariables,
+  InterviewDashboardSidePanelQuery,
+  InterviewDashboardSidePanelQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
   InterviewNotesQuery,
@@ -209,6 +213,8 @@ export type {
   UsersByPositionQueryVariables,
   UploadInterviewNotesMutation,
   UploadInterviewNotesMutationVariables,
+  UpdateApplicantRecordIsApplicantFlaggedMutation,
+  UpdateApplicantRecordIsApplicantFlaggedMutationVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -238,6 +244,15 @@ export type InterviewedApplicantResult = ArrayElement<
 >;
 export type InterviewDashboardResult = ArrayElement<
   OperationField<Operations.InterviewDashboardQuery, "interviewDashboard">
+>;
+export type InterviewDashboardSidePanelResult = OperationField<
+  Operations.InterviewDashboardSidePanelQuery,
+  "interviewDashboardSidePanel"
+>;
+
+export type UpdateApplicantRecordIsApplicantFlaggedResult = OperationField<
+  Operations.UpdateApplicantRecordIsApplicantFlaggedMutation,
+  "updateApplicantRecordIsApplicantFlagged"
 >;
 export type InterviewerResult = ArrayElement<
   OperationField<Operations.InterviewersByGroupIdQuery, "interviewersByGroupId">

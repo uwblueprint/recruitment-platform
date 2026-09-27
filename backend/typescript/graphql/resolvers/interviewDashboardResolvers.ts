@@ -3,6 +3,7 @@ import IInterviewCompositeService from "../../services/interfaces/IInterviewComp
 import {
   InterviewDashboardRowDTO,
   InterviewDashboardSortBy,
+  InterviewDashboardSidePanelDTO,
   InterviewDelegationDTO,
   InterviewInviteDTO,
 } from "../../types";
@@ -30,6 +31,14 @@ const interviewDashboardResolvers = {
         resultsPerPage,
         sortBy,
         sortAscending,
+      );
+    },
+    interviewDashboardSidePanel: async (
+      _parent: undefined,
+      { applicantRecordId }: { applicantRecordId: string },
+    ): Promise<InterviewDashboardSidePanelDTO> => {
+      return interviewCompositeService.getInterviewDashboardSidePanel(
+        applicantRecordId,
       );
     },
     interviewInvites: async (): Promise<InterviewInviteDTO[]> => {

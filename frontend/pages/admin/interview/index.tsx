@@ -1,3 +1,4 @@
+import { InterviewDashboardSidePanel } from "./_components/side-panel/InterviewDashboardSidePanel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import {
@@ -5,6 +6,7 @@ import {
   INTERVIEW_DASHBOARD_COLUMNS,
 } from "@/components/dashboard/interview-dashboard/columns";
 import useInterviewDashboard from "@/components/dashboard/interview-dashboard/hooks/useInterviewDashboard";
+import type { InterviewDashboardResult } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
   RowSelectionState,
@@ -18,9 +20,10 @@ const DEFAULT_RESULTS_PER_PAGE = 25;
 const InterviewDashboardPage: NextPageWithLayout = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(
-    DEFAULT_RESULTS_PER_PAGE,
+    DEFAULT_RESULTS_PER_PAGE
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
 
   // The table is single-sort, so only the first SortingState entry is used.
@@ -34,13 +37,17 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     pageNumber,
     resultsPerPage,
     sortBy,
-    sortAscending,
+    sortAscending
   );
+
+  const activeRow: InterviewDashboardResult | null =
+    activeIndex !== null ? rows[activeIndex] ?? null : null;
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
     setRowSelection({});
+    setActiveIndex(null);
   };
 
   // Changing the sort reorders the whole result set, so return to the first page.
@@ -69,6 +76,13 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
+          onRowClick={(row) =>
+            setActiveIndex(
+              rows.findIndex(
+                (r) => r.applicantRecordId === row.applicantRecordId
+              )
+            )
+          }
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={handleSortingChange}
@@ -82,6 +96,26 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           }}
         />
       </main>
+
+      <InterviewDashboardSidePanel
+        row={activeRow ?? undefined}
+        onClose={() => setActiveIndex(null)}
+        navigation={
+          activeIndex !== null
+            ? {
+                current: activeIndex + 1,
+                canPrev: activeIndex > 0,
+                canNext: activeIndex < rows.length - 1,
+                total: rows.length,
+                onPrev: () => setActiveIndex((i) => Math.max((i ?? 0) - 1, 0)),
+                onNext: () =>
+                  setActiveIndex((i) =>
+                    Math.min((i ?? 0) + 1, rows.length - 1)
+                  ),
+              }
+            : undefined
+        }
+      />
     </div>
   );
 };

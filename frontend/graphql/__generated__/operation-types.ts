@@ -50,6 +50,13 @@ export type InterviewDashboardQueryVariables = Exact<{
 
 export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
 
+export type InterviewDashboardSidePanelQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type InterviewDashboardSidePanelQuery = { interviewDashboardSidePanel: { firstName: string, lastName: string, term: string, program: string, position: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, isApplicantFlagged: boolean, isShortlistedForOffer: boolean, interviewStatus: Types.InterviewStatus | null, interviewScore: number | null, interviewedApplicantRecordId: string | null, interviewDate: string | null, interviewers: Array<{ firstName: string, lastName: string }>, interview: { skill: number | null, passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, comments: string | null } | null } };
+
 export type InterviewGroupQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -224,6 +231,14 @@ export type UpdateAdminCommentMutationVariables = Exact<{
 
 
 export type UpdateAdminCommentMutation = { updateAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
+
+export type UpdateApplicantRecordIsApplicantFlaggedMutationVariables = Exact<{
+  id: string | number;
+  flagValue: boolean;
+}>;
+
+
+export type UpdateApplicantRecordIsApplicantFlaggedMutation = { updateApplicantRecordIsApplicantFlagged: { id: string, isApplicantFlagged: boolean } };
 
 export type UpdateApplicantRecordStatusMutationVariables = Exact<{
   id: string | number;

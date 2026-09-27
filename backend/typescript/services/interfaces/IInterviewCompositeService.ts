@@ -1,6 +1,7 @@
 import {
   InterviewDelegationDTO,
   InterviewDashboardRowDTO,
+  InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
   InterviewInviteDTO,
   InterviewedApplicantsDTO,
@@ -24,6 +25,14 @@ interface IInterviewCompositeService {
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
   ): Promise<InterviewDashboardRowDTO[]>;
+
+  /**
+   * Fetches the details shown in the admin interview dashboard side panel.
+   * @param applicantRecordId the id of the applicant record to display
+   */
+  getInterviewDashboardSidePanel(
+    applicantRecordId: string,
+  ): Promise<InterviewDashboardSidePanelDTO>;
 
   /**
    * Delegates interviewers to interview applicants.

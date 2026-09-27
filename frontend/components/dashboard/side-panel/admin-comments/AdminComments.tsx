@@ -39,8 +39,8 @@ export const AdminCommentsSection = ({
       {isLoading ? (
         <p className="text-sm text-neutral-500">Loading comments...</p>
       ) : comments.length === 0 && !error ? (
-        <p className="border-b border-neutral-200 py-2 text-sm text-neutral-500">
-          No admin comments yet.
+        <p className="flex min-h-[180px] items-center justify-center px-4 text-center text-base font-semibold text-neutral-500">
+          No comments yet.
         </p>
       ) : (
         <ul>

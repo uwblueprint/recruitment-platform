@@ -11,6 +11,25 @@ const interviewDashboardTypes = gql`
     interviewScore: Int
   }
 
+  type InterviewDashboardSidePanelDTO {
+    firstName: String!
+    lastName: String!
+    term: String!
+    program: String!
+    position: String!
+    resumeUrl: String!
+    applicationStatus: ApplicationStatus!
+    skillCategory: SkillCategory
+    isApplicantFlagged: Boolean!
+    isShortlistedForOffer: Boolean!
+    interviewers: [UserDTO!]!
+    interview: Interview
+    interviewStatus: InterviewStatus
+    interviewScore: Int
+    interviewedApplicantRecordId: ID
+    interviewDate: String
+  }
+
   enum InterviewDashboardSortBy {
     FIRST_NAME
     LAST_NAME
@@ -43,6 +62,10 @@ const interviewDashboardTypes = gql`
       sortBy: InterviewDashboardSortBy
       sortAscending: Boolean
     ): [InterviewDashboardRowDTO!]!
+
+    interviewDashboardSidePanel(
+      applicantRecordId: ID!
+    ): InterviewDashboardSidePanelDTO!
     interviewInvites: [InterviewInviteDTO!]!
   }
 

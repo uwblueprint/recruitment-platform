@@ -11,6 +11,7 @@ import {
   CreateInterviewDelegationDTO,
   ApplicationStatusEnum,
   InterviewDashboardRowDTO,
+  InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
   InterviewDashboardSortByEnum,
   InterviewDelegationDTO,
@@ -26,6 +27,7 @@ import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 import InterviewedApplicantRecordsService from "./interviewedApplicantRecordService";
 import {
   toInterviewDashboardRowDTO,
+  toInterviewDashboardSidePanelDTO,
   toInterviewedApplicantDTO,
   toInterviewNotesDTO,
   toUserDTO,
@@ -258,6 +260,89 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to get interview dashboard. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getInterviewDashboardSidePanel(
+    applicantRecordId: string,
+  ): Promise<InterviewDashboardSidePanelDTO> {
+    try {
+      const applicantRecord = await ApplicantRecord.findByPk(
+        applicantRecordId,
+        {
+          attributes: [
+            "id",
+            "position",
+            "status",
+            "skill_category",
+            "is_applicant_flagged",
+            "is_shortlisted_for_offer",
+          ],
+          include: [
+            {
+              attributes: [
+                "first_name",
+                "last_name",
+                "term",
+                "program",
+                "resume_url",
+              ],
+              model: Applicant,
+              required: true,
+            },
+            {
+              attributes: [
+                "id",
+                "applicant_record_id",
+                "score",
+                "interview_json",
+                "status",
+                "interview_date",
+              ],
+              model: InterviewedApplicantRecord,
+              as: "interviewed_applicant_record",
+              include: [
+                {
+                  attributes: [
+                    "interviewed_applicant_record_id",
+                    "interviewer_id",
+                  ],
+                  model: InterviewDelegation,
+                  as: "interview_delegations",
+                  // NOTE: fetched in its own query. Joining this deep generates column
+                  //       aliases longer than Postgres' 63 character identifier limit
+                  //       (e.g. `interviewed_applicant_record.interview_delegations.interviewer.first_name`),
+                  //       which get truncated and leave the interviewer unmapped.
+                  separate: true,
+                  order: [["interviewer_id", "ASC"]],
+                  include: [
+                    {
+                      attributes: { exclude: ["createdAt", "updatedAt"] },
+                      model: User,
+                      as: "interviewer",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      );
+
+      if (!applicantRecord) {
+        throw new Error(
+          `ApplicantRecord with ID ${applicantRecordId} not found`,
+        );
+      }
+
+      return toInterviewDashboardSidePanelDTO(applicantRecord);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get interview dashboard side panel for applicant record ${applicantRecordId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }

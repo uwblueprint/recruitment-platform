@@ -1,5 +1,5 @@
+import { ReviewDashboardSidePanel } from "./_components/side-panel/ReviewDashboardSidePanel";
 import { Toast } from "@/components/common/Toast";
-import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import {
   FilterCategoryVariant,
@@ -31,7 +31,6 @@ import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardFilterOptions from "./_components/hooks/useReviewDashboardFilterOptions";
-import useReviewDashboardSidePanel from "./_components/hooks/useReviewDashboardSidePanel";
 import useTabCounts from "./_components/hooks/useTabCounts";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
 
@@ -129,7 +128,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         ? true
         : undefined,
     }),
-    [selectedFilters, debouncedSearch],
+    [selectedFilters, debouncedSearch]
   );
 
   const { rows, isLoading, error, setRowStatus, refetch } = useReviewDashboard(
@@ -138,17 +137,15 @@ const AdminReviewPage: NextPageWithLayout = () => {
     sortBy,
     sortAscending,
     backendFilters,
-    activeView,
+    activeView
   );
 
   const applicantRecordIds = useReviewDashboardApplicantRecordIds(
     sortBy,
     sortAscending,
-    backendFilters,
+    backendFilters
   );
   const activeRow = rows.find((row) => row.applicantRecordId === activeId);
-  const { details, isLoading: isDetailsLoading } =
-    useReviewDashboardSidePanel(activeId);
   const activeNavigationIndex =
     activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
 
@@ -173,7 +170,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     async (
       applicantRecordId: string,
       nextStatus: ApplicationStatus,
-      previousStatus: ApplicationStatus,
+      previousStatus: ApplicationStatus
     ) => {
       setStatusError(false);
       setRowStatus(applicantRecordId, nextStatus);
@@ -182,7 +179,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         const confirmedStatus =
           await ReviewDashboardAPIClient.updateApplicantRecordStatus(
             applicantRecordId,
-            nextStatus,
+            nextStatus
           );
         setRowStatus(applicantRecordId, confirmedStatus);
         return confirmedStatus;
@@ -192,24 +189,25 @@ const AdminReviewPage: NextPageWithLayout = () => {
         throw error;
       }
     },
-    [setRowStatus],
+    [setRowStatus]
   );
 
   // TanStack Table expects a stable `columns` reference, so build it once from
   // the stable status handler.
   const columns = useMemo(
-    () => createReviewDashboardColumns({
-      onStatusChange: handleStatusChange,
-      onReviewerClick: (row, reviewer) => {
-        setReviewerReassignmentTarget({
-          applicantRecordId: row.applicantRecordId,
-          position: row.position,
-          reviewerId: reviewer.id,
-          reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
-        });
-      },
-    }),
-    [handleStatusChange],
+    () =>
+      createReviewDashboardColumns({
+        onStatusChange: handleStatusChange,
+        onReviewerClick: (row, reviewer) => {
+          setReviewerReassignmentTarget({
+            applicantRecordId: row.applicantRecordId,
+            position: row.position,
+            reviewerId: reviewer.id,
+            reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+          });
+        },
+      }),
+    [handleStatusChange]
   );
 
   const handleViewChange = (view: DashboardView) => {
@@ -229,14 +227,12 @@ const AdminReviewPage: NextPageWithLayout = () => {
     openBulkAction,
     toast: bulkActionToast,
     dismissToast: dismissBulkActionToast,
-  } = useBulkStatusAction(
-    {
-      onSuccess: () => {
-        clearSelection();
-        refetch();
-      },
-    }
-  );
+  } = useBulkStatusAction({
+    onSuccess: () => {
+      clearSelection();
+      refetch();
+    },
+  });
 
   const handleResultsPerPageChange = (value: number) => {
     setResultsPerPage(value);
@@ -259,7 +255,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
   const handleFilterCategoryChange = (
     categoryKey: string,
-    values: string[],
+    values: string[]
   ) => {
     setSelectedFilters((prev) => ({ ...prev, [categoryKey]: values }));
     setPageNumber(1);
@@ -354,13 +350,11 @@ const AdminReviewPage: NextPageWithLayout = () => {
           }}
         />
       </main>
-      <DashboardSidePanel
-        open={activeId !== undefined}
+      <ReviewDashboardSidePanel
+        applicantRecordId={activeId}
         onClose={() => setActiveId(undefined)}
         row={activeRow}
-        details={details}
         onStatusChange={handleStatusChange}
-        isLoading={isDetailsLoading}
         navigation={
           activeNavigationIndex >= 0
             ? {

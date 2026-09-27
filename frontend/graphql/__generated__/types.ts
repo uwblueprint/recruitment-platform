@@ -188,6 +188,26 @@ export type InterviewDashboardRowDto = {
   position: Scalars['String']['output'];
 };
 
+export type InterviewDashboardSidePanelDto = {
+  __typename?: 'InterviewDashboardSidePanelDTO';
+  applicationStatus: ApplicationStatus;
+  firstName: Scalars['String']['output'];
+  interview?: Maybe<Interview>;
+  interviewDate?: Maybe<Scalars['String']['output']>;
+  interviewScore?: Maybe<Scalars['Int']['output']>;
+  interviewStatus?: Maybe<InterviewStatus>;
+  interviewedApplicantRecordId?: Maybe<Scalars['ID']['output']>;
+  interviewers: Array<UserDto>;
+  isApplicantFlagged: Scalars['Boolean']['output'];
+  isShortlistedForOffer: Scalars['Boolean']['output'];
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
+  program: Scalars['String']['output'];
+  resumeUrl: Scalars['String']['output'];
+  skillCategory?: Maybe<SkillCategory>;
+  term: Scalars['String']['output'];
+};
+
 export enum InterviewDashboardSortBy {
   ApplicationStatus = 'APPLICATION_STATUS',
   FirstName = 'FIRST_NAME',
@@ -609,6 +629,7 @@ export type Query = {
   entity: EntityResponseDto;
   file: Scalars['String']['output'];
   interviewDashboard: Array<InterviewDashboardRowDto>;
+  interviewDashboardSidePanel: InterviewDashboardSidePanelDto;
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
   interviewInvites: Array<InterviewInviteDto>;
@@ -668,6 +689,11 @@ export type QueryInterviewDashboardArgs = {
   resultsPerPage: Scalars['Int']['input'];
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<InterviewDashboardSortBy>;
+};
+
+
+export type QueryInterviewDashboardSidePanelArgs = {
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
