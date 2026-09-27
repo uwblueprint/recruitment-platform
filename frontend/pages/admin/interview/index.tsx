@@ -1,4 +1,4 @@
-import { InterviewDashboardSidePanel } from "./_components/InterviewDashboardSidePanel";
+import { InterviewDashboardSidePanel } from "./_components/side-panel/InterviewDashboardSidePanel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import {

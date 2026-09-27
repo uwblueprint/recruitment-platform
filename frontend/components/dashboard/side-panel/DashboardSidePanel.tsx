@@ -66,6 +66,7 @@ type DashboardSidePanelProps = {
   navigation?: SidePanelNavigation;
   maxScore?: number;
   width?: number;
+  showDetailsDivider?: boolean;
   onStatusChange?: (
     applicantRecordId: string,
     nextStatus: ApplicationStatus,
@@ -92,6 +93,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
     onStatusChange,
     maxScore = MAX_TOTAL_SCORE,
     width = 913,
+    showDetailsDivider = true,
   } = props;
 
   return (
@@ -150,7 +152,11 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
               onStatusChange={onStatusChange}
               maxScore={maxScore}
             />
-            <SidePanelInfoRow row={row} details={details} />
+            <SidePanelInfoRow
+              row={row}
+              details={details}
+              showDivider={showDetailsDivider}
+            />
 
             {isLoading ? (
               <p className="py-8 text-center text-sm text-neutral-500">
@@ -235,7 +241,11 @@ const SidePanelApplicantBar = ({
   );
 };
 
-const SidePanelInfoRow = ({ row, details }: ActiveApplicantProps) => {
+const SidePanelInfoRow = ({
+  row,
+  details,
+  showDivider,
+}: ActiveApplicantProps & { showDivider: boolean }) => {
   // "Term" in the UI is the academic term (e.g. 2A, 2B), not the recruitment
   // cycle stored in `applicant.term`.
   const term = details?.academicYear ?? EMPTY_VALUE;
@@ -244,7 +254,11 @@ const SidePanelInfoRow = ({ row, details }: ActiveApplicantProps) => {
   const resumeUrl = details?.resumeUrl;
 
   return (
-    <div className="flex flex-wrap items-center gap-x-8 gap-y-2 border-b border-neutral-200 pb-2 text-sm">
+    <div
+      className={`flex flex-wrap items-center gap-x-8 gap-y-2 pb-2 text-sm ${
+        showDivider ? "border-b border-neutral-200" : ""
+      }`}
+    >
       <InfoField label="Term" value={term} />
       <InfoField label="Program" value={program} />
       <InfoField label="Role" value={role} />
