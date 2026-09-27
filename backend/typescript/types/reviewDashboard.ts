@@ -1,6 +1,28 @@
+import { ValueOf } from "../utilities/typingUtils";
 import { ApplicationStatus, SkillCategory } from "./applicantRecord";
 import { Review, ReviewStatus } from "./reviewedApplicantRecord";
 import { UserDTO } from "./user";
+
+export const DashboardViewEnum = {
+  ALL: "ALL",
+  SHORTLISTED: "SHORTLISTED",
+  CONFLICTS: "CONFLICTS",
+} as const;
+
+export type DashboardView = ValueOf<typeof DashboardViewEnum>;
+
+export const ReviewDashboardSortByEnum = {
+  FIRST_NAME: "FIRST_NAME",
+  LAST_NAME: "LAST_NAME",
+  CHOICE: "CHOICE",
+  TIMES_APPLIED: "TIMES_APPLIED",
+  REVIEWER_1: "REVIEWER_1",
+  REVIEWER_2: "REVIEWER_2",
+  TOTAL_SCORE: "TOTAL_SCORE",
+  APPLICATION_STATUS: "APPLICATION_STATUS",
+} as const;
+
+export type ReviewDashboardSortBy = ValueOf<typeof ReviewDashboardSortByEnum>;
 
 export type ReviewDetails = {
   reviewer: UserDTO;
@@ -9,6 +31,7 @@ export type ReviewDetails = {
 };
 
 export type ReviewDashboardRowDTO = {
+  applicantRecordId: string;
   firstName: string;
   lastName: string;
   position: string;
@@ -24,8 +47,34 @@ export type ReviewDashboardSidePanelDTO = {
   lastName: string;
   position: string;
   program: string;
+  academicYear: string;
   resumeUrl: string;
   applicationStatus: ApplicationStatus;
   skillCategory: SkillCategory | null;
   reviewDetails: ReviewDetails[];
+};
+
+export type FilterOption = {
+  value: string;
+  label: string;
+};
+
+export type ReviewDashboardFilterOptionsDTO = {
+  positions: FilterOption[];
+  applicationStatuses: FilterOption[];
+  skillCategories: FilterOption[];
+  scoreRanges: FilterOption[];
+  years: FilterOption[];
+  bookmarked: FilterOption[];
+};
+
+export type ReviewDashboardFilters = {
+  /** Free text matched case-insensitively against the applicant's full name. */
+  search?: string;
+  positions?: string[];
+  applicationStatuses?: ApplicationStatus[];
+  skillCategories?: SkillCategory[];
+  scoreRanges?: string[];
+  years?: string[];
+  bookmarked?: boolean;
 };

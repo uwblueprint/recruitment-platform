@@ -7,7 +7,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  Upload: { input: unknown; output: unknown; }
+  Upload: { input: File; output: File; }
 };
 
 export type AdminCommentDto = {
@@ -31,6 +31,12 @@ export type ApplicantRecordDto = {
   roleSpecificQuestions: Array<ShortAnswerQuestion>;
   skillCategory?: Maybe<SkillCategory>;
   status: ApplicationStatus;
+};
+
+export type ApplicantRecordWithReviewersDto = {
+  __typename?: 'ApplicantRecordWithReviewersDTO';
+  applicantRecord: ApplicantRecordDto;
+  reviewedApplicantRecords: Array<ReviewedApplicantRecordWithReviewerDto>;
 };
 
 export type ApplicationDto = {
@@ -114,6 +120,12 @@ export type CreateUserDto = {
   role: Role;
 };
 
+export enum DashboardView {
+  All = 'ALL',
+  Conflicts = 'CONFLICTS',
+  Shortlisted = 'SHORTLISTED'
+}
+
 export type EntityRequestDto = {
   boolField: Scalars['Boolean']['input'];
   contentType?: InputMaybe<Scalars['String']['input']>;
@@ -142,6 +154,12 @@ export enum Enum {
   D = 'D'
 }
 
+export type FilterOption = {
+  __typename?: 'FilterOption';
+  label: Scalars['String']['output'];
+  value: Scalars['String']['output'];
+};
+
 export type Interview = {
   __typename?: 'Interview';
   comments?: Maybe<Scalars['String']['output']>;
@@ -157,6 +175,47 @@ export enum InterviewConflict {
   ApplicantNoResponse = 'APPLICANT_NO_RESPONSE',
   CannotAttend = 'CANNOT_ATTEND',
   PartnerNoResponse = 'PARTNER_NO_RESPONSE'
+}
+
+export type InterviewDashboardRowDto = {
+  __typename?: 'InterviewDashboardRowDTO';
+  applicantRecordId: Scalars['ID']['output'];
+  applicationStatus: ApplicationStatus;
+  firstName: Scalars['String']['output'];
+  interviewScore?: Maybe<Scalars['Int']['output']>;
+  interviewers: Array<UserDto>;
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
+};
+
+export type InterviewDashboardSidePanelDto = {
+  __typename?: 'InterviewDashboardSidePanelDTO';
+  applicationStatus: ApplicationStatus;
+  firstName: Scalars['String']['output'];
+  interview?: Maybe<Interview>;
+  interviewDate?: Maybe<Scalars['String']['output']>;
+  interviewScore?: Maybe<Scalars['Int']['output']>;
+  interviewStatus?: Maybe<InterviewStatus>;
+  interviewedApplicantRecordId?: Maybe<Scalars['ID']['output']>;
+  interviewers: Array<UserDto>;
+  isApplicantFlagged: Scalars['Boolean']['output'];
+  isShortlistedForOffer: Scalars['Boolean']['output'];
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
+  program: Scalars['String']['output'];
+  resumeUrl: Scalars['String']['output'];
+  skillCategory?: Maybe<SkillCategory>;
+  term: Scalars['String']['output'];
+};
+
+export enum InterviewDashboardSortBy {
+  ApplicationStatus = 'APPLICATION_STATUS',
+  FirstName = 'FIRST_NAME',
+  Interviewer_1 = 'INTERVIEWER_1',
+  Interviewer_2 = 'INTERVIEWER_2',
+  InterviewScore = 'INTERVIEW_SCORE',
+  LastName = 'LAST_NAME',
+  Position = 'POSITION'
 }
 
 export type InterviewDelegationDto = {
@@ -189,6 +248,30 @@ export type InterviewInput = {
   teamPlayer?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type InterviewInviteDto = {
+  __typename?: 'InterviewInviteDTO';
+  id: Scalars['ID']['output'];
+  interviewees: Array<InterviewInviteeDto>;
+  interviewers: Array<UserDto>;
+  position: Scalars['String']['output'];
+  schedulingLink?: Maybe<Scalars['String']['output']>;
+  status: InterviewGroupStatus;
+};
+
+export type InterviewInviteeDto = {
+  __typename?: 'InterviewInviteeDTO';
+  firstName: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  position: Scalars['String']['output'];
+};
+
+export type InterviewNotes = {
+  __typename?: 'InterviewNotes';
+  fileId: Scalars['ID']['output'];
+  fileName: Scalars['String']['output'];
+  signedUrl: Scalars['String']['output'];
+};
+
 export type InterviewPairingsDto = {
   __typename?: 'InterviewPairingsDTO';
   groupMembers: Array<UserDto>;
@@ -198,6 +281,7 @@ export type InterviewPairingsDto = {
 
 export enum InterviewStatus {
   Complete = 'COMPLETE',
+  ConflictReported = 'CONFLICT_REPORTED',
   InProgress = 'IN_PROGRESS',
   NeedsReview = 'NEEDS_REVIEW'
 }
@@ -251,10 +335,14 @@ export type Mutation = {
   login: AuthDto;
   loginWithGoogle: AuthDto;
   logout?: Maybe<Scalars['ID']['output']>;
+  reassignReviewer: ReviewedApplicantRecordDto;
   refresh: Scalars['String']['output'];
   register: AuthDto;
+  reportInterviewConflict: InterviewedApplicantRecord;
   reportReviewConflict: ReviewedApplicantRecordDto;
   resetPassword: Scalars['Boolean']['output'];
+  sendRejectionEmails: RejectionEmailResult;
+  submitInterviewScores: InterviewedApplicantRecord;
   updateAdminComment: AdminCommentDto;
   updateApplicantRecordIsApplicantFlagged: ApplicantRecordDto;
   updateApplicantRecordStatus: ApplicantRecordDto;
@@ -266,6 +354,7 @@ export type Mutation = {
   updateReviewedApplicantRecord: ReviewedApplicantRecordDto;
   updateSimpleEntity: SimpleEntityResponseDto;
   updateUser: UserDto;
+  uploadInterviewNotes: InterviewNotes;
 };
 
 
@@ -409,6 +498,13 @@ export type MutationLogoutArgs = {
 };
 
 
+export type MutationReassignReviewerArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+  newReviewerId: Scalars['ID']['input'];
+  oldReviewerId: Scalars['ID']['input'];
+};
+
+
 export type MutationRefreshArgs = {
   refreshToken: Scalars['String']['input'];
 };
@@ -416,6 +512,13 @@ export type MutationRefreshArgs = {
 
 export type MutationRegisterArgs = {
   user: RegisterUserDto;
+};
+
+
+export type MutationReportInterviewConflictArgs = {
+  interviewHasConflict: InterviewConflict;
+  interviewedApplicantRecordId: Scalars['ID']['input'];
+  interviewerId: Scalars['ID']['input'];
 };
 
 
@@ -427,6 +530,17 @@ export type MutationReportReviewConflictArgs = {
 
 export type MutationResetPasswordArgs = {
   email: Scalars['String']['input'];
+};
+
+
+export type MutationSendRejectionEmailsArgs = {
+  ids: Array<Scalars['ID']['input']>;
+};
+
+
+export type MutationSubmitInterviewScoresArgs = {
+  id: Scalars['ID']['input'];
+  interviewJson: InterviewInput;
 };
 
 
@@ -498,6 +612,12 @@ export type MutationUpdateUserArgs = {
   user: UpdateUserDto;
 };
 
+
+export type MutationUploadInterviewNotesArgs = {
+  file: Scalars['Upload']['input'];
+  interviewedApplicantRecordId: Scalars['ID']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   _empty?: Maybe<Scalars['String']['output']>;
@@ -508,17 +628,25 @@ export type Query = {
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
   file: Scalars['String']['output'];
+  interviewDashboard: Array<InterviewDashboardRowDto>;
+  interviewDashboardSidePanel: InterviewDashboardSidePanelDto;
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
+  interviewInvites: Array<InterviewInviteDto>;
+  interviewNotes?: Maybe<InterviewNotes>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
+  interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
   interviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
   interviewedPairingsByUserId: Array<InterviewPairingsDto>;
   interviewersByGroupId: Array<UserDto>;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewDashboard: Array<ReviewDashboardRowDto>;
+  reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
+  reviewDashboardFilterOptions: ReviewDashboardFilterOptionsDto;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
+  reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
   reviewedApplicantsByUserId: Array<ReviewedApplicantsDto>;
   simpleEntities: Array<SimpleEntityResponseDto>;
   simpleEntitiesCSV: Scalars['String']['output'];
@@ -526,6 +654,7 @@ export type Query = {
   userByEmail: UserDto;
   userById: UserDto;
   users: Array<UserDto>;
+  usersByPosition: Array<Maybe<UserDto>>;
   usersCSV: Scalars['String']['output'];
 };
 
@@ -555,6 +684,19 @@ export type QueryFileArgs = {
 };
 
 
+export type QueryInterviewDashboardArgs = {
+  pageNumber: Scalars['Int']['input'];
+  resultsPerPage: Scalars['Int']['input'];
+  sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
+  sortBy?: InputMaybe<InterviewDashboardSortBy>;
+};
+
+
+export type QueryInterviewDashboardSidePanelArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryInterviewDelegationArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
   interviewerId: Scalars['ID']['input'];
@@ -566,8 +708,18 @@ export type QueryInterviewGroupArgs = {
 };
 
 
+export type QueryInterviewNotesArgs = {
+  interviewedApplicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryInterviewedApplicantRecordArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewedApplicantRecordByApplicantRecordIdArgs = {
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -599,8 +751,24 @@ export type QueryIsAuthorizedToReviewArgs = {
 
 
 export type QueryReviewDashboardArgs = {
+  filters?: InputMaybe<ReviewDashboardFilters>;
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
+  sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
+  sortBy?: InputMaybe<ReviewDashboardSortBy>;
+  view?: InputMaybe<DashboardView>;
+};
+
+
+export type QueryReviewDashboardApplicantRecordIdsArgs = {
+  filters?: InputMaybe<ReviewDashboardFilters>;
+  sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
+  sortBy?: InputMaybe<ReviewDashboardSortBy>;
+};
+
+
+export type QueryReviewDashboardFilterOptionsArgs = {
+  department?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -612,6 +780,11 @@ export type QueryReviewDashboardSidePanelArgs = {
 export type QueryReviewedApplicantRecordArgs = {
   applicantRecordId: Scalars['ID']['input'];
   reviewerId: Scalars['ID']['input'];
+};
+
+
+export type QueryReviewedApplicantRecordsByApplicantRecordIdArgs = {
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -634,11 +807,28 @@ export type QueryUserByIdArgs = {
   id: Scalars['ID']['input'];
 };
 
+
+export type QueryUsersByPositionArgs = {
+  position: Scalars['String']['input'];
+};
+
 export type RegisterUserDto = {
   email: Scalars['String']['input'];
   firstName: Scalars['String']['input'];
   lastName: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+export type RejectionEmailFailure = {
+  __typename?: 'RejectionEmailFailure';
+  error: Scalars['String']['output'];
+  to: Scalars['String']['output'];
+};
+
+export type RejectionEmailResult = {
+  __typename?: 'RejectionEmailResult';
+  failed: Array<RejectionEmailFailure>;
+  sent: Array<Scalars['String']['output']>;
 };
 
 export type Review = {
@@ -651,6 +841,26 @@ export type Review = {
   teamPlayer?: Maybe<Scalars['Int']['output']>;
 };
 
+export type ReviewDashboardFilterOptionsDto = {
+  __typename?: 'ReviewDashboardFilterOptionsDTO';
+  applicationStatuses: Array<FilterOption>;
+  bookmarked: Array<FilterOption>;
+  positions: Array<FilterOption>;
+  scoreRanges: Array<FilterOption>;
+  skillCategories: Array<FilterOption>;
+  years: Array<FilterOption>;
+};
+
+export type ReviewDashboardFilters = {
+  applicationStatuses?: InputMaybe<Array<ApplicationStatus>>;
+  bookmarked?: InputMaybe<Scalars['Boolean']['input']>;
+  positions?: InputMaybe<Array<Scalars['String']['input']>>;
+  scoreRanges?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  skillCategories?: InputMaybe<Array<SkillCategory>>;
+  years?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type ReviewDashboardReviewDetails = {
   __typename?: 'ReviewDashboardReviewDetails';
   review?: Maybe<Review>;
@@ -660,6 +870,7 @@ export type ReviewDashboardReviewDetails = {
 
 export type ReviewDashboardRowDto = {
   __typename?: 'ReviewDashboardRowDTO';
+  applicantRecordId: Scalars['ID']['output'];
   applicationStatus: ApplicationStatus;
   choice: Scalars['Int']['output'];
   firstName: Scalars['String']['output'];
@@ -672,6 +883,7 @@ export type ReviewDashboardRowDto = {
 
 export type ReviewDashboardSidePanelDto = {
   __typename?: 'ReviewDashboardSidePanelDTO';
+  academicYear: Scalars['String']['output'];
   applicationStatus: ApplicationStatus;
   firstName: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
@@ -681,6 +893,17 @@ export type ReviewDashboardSidePanelDto = {
   reviewDetails: Array<ReviewDashboardReviewDetails>;
   skillCategory?: Maybe<SkillCategory>;
 };
+
+export enum ReviewDashboardSortBy {
+  ApplicationStatus = 'APPLICATION_STATUS',
+  Choice = 'CHOICE',
+  FirstName = 'FIRST_NAME',
+  LastName = 'LAST_NAME',
+  Reviewer_1 = 'REVIEWER_1',
+  Reviewer_2 = 'REVIEWER_2',
+  TimesApplied = 'TIMES_APPLIED',
+  TotalScore = 'TOTAL_SCORE'
+}
 
 export type ReviewInput = {
   comments?: InputMaybe<Scalars['String']['input']>;
@@ -706,6 +929,12 @@ export type ReviewedApplicantRecordDto = {
   reviewerId: Scalars['ID']['output'];
   score?: Maybe<Scalars['Int']['output']>;
   status: Scalars['String']['output'];
+};
+
+export type ReviewedApplicantRecordWithReviewerDto = {
+  __typename?: 'ReviewedApplicantRecordWithReviewerDTO';
+  reviewedApplicantRecord: ReviewedApplicantRecordDto;
+  reviewer: UserDto;
 };
 
 export type ReviewedApplicantsDto = {

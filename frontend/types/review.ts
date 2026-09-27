@@ -65,3 +65,12 @@ export type Review = {
   skillCategory?: SkillCategory;
   comments?: string;
 };
+
+export type ReviewerScore = {
+  reviewer: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  score: number | null;
+};

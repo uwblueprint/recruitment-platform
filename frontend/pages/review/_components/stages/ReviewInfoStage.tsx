@@ -12,6 +12,7 @@ export interface ReviewStageProps {
   application: ApplicationDTO | undefined;
   scores: ReviewScores;
   onReportConflict?: () => void;
+  viewOnly?: boolean;
 }
 
 const InfoBanner = () => (
@@ -54,6 +55,7 @@ export const ReviewInfoStage = ({
   application,
   scores,
   onReportConflict,
+  viewOnly = false,
 }: ReviewStageProps) => {
   const firstShortAnswer = application?.shortAnswerQuestions[0];
   const questions = [
@@ -74,7 +76,11 @@ export const ReviewInfoStage = ({
   ];
 
   return (
-    <ReviewPageLayout currentStage={ReviewStage.INFO} scores={scores}>
+    <ReviewPageLayout
+      currentStage={ReviewStage.INFO}
+      scores={scores}
+      viewOnly={viewOnly}
+    >
       <PanelLayout
         variant="grey"
         borderRight
@@ -86,11 +92,13 @@ export const ReviewInfoStage = ({
       <PanelLayout
         title="Basic Information"
         titleButton={
-          <ReportConflictButton
-            name={name}
-            showQuestion
-            onClick={onReportConflict}
-          />
+          viewOnly ? undefined : (
+            <ReportConflictButton
+              name={name}
+              showQuestion
+              onClick={onReportConflict}
+            />
+          )
         }
       >
         <div className="my-12 flex w-full flex-col">

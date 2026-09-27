@@ -41,6 +41,11 @@ const reviewedApplicantRecordTypes = gql`
     reviewerHasConflict: Boolean!
   }
 
+  type ReviewedApplicantRecordWithReviewerDTO {
+    reviewer: UserDTO!
+    reviewedApplicantRecord: ReviewedApplicantRecordDTO!
+  }
+
   input CreateReviewedApplicantRecordDTO {
     applicantRecordId: ID!
     reviewerId: ID!
@@ -78,6 +83,12 @@ const reviewedApplicantRecordTypes = gql`
       applicantRecordId: ID!
       reviewerId: ID!
       reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!
+    ): ReviewedApplicantRecordDTO!
+
+    reassignReviewer(
+      applicantRecordId: ID!
+      oldReviewerId: ID!
+      newReviewerId: ID!
     ): ReviewedApplicantRecordDTO!
   }
 `;

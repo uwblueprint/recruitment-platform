@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import {
   CreateInterviewedApplicantRecordDTO,
   InterviewedApplicantRecordDTO,
@@ -11,6 +12,14 @@ interface IInterviewedApplicantRecordsService {
    */
   getInterviewedApplicantRecordById(
     id: string,
+  ): Promise<InterviewedApplicantRecordDTO>;
+
+  /**
+   * Gets a single interviewed applicant record by applicant record ID
+   * @Param applicantRecordId the ID of the applicant record
+   */
+  getInterviewedApplicantRecordByApplicantRecordId(
+    applicantRecordId: string,
   ): Promise<InterviewedApplicantRecordDTO>;
 
   /**
@@ -29,6 +38,7 @@ interface IInterviewedApplicantRecordsService {
   updateInterviewedApplicantRecord(
     id: string,
     interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO,
+    transaction?: Transaction,
   ): Promise<InterviewedApplicantRecordDTO>;
 
   /**

@@ -1,0 +1,6 @@
+mutation UpdateApplicantRecordStatus($id: ID!, $status: ApplicationStatus!) {
+  updateApplicantRecordStatus(id: $id, status: $status) {
+    id
+    status
+  }
+}

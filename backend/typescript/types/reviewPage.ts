@@ -1,5 +1,8 @@
-import { ShortAnswerQuestion } from "./applicantRecord";
-import { ReviewStatus } from "./reviewedApplicantRecord";
+import { ApplicantRecordDTO, ShortAnswerQuestion } from "./applicantRecord";
+import {
+  ReviewedApplicantRecordWithReviewerDTO,
+  ReviewStatus,
+} from "./reviewedApplicantRecord";
 
 export type ApplicationDTO = {
   id: string;
@@ -27,4 +30,9 @@ export type ReviewedApplicantsDTO = {
   reviewStatus: ReviewStatus;
   applicantFirstName: string;
   applicantLastName: string;
+};
+
+export type ApplicantRecordWithReviewersDTO = {
+  applicantRecord: ApplicantRecordDTO;
+  reviewedApplicantRecords: ReviewedApplicantRecordWithReviewerDTO[];
 };

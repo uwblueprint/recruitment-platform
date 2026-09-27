@@ -17,7 +17,7 @@ module.exports = {
         white: "#FFFFFF",
 
         neutral: {
-          50: "#FFFFFF",
+          50: "#F5F5F5",
           100: "#EEEEEE",
           200: "#C4C4C4",
           500: "#737373",
@@ -45,6 +45,7 @@ module.exports = {
           DEFAULT: "#7EAE5A",
           50: "#F5FFF5",
           100: "#CEEBB8",
+          200: "#A8D88A",
           500: "#7EAE5A",
           700: "#4F7F2B",
           900: "#006002",
@@ -59,6 +60,8 @@ module.exports = {
         orange: {
           DEFAULT: "#CE812E",
           50: "#FFFCF5",
+          100: "#FCE3C2",
+          200: "#F7C98A",
           500: "#CE812E",
           900: "#603000",
         },
@@ -66,6 +69,7 @@ module.exports = {
           DEFAULT: "#EAB01A",
           50: "#FFF8E9",
           100: "#FFF2A1",
+          200: "#FCE588",
           500: "#EAB01A",
           900: "#A45200",
         },
@@ -76,6 +80,15 @@ module.exports = {
           500: "#CE66FF",
           900: "#420060",
         },
+        purple: {
+          DEFAULT: "#7C3AED",
+          50: "#F5F3FF",
+          100: "#EDE9FE",
+          200: "#DDD6FE",
+          500: "#7C3AED",
+          700: "#6D28D9",
+          900: "#4C1D95",
+        },
 
         // Semantic tokens (recruitment UI)
         link: "#3279B7",
@@ -83,6 +96,10 @@ module.exports = {
         input: "#7D7D7D",
         success: "#00A403",
         error: "#CD5A5A",
+        status: {
+          interviewed: "#DAD7E9",
+        },
+        chip: "#848AA5",
         surface: {
           grey: "#F3F4F6",
           muted: "#FAFAFA",
@@ -108,6 +125,7 @@ module.exports = {
         },
       },
       fontFamily: {
+        inter: "Inter, sans-serif",
         poppins: "Poppins, sans-serif",
         source: "'Source Sans Pro', sans-serif",
       },

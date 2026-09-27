@@ -10,10 +10,13 @@ import type * as Schema from "./__generated__/types";
  */
 export {
   ApplicationStatus,
+  DashboardView,
   Enum,
   InterviewConflict,
+  InterviewDashboardSortBy,
   InterviewGroupStatus,
   InterviewStatus,
+  ReviewDashboardSortBy,
   ReviewStatus,
   Role,
   SimpleEntityEnum,
@@ -44,6 +47,8 @@ export type InterviewDTO = WithoutTypename<Schema.Interview>;
 export type InterviewDelegationDTO =
   WithoutTypename<Schema.InterviewDelegationDto>;
 export type InterviewGroupDTO = WithoutTypename<Schema.InterviewGroupDto>;
+export type InterviewInviteeDTO = WithoutTypename<Schema.InterviewInviteeDto>;
+export type InterviewInviteDTO = WithoutTypename<Schema.InterviewInviteDto>;
 export type InterviewPairingsDTO = WithoutTypename<Schema.InterviewPairingsDto>;
 export type InterviewedApplicantRecordDTO =
   WithoutTypename<Schema.InterviewedApplicantRecord>;
@@ -61,12 +66,15 @@ export type ReviewedApplicantRecordDTO =
   WithoutTypename<Schema.ReviewedApplicantRecordDto>;
 export type ReviewedApplicantsDTO =
   WithoutTypename<Schema.ReviewedApplicantsDto>;
-export type ShortAnswerQuestionDTO = WithoutTypename<Schema.ShortAnswerQuestion>;
+export type ShortAnswerQuestionDTO =
+  WithoutTypename<Schema.ShortAnswerQuestion>;
 export type SimpleEntityRequestDTO = Schema.SimpleEntityRequestDto;
 export type SimpleEntityResponseDTO =
   WithoutTypename<Schema.SimpleEntityResponseDto>;
 export type UserDTO = WithoutTypename<Schema.UserDto>;
-export type ReviewDashboardReviewDetails = WithoutTypename<Schema.ReviewDashboardReviewDetails>;
+export type ReviewDashboardReviewDetails =
+  WithoutTypename<Schema.ReviewDashboardReviewDetails>;
+export type ReviewDashboardFilters = Schema.ReviewDashboardFilters;
 
 /**
  * Clean aliases for generated GraphQL input types.
@@ -92,47 +100,122 @@ export type UpdateReviewedApplicantRecordDTO =
 export type UpdateUserDTO = Schema.UpdateUserDto;
 
 /**
- * Re-export generated operation result and variable types from one stable place.
- */
-/**
  * Re-export typed GraphQL documents from the client preset artifact.
  *
  * Import documents from this file instead of `__generated__/graphql` directly.
  */
 export {
+  AdminCommentsByApplicantRecordIdDocument,
+  CreateAdminCommentDocument,
+  UpdateAdminCommentDocument,
+  DeleteAdminCommentByIdDocument,
+  ApplicationDocument,
+  InterviewDashboardSidePanelDocument,
+  BulkUpdateApplicantRecordsStatusDocument,
+  SendRejectionEmailsDocument,
   InterviewedApplicantsByUserIdDocument,
+  InterviewedPairingsByUserIdDocument,
+  InterviewDashboardDocument,
+  InterviewedApplicantRecordByApplicantRecordIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
+  InterviewInvitesDocument,
+  InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
+  ReassignReviewerDocument,
   RefreshDocument,
+  ReportInterviewConflictDocument,
   ReportReviewConflictDocument,
+  ReviewedApplicantRecordsByApplicantRecordIdDocument,
+  ReviewDashboardApplicantRecordIdsDocument,
+  ReviewDashboardDocument,
+  ReviewDashboardSidePanelDocument,
+  ReviewDashboardFilterOptionsDocument,
+  UpdateApplicantRecordStatusDocument,
+  SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
   LogoutDocument,
+  ReviewedApplicantsByUserIdDocument,
+  UsersByPositionDocument,
+  UploadInterviewNotesDocument,
+  UpdateApplicantRecordIsApplicantFlaggedDocument,
 } from "./__generated__/graphql";
 
 export type {
+  AdminCommentsByApplicantRecordIdQuery,
+  AdminCommentsByApplicantRecordIdQueryVariables,
+  CreateAdminCommentMutation,
+  CreateAdminCommentMutationVariables,
+  UpdateAdminCommentMutation,
+  UpdateAdminCommentMutationVariables,
+  DeleteAdminCommentByIdMutation,
+  DeleteAdminCommentByIdMutationVariables,
+  ApplicationQuery,
+  ApplicationQueryVariables,
+  BulkUpdateApplicantRecordsStatusMutation,
+  SendRejectionEmailsMutation,
+  SendRejectionEmailsMutationVariables,
+  BulkUpdateApplicantRecordsStatusMutationVariables,
   InterviewGroupQuery,
   InterviewGroupQueryVariables,
+  InterviewInvitesQuery,
+  InterviewInvitesQueryVariables,
+  InterviewedApplicantRecordByApplicantRecordIdQuery,
+  InterviewedApplicantRecordByApplicantRecordIdQueryVariables,
   InterviewedApplicantsByUserIdQuery,
   InterviewedApplicantsByUserIdQueryVariables,
+  InterviewedPairingsByUserIdQuery,
+  InterviewedPairingsByUserIdQueryVariables,
+  InterviewDashboardQuery,
+  InterviewDashboardQueryVariables,
+  InterviewDashboardSidePanelQuery,
+  InterviewDashboardSidePanelQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
+  InterviewNotesQuery,
+  InterviewNotesQueryVariables,
   IsAuthorizedByRoleQuery,
   IsAuthorizedByRoleQueryVariables,
   LoginMutation,
   LoginMutationVariables,
   LoginWithGoogleMutation,
   LoginWithGoogleMutationVariables,
+  ReassignReviewerMutation,
+  ReassignReviewerMutationVariables,
   RefreshMutation,
   RefreshMutationVariables,
+  ReportInterviewConflictMutation,
+  ReportInterviewConflictMutationVariables,
   ReportReviewConflictMutation,
   ReportReviewConflictMutationVariables,
+  ReviewedApplicantRecordsByApplicantRecordIdQuery,
+  ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
+  ReviewDashboardApplicantRecordIdsQuery,
+  ReviewDashboardApplicantRecordIdsQueryVariables,
+  ReviewDashboardQuery,
+  ReviewDashboardQueryVariables,
+  ReviewDashboardSidePanelQuery,
+  ReviewDashboardSidePanelQueryVariables,
+  ReviewDashboardFilterOptionsQuery,
+  ReviewDashboardFilterOptionsQueryVariables,
+  UpdateApplicantRecordStatusMutation,
+  UpdateApplicantRecordStatusMutationVariables,
+  SubmitInterviewScoresMutation,
+  SubmitInterviewScoresMutationVariables,
   UpdateInterviewGroupMutation,
   UpdateInterviewGroupMutationVariables,
   UpdateInterviewGroupSchedulingLinkMutation,
   UpdateInterviewGroupSchedulingLinkMutationVariables,
+  ReviewedApplicantsByUserIdQuery,
+  ReviewedApplicantsByUserIdQueryVariables,
+  UsersByPositionQuery,
+  UsersByPositionQueryVariables,
+  UploadInterviewNotesMutation,
+  UploadInterviewNotesMutationVariables,
+  UpdateApplicantRecordIsApplicantFlaggedMutation,
+  UpdateApplicantRecordIsApplicantFlaggedMutationVariables,
 } from "./__generated__/operation-types";
 
 /**
@@ -160,11 +243,29 @@ export type InterviewedApplicantResult = ArrayElement<
     "interviewedApplicantsByUserId"
   >
 >;
+export type InterviewDashboardResult = ArrayElement<
+  OperationField<Operations.InterviewDashboardQuery, "interviewDashboard">
+>;
+export type InterviewDashboardSidePanelResult = OperationField<
+  Operations.InterviewDashboardSidePanelQuery,
+  "interviewDashboardSidePanel"
+>;
+
+export type UpdateApplicantRecordIsApplicantFlaggedResult = OperationField<
+  Operations.UpdateApplicantRecordIsApplicantFlaggedMutation,
+  "updateApplicantRecordIsApplicantFlagged"
+>;
 export type InterviewerResult = ArrayElement<
+  OperationField<Operations.InterviewersByGroupIdQuery, "interviewersByGroupId">
+>;
+export type InterviewPairingResult = ArrayElement<
   OperationField<
-    Operations.InterviewersByGroupIdQuery,
-    "interviewersByGroupId"
+    Operations.InterviewedPairingsByUserIdQuery,
+    "interviewedPairingsByUserId"
   >
+>;
+export type InterviewGroupMemberResult = ArrayElement<
+  InterviewPairingResult["groupMembers"]
 >;
 export type UpdateInterviewGroupResult = OperationField<
   Operations.UpdateInterviewGroupMutation,
@@ -174,7 +275,85 @@ export type UpdateInterviewGroupSchedulingLinkResult = OperationField<
   Operations.UpdateInterviewGroupSchedulingLinkMutation,
   "updateInterviewGroupSchedulingLink"
 >;
+export type ApplicationResult = OperationField<
+  Operations.ApplicationQuery,
+  "application"
+>;
 export type ReviewConflictReportResult = OperationField<
   Operations.ReportReviewConflictMutation,
   "reportReviewConflict"
+>;
+export type InterviewedApplicantRecordResult = OperationField<
+  Operations.InterviewedApplicantRecordByApplicantRecordIdQuery,
+  "interviewedApplicantRecordByApplicantRecordId"
+>;
+export type SubmitInterviewScoresResult = OperationField<
+  Operations.SubmitInterviewScoresMutation,
+  "submitInterviewScores"
+>;
+export type InterviewNotesResult = OperationField<
+  Operations.InterviewNotesQuery,
+  "interviewNotes"
+>;
+export type UploadInterviewNotesResult = OperationField<
+  Operations.UploadInterviewNotesMutation,
+  "uploadInterviewNotes"
+>;
+export type ApplicantRecordWithReviewersResult = OperationField<
+  Operations.ReviewedApplicantRecordsByApplicantRecordIdQuery,
+  "reviewedApplicantRecordsByApplicantRecordId"
+>;
+export type ReviewedApplicantRecordWithReviewerResult = ArrayElement<
+  ApplicantRecordWithReviewersResult["reviewedApplicantRecords"]
+>;
+export type ReportInterviewConflictResult = OperationField<
+  Operations.ReportInterviewConflictMutation,
+  "reportInterviewConflict"
+>;
+export type ReviewDashboardResult = ArrayElement<
+  OperationField<Operations.ReviewDashboardQuery, "reviewDashboard">
+>;
+export type ReviewDashboardSidePanelResult = OperationField<
+  Operations.ReviewDashboardSidePanelQuery,
+  "reviewDashboardSidePanel"
+>;
+export type ReviewDashboardSidePanelReviewDetail = ArrayElement<
+  ReviewDashboardSidePanelResult["reviewDetails"]
+>;
+
+export type ReviewDashboardFilterOptionsResult = OperationField<
+  Operations.ReviewDashboardFilterOptionsQuery,
+  "reviewDashboardFilterOptions"
+>;
+
+export type ReviewedApplicantResult = ArrayElement<
+  OperationField<
+    Operations.ReviewedApplicantsByUserIdQuery,
+    "reviewedApplicantsByUserId"
+  >
+>;
+export type InterviewedPairingResult = ArrayElement<
+  OperationField<
+    Operations.InterviewedPairingsByUserIdQuery,
+    "interviewedPairingsByUserId"
+  >
+>;
+
+export type ReassignReviewerResult = OperationField<
+  Operations.ReassignReviewerMutation,
+  "reassignReviewer"
+>;
+
+export type UsersByPositionResult = OperationField<
+  Operations.UsersByPositionQuery,
+  "usersByPosition"
+>;
+export type InterviewInviteResult = ArrayElement<
+  OperationField<Operations.InterviewInvitesQuery, "interviewInvites">
+>;
+export type AdminCommentResult = ArrayElement<
+  OperationField<
+    Operations.AdminCommentsByApplicantRecordIdQuery,
+    "adminCommentsByApplicantRecordId"
+  >
 >;

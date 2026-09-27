@@ -1,32 +1,76 @@
-import { Op } from "sequelize";
-import User from "../../models/user.model";
+import { Op, Order, OrderItem, col, literal, Transaction } from "sequelize";
+import { sequelize } from "../../models";
+import Applicant from "../../models/applicant.model";
+import ApplicantRecord from "../../models/applicantRecord.model";
+import FirebaseFile from "../../models/firebaseFile.model";
+import InterviewDelegation from "../../models/interviewDelegation.model";
+import InterviewGroup from "../../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.model";
+import User from "../../models/user.model";
 import {
   CreateInterviewDelegationDTO,
+  ApplicationStatusEnum,
+  InterviewDashboardRowDTO,
+  InterviewDashboardSidePanelDTO,
+  InterviewDashboardSortBy,
+  InterviewDashboardSortByEnum,
   InterviewDelegationDTO,
+  InterviewInviteDTO,
+  InterviewInviteeDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
+  InterviewNotesDTO,
   InterviewPairingsDTO,
   UserDTO,
 } from "../../types";
-import { toInterviewedApplicantDTO, toUserDTO } from "../../utilities/dtoUtils";
+import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
+import InterviewedApplicantRecordsService from "./interviewedApplicantRecordService";
+import {
+  toInterviewDashboardRowDTO,
+  toInterviewDashboardSidePanelDTO,
+  toInterviewedApplicantDTO,
+  toInterviewNotesDTO,
+  toUserDTO,
+} from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";
+import FileStorageService from "./fileStorageService";
+import FirebaseFileService from "./firebaseFileService";
 import InterviewDelegationService from "./interviewDelegationService";
 import InterviewGroupService from "./interviewGroupService";
+import IFirebaseFileService from "../interfaces/IFirebaseFileService";
 import IInterviewDelegationService from "../interfaces/IInterviewDelegationService";
+import {
+  INTERVIEW_NOTES_ACCEPTED_EXTENSION,
+  INTERVIEW_NOTES_ACCEPTED_MIME_TYPE,
+  INTERVIEW_NOTES_STORAGE_PREFIX,
+} from "../../constants/interviewNotes";
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
-import InterviewDelegation from "../../models/interviewDelegation.model";
-import ApplicantRecord from "../../models/applicantRecord.model";
-import Applicant from "../../models/applicant.model";
-import InterviewGroup from "../../models/interviewGroup.model";
+import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedApplicantRecordService";
 
 const Logger = logger(__filename);
 
 const interviewDelegationsService: IInterviewDelegationService = new InterviewDelegationService();
 
 const interviewGroupService: IInterviewGroupService = new InterviewGroupService();
+
+// Inline-initialized so this class's constructor stays parameter-less. Other
+// devs working on this same composite service can append methods without
+// having to reconcile constructor signatures.
+// TODO(workstream B follow-up / firebase sync): the bucket name is read from
+// `FIREBASE_STORAGE_DEFAULT_BUCKET`. Until the real interview-notes bucket is
+// wired up, this points at whatever bucket the rest of the app uses (see
+// `entityResolvers.ts`). The upload code path will hit firebase at runtime;
+// confirm with partner before merging.
+const interviewNotesBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
+const interviewNotesFileStorageService = new FileStorageService(
+  interviewNotesBucket,
+);
+const firebaseFileService: IFirebaseFileService = new FirebaseFileService(
+  interviewNotesFileStorageService,
+);
+const interviewedApplicantRecordsService: IInterviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
 
 type InterviewerAssignment = {
   interviewedApplicantRecordId: string;
@@ -64,8 +108,246 @@ function dedupeUsersById(users: User[]): User[] {
   });
 }
 
+/**
+ * Builds the ORDER BY clause for the interview dashboard query.
+ *
+ * Interviewers are a hasMany loaded via `separate: true`, so their names are
+ * not in the main query and a plain ORDER BY can't reference them. Instead,
+ * order by the Nth interviewer's "last first" name via a correlated subquery
+ * (LIMIT 1 OFFSET idx mirrors how interviewers[idx] is picked in the DTO).
+ * Sorting in SQL means it runs *before* LIMIT/OFFSET, so the right rows land
+ * on each page — sorting the returned page in JS would only order within a
+ * page, since the DB would already have chosen the page by id.
+ * Records missing that interviewer yield a NULL from the subquery, which the
+ * NULLS LAST direction keeps at the bottom; id is a stable tiebreak.
+ * NULLS LAST also keeps missing scores at the bottom in either direction,
+ * matching the review dashboard.
+ */
+function buildInterviewDashboardOrder(
+  sortBy?: InterviewDashboardSortBy,
+  sortAscending?: boolean,
+): Order {
+  const direction =
+    sortAscending === false ? "DESC NULLS LAST" : "ASC NULLS LAST";
+
+  const sortColumnMap: Record<
+    Exclude<InterviewDashboardSortBy, "INTERVIEWER_1" | "INTERVIEWER_2">,
+    OrderItem
+  > = {
+    FIRST_NAME: [col("applicant.first_name"), direction],
+    LAST_NAME: [col("applicant.last_name"), direction],
+    POSITION: ["position", direction],
+    INTERVIEW_SCORE: [col("interviewed_applicant_record.score"), direction],
+    APPLICATION_STATUS: ["status", direction],
+  };
+
+  if (
+    sortBy === InterviewDashboardSortByEnum.INTERVIEWER_1 ||
+    sortBy === InterviewDashboardSortByEnum.INTERVIEWER_2
+  ) {
+    const idx = sortBy === InterviewDashboardSortByEnum.INTERVIEWER_1 ? 0 : 1;
+    return [
+      [
+        literal(`(
+          SELECT u."last_name" || ' ' || u."first_name"
+          FROM "interviewed_applicant_records" AS iar
+          JOIN "interview_delegations" AS d
+            ON d."interviewed_applicant_record_id" = iar."id"
+          JOIN "users" AS u ON u."id" = d."interviewer_id"
+          WHERE iar."applicant_record_id" = "ApplicantRecord"."id"
+          ORDER BY d."createdAt" ASC, d."interviewer_id" ASC
+          LIMIT 1 OFFSET ${idx}
+        )`),
+        direction,
+      ],
+      ["id", "ASC"],
+    ];
+  }
+  if (sortBy) {
+    return [sortColumnMap[sortBy], ["id", "ASC"]];
+  }
+  return [["id", "ASC"]];
+}
+
 class InterviewCompositeService implements IInterviewCompositeService {
+  private interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
+
   /* eslint-disable class-methods-use-this */
+  async getInterviewDashboard(
+    pageNumber: number,
+    resultsPerPage: number,
+    sortBy?: InterviewDashboardSortBy,
+    sortAscending?: boolean,
+  ): Promise<InterviewDashboardRowDTO[]> {
+    try {
+      if (
+        !Number.isInteger(pageNumber) ||
+        pageNumber < 1 ||
+        !Number.isInteger(resultsPerPage) ||
+        resultsPerPage < 1
+      ) {
+        throw new Error(
+          "pageNumber and resultsPerPage must be positive integers",
+        );
+      }
+
+      const applicantRecords = await ApplicantRecord.findAll({
+        attributes: ["id", "position", "status"],
+        where: {
+          status: {
+            [Op.in]: [
+              ApplicationStatusEnum.INTERVIEWED,
+              ApplicationStatusEnum.SELECTED,
+            ],
+          },
+        },
+        include: [
+          {
+            attributes: ["first_name", "last_name"],
+            model: Applicant,
+            required: true,
+          },
+          {
+            attributes: ["id", "applicant_record_id", "score"],
+            model: InterviewedApplicantRecord,
+            as: "interviewed_applicant_record",
+            include: [
+              {
+                attributes: [
+                  "interviewed_applicant_record_id",
+                  "interviewer_id",
+                  "createdAt",
+                ],
+                model: InterviewDelegation,
+                as: "interview_delegations",
+                // separate: true runs the hasMany as its own query, so the main
+                // query is left with plain single-row joins — Sequelize won't
+                // wrap it in a subquery, which lets ORDER BY reference the
+                // "applicant" and "interviewed_applicant_record" tables
+                // directly. This order must stay in sync with the correlated
+                // subquery in buildInterviewDashboardOrder so that
+                // "interviewer N" means the same row in both places.
+                separate: true,
+                order: [
+                  ["createdAt", "ASC"],
+                  ["interviewer_id", "ASC"],
+                ] as Order,
+                include: [
+                  {
+                    attributes: [
+                      "id",
+                      "first_name",
+                      "last_name",
+                      "email",
+                      "position",
+                      "role",
+                      "is_archived",
+                    ],
+                    model: User,
+                    as: "interviewer",
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        order: buildInterviewDashboardOrder(sortBy, sortAscending),
+        limit: resultsPerPage,
+        offset: (pageNumber - 1) * resultsPerPage,
+      });
+
+      return applicantRecords.map(toInterviewDashboardRowDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get interview dashboard. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getInterviewDashboardSidePanel(
+    applicantRecordId: string,
+  ): Promise<InterviewDashboardSidePanelDTO> {
+    try {
+      const applicantRecord = await ApplicantRecord.findByPk(
+        applicantRecordId,
+        {
+          attributes: [
+            "id",
+            "position",
+            "status",
+            "skill_category",
+            "is_applicant_flagged",
+            "is_shortlisted_for_offer",
+          ],
+          include: [
+            {
+              attributes: [
+                "first_name",
+                "last_name",
+                "term",
+                "program",
+                "resume_url",
+              ],
+              model: Applicant,
+              required: true,
+            },
+            {
+              attributes: [
+                "id",
+                "applicant_record_id",
+                "score",
+                "interview_json",
+                "status",
+                "interview_date",
+              ],
+              model: InterviewedApplicantRecord,
+              as: "interviewed_applicant_record",
+              include: [
+                {
+                  attributes: [
+                    "interviewed_applicant_record_id",
+                    "interviewer_id",
+                  ],
+                  model: InterviewDelegation,
+                  as: "interview_delegations",
+                  // NOTE: fetched in its own query. Joining this deep generates column
+                  //       aliases longer than Postgres' 63 character identifier limit
+                  //       (e.g. `interviewed_applicant_record.interview_delegations.interviewer.first_name`),
+                  //       which get truncated and leave the interviewer unmapped.
+                  separate: true,
+                  order: [["interviewer_id", "ASC"]],
+                  include: [
+                    {
+                      attributes: { exclude: ["createdAt", "updatedAt"] },
+                      model: User,
+                      as: "interviewer",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      );
+
+      if (!applicantRecord) {
+        throw new Error(
+          `ApplicantRecord with ID ${applicantRecordId} not found`,
+        );
+      }
+
+      return toInterviewDashboardSidePanelDTO(applicantRecord);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get interview dashboard side panel for applicant record ${applicantRecordId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
   async getInterviewedApplicantsByUserId(
     userId: string,
   ): Promise<InterviewedApplicantsDTO[]> {
@@ -307,6 +589,207 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to delegate interviewers. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getInterviewInvites(): Promise<InterviewInviteDTO[]> {
+    try {
+      // Query 1: groups with interviewers only (avoids deep join collision)
+      const groups = await InterviewGroup.findAll({
+        include: [
+          {
+            model: InterviewDelegation,
+            as: "interview_delegations",
+            required: false,
+            separate: true,
+            include: [{ model: User, as: "interviewer" }],
+          },
+        ],
+      });
+
+      // Collect all interviewed_applicant_record_ids across all delegations
+      const allIarIds = [
+        ...new Set(
+          groups.flatMap((g) =>
+            (g.interview_delegations ?? []).map(
+              (d) => d.interviewed_applicant_record_id,
+            ),
+          ),
+        ),
+      ];
+
+      // Query 2: load interviewee data for those records
+      const iarByRecordId = new Map<string, InterviewedApplicantRecord>();
+      if (allIarIds.length > 0) {
+        const iars = await InterviewedApplicantRecord.findAll({
+          where: { id: { [Op.in]: allIarIds } },
+          include: [
+            {
+              model: ApplicantRecord,
+              include: [{ model: Applicant }],
+            },
+          ],
+        });
+        iars.forEach((iar) => iarByRecordId.set(iar.id, iar));
+      }
+
+      return groups.map((group) => {
+        const delegations = group.interview_delegations ?? [];
+
+        const interviewers = dedupeUsersById(
+          delegations.map((d) => d.interviewer).filter((u): u is User => !!u),
+        ).map((user) => toUserDTO(user));
+
+        const seenApplicantRecordIds = new Set<string>();
+        const interviewees: InterviewInviteeDTO[] = delegations
+          .map((d) => iarByRecordId.get(d.interviewed_applicant_record_id))
+          .filter(
+            (iar): iar is InterviewedApplicantRecord =>
+              !!iar?.applicant_record?.applicant,
+          )
+          .filter((iar) => {
+            if (seenApplicantRecordIds.has(iar.applicant_record_id))
+              return false;
+            seenApplicantRecordIds.add(iar.applicant_record_id);
+            return true;
+          })
+          .map((iar) => ({
+            firstName: iar.applicant_record.applicant.first_name,
+            lastName: iar.applicant_record.applicant.last_name,
+            position: iar.applicant_record.position,
+          }));
+
+        const position = interviewees[0]?.position ?? "";
+
+        return {
+          id: group.id,
+          interviewers,
+          interviewees,
+          position,
+          schedulingLink: group.scheduling_link,
+          status: group.status,
+        };
+      });
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to fetch interview invites. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async uploadInterviewNotes(
+    interviewedApplicantRecordId: string,
+    upload: CreateFirebaseFileDTO,
+  ): Promise<InterviewNotesDTO> {
+    let transaction: Transaction | undefined;
+    let uploadedStoragePath: string | undefined;
+    let committed = false;
+
+    try {
+      if (
+        upload.contentType !== INTERVIEW_NOTES_ACCEPTED_MIME_TYPE ||
+        !upload.originalFileName
+          .toLowerCase()
+          .endsWith(INTERVIEW_NOTES_ACCEPTED_EXTENSION)
+      ) {
+        throw new Error("Only PDF files are accepted for interview notes.");
+      }
+
+      // Keep the previous notes linked until the replacement is ready. The row
+      // lock also serializes concurrent uploads for the same applicant record.
+      transaction = await sequelize.transaction();
+      const record = await InterviewedApplicantRecord.findByPk(
+        interviewedApplicantRecordId,
+        { transaction, lock: transaction.LOCK.UPDATE },
+      );
+      if (!record) {
+        throw new Error(
+          `No interviewed applicant record with id ${interviewedApplicantRecordId} found.`,
+        );
+      }
+
+      const previousNotesId = record.interview_notes_id;
+
+      const fileRow = await FirebaseFile.create(
+        {
+          original_file_name: upload.originalFileName,
+          uploaded_user_id: upload.uploadedUserId,
+          size_bytes: upload.sizeBytes,
+          storage_path: "",
+        },
+        { transaction },
+      );
+      const storagePath = `${INTERVIEW_NOTES_STORAGE_PREFIX}/${fileRow.id}`;
+      await fileRow.update({ storage_path: storagePath }, { transaction });
+
+      // Track the path before uploading in case storage writes the object
+      // but the upload request fails before receiving its response.
+      uploadedStoragePath = storagePath;
+      await interviewNotesFileStorageService.createFile(
+        storagePath,
+        upload.localFilePath,
+        upload.contentType,
+      );
+      const signedUrl = await firebaseFileService.getSignedUrl(storagePath);
+
+      await interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
+        interviewedApplicantRecordId,
+        { interviewNotesId: fileRow.id },
+        transaction,
+      );
+      await transaction.commit();
+      committed = true;
+
+      if (previousNotesId) {
+        try {
+          // Delete the previous notes file from storage and the database.
+          // If this fails, log the error but don't throw, since the new notes are already committed.
+          await firebaseFileService.deleteFirebaseFileById(previousNotesId);
+        } catch (cleanupError: unknown) {
+          Logger.error(
+            `Failed to delete previous interview notes file ${previousNotesId} for record ${interviewedApplicantRecordId}. Reason = ${getErrorMessage(
+              cleanupError,
+            )}`,
+          );
+        }
+      }
+
+      return toInterviewNotesDTO(fileRow, signedUrl);
+    } catch (error: unknown) {
+      // If not commited, roll back the transaction
+      if (transaction && !committed) {
+        try {
+          await transaction.rollback();
+        } catch (rollbackError: unknown) {
+          Logger.error(
+            `Failed to roll back interview notes upload. Reason = ${getErrorMessage(
+              rollbackError,
+            )}`,
+          );
+        }
+      }
+
+      // If not committed and a storage path was uploaded, attempt to clean up the uploaded file.
+      if (uploadedStoragePath && !committed) {
+        try {
+          await interviewNotesFileStorageService.deleteFile(
+            uploadedStoragePath,
+          );
+        } catch (cleanupError: unknown) {
+          Logger.error(
+            `Failed to clean up interview notes file ${uploadedStoragePath}. Reason = ${getErrorMessage(
+              cleanupError,
+            )}`,
+          );
+        }
+      }
+      Logger.error(
+        `Failed to upload interview notes for record ${interviewedApplicantRecordId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }

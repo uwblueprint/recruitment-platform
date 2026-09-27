@@ -5,6 +5,7 @@ const interviewedApplicantRecordsTypes = gql`
     NEEDS_REVIEW
     IN_PROGRESS
     COMPLETE
+    CONFLICT_REPORTED
   }
 
   type Interview {

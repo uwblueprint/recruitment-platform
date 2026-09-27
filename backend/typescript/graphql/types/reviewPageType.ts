@@ -28,6 +28,11 @@ const reviewPageType = gql`
     applicantLastName: String!
   }
 
+  type ApplicantRecordWithReviewersDTO {
+    applicantRecord: ApplicantRecordDTO!
+    reviewedApplicantRecords: [ReviewedApplicantRecordWithReviewerDTO!]!
+  }
+
   extend type Mutation {
     reportReviewConflict(
       applicantRecordId: ID!
@@ -38,6 +43,9 @@ const reviewPageType = gql`
   extend type Query {
     application(applicantRecordId: ID!): ApplicationDTO!
     reviewedApplicantsByUserId(userId: ID!): [ReviewedApplicantsDTO!]!
+    reviewedApplicantRecordsByApplicantRecordId(
+      applicantRecordId: ID!
+    ): ApplicantRecordWithReviewersDTO!
   }
 `;
 
