@@ -1,5 +1,7 @@
-import { ButtonHTMLAttributes, ReactNode, useState } from "react";
+import { ButtonHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
+import { NavbarPopover } from "@/components/common/NavbarPopover";
+import { NavbarPopoverItem } from "@/components/common/NavbarPopoverItem";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { client } from "@/client";
@@ -13,26 +15,48 @@ interface NavbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
+const RECRUITMENT_DEPARTMENTS = [
+  "Community",
+  "Product",
+  "Design",
+  "Engineering",
+];
+
 const NavbarButton = ({ children, ...props }: NavbarButtonProps) => (
   <button
     {...props}
-    className="flex items-center gap-2 text-sm font-poppins font-medium text-neutral-600 hover:text-blue-500 focus:outline-none"
+    type="button"
+    className="flex items-center gap-2 whitespace-nowrap font-poppins text-base font-medium leading-6 text-neutral-800 hover:text-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-blue-500"
   >
     {children}
   </button>
 );
 
 export const Navbar = () => {
-  const [recruitmentOpen, setRecruitmentOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
+  const [recruitmentAnchor, setRecruitmentAnchor] = useState<HTMLButtonElement | null>(null);
+  const [profileAnchor, setProfileAnchor] = useState<HTMLButtonElement | null>(null);
+  const closeMenus = () => {
+    setRecruitmentAnchor(null);
+    setProfileAnchor(null);
+  };
   const { setAuthenticatedUser } = useAuthUserContext();
   const authenticatedUser = useAuthenticatedUser();
   const userName = authenticatedUser
-    ? `${authenticatedUser.firstName} ${authenticatedUser.lastName}`
+    ? `${authenticatedUser.firstName} ${authenticatedUser.lastName.charAt(0)}`
     : "User";
   const router = useRouter();
 
+  useEffect(() => {
+    const handleRouteChange = () => {
+      setRecruitmentAnchor(null);
+      setProfileAnchor(null);
+    };
+    router.events.on("routeChangeStart", handleRouteChange);
+    return () => router.events.off("routeChangeStart", handleRouteChange);
+  }, [router.events]);
+
   const handleLogout = async () => {
+    closeMenus();
     try {
       if (authenticatedUser?.id) {
         await client.mutate({
@@ -49,75 +73,95 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="flex shrink-0 items-center justify-between px-8 py-3 bg-blue-50 border-b border-neutral-100 w-full sticky top-0 z-50">
+    <nav aria-label="Admin navigation" className="sticky top-0 z-50 flex h-[72px] w-full shrink-0 items-center justify-between gap-6 bg-blue-50 px-6">
       
-      <div className="flex items-center gap-8">
-        <Link href="/admin/review">
+      <div className="flex items-center gap-6">
+        <Link href="/admin/review" className="mr-10 shrink-0" aria-label="Blueprint admin home">
           <Image
             src="/common/review-page-banner.svg"
             alt="Blueprint Logo"
-            width={100}
-            height={40}
+            width={120}
+            height={24}
+            className="h-auto w-[120px]"
           />
         </Link>
 
         <div className="relative">
-          <NavbarButton onClick={() => setRecruitmentOpen(!recruitmentOpen)}>
+          <NavbarButton
+            aria-expanded={Boolean(recruitmentAnchor)}
+            aria-controls={recruitmentAnchor ? "recruitment-popover" : undefined}
+            onClick={(event) => setRecruitmentAnchor(event.currentTarget)}
+          >
             Recruitment
-            <ArrowDownIcon />
+            <ArrowDownIcon className="h-2 w-3" />
           </NavbarButton>
 
-          {recruitmentOpen && (
-            <div className="absolute top-full left-0 mt-1 bg-white border border-neutral-100 rounded shadow-md">
-              <Link href="/admin/review?department=Community" className="block px-4 py-2 text-sm font-poppins text-neutral-600 hover:bg-blue-50">
-                Community
-              </Link>
-              <Link href="/admin/review?department=Product" className="block px-4 py-2 text-sm font-poppins text-neutral-600 hover:bg-blue-50">
-                Product
-              </Link>
-              <Link href="/admin/review?department=Design" className="block px-4 py-2 text-sm font-poppins text-neutral-600 hover:bg-blue-50">
-                Design
-              </Link>
-              <Link href="/admin/review?department=Engineering" className="block px-4 py-2 text-sm font-poppins text-neutral-600 hover:bg-blue-50">
-                Engineering
-              </Link>
+          <NavbarPopover
+            id="recruitment-popover"
+            anchorEl={recruitmentAnchor}
+            onClose={closeMenus}
+          >
+            <div className="py-1.5">
+              {RECRUITMENT_DEPARTMENTS.map((department) => {
+                const isSelected = router.query.department === department;
+
+                return (
+                  <NavbarPopoverItem
+                    key={department}
+                    href={{
+                      pathname: "/admin/review",
+                      query: { department },
+                    }}
+                    isSelected={isSelected}
+                    onClick={closeMenus}
+                  >
+                    {department}
+                  </NavbarPopoverItem>
+                );
+              })}
             </div>
-          )}
+          </NavbarPopover>
         </div>
 
-        <Link href="/admin/management" className="text-sm font-poppins font-medium text-neutral-600 hover:text-blue-500">
+        <Link href="/admin/management" className="whitespace-nowrap font-poppins text-base font-medium leading-6 text-neutral-800 hover:text-blue-500">
           Management
         </Link>
 
-        <Link href="/admin/interview-invites" className="text-sm font-poppins font-medium text-neutral-600 hover:text-blue-500">
-          Interview Invites
+        <Link href="/admin/interview-invites" className="whitespace-nowrap font-poppins text-base font-medium leading-6 text-neutral-800 hover:text-blue-500">
+          Interview invite
         </Link>
       </div>
 
       <div className="relative">
-        <NavbarButton onClick={() => setProfileOpen(!profileOpen)}>
-          <UserIcon className="w-5 h-5" />
+        <NavbarButton
+          aria-expanded={Boolean(profileAnchor)}
+          aria-controls={profileAnchor ? "profile-popover" : undefined}
+          onClick={(event) => setProfileAnchor(event.currentTarget)}
+        >
+          <UserIcon className="mr-1 h-6 w-6" />
           <span>{userName}</span>
-          <ArrowDownIcon />
+          <ArrowDownIcon className="h-2 w-3" />
         </NavbarButton>
 
-        {profileOpen && (
-          <div className="absolute top-full right-0 mt-1 bg-white border border-neutral-100 rounded shadow-md w-48">
-            <button className="block w-full text-left px-4 py-2 text-sm font-poppins text-neutral-600 hover:bg-blue-50">
+        <NavbarPopover
+          id="profile-popover"
+          anchorEl={profileAnchor}
+          onClose={closeMenus}
+          align="right"
+        >
+          <div className="py-1.5">
+            <NavbarPopoverItem onClick={closeMenus}>
               My Profile
-            </button>
-            <Link href="/home" className="block px-4 py-2 text-sm font-poppins text-neutral-600 hover:bg-blue-50">
+            </NavbarPopoverItem>
+            <NavbarPopoverItem href="/home" onClick={closeMenus}>
               Switch to Review
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 w-full text-left px-4 py-2 text-sm font-poppins text-neutral-600 hover:bg-blue-50"
-            >
+            </NavbarPopoverItem>
+            <NavbarPopoverItem onClick={handleLogout}>
               <LogoutIcon className="w-4 h-4" />
               Logout
-            </button>
+            </NavbarPopoverItem>
           </div>
-        )}
+        </NavbarPopover>
       </div>
     </nav>
   );
