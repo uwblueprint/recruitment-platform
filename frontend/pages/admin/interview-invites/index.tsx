@@ -1,6 +1,5 @@
-import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import { ReactElement } from "react";
 import { NextPageWithLayout } from "../../_app";
+import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { InterviewInvite } from "./_components/types";
 import { InterviewInviteList } from "./_components/InterviewInviteList";
 import useInterviewInvites from "./_components/hooks/useInterviewInvites";
@@ -23,7 +22,7 @@ const InterviewInvites: NextPageWithLayout = () => {
   }));
 
   return (
-    <div className="flex h-screen flex-col bg-white">
+    <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex flex-col items-start gap-5 flex-1 self-stretch px-6 py-3">
         <h1 className="font-poppins font-semibold text-[28px] text-blue leading-[1.4]">
           Interview invite Dashboard
@@ -43,8 +42,6 @@ const InterviewInvites: NextPageWithLayout = () => {
   );
 };
 
-InterviewInvites.getLayout = (page: ReactElement) => (
-  <ProtectedRoute allowedRoles={["Admin"]}>{page}</ProtectedRoute>
-);
+InterviewInvites.getLayout = getAdminLayout;
 
 export default InterviewInvites;

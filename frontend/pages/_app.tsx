@@ -16,7 +16,13 @@ type AppPropsWithLayout = AppProps & {
 
 const App = ({ Component, pageProps }: AppPropsWithLayout) => {
   const getLayout = Component.getLayout ?? ((page) => page);
-  return <ApolloProvider client={client}><AuthProvider>{getLayout(<Component {...pageProps} />)}</AuthProvider></ApolloProvider>;
+  const page = getLayout(<Component {...pageProps} />);
+
+  return (
+    <ApolloProvider client={client}>
+      <AuthProvider>{page}</AuthProvider>
+    </ApolloProvider>
+  );
 };
 
 export default App;
