@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { ButtonHTMLAttributes, ReactNode, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/router";
@@ -7,13 +7,13 @@ import { LogoutDocument } from "@/graphql/typeUtils";
 import { useAuthUserContext, useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { UserIcon } from "@/components/icons/user.icon";
 import { LogoutIcon } from "@/components/icons/logout.icon";
-import { ChevronDownIcon } from "@/components/icons/arrow-down.icon";
+import { ArrowDownIcon } from "@/components/icons/arrow-down.icon";
 
-interface NavbarButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  children: React.ReactNode;
+interface NavbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children: ReactNode;
 }
 
-const NavbarButton: FC<NavbarButtonProps> = ({ children, ...props }) => (
+const NavbarButton = ({ children, ...props }: NavbarButtonProps) => (
   <button
     {...props}
     className="flex items-center gap-2 text-sm font-poppins font-medium text-neutral-600 hover:text-blue-500 focus:outline-none"
@@ -22,7 +22,7 @@ const NavbarButton: FC<NavbarButtonProps> = ({ children, ...props }) => (
   </button>
 );
 
-export const Navbar: FC = () => {
+export const Navbar = () => {
   const [recruitmentOpen, setRecruitmentOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const { setAuthenticatedUser } = useAuthUserContext();
@@ -49,12 +49,12 @@ export const Navbar: FC = () => {
   };
 
   return (
-    <nav className="flex items-center justify-between px-8 py-3 bg-blue-50 border-b border-neutral-100 w-full sticky top-0 z-50">
+    <nav className="flex shrink-0 items-center justify-between px-8 py-3 bg-blue-50 border-b border-neutral-100 w-full sticky top-0 z-50">
       
       <div className="flex items-center gap-8">
         <Link href="/admin/review">
           <Image
-            src="common/review-page-banner.svg"
+            src="/common/review-page-banner.svg"
             alt="Blueprint Logo"
             width={100}
             height={40}
@@ -64,7 +64,7 @@ export const Navbar: FC = () => {
         <div className="relative">
           <NavbarButton onClick={() => setRecruitmentOpen(!recruitmentOpen)}>
             Recruitment
-            <ChevronDownIcon />
+            <ArrowDownIcon />
           </NavbarButton>
 
           {recruitmentOpen && (
@@ -98,7 +98,7 @@ export const Navbar: FC = () => {
         <NavbarButton onClick={() => setProfileOpen(!profileOpen)}>
           <UserIcon className="w-5 h-5" />
           <span>{userName}</span>
-          <ChevronDownIcon />
+          <ArrowDownIcon />
         </NavbarButton>
 
         {profileOpen && (
