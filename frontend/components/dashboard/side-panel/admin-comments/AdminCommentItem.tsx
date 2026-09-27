@@ -5,6 +5,7 @@ import { useState } from "react";
 import type { AdminCommentResult } from "@/graphql/typeUtils";
 
 import { AdminCommentComposer } from "./AdminCommentComposer";
+import { DeleteCommentDialogue } from "./DeleteCommentDialogue";
 
 type AdminCommentItemProps = {
   comment: AdminCommentResult;
@@ -21,6 +22,8 @@ export const AdminCommentItem = ({
 }: AdminCommentItemProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteDialogueOpen, setIsDeleteDialogueOpen] = useState(false);
+  const [deleteError, setDeleteError] = useState<string>();
   const createdAtMs = new Date(comment.createdAt).getTime();
   const updatedAtMs = new Date(comment.updatedAt).getTime();
   const wasEdited =
@@ -29,11 +32,15 @@ export const AdminCommentItem = ({
     updatedAtMs - createdAtMs >= 1000;
 
   const handleDelete = async () => {
-    if (!window.confirm("Delete this comment?")) return;
+    if (isDeleting) return;
     setIsDeleting(true);
+    setDeleteError(undefined);
     try {
       await onDelete(comment.id);
+      setIsDeleteDialogueOpen(false);
     } catch {
+      setDeleteError("Failed to delete comment. Please try again.");
+    } finally {
       setIsDeleting(false);
     }
   };
@@ -58,7 +65,10 @@ export const AdminCommentItem = ({
             </button>
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={() => {
+                setDeleteError(undefined);
+                setIsDeleteDialogueOpen(true);
+              }}
               disabled={isDeleting}
               className="text-blue hover:opacity-80 disabled:opacity-40"
               aria-label="Delete comment"
@@ -87,6 +97,15 @@ export const AdminCommentItem = ({
           {comment.comment}
         </p>
       )}
+      <DeleteCommentDialogue
+        open={isDeleteDialogueOpen}
+        isSubmitting={isDeleting}
+        errorText={deleteError}
+        onClose={() => {
+          if (!isDeleting) setIsDeleteDialogueOpen(false);
+        }}
+        onConfirm={handleDelete}
+      />
     </li>
   );
 };
