@@ -1,5 +1,12 @@
-query InterviewNotes($fileId: ID!) {
-  interviewNotes(fileId: $fileId) {
+query InterviewNotesByFileId($fileId: ID!) {
+  interviewNotesByFileId(fileId: $fileId) {
+    fileId
+    fileName
+    signedUrl
+  }
+}
+query InterviewNotes($interviewedApplicantRecordId: ID!) {
+  interviewNotes(interviewedApplicantRecordId: $interviewedApplicantRecordId) {
     fileId
     fileName
     signedUrl

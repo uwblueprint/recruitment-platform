@@ -4,8 +4,10 @@ import {
   ApplicantDTO,
   ApplicantRecordDTO,
   ApplicationDTO,
+  FirebaseFileDTO,
   InterviewDelegationDTO,
   InterviewGroupDTO,
+  InterviewNotesDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
   InterviewDashboardRowDTO,
@@ -29,7 +31,6 @@ import InterviewGroup from "../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 import User from "../models/user.model";
-import { FirebaseFileDTO, InterviewNotesDTO } from "../types/firebaseFile";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -215,6 +216,7 @@ export function toReviewDashboardSidePanelDTO(
     lastName: applicantRecord.applicant.last_name,
     position: applicantRecord.position,
     program: applicantRecord.applicant.program,
+    academicYear: applicantRecord.applicant.academic_year,
     resumeUrl: applicantRecord.applicant.resume_url,
     applicationStatus: applicantRecord.status,
     skillCategory: applicantRecord.skill_category as SkillCategory,
@@ -305,16 +307,18 @@ export function toFirebaseFileDTO(model: FirebaseFile): FirebaseFileDTO {
     id: model.id,
     storagePath: model.storage_path,
     originalFileName: model.original_file_name,
+    uploadedUserId: model.uploaded_user_id,
+    sizeBytes: Number(model.size_bytes), // BIGINT comes back as string from pg driver
   };
 }
 
 export function toInterviewNotesDTO(
-  file: FirebaseFileDTO,
+  model: FirebaseFile,
   signedUrl: string,
 ): InterviewNotesDTO {
   return {
-    fileId: file.id,
-    fileName: file.originalFileName,
+    fileId: model.id,
+    fileName: model.original_file_name,
     signedUrl,
   };
 }

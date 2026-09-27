@@ -2,7 +2,7 @@ import { client } from "@/client";
 import {
   InterviewDashboardDocument,
   InterviewDashboardSidePanelDocument,
-  InterviewNotesDocument,
+  InterviewNotesByFileIdDocument,
   UpdateApplicantRecordIsApplicantFlaggedDocument,
   type InterviewDashboardQuery,
   type InterviewDashboardQueryVariables,
@@ -10,12 +10,13 @@ import {
   type InterviewDashboardSidePanelQuery,
   type InterviewDashboardSidePanelQueryVariables,
   type InterviewDashboardSidePanelResult,
-  type InterviewNotesQuery,
-  type InterviewNotesQueryVariables,
-  type InterviewNotesResult,
+  type InterviewNotesByFileIdQuery,
+  type InterviewNotesByFileIdQueryVariables,
+  type InterviewNotesByFileIdResult,
   type UpdateApplicantRecordIsApplicantFlaggedMutation,
   type UpdateApplicantRecordIsApplicantFlaggedMutationVariables,
   type UpdateApplicantRecordIsApplicantFlaggedResult,
+  type InterviewDashboardSortBy,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
@@ -24,6 +25,8 @@ class InterviewDashboardAPIClient {
   static async getInterviewDashboard(
     pageNumber: number,
     resultsPerPage: number,
+    sortBy?: InterviewDashboardSortBy,
+    sortAscending?: boolean,
   ): Promise<InterviewDashboardResult[]> {
     await BaseAPIClient.handleAuthRefresh();
 
@@ -33,7 +36,7 @@ class InterviewDashboardAPIClient {
         InterviewDashboardQueryVariables
       >({
         query: InterviewDashboardDocument,
-        variables: { pageNumber, resultsPerPage },
+        variables: { pageNumber, resultsPerPage, sortBy, sortAscending },
         fetchPolicy: "network-only",
       });
 
@@ -76,24 +79,24 @@ class InterviewDashboardAPIClient {
 
   static async getInterviewNotes(
     fileId: string,
-  ): Promise<InterviewNotesResult> {
+  ): Promise<InterviewNotesByFileIdResult> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
       const { data } = await client.query<
-        InterviewNotesQuery,
-        InterviewNotesQueryVariables
+        InterviewNotesByFileIdQuery,
+        InterviewNotesByFileIdQueryVariables
       >({
-        query: InterviewNotesDocument,
+        query: InterviewNotesByFileIdDocument,
         variables: { fileId },
         fetchPolicy: "network-only",
       });
 
-      if (!data?.interviewNotes) {
+      if (!data?.interviewNotesByFileId) {
         throw new Error("No data returned");
       }
 
-      return data.interviewNotes;
+      return data.interviewNotesByFileId;
     } catch {
       throw new Error("Failed to get interview notes");
     }

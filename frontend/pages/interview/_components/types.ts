@@ -1,3 +1,7 @@
+import type {
+  ApplicationResult,
+  ReviewedApplicantRecordWithReviewerResult,
+} from "@/graphql/typeUtils";
 import { InterviewStep as InterviewStepValues } from "./constants";
 
 type InterviewStep =
@@ -20,12 +24,18 @@ type InterviewProgressState = {
   currentStep: InterviewStep;
   stepStatuses: Record<InterviewStep, StepStatus>;
   updateStepStatus: (step: InterviewStep, status: StepStatus) => void;
-  currentSubStep: string | null;
-  setCurrentSubStep: (subStep: string | null) => void;
+  currentSubStep?: string;
+  setCurrentSubStep: (subStep?: string) => void;
   reportDialogOpen: boolean;
   setReportDialogOpen: (open: boolean) => void;
   reportIssueSubmitted: boolean;
   setReportIssueSubmitted: (submitted: boolean) => void;
+  candidateName?: string;
+  setCandidateName: (name?: string) => void;
+  application?: ApplicationResult;
+  reviewers: ReviewedApplicantRecordWithReviewerResult[];
+  combinedReviewScore?: number;
+  position: string;
 };
 
 export type {

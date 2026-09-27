@@ -2,7 +2,7 @@ import { Button } from "@/components/common/Button";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
 import { ReactNode, useContext } from "react";
-import { ReviewScoreInput } from "../common/ReviewScoreInput";
+import { ScoreInput } from "@/components/common/ScoreInput";
 import { ReviewerScoresList } from "../common/ReviewerScoresList";
 import { ReviewStage } from "../constants";
 import { ReviewPageLayout } from "../layouts/ReviewPageLayout";
@@ -105,7 +105,7 @@ export const ReviewSkillStage = ({
           <ReviewerScoresList scores={reviewerScores} />
         ) : (
           <div className="flex items-center gap-3">
-            <ReviewScoreInput
+            <ScoreInput
               id="skl-score"
               value={scores[ReviewStage.SKL] || ""}
               min={1}

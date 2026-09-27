@@ -6,6 +6,10 @@ query InterviewedPairingsByUserId($userId: ID!) {
       id
       firstName
       lastName
+      email
+      role
+      position
+      isArchived
     }
   }
 }

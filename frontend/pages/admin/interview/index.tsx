@@ -4,10 +4,17 @@ import {
 } from "@/components/dashboard/side-panel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import { INTERVIEW_DASHBOARD_COLUMNS } from "@/components/dashboard/interview-dashboard/columns";
+import {
+  COLUMN_ID_TO_SORT_BY,
+  INTERVIEW_DASHBOARD_COLUMNS,
+} from "@/components/dashboard/interview-dashboard/columns";
 import useInterviewDashboard from "@/components/dashboard/interview-dashboard/hooks/useInterviewDashboard";
 import type { InterviewDashboardResult } from "@/graphql/typeUtils";
-import { RowSelectionState } from "@tanstack/react-table";
+import {
+  OnChangeFn,
+  RowSelectionState,
+  SortingState,
+} from "@tanstack/react-table";
 import { ReactElement, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 
@@ -20,10 +27,20 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [sorting, setSorting] = useState<SortingState>([]);
+
+  // The table is single-sort, so only the first SortingState entry is used.
+  // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
+  // undefined and the backend falls back to its default order.
+  const activeSort = sorting[0];
+  const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
+  const sortAscending = activeSort ? !activeSort.desc : undefined;
 
   const { rows, isLoading, hasError } = useInterviewDashboard(
     pageNumber,
     resultsPerPage,
+    sortBy,
+    sortAscending,
   );
 
   const activeRow: InterviewDashboardResult | null =
@@ -34,6 +51,13 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     setPageNumber(1);
     setRowSelection({});
     setActiveIndex(null);
+  };
+
+  // Changing the sort reorders the whole result set, so return to the first page.
+  const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
+    setSorting(updater);
+    setPageNumber(1);
+    setRowSelection({});
   };
 
   return (
@@ -59,6 +83,8 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             setActiveIndex(rows.findIndex((r) => r.applicantRecordId === row.applicantRecordId))
           }
           isLoading={isLoading}
+          sorting={sorting}
+          onSortingChange={handleSortingChange}
           emptyMessage="No interviewed applicants found."
           pagination={{
             pageNumber,
@@ -73,12 +99,14 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
       <DashboardSidePanel
         open={activeRow !== null}
         onClose={() => setActiveIndex(null)}
-        pagination={
+        navigation={
           activeIndex !== null
             ? {
-                currentIndex: activeIndex,
-                totalCount: rows.length,
-                onPrevious: () => setActiveIndex((i) => Math.max((i ?? 0) - 1, 0)),
+                current: activeIndex + 1,
+                canPrev: activeIndex > 0,
+                canNext: activeIndex < rows.length - 1,
+                total: rows.length,
+                onPrev: () => setActiveIndex((i) => Math.max((i ?? 0) - 1, 0)),
                 onNext: () =>
                   setActiveIndex((i) => Math.min((i ?? 0) + 1, rows.length - 1)),
               }

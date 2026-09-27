@@ -1,65 +1,43 @@
-import { DashboardStatusChip } from "@/components/dashboard/table";
+import {
+  APPLICATION_STATUS_OPTIONS,
+  DashboardStatusChip,
+} from "@/components/dashboard/common";
 import { ApplicationStatus } from "@/graphql/typeUtils";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import { useState } from "react";
 
-const APPLICATION_STATUS_OPTIONS = [
-  {
-    value: ApplicationStatus.Applied,
-    label: "Applied",
-    className: "bg-neutral-200 text-black",
-  },
-  {
-    value: ApplicationStatus.InReview,
-    label: "In Review",
-    className: "bg-yellow-200 text-black",
-  },
-  {
-    value: ApplicationStatus.Reviewed,
-    label: "Reviewed",
-    className: "bg-green-200 text-black",
-  },
-  {
-    value: ApplicationStatus.Selected,
-    label: "Selected",
-    className: "bg-purple-200 text-black",
-  },
-  {
-    value: ApplicationStatus.Rejected,
-    label: "Rejected",
-    className: "bg-red-200 text-black",
-  },
-] as const;
+import { RejectApplicantDialogue } from "../dialogues/RejectApplicantDialogue";
+import useReviewStatusAction from "../hooks/useReviewStatusAction";
 
 type ReviewStatusCellProps = {
   applicantRecordId: string;
   status: ApplicationStatus;
+  onChange: (
+    applicantRecordId: string,
+    nextStatus: ApplicationStatus,
+    previousStatus: ApplicationStatus,
+  ) => Promise<ApplicationStatus>;
 };
 
+/**
+ * Controlled status chip for the dashboard table. The dashboard page owns the
+ * status and persists it; the action hook handles rejection confirmation and email.
+ */
 export const ReviewStatusCell = ({
   applicantRecordId,
   status,
+  onChange,
 }: ReviewStatusCellProps) => {
-  const [selectedStatus, setSelectedStatus] = useState(status);
-
-  const handleChange = async (newStatus: ApplicationStatus) => {
-    setSelectedStatus(newStatus);
-    try {
-      const confirmedStatus = await ReviewDashboardAPIClient.updateApplicantRecordStatus(
-        applicantRecordId,
-        newStatus,
-      );
-      setSelectedStatus(confirmedStatus);
-    } catch (err) {
-      console.error("Failed to update status:", err);
-    }
-  };
+  const { selectedStatus, handleChange, isSubmitting, dialogue, errorText } =
+    useReviewStatusAction({ applicantRecordId, status, onChange });
 
   return (
-    <DashboardStatusChip
-      value={selectedStatus}
-      options={APPLICATION_STATUS_OPTIONS}
-      onChange={handleChange}
-    />
+    <div role="presentation" onClick={(event) => event.stopPropagation()}>
+      <DashboardStatusChip
+        value={selectedStatus}
+        options={APPLICATION_STATUS_OPTIONS}
+        onChange={isSubmitting ? undefined : handleChange}
+      />
+      {errorText && <p role="alert" className="text-xs text-red-500">{errorText}</p>}
+      {dialogue && <RejectApplicantDialogue {...dialogue} />}
+    </div>
   );
 };

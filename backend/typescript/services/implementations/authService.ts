@@ -186,6 +186,25 @@ class AuthService implements IAuthService {
     }
   }
 
+  async getUserIdByAccessToken(accessToken: string): Promise<number> {
+    try {
+      const decodedIdToken: firebaseAdmin.auth.DecodedIdToken = await firebaseAdmin
+        .auth()
+        .verifyIdToken(accessToken, true);
+      const userId = await this.userService.getUserIdByAuthId(
+        decodedIdToken.uid,
+      );
+      return Number(userId);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to resolve user id from access token. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
   async isAuthorizedByUserId(
     accessToken: string,
     requestedUserId: string,

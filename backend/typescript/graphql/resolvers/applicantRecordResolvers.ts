@@ -1,11 +1,30 @@
 import ApplicantRecordService from "../../services/implementations/applicantRecordService";
+import EmailService from "../../services/implementations/emailService";
 import IApplicantRecordService from "../../services/interfaces/IApplicantRecordService";
-import { ApplicantRecordDTO, ApplicationStatus } from "../../types";
+import IEmailService from "../../services/interfaces/emailService";
+import nodemailerConfig from "../../nodemailer.config";
+import {
+  ApplicantRecordDTO,
+  ApplicationStatus,
+  BulkEmailResult,
+} from "../../types";
 
-const applicantRecordService: IApplicantRecordService = new ApplicantRecordService();
+const emailService: IEmailService = new EmailService(
+  nodemailerConfig,
+  "UW Blueprint Recruitment",
+);
+const applicantRecordService: IApplicantRecordService = new ApplicantRecordService(
+  emailService,
+);
 
 const applicantRecordResolvers = {
   Mutation: {
+    sendRejectionEmails: async (
+      _parent: undefined,
+      { ids }: { ids: string[] },
+    ): Promise<BulkEmailResult> => {
+      return applicantRecordService.sendRejectionEmails(ids);
+    },
     updateApplicantRecordStatus: async (
       _parent: undefined,
       { id, status }: { id: string; status: ApplicationStatus },

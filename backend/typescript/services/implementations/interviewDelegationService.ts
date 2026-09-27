@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import { sequelize } from "../../models";
 import InterviewDelegation from "../../models/interviewDelegation.model";
 import {
@@ -39,7 +40,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
     interviewedApplicantRecordId: string,
     interviewerId: string,
     interviewDelegation: UpdateInterviewDelegationDTO,
-    t?: any,
+    t?: Transaction,
   ): Promise<InterviewDelegationDTO> {
     try {
       const existingDelegation = await InterviewDelegation.findOne({
@@ -47,6 +48,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
           interviewed_applicant_record_id: interviewedApplicantRecordId,
           interviewer_id: Number(interviewerId),
         },
+        transaction: t,
       });
       if (!existingDelegation) {
         throw new Error(
@@ -54,9 +56,12 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
         );
       }
 
-      const updatedDelegation = await existingDelegation.update({
-        interview_has_conflict: interviewDelegation.interviewHasConflict,
-      });
+      const updatedDelegation = await existingDelegation.update(
+        {
+          interview_has_conflict: interviewDelegation.interviewHasConflict,
+        },
+        { transaction: t },
+      );
       return toInterviewDelegationDTO(updatedDelegation);
     } catch (error: unknown) {
       Logger.error(

@@ -1,0 +1,9 @@
+mutation SendRejectionEmails($ids: [ID!]!) {
+  sendRejectionEmails(ids: $ids) {
+    sent
+    failed {
+      to
+      error
+    }
+  }
+}

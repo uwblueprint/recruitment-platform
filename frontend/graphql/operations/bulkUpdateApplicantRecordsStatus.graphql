@@ -1,0 +1,9 @@
+mutation BulkUpdateApplicantRecordsStatus(
+  $ids: [ID!]!
+  $status: ApplicationStatus!
+) {
+  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {
+    id
+    status
+  }
+}
