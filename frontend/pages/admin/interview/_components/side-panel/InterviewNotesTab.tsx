@@ -1,4 +1,4 @@
-import useInterviewNotes from "./hooks/useInterviewNotes";
+import useInterviewNotes from "../../../../../components/dashboard/side-panel/hooks/useInterviewNotes";
 
 type InterviewNotesTabProps = {
   interviewNotesId: string | null;

@@ -67,6 +67,7 @@ type DashboardSidePanelProps = {
   maxScore?: number;
   width?: number;
   showDetailsDivider?: boolean;
+  showScoreOnHeader?: boolean;
   onStatusChange?: (
     applicantRecordId: string,
     nextStatus: ApplicationStatus,
@@ -94,6 +95,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
     maxScore = MAX_TOTAL_SCORE,
     width = 913,
     showDetailsDivider = true,
+    showScoreOnHeader = true,
   } = props;
 
   return (
@@ -151,6 +153,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
               details={details}
               onStatusChange={onStatusChange}
               maxScore={maxScore}
+              showScore={showScoreOnHeader}
             />
             <SidePanelInfoRow
               row={row}
@@ -190,6 +193,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
 type SidePanelApplicantBarProps = ActiveApplicantProps & {
   onStatusChange?: DashboardSidePanelProps["onStatusChange"];
   maxScore: number;
+  showScore?: boolean;
 };
 
 const SidePanelApplicantBar = ({
@@ -197,6 +201,7 @@ const SidePanelApplicantBar = ({
   details,
   onStatusChange,
   maxScore,
+  showScore = true,
 }: SidePanelApplicantBarProps) => {
   const applicantName = `${row.firstName} ${row.lastName}`;
   const { totalScore } = row;
@@ -208,7 +213,7 @@ const SidePanelApplicantBar = ({
         <h2 className="truncate font-source text-lg font-bold text-blue-900">
           {applicantName}
         </h2>
-        {totalScore !== null ? (
+        {totalScore !== null && showScore ? (
           <span className="whitespace-nowrap font-poppins font-medium text-green-700">
             {totalScore}/{maxScore}
           </span>

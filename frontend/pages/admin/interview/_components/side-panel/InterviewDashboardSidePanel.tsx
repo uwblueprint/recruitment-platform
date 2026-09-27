@@ -4,13 +4,15 @@ import {
 } from "@/components/dashboard/side-panel";
 import useInterviewDashboardSidePanel from "@/components/dashboard/side-panel/hooks/useInterviewDashboardSidePanel";
 import { useId, useState } from "react";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
+import Tabs, { tabsClasses } from "@mui/material/Tabs";
+import Tab, { tabClasses } from "@mui/material/Tab";
+import { styled } from "@mui/material/styles";
+import { buttonBaseClasses } from "@mui/material/ButtonBase";
 import type {
   InterviewDashboardResult,
   InterviewDashboardSidePanelResult,
 } from "@/graphql/typeUtils";
-import { InterviewNotesTab } from "@/components/dashboard/side-panel/InterviewNotesTab";
+import { InterviewNotesTab } from "@/pages/admin/interview/_components/side-panel/InterviewNotesTab";
 import { InterviewScoreColumn } from "./InterviewScoreColumn";
 
 const TABS = ["Overview", "Interview notes"] as const;
@@ -24,37 +26,14 @@ const InterviewSidePanelContent = ({
   const tabsId = useId();
   return (
     <div className="flex flex-col gap-5">
-      <Tabs
+      <InterviewTabs
         value={activeTab}
         onChange={(_, tab: (typeof TABS)[number]) => setActiveTab(tab)}
         aria-label="Interview details"
         selectionFollowsFocus
-        sx={{
-          minHeight: 44,
-          borderBottom: "1px solid #808080",
-          "& .MuiTabs-indicator": { display: "none" },
-          "& .MuiTab-root": {
-            minHeight: 44,
-            minWidth: 0,
-            padding: "12px 24px",
-            borderRadius: "24px 24px 0 0",
-            backgroundColor: "#F7F7F7",
-            color: "#999999",
-            fontFamily: "inherit",
-            fontSize: 14,
-            fontWeight: 600,
-            lineHeight: "20px",
-            textTransform: "none",
-            "&.Mui-selected": { backgroundColor: "#EBEBEB", color: "#000000" },
-            "&.Mui-focusVisible": {
-              outline: "2px solid #0573E8",
-              outlineOffset: -3,
-            },
-          },
-        }}
       >
         {TABS.map((tab, index) => (
-          <Tab
+          <InterviewTab
             key={tab}
             value={tab}
             label={tab}
@@ -62,7 +41,7 @@ const InterviewSidePanelContent = ({
             aria-controls={`${tabsId}-panel`}
           />
         ))}
-      </Tabs>
+      </InterviewTabs>
       <div
         role="tabpanel"
         id={`${tabsId}-panel`}
@@ -72,7 +51,7 @@ const InterviewSidePanelContent = ({
         {activeTab === "Overview" ? (
           <InterviewScoreColumn details={details} />
         ) : (
-          <div className="h-[500px]">
+          <div className="h-[700px]">
             <InterviewNotesTab interviewNotesId={details.interviewNotesId} />
           </div>
         )}
@@ -105,10 +84,10 @@ export const InterviewDashboardSidePanel = ({
       row={row ? { ...row, totalScore: row.interviewScore } : undefined}
       details={details ? { ...details, academicYear: details.term } : undefined}
       maxScore={20}
-      width={600}
       isLoading={isLoading}
       hasError={hasError}
       navigation={navigation}
+      showScoreOnHeader={false}
     >
       {details && row ? (
         <InterviewSidePanelContent
@@ -119,3 +98,31 @@ export const InterviewDashboardSidePanel = ({
     </DashboardSidePanel>
   );
 };
+
+const InterviewTabs = styled(Tabs)({
+  minHeight: 44,
+  borderBottom: "1px solid #808080",
+  [`& .${tabsClasses.indicator}`]: { display: "none" },
+});
+
+const InterviewTab = styled(Tab)({
+  minHeight: 44,
+  minWidth: 0,
+  padding: "12px 24px",
+  borderRadius: "24px 24px 0 0",
+  backgroundColor: "#F7F7F7",
+  color: "#999999",
+  fontFamily: "inherit",
+  fontSize: 14,
+  fontWeight: 600,
+  lineHeight: "20px",
+  textTransform: "none",
+  [`&.${tabClasses.selected}`]: {
+    backgroundColor: "#EBEBEB",
+    color: "#000000",
+  },
+  [`&.${buttonBaseClasses.focusVisible}`]: {
+    outline: "2px solid #0573E8",
+    outlineOffset: -3,
+  },
+});
