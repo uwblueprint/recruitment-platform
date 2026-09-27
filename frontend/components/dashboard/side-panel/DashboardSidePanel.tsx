@@ -10,6 +10,8 @@ import Drawer from "@mui/material/Drawer";
 import Link from "next/link";
 import { useState } from "react";
 
+import { ReviewStatusCell } from "@/pages/admin/review/_components/columns/ReviewStatusCell";
+
 import { Button } from "@/components/common/Button";
 import type {
   ApplicationStatus,
@@ -18,7 +20,6 @@ import type {
 } from "@/graphql/typeUtils";
 
 import {
-  APPLICATION_STATUS_OPTIONS,
   DashboardStatusChip,
   SKILL_CATEGORY_OPTIONS,
 } from "../common";
@@ -50,15 +51,15 @@ type DashboardSidePanelProps = {
   isLoading?: boolean;
   navigation?: SidePanelNavigation;
   /**
-   * Persists a status chip selection; omit to leave the chip read-only.
+   * Persists a status chip selection.
    * `previousStatus` is the value the chip was rendering, so the caller can
    * roll back when the update fails.
    */
-  onStatusChange?: (
+  onStatusChange: (
     applicantRecordId: string,
     nextStatus: ApplicationStatus,
     previousStatus: ApplicationStatus,
-  ) => void;
+  ) => Promise<ApplicationStatus>;
 };
 
 /** Props for sections that only render once an active row exists. */
@@ -164,11 +165,7 @@ export const DashboardSidePanel = ({
 );
 
 type SidePanelApplicantBarProps = ActiveApplicantProps & {
-  onStatusChange?: (
-    applicantRecordId: string,
-    nextStatus: ApplicationStatus,
-    previousStatus: ApplicationStatus,
-  ) => void;
+  onStatusChange: DashboardSidePanelProps["onStatusChange"];
 };
 
 const SidePanelApplicantBar = ({
@@ -201,16 +198,10 @@ const SidePanelApplicantBar = ({
             options={SKILL_CATEGORY_OPTIONS}
           />
         ) : null}
-        <DashboardStatusChip
-          value={row.applicationStatus}
-          options={APPLICATION_STATUS_OPTIONS}
-          onChange={(status) =>
-            onStatusChange?.(
-              row.applicantRecordId,
-              status,
-              row.applicationStatus,
-            )
-          }
+        <ReviewStatusCell
+          applicantRecordId={row.applicantRecordId}
+          status={row.applicationStatus}
+          onChange={onStatusChange}
         />
       </div>
 

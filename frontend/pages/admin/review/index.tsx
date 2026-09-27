@@ -17,7 +17,7 @@ import {
 } from "@tanstack/react-table";
 import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 import { useRouter } from "next/router";
-import { ReactElement, useCallback, useMemo, useMemo, useState } from "react";
+import { ReactElement, useCallback, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import {
   COLUMN_ID_TO_SORT_BY,
@@ -65,19 +65,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
   const [reviewerReassignmentTarget, setReviewerReassignmentTarget] =
     useState<ReviewerReassignmentTarget | null>(null);
-
-  const columns = useMemo(
-    () =>
-      createReviewDashboardColumns((row, reviewer) => {
-        setReviewerReassignmentTarget({
-          applicantRecordId: row.applicantRecordId,
-          position: row.position,
-          reviewerId: reviewer.id,
-          reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
-        });
-      }),
-    []
-  );
 
   // The query fires on the settled text; the input keeps the raw value.
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
@@ -198,9 +185,11 @@ const AdminReviewPage: NextPageWithLayout = () => {
             nextStatus,
           );
         setRowStatus(applicantRecordId, confirmedStatus);
-      } catch {
+        return confirmedStatus;
+      } catch (error) {
         setRowStatus(applicantRecordId, previousStatus);
         setStatusError(true);
+        throw error;
       }
     },
     [setRowStatus],
@@ -209,7 +198,17 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // TanStack Table expects a stable `columns` reference, so build it once from
   // the stable status handler.
   const columns = useMemo(
-    () => createReviewDashboardColumns({ onStatusChange: handleStatusChange }),
+    () => createReviewDashboardColumns({
+      onStatusChange: handleStatusChange,
+      onReviewerClick: (row, reviewer) => {
+        setReviewerReassignmentTarget({
+          applicantRecordId: row.applicantRecordId,
+          position: row.position,
+          reviewerId: reviewer.id,
+          reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+        });
+      },
+    }),
     [handleStatusChange],
   );
 

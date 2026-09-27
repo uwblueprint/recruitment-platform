@@ -7,13 +7,20 @@ import { ApplicationStatus } from "@/graphql/typeUtils";
 type UseReviewStatusActionOptions = {
   applicantRecordId: string;
   status: ApplicationStatus;
+  onChange?: (
+    applicantRecordId: string,
+    nextStatus: ApplicationStatus,
+    previousStatus: ApplicationStatus,
+  ) => Promise<ApplicationStatus>;
 };
 
 const useReviewStatusAction = ({
   applicantRecordId,
   status,
+  onChange,
 }: UseReviewStatusActionOptions) => {
-  const [selectedStatus, setSelectedStatus] = useState(status);
+  const [localStatus, setSelectedStatus] = useState(status);
+  const selectedStatus = onChange ? status : localStatus;
   const [isConfirming, setIsConfirming] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorText, setErrorText] = useState<string>();
@@ -25,10 +32,12 @@ const useReviewStatusAction = ({
     setIsSubmitting(true);
     setErrorText(undefined);
     try {
-      const confirmedStatus = await ReviewDashboardAPIClient.updateApplicantRecordStatus(
-        applicantRecordId,
-        newStatus,
-      );
+      const confirmedStatus = onChange
+        ? await onChange(applicantRecordId, newStatus, status)
+        : await ReviewDashboardAPIClient.updateApplicantRecordStatus(
+            applicantRecordId,
+            newStatus,
+          );
       setSelectedStatus(confirmedStatus);
       if (confirmedStatus === ApplicationStatus.Rejected) {
         try {

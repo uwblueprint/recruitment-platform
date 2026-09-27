@@ -14,13 +14,12 @@ type ReviewStatusCellProps = {
     applicantRecordId: string,
     nextStatus: ApplicationStatus,
     previousStatus: ApplicationStatus,
-  ) => void;
+  ) => Promise<ApplicationStatus>;
 };
 
 /**
  * Controlled status chip for the dashboard table. The dashboard page owns the
- * status and persists it, so this cell stays purely presentational and always
- * renders whatever the row currently holds.
+ * status and persists it; the action hook handles rejection confirmation and email.
  */
 export const ReviewStatusCell = ({
   applicantRecordId,
@@ -28,14 +27,14 @@ export const ReviewStatusCell = ({
   onChange,
 }: ReviewStatusCellProps) => {
   const { selectedStatus, handleChange, isSubmitting, dialogue, errorText } =
-    useReviewStatusAction({ applicantRecordId, status });
+    useReviewStatusAction({ applicantRecordId, status, onChange });
 
   return (
     <div role="presentation" onClick={(event) => event.stopPropagation()}>
       <DashboardStatusChip
         value={selectedStatus}
         options={APPLICATION_STATUS_OPTIONS}
-        onChange={(newStatus) => onChange(applicantRecordId, newStatus, status)}
+        onChange={isSubmitting ? undefined : handleChange}
       />
       {errorText && <p role="alert" className="text-xs text-red-500">{errorText}</p>}
       {dialogue && <RejectApplicantDialogue {...dialogue} />}

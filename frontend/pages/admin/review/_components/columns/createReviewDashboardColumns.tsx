@@ -19,6 +19,10 @@ const reviewerName = (row: ReviewDashboardResult, index: number) => {
 };
 
 type ReviewDashboardColumnOptions = {
+  onReviewerClick: (
+    row: ReviewDashboardResult,
+    reviewer: NonNullable<ReviewDashboardResult["reviewers"][number]>,
+  ) => void;
   /**
    * Persists a status chip selection; owned by the dashboard page.
    * `previousStatus` is the value the chip was rendering, so the page can roll
@@ -28,7 +32,7 @@ type ReviewDashboardColumnOptions = {
     applicantRecordId: string,
     nextStatus: ApplicationStatus,
     previousStatus: ApplicationStatus,
-  ) => void;
+  ) => Promise<ApplicationStatus>;
 };
 
 /**
@@ -38,6 +42,7 @@ type ReviewDashboardColumnOptions = {
  */
 export const createReviewDashboardColumns = ({
   onStatusChange,
+  onReviewerClick,
 }: ReviewDashboardColumnOptions): ColumnDef<
   ReviewDashboardResult,
   unknown
@@ -143,7 +148,6 @@ export const createReviewDashboardColumns = ({
     enableSorting: true,
     cell: ({ row }) => (
       <ReviewStatusCell
-        key={`${row.original.applicantRecordId}-${row.original.applicationStatus}`}
         applicantRecordId={row.original.applicantRecordId}
         status={row.original.applicationStatus}
         onChange={onStatusChange}
