@@ -10,7 +10,7 @@ import type {
   InterviewDashboardSidePanelResult,
 } from "@/graphql/typeUtils";
 import { InterviewNotesTab } from "@/components/dashboard/side-panel/InterviewNotesTab";
-import { SidePanelScoreColumn } from "@/components/dashboard/side-panel/SidePanelScoreColumn";
+import { InterviewScoreColumn } from "./InterviewScoreColumn";
 
 const TABS = ["Overview", "Interview notes"] as const;
 
@@ -24,16 +24,7 @@ const InterviewSidePanelContent = ({
     <div className="flex flex-col gap-5">
       <Tabs tabs={TABS} activeTab={activeTab} onChange={setActiveTab} />
       {activeTab === "Overview" ? (
-        <SidePanelScoreColumn
-          label="Interviewers"
-          name={
-            details.interviewers
-              .map(({ firstName, lastName }) => `${firstName} ${lastName}`)
-              .join(", ") || "-"
-          }
-          scores={details.interview}
-          commentsLabel="Interviewer Comments"
-        />
+        <InterviewScoreColumn details={details} />
       ) : (
         <div className="h-[500px]">
           <InterviewNotesTab interviewNotesId={details.interviewNotesId} />
@@ -66,6 +57,7 @@ export const InterviewDashboardSidePanel = ({
       row={row ? { ...row, totalScore: row.interviewScore } : undefined}
       details={details ? { ...details, academicYear: details.term } : undefined}
       maxScore={20}
+      width={547}
       isLoading={isLoading}
       hasError={hasError}
       navigation={navigation}

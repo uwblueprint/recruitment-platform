@@ -1,4 +1,4 @@
-import { ReviewDashboardSidePanel } from "./_components/ReviewDashboardSidePanel";
+import { ReviewDashboardSidePanel } from "./_components/side-panel/ReviewDashboardSidePanel";
 import { Toast } from "@/components/common/Toast";
 import { DashboardTable } from "@/components/dashboard/table";
 import {

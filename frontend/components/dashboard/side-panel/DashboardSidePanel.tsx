@@ -65,6 +65,7 @@ type DashboardSidePanelProps = {
   hasError?: boolean;
   navigation?: SidePanelNavigation;
   maxScore?: number;
+  width?: number;
   onStatusChange?: (
     applicantRecordId: string,
     nextStatus: ApplicationStatus,
@@ -90,6 +91,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
     navigation,
     onStatusChange,
     maxScore = MAX_TOTAL_SCORE,
+    width = 913,
   } = props;
 
   return (
@@ -97,7 +99,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
       anchor="right"
       open={open}
       onClose={onClose}
-      PaperProps={{ className: "w-full max-w-[920px]" }}
+      PaperProps={{ sx: { width, maxWidth: "100%" } }}
     >
       <aside className="flex h-full flex-col bg-white font-source text-neutral-800">
         <header className="flex shrink-0 items-center justify-between px-8 pb-2 pt-6">
