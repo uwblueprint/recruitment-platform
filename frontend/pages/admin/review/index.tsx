@@ -6,6 +6,8 @@ import {
   type SelectedFilters,
 } from "@/components/dashboard/filters";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
+import type { ApplicationStatus } from "@/graphql/typeUtils";
 import { DashboardView } from "@/graphql/typeUtils";
 import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
 import {
@@ -15,7 +17,7 @@ import {
 } from "@tanstack/react-table";
 import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 import { useRouter } from "next/router";
-import { ReactElement, useMemo, useState } from "react";
+import { ReactElement, useCallback, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import {
   COLUMN_ID_TO_SORT_BY,
@@ -64,25 +66,14 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const [reviewerReassignmentTarget, setReviewerReassignmentTarget] =
     useState<ReviewerReassignmentTarget | null>(null);
 
-  const columns = useMemo(
-    () =>
-      createReviewDashboardColumns((row, reviewer) => {
-        setReviewerReassignmentTarget({
-          applicantRecordId: row.applicantRecordId,
-          position: row.position,
-          reviewerId: reviewer.id,
-          reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
-        });
-      }),
-    []
-  );
-
   // The query fires on the settled text; the input keeps the raw value.
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
 
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort ? !activeSort.desc : undefined;
+
+  const [statusError, setStatusError] = useState(false);
 
   const { filterOptions } = useReviewDashboardFilterOptions();
 
@@ -141,7 +132,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     [selectedFilters, debouncedSearch],
   );
 
-  const { rows, isLoading, error, refetch } = useReviewDashboard(
+  const { rows, isLoading, error, setRowStatus, refetch } = useReviewDashboard(
     pageNumber,
     resultsPerPage,
     sortBy,
@@ -172,6 +163,54 @@ const AdminReviewPage: NextPageWithLayout = () => {
     setPageNumber(Math.floor(index / resultsPerPage) + 1);
     setRowSelection({});
   };
+
+  // Writes the new status straight into `rows` so the table chip and the side
+  // panel chip both move at once, then reconciles with what the server echoes
+  // back. A failed update rolls the chip back to `previousStatus` rather than
+  // leaving the UI showing a status that was never saved. Callers pass the
+  // status they were rendering, which keeps this handler stable.
+  const handleStatusChange = useCallback(
+    async (
+      applicantRecordId: string,
+      nextStatus: ApplicationStatus,
+      previousStatus: ApplicationStatus,
+    ) => {
+      setStatusError(false);
+      setRowStatus(applicantRecordId, nextStatus);
+
+      try {
+        const confirmedStatus =
+          await ReviewDashboardAPIClient.updateApplicantRecordStatus(
+            applicantRecordId,
+            nextStatus,
+          );
+        setRowStatus(applicantRecordId, confirmedStatus);
+        return confirmedStatus;
+      } catch (error) {
+        setRowStatus(applicantRecordId, previousStatus);
+        setStatusError(true);
+        throw error;
+      }
+    },
+    [setRowStatus],
+  );
+
+  // TanStack Table expects a stable `columns` reference, so build it once from
+  // the stable status handler.
+  const columns = useMemo(
+    () => createReviewDashboardColumns({
+      onStatusChange: handleStatusChange,
+      onReviewerClick: (row, reviewer) => {
+        setReviewerReassignmentTarget({
+          applicantRecordId: row.applicantRecordId,
+          position: row.position,
+          reviewerId: reviewer.id,
+          reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+        });
+      },
+    }),
+    [handleStatusChange],
+  );
 
   const handleViewChange = (view: DashboardView) => {
     setActiveView(view);
@@ -290,6 +329,12 @@ const AdminReviewPage: NextPageWithLayout = () => {
             Failed to load review dashboard
           </div>
         ) : null}
+
+        {statusError ? (
+          <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
+            Failed to update applicant status
+          </div>
+        ) : null}
         <DashboardTable
           data={rows}
           columns={columns}
@@ -314,6 +359,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         onClose={() => setActiveId(undefined)}
         row={activeRow}
         details={details}
+        onStatusChange={handleStatusChange}
         isLoading={isDetailsLoading}
         navigation={
           activeNavigationIndex >= 0

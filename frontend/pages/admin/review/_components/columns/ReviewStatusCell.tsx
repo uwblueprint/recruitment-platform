@@ -10,14 +10,24 @@ import useReviewStatusAction from "../hooks/useReviewStatusAction";
 type ReviewStatusCellProps = {
   applicantRecordId: string;
   status: ApplicationStatus;
+  onChange: (
+    applicantRecordId: string,
+    nextStatus: ApplicationStatus,
+    previousStatus: ApplicationStatus,
+  ) => Promise<ApplicationStatus>;
 };
 
+/**
+ * Controlled status chip for the dashboard table. The dashboard page owns the
+ * status and persists it; the action hook handles rejection confirmation and email.
+ */
 export const ReviewStatusCell = ({
   applicantRecordId,
   status,
+  onChange,
 }: ReviewStatusCellProps) => {
   const { selectedStatus, handleChange, isSubmitting, dialogue, errorText } =
-    useReviewStatusAction({ applicantRecordId, status });
+    useReviewStatusAction({ applicantRecordId, status, onChange });
 
   return (
     <div role="presentation" onClick={(event) => event.stopPropagation()}>

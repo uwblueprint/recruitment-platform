@@ -10,14 +10,16 @@ import Drawer from "@mui/material/Drawer";
 import Link from "next/link";
 import { useState } from "react";
 
+import { ReviewStatusCell } from "@/pages/admin/review/_components/columns/ReviewStatusCell";
+
 import { Button } from "@/components/common/Button";
 import type {
+  ApplicationStatus,
   ReviewDashboardResult,
   ReviewDashboardSidePanelResult,
 } from "@/graphql/typeUtils";
 
 import {
-  APPLICATION_STATUS_OPTIONS,
   DashboardStatusChip,
   SKILL_CATEGORY_OPTIONS,
 } from "../common";
@@ -48,6 +50,16 @@ type DashboardSidePanelProps = {
   details?: ReviewDashboardSidePanelResult;
   isLoading?: boolean;
   navigation?: SidePanelNavigation;
+  /**
+   * Persists a status chip selection.
+   * `previousStatus` is the value the chip was rendering, so the caller can
+   * roll back when the update fails.
+   */
+  onStatusChange: (
+    applicantRecordId: string,
+    nextStatus: ApplicationStatus,
+    previousStatus: ApplicationStatus,
+  ) => Promise<ApplicationStatus>;
 };
 
 /** Props for sections that only render once an active row exists. */
@@ -63,6 +75,7 @@ export const DashboardSidePanel = ({
   details,
   isLoading = false,
   navigation,
+  onStatusChange,
 }: DashboardSidePanelProps) => (
   <Drawer
     anchor="right"
@@ -113,7 +126,11 @@ export const DashboardSidePanel = ({
           key={row.applicantRecordId}
           className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8"
         >
-          <SidePanelApplicantBar row={row} details={details} />
+          <SidePanelApplicantBar
+            row={row}
+            details={details}
+            onStatusChange={onStatusChange}
+          />
           <SidePanelInfoRow row={row} details={details} />
 
           {details ? (
@@ -147,14 +164,17 @@ export const DashboardSidePanel = ({
   </Drawer>
 );
 
-const SidePanelApplicantBar = ({ row, details }: ActiveApplicantProps) => {
+type SidePanelApplicantBarProps = ActiveApplicantProps & {
+  onStatusChange: DashboardSidePanelProps["onStatusChange"];
+};
+
+const SidePanelApplicantBar = ({
+  row,
+  details,
+  onStatusChange,
+}: SidePanelApplicantBarProps) => {
   const applicantName = `${row.firstName} ${row.lastName}`;
   const { totalScore } = row;
-
-  // Visual-only status control. Selecting a value updates the chip locally;
-  // persisting to the backend is handled in a future ticket. The container is
-  // keyed by applicant record id, so this state resets per applicant.
-  const [selectedStatus, setSelectedStatus] = useState(row.applicationStatus);
 
   return (
     <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
@@ -178,10 +198,10 @@ const SidePanelApplicantBar = ({ row, details }: ActiveApplicantProps) => {
             options={SKILL_CATEGORY_OPTIONS}
           />
         ) : null}
-        <DashboardStatusChip
-          value={selectedStatus}
-          options={APPLICATION_STATUS_OPTIONS}
-          onChange={setSelectedStatus}
+        <ReviewStatusCell
+          applicantRecordId={row.applicantRecordId}
+          status={row.applicationStatus}
+          onChange={onStatusChange}
         />
       </div>
 
