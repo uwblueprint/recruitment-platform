@@ -5,7 +5,6 @@ import {
   FilterCategoryVariant,
   type SelectedFilters,
 } from "@/components/dashboard/filters";
-import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
 import type { ApplicationStatus } from "@/graphql/typeUtils";
 import { DashboardView } from "@/graphql/typeUtils";
@@ -17,8 +16,9 @@ import {
 } from "@tanstack/react-table";
 import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 import { useRouter } from "next/router";
-import { ReactElement, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
+import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import {
   COLUMN_ID_TO_SORT_BY,
   createReviewDashboardColumns,
@@ -291,7 +291,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
     );
 
   return (
-    <div className="flex h-screen flex-col bg-white">
+    <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
         <DashboardTabs
           activeView={activeView}
@@ -391,8 +391,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
   );
 };
 
-AdminReviewPage.getLayout = (page: ReactElement) => (
-  <ProtectedRoute allowedRoles={["Admin"]}>{page}</ProtectedRoute>
-);
+AdminReviewPage.getLayout = getAdminLayout;
 
 export default AdminReviewPage;

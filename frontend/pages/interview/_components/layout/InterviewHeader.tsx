@@ -1,6 +1,6 @@
 import { BlueprintLogo } from "@/components/common/BlueprintLogo";
 import Link from "next/link";
-import { useContext } from "react";
+import { ReactNode, useContext } from "react";
 import { PROFILE_HEADER_STEPS } from "../constants";
 import { InterviewProgressContext } from "../InterviewProgressContext";
 
@@ -13,11 +13,13 @@ interface HeaderStep {
 interface InterviewHeaderProps {
   steps?: HeaderStep[];
   currentStep?: string;
+  actions?: ReactNode;
 }
 
 export const InterviewHeader = ({
   steps = PROFILE_HEADER_STEPS,
   currentStep = steps[0]?.step,
+  actions,
 }: InterviewHeaderProps) => {
   const progressContext = useContext(InterviewProgressContext);
   const activeStep = progressContext?.currentSubStep ?? currentStep;
@@ -30,6 +32,7 @@ export const InterviewHeader = ({
         </Link>
 
         <div className="flex items-center gap-9">
+          {actions}
           {steps.map(({ step, label, index }) => {
             const active = step === activeStep;
             return (

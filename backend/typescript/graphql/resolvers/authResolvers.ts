@@ -12,7 +12,6 @@ import { AuthDTO, RegisterUserDTO, Role } from "../../types";
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
-
 const cookieOptions: CookieOptions = {
   httpOnly: true,
   sameSite: process.env.PREVIEW_DEPLOY ? "none" : "strict",

@@ -136,6 +136,7 @@ export {
   SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
   UpdateInterviewGroupSchedulingLinkDocument,
+  LogoutDocument,
   ReviewedApplicantsByUserIdDocument,
   UsersByPositionDocument,
   UploadInterviewNotesDocument,

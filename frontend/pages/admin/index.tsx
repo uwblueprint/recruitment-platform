@@ -1,17 +1,12 @@
-import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import { ReactElement } from "react";
-import { NextPageWithLayout } from "../_app";
+import { GetServerSideProps } from "next";
 
-const AdminPage: NextPageWithLayout = () => {
-  return (
-    <div className="flex h-screen flex-col bg-white">
-      <main className="flex min-h-0 flex-1 flex-col overflow-hidden" />
-    </div>
-  );
-};
+export const getServerSideProps: GetServerSideProps = async () => ({
+  redirect: {
+    destination: "/admin/review",
+    permanent: false,
+  },
+});
 
-AdminPage.getLayout = (page: ReactElement) => (
-  <ProtectedRoute allowedRoles={["Admin", "User"]}>{page}</ProtectedRoute>
-);
-
-export default AdminPage;
+export default function AdminRedirect() {
+  return null;
+}
