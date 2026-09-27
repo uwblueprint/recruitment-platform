@@ -51,13 +51,9 @@ const InterviewSidePanelContent = ({
         {activeTab === "Overview" ? (
           <InterviewScoreColumn details={details} />
         ) : (
-          <div className="h-[700px]">
-            <InterviewNotesTab
-              interviewedApplicantRecordId={
-                details.interviewedApplicantRecordId
-              }
-            />
-          </div>
+          <InterviewNotesTab
+            interviewedApplicantRecordId={details.interviewedApplicantRecordId}
+          />
         )}
       </div>
     </div>

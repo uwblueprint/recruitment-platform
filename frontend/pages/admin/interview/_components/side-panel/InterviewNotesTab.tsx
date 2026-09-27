@@ -13,7 +13,7 @@ export const InterviewNotesTab = ({
 
   if (isLoading) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-neutral-500">
+      <div className="flex p-12 items-center justify-center text-sm text-neutral-500">
         Loading interview notes…
       </div>
     );
@@ -21,7 +21,7 @@ export const InterviewNotesTab = ({
 
   if (hasError) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-alert-errorText">
+      <div className="flex p-12 items-center justify-center text-sm text-alert-errorText">
         Failed to load interview notes.
       </div>
     );
@@ -29,7 +29,7 @@ export const InterviewNotesTab = ({
 
   if (!notes) {
     return (
-      <div className="flex h-full items-center justify-center text-sm text-neutral-500">
+      <div className="flex p-12 items-center justify-center px-4 text-center text-base font-semibold text-neutral-500">
         No interview notes have been uploaded yet.
       </div>
     );
@@ -39,7 +39,7 @@ export const InterviewNotesTab = ({
     <iframe
       src={notes.signedUrl}
       title={notes.fileName}
-      className="h-full w-full rounded border border-neutral-200"
+      className="h-[700px] w-full rounded border border-neutral-200"
     />
   );
 };
