@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import InterviewDashboardAPIClient from "@/APIClients/InterviewDashboardAPIClient";
+import InterviewAssessmentAPIClient from "@/APIClients/InterviewAssessmentAPIClient";
 import type { InterviewNotesResult } from "@/graphql/typeUtils";
 
 type UseInterviewNotesResult = {
@@ -9,7 +9,7 @@ type UseInterviewNotesResult = {
 };
 
 const useInterviewNotes = (
-  fileId: string | null,
+  interviewedApplicantRecordId: string | null
 ): UseInterviewNotesResult => {
   const [state, setState] = useState<UseInterviewNotesResult>({
     notes: null,
@@ -18,7 +18,7 @@ const useInterviewNotes = (
   });
 
   useEffect(() => {
-    if (!fileId) {
+    if (!interviewedApplicantRecordId) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setState({ notes: null, isLoading: false, hasError: false });
       return undefined;
@@ -28,7 +28,7 @@ const useInterviewNotes = (
 
     setState({ notes: null, isLoading: true, hasError: false });
 
-    InterviewDashboardAPIClient.getInterviewNotes(fileId)
+    InterviewAssessmentAPIClient.getInterviewNotes(interviewedApplicantRecordId)
       .then((notes) => {
         if (isCurrentRequest) {
           setState({ notes, isLoading: false, hasError: false });
@@ -43,7 +43,7 @@ const useInterviewNotes = (
     return () => {
       isCurrentRequest = false;
     };
-  }, [fileId]);
+  }, [interviewedApplicantRecordId]);
 
   return state;
 };

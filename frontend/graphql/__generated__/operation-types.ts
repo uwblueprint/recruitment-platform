@@ -55,7 +55,7 @@ export type InterviewDashboardSidePanelQueryVariables = Exact<{
 }>;
 
 
-export type InterviewDashboardSidePanelQuery = { interviewDashboardSidePanel: { firstName: string, lastName: string, term: string, program: string, position: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, isApplicantFlagged: boolean, isShortlistedForOffer: boolean, interviewStatus: Types.InterviewStatus | null, interviewScore: number | null, interviewNotesId: string | null, interviewDate: string | null, interviewers: Array<{ firstName: string, lastName: string }>, interview: { skill: number | null, passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, comments: string | null } | null } };
+export type InterviewDashboardSidePanelQuery = { interviewDashboardSidePanel: { firstName: string, lastName: string, term: string, program: string, position: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, isApplicantFlagged: boolean, isShortlistedForOffer: boolean, interviewStatus: Types.InterviewStatus | null, interviewScore: number | null, interviewedApplicantRecordId: string | null, interviewDate: string | null, interviewers: Array<{ firstName: string, lastName: string }>, interview: { skill: number | null, passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, comments: string | null } | null } };
 
 export type InterviewGroupQueryVariables = Exact<{
   id: string | number;
@@ -68,13 +68,6 @@ export type InterviewInvitesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type InterviewInvitesQuery = { interviewInvites: Array<{ id: string, position: string, schedulingLink: string | null, status: Types.InterviewGroupStatus, interviewers: Array<{ id: string, firstName: string, lastName: string }>, interviewees: Array<{ firstName: string, lastName: string, position: string }> }> };
-
-export type InterviewNotesByFileIdQueryVariables = Exact<{
-  fileId: string | number;
-}>;
-
-
-export type InterviewNotesByFileIdQuery = { interviewNotesByFileId: { fileId: string, fileName: string, signedUrl: string } };
 
 export type InterviewNotesQueryVariables = Exact<{
   interviewedApplicantRecordId: string | number;

@@ -24,13 +24,10 @@ const interviewPageType = gql`
     interviewedApplicantsByUserId(userId: ID!): [InterviewedApplicantsDTO!]!
     interviewedPairingsByUserId(userId: ID!): [InterviewPairingsDTO!]!
     interviewersByGroupId(groupId: ID!): [UserDTO!]!
-    interviewNotesByFileId(fileId: ID!): InterviewNotes!
     interviewedApplicantRecordByApplicantRecordId(
       applicantRecordId: ID!
     ): InterviewedApplicantRecord!
-    interviewNotes(
-      interviewedApplicantRecordId: ID!
-    ): InterviewNotes
+    interviewNotes(interviewedApplicantRecordId: ID!): InterviewNotes
   }
 
   extend type Mutation {

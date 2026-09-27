@@ -119,7 +119,6 @@ export {
   InterviewedApplicantRecordByApplicantRecordIdDocument,
   InterviewersByGroupIdDocument,
   InterviewGroupDocument,
-  InterviewNotesByFileIdDocument,
   InterviewInvitesDocument,
   InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
@@ -174,8 +173,6 @@ export type {
   InterviewDashboardSidePanelQueryVariables,
   InterviewersByGroupIdQuery,
   InterviewersByGroupIdQueryVariables,
-  InterviewNotesByFileIdQuery,
-  InterviewNotesByFileIdQueryVariables,
   InterviewNotesQuery,
   InterviewNotesQueryVariables,
   IsAuthorizedByRoleQuery,
@@ -252,10 +249,7 @@ export type InterviewDashboardSidePanelResult = OperationField<
   Operations.InterviewDashboardSidePanelQuery,
   "interviewDashboardSidePanel"
 >;
-export type InterviewNotesByFileIdResult = OperationField<
-  Operations.InterviewNotesByFileIdQuery,
-  "interviewNotesByFileId"
->;
+
 export type UpdateApplicantRecordIsApplicantFlaggedResult = OperationField<
   Operations.UpdateApplicantRecordIsApplicantFlaggedMutation,
   "updateApplicantRecordIsApplicantFlagged"

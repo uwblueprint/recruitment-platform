@@ -286,7 +286,7 @@ export function toInterviewDashboardSidePanelDTO(
     interview: interviewedApplicantRecord?.interview_json ?? null,
     interviewStatus: interviewedApplicantRecord?.status ?? null,
     interviewScore: interviewedApplicantRecord?.score ?? null,
-    interviewNotesId: interviewedApplicantRecord?.interview_notes_id ?? null,
+    interviewedApplicantRecordId: interviewedApplicantRecord?.id ?? null,
     interviewDate: interviewedApplicantRecord?.interview_date ?? null,
   };
 }

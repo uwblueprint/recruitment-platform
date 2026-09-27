@@ -42,6 +42,6 @@ export type InterviewDashboardSidePanelDTO = {
   interview: Interview | null;
   interviewStatus: InterviewStatus | null;
   interviewScore: number | null;
-  interviewNotesId: string | null;
+  interviewedApplicantRecordId: string | null;
   interviewDate: Date | null;
 };

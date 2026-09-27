@@ -194,9 +194,9 @@ export type InterviewDashboardSidePanelDto = {
   firstName: Scalars['String']['output'];
   interview?: Maybe<Interview>;
   interviewDate?: Maybe<Scalars['String']['output']>;
-  interviewNotesId?: Maybe<Scalars['String']['output']>;
   interviewScore?: Maybe<Scalars['Int']['output']>;
   interviewStatus?: Maybe<InterviewStatus>;
+  interviewedApplicantRecordId?: Maybe<Scalars['ID']['output']>;
   interviewers: Array<UserDto>;
   isApplicantFlagged: Scalars['Boolean']['output'];
   isShortlistedForOffer: Scalars['Boolean']['output'];
@@ -634,7 +634,6 @@ export type Query = {
   interviewGroup: InterviewGroupDto;
   interviewInvites: Array<InterviewInviteDto>;
   interviewNotes?: Maybe<InterviewNotes>;
-  interviewNotesByFileId: InterviewNotes;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
   interviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
@@ -711,11 +710,6 @@ export type QueryInterviewGroupArgs = {
 
 export type QueryInterviewNotesArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
-};
-
-
-export type QueryInterviewNotesByFileIdArgs = {
-  fileId: Scalars['ID']['input'];
 };
 
 

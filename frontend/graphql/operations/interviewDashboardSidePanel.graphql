@@ -23,7 +23,7 @@ query InterviewDashboardSidePanel($applicantRecordId: ID!) {
     }
     interviewStatus
     interviewScore
-    interviewNotesId
+    interviewedApplicantRecordId
     interviewDate
   }
 }

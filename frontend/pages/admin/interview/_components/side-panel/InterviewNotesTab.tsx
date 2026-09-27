@@ -1,21 +1,15 @@
 import useInterviewNotes from "../../../../../components/dashboard/side-panel/hooks/useInterviewNotes";
 
 type InterviewNotesTabProps = {
-  interviewNotesId: string | null;
+  interviewedApplicantRecordId: string | null;
 };
 
 export const InterviewNotesTab = ({
-  interviewNotesId,
+  interviewedApplicantRecordId,
 }: InterviewNotesTabProps) => {
-  const { notes, isLoading, hasError } = useInterviewNotes(interviewNotesId);
-
-  if (!interviewNotesId) {
-    return (
-      <div className="flex h-full items-center justify-center text-sm text-neutral-500">
-        No interview notes have been uploaded yet.
-      </div>
-    );
-  }
+  const { notes, isLoading, hasError } = useInterviewNotes(
+    interviewedApplicantRecordId
+  );
 
   if (isLoading) {
     return (
@@ -25,10 +19,18 @@ export const InterviewNotesTab = ({
     );
   }
 
-  if (hasError || !notes) {
+  if (hasError) {
     return (
       <div className="flex h-full items-center justify-center text-sm text-alert-errorText">
         Failed to load interview notes.
+      </div>
+    );
+  }
+
+  if (!notes) {
+    return (
+      <div className="flex h-full items-center justify-center text-sm text-neutral-500">
+        No interview notes have been uploaded yet.
       </div>
     );
   }

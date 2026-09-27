@@ -299,7 +299,6 @@ class InterviewCompositeService implements IInterviewCompositeService {
                 "score",
                 "interview_json",
                 "status",
-                "interview_notes_id",
                 "interview_date",
               ],
               model: InterviewedApplicantRecord,

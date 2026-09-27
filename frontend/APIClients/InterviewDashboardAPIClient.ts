@@ -2,7 +2,6 @@ import { client } from "@/client";
 import {
   InterviewDashboardDocument,
   InterviewDashboardSidePanelDocument,
-  InterviewNotesByFileIdDocument,
   UpdateApplicantRecordIsApplicantFlaggedDocument,
   type InterviewDashboardQuery,
   type InterviewDashboardQueryVariables,
@@ -10,9 +9,6 @@ import {
   type InterviewDashboardSidePanelQuery,
   type InterviewDashboardSidePanelQueryVariables,
   type InterviewDashboardSidePanelResult,
-  type InterviewNotesByFileIdQuery,
-  type InterviewNotesByFileIdQueryVariables,
-  type InterviewNotesByFileIdResult,
   type UpdateApplicantRecordIsApplicantFlaggedMutation,
   type UpdateApplicantRecordIsApplicantFlaggedMutationVariables,
   type UpdateApplicantRecordIsApplicantFlaggedResult,
@@ -74,31 +70,6 @@ class InterviewDashboardAPIClient {
       return data.interviewDashboardSidePanel;
     } catch {
       throw new Error("Failed to get interview dashboard side panel");
-    }
-  }
-
-  static async getInterviewNotes(
-    fileId: string,
-  ): Promise<InterviewNotesByFileIdResult> {
-    await BaseAPIClient.handleAuthRefresh();
-
-    try {
-      const { data } = await client.query<
-        InterviewNotesByFileIdQuery,
-        InterviewNotesByFileIdQueryVariables
-      >({
-        query: InterviewNotesByFileIdDocument,
-        variables: { fileId },
-        fetchPolicy: "network-only",
-      });
-
-      if (!data?.interviewNotesByFileId) {
-        throw new Error("No data returned");
-      }
-
-      return data.interviewNotesByFileId;
-    } catch {
-      throw new Error("Failed to get interview notes");
     }
   }
 

@@ -26,7 +26,7 @@ const interviewDashboardTypes = gql`
     interview: Interview
     interviewStatus: InterviewStatus
     interviewScore: Int
-    interviewNotesId: String
+    interviewedApplicantRecordId: ID
     interviewDate: String
   }
 

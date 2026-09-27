@@ -50,16 +50,6 @@ const interviewPageResolvers = {
     ): Promise<UserDTO[]> => {
       return interviewCompositeService.getInterviewersByGroupId(groupId);
     },
-    interviewNotesByFileId: async (
-      _parent: undefined,
-      { fileId }: { fileId: string },
-    ): Promise<InterviewNotesDTO> => {
-      const file = await firebaseFileService.getFirebaseFileById(fileId);
-      const signedUrl = await firebaseFileService.getSignedUrl(
-        file.storagePath,
-      );
-      return { fileId: file.id, fileName: file.originalFileName, signedUrl };
-    },
     interviewedApplicantRecordByApplicantRecordId: async (
       _parent: undefined,
       { applicantRecordId }: { applicantRecordId: string },

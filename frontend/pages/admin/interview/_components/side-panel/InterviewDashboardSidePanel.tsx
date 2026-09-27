@@ -52,7 +52,11 @@ const InterviewSidePanelContent = ({
           <InterviewScoreColumn details={details} />
         ) : (
           <div className="h-[700px]">
-            <InterviewNotesTab interviewNotesId={details.interviewNotesId} />
+            <InterviewNotesTab
+              interviewedApplicantRecordId={
+                details.interviewedApplicantRecordId
+              }
+            />
           </div>
         )}
       </div>
