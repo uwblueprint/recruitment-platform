@@ -1,7 +1,4 @@
-import {
-  DashboardSidePanel,
-  InterviewSidePanelContent,
-} from "@/components/dashboard/side-panel";
+import { InterviewDashboardSidePanel } from "./_components/InterviewDashboardSidePanel";
 import { DashboardTable } from "@/components/dashboard/table";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import {
@@ -23,7 +20,7 @@ const DEFAULT_RESULTS_PER_PAGE = 25;
 const InterviewDashboardPage: NextPageWithLayout = () => {
   const [pageNumber, setPageNumber] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(
-    DEFAULT_RESULTS_PER_PAGE,
+    DEFAULT_RESULTS_PER_PAGE
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -40,7 +37,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     pageNumber,
     resultsPerPage,
     sortBy,
-    sortAscending,
+    sortAscending
   );
 
   const activeRow: InterviewDashboardResult | null =
@@ -80,7 +77,11 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
           onRowClick={(row) =>
-            setActiveIndex(rows.findIndex((r) => r.applicantRecordId === row.applicantRecordId))
+            setActiveIndex(
+              rows.findIndex(
+                (r) => r.applicantRecordId === row.applicantRecordId
+              )
+            )
           }
           isLoading={isLoading}
           sorting={sorting}
@@ -96,8 +97,8 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
         />
       </main>
 
-      <DashboardSidePanel
-        open={activeRow !== null}
+      <InterviewDashboardSidePanel
+        row={activeRow ?? undefined}
         onClose={() => setActiveIndex(null)}
         navigation={
           activeIndex !== null
@@ -108,17 +109,13 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
                 total: rows.length,
                 onPrev: () => setActiveIndex((i) => Math.max((i ?? 0) - 1, 0)),
                 onNext: () =>
-                  setActiveIndex((i) => Math.min((i ?? 0) + 1, rows.length - 1)),
+                  setActiveIndex((i) =>
+                    Math.min((i ?? 0) + 1, rows.length - 1)
+                  ),
               }
             : undefined
         }
-      >
-        {activeRow ? (
-          <InterviewSidePanelContent
-            applicantRecordId={activeRow.applicantRecordId}
-          />
-        ) : null}
-      </DashboardSidePanel>
+      />
     </div>
   );
 };

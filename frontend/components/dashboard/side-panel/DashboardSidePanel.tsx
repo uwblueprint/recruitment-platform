@@ -20,11 +20,11 @@ import type {
 } from "@/graphql/typeUtils";
 
 import {
+  APPLICATION_STATUS_OPTIONS,
   DashboardStatusChip,
   SKILL_CATEGORY_OPTIONS,
 } from "../common";
 import { AdminCommentsSection } from "./admin-comments";
-import { SidePanelReviewerColumn } from "./SidePanelReviewerColumn";
 
 /** Maximum combined review score: 4 criteria × 5 points × 2 reviewers. */
 const MAX_TOTAL_SCORE = 40;
@@ -41,140 +41,154 @@ export type SidePanelNavigation = {
   onNext: () => void;
 };
 
+type ApplicantRow = Pick<
+  ReviewDashboardResult,
+  | "applicantRecordId"
+  | "firstName"
+  | "lastName"
+  | "position"
+  | "applicationStatus"
+  | "totalScore"
+>;
+type ApplicantDetails = Pick<
+  ReviewDashboardSidePanelResult,
+  "academicYear" | "program" | "position" | "resumeUrl" | "skillCategory"
+>;
+
 type DashboardSidePanelProps = {
   open: boolean;
   onClose: () => void;
+  row?: ApplicantRow;
+  details?: ApplicantDetails;
   children?: ReactNode;
-  /** Row that was clicked; drives the always-available header summary. */
-  row?: ReviewDashboardResult;
-  /** Expanded details fetched for the active applicant. */
-  details?: ReviewDashboardSidePanelResult;
   isLoading?: boolean;
+  hasError?: boolean;
   navigation?: SidePanelNavigation;
-  /**
-   * Persists a status chip selection.
-   * `previousStatus` is the value the chip was rendering, so the caller can
-   * roll back when the update fails.
-   */
+  maxScore?: number;
   onStatusChange?: (
     applicantRecordId: string,
     nextStatus: ApplicationStatus,
-    previousStatus: ApplicationStatus,
+    previousStatus: ApplicationStatus
   ) => Promise<ApplicationStatus>;
 };
 
 /** Props for sections that only render once an active row exists. */
 type ActiveApplicantProps = {
-  row: ReviewDashboardResult;
-  details?: ReviewDashboardSidePanelResult;
+  row: ApplicantRow;
+  details?: ApplicantDetails;
 };
 
-export const DashboardSidePanel = ({
-  open,
-  onClose,
-  children,
-  row,
-  details,
-  isLoading = false,
-  navigation,
-  onStatusChange,
-}: DashboardSidePanelProps) => (
-  <Drawer
-    anchor="right"
-    open={open}
-    onClose={onClose}
-    PaperProps={{ className: "w-full max-w-[920px]" }}
-  >
-    <aside className="flex h-full flex-col bg-white font-source text-neutral-800">
-      <header className="flex shrink-0 items-center justify-between px-8 pb-2 pt-6">
-        <button
-          aria-label="Close side panel"
-          className="flex h-8 w-8 items-center justify-center rounded text-neutral-500 hover:bg-surface-muted"
-          onClick={onClose}
-          type="button"
-        >
-          <KeyboardDoubleArrowLeft sx={{ fontSize: 22 }} />
-        </button>
+export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
+  const {
+    open,
+    onClose,
+    row,
+    details,
+    children,
+    isLoading = false,
+    hasError = false,
+    navigation,
+    onStatusChange,
+    maxScore = MAX_TOTAL_SCORE,
+  } = props;
 
-        {navigation ? (
-          <div className="flex items-center gap-3 text-sm text-neutral-500">
-            <button
-              aria-label="Previous applicant"
-              className="flex h-7 w-7 items-center justify-center rounded hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-40"
-              onClick={navigation.onPrev}
-              disabled={!navigation.canPrev}
-              type="button"
-            >
-              <KeyboardArrowLeft sx={{ fontSize: 20 }} />
-            </button>
-            <span className="tabular-nums">
-              {navigation.current}/{navigation.total}
-            </span>
-            <button
-              aria-label="Next applicant"
-              className="flex h-7 w-7 items-center justify-center rounded hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-40"
-              onClick={navigation.onNext}
-              disabled={!navigation.canNext}
-              type="button"
-            >
-              <KeyboardArrowRight sx={{ fontSize: 20 }} />
-            </button>
+  return (
+    <Drawer
+      anchor="right"
+      open={open}
+      onClose={onClose}
+      PaperProps={{ className: "w-full max-w-[920px]" }}
+    >
+      <aside className="flex h-full flex-col bg-white font-source text-neutral-800">
+        <header className="flex shrink-0 items-center justify-between px-8 pb-2 pt-6">
+          <button
+            aria-label="Close side panel"
+            className="flex h-8 w-8 items-center justify-center rounded text-neutral-500 hover:bg-surface-muted"
+            onClick={onClose}
+            type="button"
+          >
+            <KeyboardDoubleArrowLeft sx={{ fontSize: 22 }} />
+          </button>
+
+          {navigation ? (
+            <div className="flex items-center gap-3 text-sm text-neutral-500">
+              <button
+                aria-label="Previous applicant"
+                className="flex h-7 w-7 items-center justify-center rounded hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-40"
+                onClick={navigation.onPrev}
+                disabled={!navigation.canPrev}
+                type="button"
+              >
+                <KeyboardArrowLeft sx={{ fontSize: 20 }} />
+              </button>
+              <span className="tabular-nums">
+                {navigation.current}/{navigation.total}
+              </span>
+              <button
+                aria-label="Next applicant"
+                className="flex h-7 w-7 items-center justify-center rounded hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-40"
+                onClick={navigation.onNext}
+                disabled={!navigation.canNext}
+                type="button"
+              >
+                <KeyboardArrowRight sx={{ fontSize: 20 }} />
+              </button>
+            </div>
+          ) : null}
+        </header>
+
+        {row ? (
+          <div
+            key={row.applicantRecordId}
+            className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8"
+          >
+            <SidePanelApplicantBar
+              row={row}
+              details={details}
+              onStatusChange={onStatusChange}
+              maxScore={maxScore}
+            />
+            <SidePanelInfoRow row={row} details={details} />
+
+            {isLoading ? (
+              <p className="py-8 text-center text-sm text-neutral-500">
+                Loading applicant details…
+              </p>
+            ) : hasError ? (
+              <p className="py-8 text-center text-sm text-alert-errorText">
+                Failed to load applicant details.
+              </p>
+            ) : (
+              <div className="border-b border-neutral-200 pb-4">{children}</div>
+            )}
+
+            <AdminCommentsSection applicantRecordId={row.applicantRecordId} />
           </div>
         ) : null}
-      </header>
 
-      {children}
-      {row && onStatusChange ? (
-        <div
-          key={row.applicantRecordId}
-          className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8"
-        >
-          <SidePanelApplicantBar
-            row={row}
-            details={details}
-            onStatusChange={onStatusChange}
-          />
-          <SidePanelInfoRow row={row} details={details} />
-
-          {details ? (
-            <div className="flex flex-col gap-10 border-b border-neutral-200 pb-4 md:flex-row">
-              <SidePanelReviewerColumn
-                index={0}
-                detail={details.reviewDetails[0]}
-              />
-              <SidePanelReviewerColumn
-                index={1}
-                detail={details.reviewDetails[1]}
-              />
-            </div>
-          ) : isLoading ? (
-            <p className="py-8 text-center text-sm text-neutral-500">
-              Loading…
-            </p>
-          ) : null}
-
-          <AdminCommentsSection applicantRecordId={row.applicantRecordId} />
-        </div>
-      ) : null}
-
-      {row ? <footer className="flex shrink-0 justify-end px-8 py-5">
-        <Button size="sm" className="flex items-center gap-2">
-          <CheckCircleOutline sx={{ fontSize: 19 }} />
-          Shortlist Applicant
-        </Button>
-      </footer> : null}
-    </aside>
-  </Drawer>
-);
+        {row ? (
+          <footer className="flex shrink-0 justify-end px-8 py-5">
+            <Button size="sm" className="flex items-center gap-2">
+              <CheckCircleOutline sx={{ fontSize: 19 }} />
+              Shortlist Applicant
+            </Button>
+          </footer>
+        ) : null}
+      </aside>
+    </Drawer>
+  );
+};
 
 type SidePanelApplicantBarProps = ActiveApplicantProps & {
-  onStatusChange: NonNullable<DashboardSidePanelProps["onStatusChange"]>;
+  onStatusChange?: DashboardSidePanelProps["onStatusChange"];
+  maxScore: number;
 };
 
 const SidePanelApplicantBar = ({
   row,
   details,
   onStatusChange,
+  maxScore,
 }: SidePanelApplicantBarProps) => {
   const applicantName = `${row.firstName} ${row.lastName}`;
   const { totalScore } = row;
@@ -188,7 +202,7 @@ const SidePanelApplicantBar = ({
         </h2>
         {totalScore !== null ? (
           <span className="whitespace-nowrap font-poppins font-medium text-green-700">
-            {totalScore}/{MAX_TOTAL_SCORE}
+            {totalScore}/{maxScore}
           </span>
         ) : null}
       </div>
@@ -201,14 +215,20 @@ const SidePanelApplicantBar = ({
             options={SKILL_CATEGORY_OPTIONS}
           />
         ) : null}
-        <ReviewStatusCell
-          applicantRecordId={row.applicantRecordId}
-          status={row.applicationStatus}
-          onChange={onStatusChange}
-        />
+        {onStatusChange ? (
+          <ReviewStatusCell
+            applicantRecordId={row.applicantRecordId}
+            status={row.applicationStatus}
+            onChange={onStatusChange}
+          />
+        ) : (
+          <DashboardStatusChip
+            value={row.applicationStatus}
+            options={APPLICATION_STATUS_OPTIONS}
+          />
+        )}
       </div>
-
-      <BookmarkButton />
+      <BookmarkButton key={row.applicantRecordId} />
     </div>
   );
 };
