@@ -1,5 +1,6 @@
 import { ReactElement, useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { SplitPanelLayout } from "@/components/layouts/SplitPageLayout";
@@ -28,6 +29,26 @@ import { Button } from "@/components/common/Button";
 import { ArrowRightIcon } from "@/components/icons/arrow-right.icon";
 import StatusBadge from "./home/_components/StatusBadge";
 import HomeTable from "./home/_components/HomeTable";
+
+const HomeHeader = () => {
+  const user = useAuthenticatedUser();
+
+  return (
+    <InterviewHeader
+      steps={[]}
+      actions={
+        user?.role === "Admin" ? (
+          <Link
+            href="/admin"
+            className="font-poppins text-base font-medium text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          >
+            Switch to Admin
+          </Link>
+        ) : null
+      }
+    />
+  );
+};
 
 const EmptyState = ({ message }: { message: string }) => (
   <div className="flex flex-col items-center justify-center py-16 text-neutral-500">
@@ -204,7 +225,7 @@ const HomePage: NextPageWithLayout = () => {
 
 HomePage.getLayout = (page: ReactElement) => (
   <ProtectedRoute allowedRoles={["Admin", "User"]}>
-    <SplitPanelLayout header={<InterviewHeader steps={[]} />}>
+    <SplitPanelLayout header={<HomeHeader />}>
       <IllustrationPanel />
       {page}
     </SplitPanelLayout>
