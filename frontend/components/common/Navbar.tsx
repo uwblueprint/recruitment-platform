@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, ReactNode, useEffect, useState } from "react";
 import Link from "next/link";
 import { NavbarPopover } from "@/components/common/NavbarPopover";
 import { NavbarPopoverItem } from "@/components/common/NavbarPopoverItem";
-import Image from "next/image";
+import { BlueprintWordmark } from "@/components/common/BlueprintWordmark";
 import { useRouter } from "next/router";
 import { client } from "@/client";
 import { LogoutDocument } from "@/graphql/typeUtils";
@@ -77,13 +77,7 @@ export const Navbar = () => {
       
       <div className="flex items-center gap-6">
         <Link href="/admin/review" className="mr-10 shrink-0" aria-label="Blueprint admin home">
-          <Image
-            src="/common/review-page-banner.svg"
-            alt="Blueprint Logo"
-            width={120}
-            height={24}
-            className="h-auto w-[120px]"
-          />
+          <BlueprintWordmark />
         </Link>
 
         <div className="relative">

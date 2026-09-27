@@ -2,6 +2,7 @@ import { useContext } from "react";
 import { Button } from "@/components/common/Button";
 import { ReviewStage } from "../constants";
 import { ReviewSetStageContext } from "../ReviewContext";
+import { BlueprintWordmark } from "@/components/common/BlueprintWordmark";
 
 export type Props = {
   name: string;
@@ -14,9 +15,10 @@ export const ReviewEndSuccessStage = ({ name }: Props) => {
     <div className="flex items-center justify-center h-screen">
       <div className="flex flex-col items-center w-3/5">
         <div className="flex flex-col items-center">
-          <img
-            src="../../../common/review-page-banner.svg"
-            className="w-1/3 mb-3"
+          <BlueprintWordmark
+            width={440}
+            height={87}
+            className="mb-3 h-auto w-1/3"
           />
           <h2 className="mb-7">Thank you!</h2>
         </div>
