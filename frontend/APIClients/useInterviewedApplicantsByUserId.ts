@@ -6,7 +6,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useInterviewedApplicantsByUserId(userId?: string) {
-  const { data, loading, error } = useQuery<
+  const { data, loading, error, refetch } = useQuery<
     InterviewedApplicantsByUserIdQuery,
     InterviewedApplicantsByUserIdQueryVariables
   >(
@@ -22,14 +22,19 @@ export default function useInterviewedApplicantsByUserId(userId?: string) {
 
   // skipToken retains previous data; never expose it without a current user.
   if (!userId) {
-    return { interviewedApplicants: [], isLoading: false, hasError: false };
+    return { data: undefined, loading: false, error: undefined, refetch };
   }
 
   const rows = data?.interviewedApplicantsByUserId;
-  const hasError = !!error || (!loading && !rows);
+  const queryError =
+    error ??
+    (!loading && !rows
+      ? new Error("No interviewedApplicants data returned")
+      : undefined);
   return {
-    interviewedApplicants: !loading && !hasError ? rows ?? [] : [],
-    isLoading: loading,
-    hasError,
+    data: !loading && !queryError ? rows : undefined,
+    loading,
+    error: queryError,
+    refetch,
   };
 }

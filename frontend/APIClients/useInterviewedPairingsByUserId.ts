@@ -6,7 +6,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useInterviewedPairingsByUserId(userId?: string) {
-  const { data, loading, error } = useQuery<
+  const { data, loading, error, refetch } = useQuery<
     InterviewedPairingsByUserIdQuery,
     InterviewedPairingsByUserIdQueryVariables
   >(
@@ -22,14 +22,19 @@ export default function useInterviewedPairingsByUserId(userId?: string) {
 
   // skipToken retains previous data; never expose it without a current user.
   if (!userId) {
-    return { interviewedPairings: [], isLoading: false, hasError: false };
+    return { data: undefined, loading: false, error: undefined, refetch };
   }
 
   const rows = data?.interviewedPairingsByUserId;
-  const hasError = !!error || (!loading && !rows);
+  const queryError =
+    error ??
+    (!loading && !rows
+      ? new Error("No interviewedPairings data returned")
+      : undefined);
   return {
-    interviewedPairings: !loading && !hasError ? rows ?? [] : [],
-    isLoading: loading,
-    hasError,
+    data: !loading && !queryError ? rows : undefined,
+    loading,
+    error: queryError,
+    refetch,
   };
 }

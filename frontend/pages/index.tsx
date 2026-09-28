@@ -5,9 +5,6 @@ import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { SplitPanelLayout } from "@/components/layouts/SplitPageLayout";
 import { InterviewHeader } from "@/pages/interview/_components/layout";
-import useReviewedApplicantsByUserId from "@/APIClients/useReviewedApplicantsByUserId";
-import useInterviewedApplicantsByUserId from "@/APIClients/useInterviewedApplicantsByUserId";
-import useInterviewedPairingsByUserId from "@/APIClients/useInterviewedPairingsByUserId";
 import { NextPageWithLayout } from "./_app";
 import IllustrationPanel from "./home/_components/IllustrationPanel";
 import Tabs from "@/components/common/Tabs";
@@ -26,6 +23,7 @@ import { Button } from "@/components/common/Button";
 import { ArrowRightIcon } from "@/components/icons/arrow-right.icon";
 import StatusBadge from "./home/_components/StatusBadge";
 import HomeTable from "./home/_components/HomeTable";
+import useHomeDashboard from "./home/_components/hooks/useHomeDashboard";
 
 const HomeHeader = () => {
   const user = useAuthenticatedUser();
@@ -72,18 +70,13 @@ const HomePage: NextPageWithLayout = () => {
   const user = useAuthenticatedUser();
 
   const [activeTab, setActiveTab] = useState<Tab>(HomeTab.APPLICATION_REVIEW);
-  const { reviewedApplicants } = useReviewedApplicantsByUserId(user?.id);
-  const { interviewedApplicants } = useInterviewedApplicantsByUserId(user?.id);
-  const { interviewedPairings } = useInterviewedPairingsByUserId(user?.id);
-
-  const tabCounts: Record<Tab, number> = {
-    [HomeTab.APPLICATION_REVIEW]: reviewedApplicants.length,
-    [HomeTab.INTERVIEW_REVIEW]: interviewedApplicants.length,
-    [HomeTab.INTERVIEW_PAIRING]: interviewedPairings.length,
-  };
-
-  const totalApplications =
-    reviewedApplicants.length + interviewedApplicants.length + interviewedPairings.length;
+  const {
+    reviewedApplicants,
+    interviewedApplicants,
+    interviewedPairings,
+    tabCounts,
+    totalApplications,
+  } = useHomeDashboard(user?.id);
 
   return (
     <div className="flex h-full flex-col overflow-y-auto p-10 gap-[74px]">
