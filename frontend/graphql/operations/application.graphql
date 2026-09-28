@@ -5,21 +5,20 @@ query Application($applicantRecordId: ID!) {
     academicYear
     email
     firstName
-    heardFrom
     lastName
+    heardFrom
     locationPreference
     program
-    position
     pronouns
     pronounsSpecified
     resumeUrl
     roleSpecificQuestions {
       question
-      response
+      answer
     }
     shortAnswerQuestions {
       question
-      response
+      answer
     }
     status
     term

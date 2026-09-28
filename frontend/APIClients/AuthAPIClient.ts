@@ -1,19 +1,20 @@
 import { client } from "@/client";
-import type { AuthResult, Role } from "@/types";
+import type { AuthResult } from "@/types";
+import type { Role as AppRole } from "@/types";
+import {
+  IsAuthorizedByRoleDocument,
+  LoginWithGoogleDocument,
+  Role,
+  type IsAuthorizedByRoleQuery,
+  type IsAuthorizedByRoleQueryVariables,
+  type LoginWithGoogleMutation,
+  type LoginWithGoogleMutationVariables,
+} from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
-import { IS_AUTHORIZED_BY_ROLE_QUERY, LOGIN_WITH_GOOGLE_MUTATION } from "@/queries/auth";
-
-type IsAuthorizedByRoleData = {
-  isAuthorizedByRole: boolean;
-};
-
-type LoginWithGoogleMutationData = {
-  loginWithGoogle: AuthResult;
-};
 
 class AuthAPIClient {
-  static async isAuthorizedByRole(allowedRoles: Role[]): Promise<boolean> {
+  static async isAuthorizedByRole(allowedRoles: AppRole[]): Promise<boolean> {
     await BaseAPIClient.handleAuthRefresh();
     const accessToken = localStorage.getItem("accessToken");
     if (!accessToken) {
@@ -22,27 +23,32 @@ class AuthAPIClient {
 
     try {
       const { data } = await client.query<
-        IsAuthorizedByRoleData,
-        { accessToken: string; roles: Role[] }
+        IsAuthorizedByRoleQuery,
+        IsAuthorizedByRoleQueryVariables
       >({
-        query: IS_AUTHORIZED_BY_ROLE_QUERY,
-        variables: { accessToken, roles: allowedRoles },
+        query: IsAuthorizedByRoleDocument,
+        variables: {
+          accessToken,
+          roles: allowedRoles as Role[],
+        },
         fetchPolicy: "network-only",
       });
 
       return Boolean(data?.isAuthorizedByRole);
-    } catch {
-      throw new Error("Auth Validation Error");
+    } catch (e) {
+      console.error("isAuthorizedByRole failed:", e);
+      const detail = e instanceof Error ? e.message : String(e);
+      throw new Error(`Auth Validation Error: ${detail}`);
     }
   }
 
   static async loginWithGoogle(idToken: string): Promise<AuthResult> {
     try {
       const { data } = await client.mutate<
-        LoginWithGoogleMutationData,
-        { idToken: string }
+        LoginWithGoogleMutation,
+        LoginWithGoogleMutationVariables
       >({
-        mutation: LOGIN_WITH_GOOGLE_MUTATION,
+        mutation: LoginWithGoogleDocument,
         variables: { idToken },
       });
 

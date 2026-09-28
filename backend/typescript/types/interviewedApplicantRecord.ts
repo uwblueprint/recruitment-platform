@@ -5,6 +5,7 @@ export const InterviewStatusEnum = {
   NEEDS_REVIEW: "NEEDS_REVIEW",
   IN_PROGRESS: "IN_PROGRESS",
   COMPLETE: "COMPLETE",
+  CONFLICT_REPORTED: "CONFLICT_REPORTED",
 } as const;
 
 export type InterviewStatus = ValueOf<typeof InterviewStatusEnum>;

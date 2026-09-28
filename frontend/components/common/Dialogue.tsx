@@ -2,13 +2,16 @@ import { DialogActions } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import { ReactNode } from "react";
 
-type DialogueProps = {
+export type DialogueProps = {
   open: boolean;
   onClose: () => void;
   header: string;
   text: string;
   errorText?: string;
   children?: ReactNode;
+  width?: string;
+  className?: string;
+  actionsClassName?: string;
 };
 
 export const Dialogue = ({
@@ -17,6 +20,9 @@ export const Dialogue = ({
   text,
   errorText,
   children,
+  width = "310px",
+  className = "",
+  actionsClassName = "",
 }: DialogueProps) => {
   return (
     <Dialog
@@ -27,11 +33,13 @@ export const Dialogue = ({
           overflow: "hidden",
           boxShadow: "none",
           opacity: 1,
-          width: "310px",
+          width: width,
         },
       }}
     >
-      <div className="flex w-full w-[310px] flex-col items-center justify-center bg-white p-6">
+      <div
+        className={`flex w-full flex-col items-center justify-center bg-white p-6 ${className}`}
+      >
         <div className="flex flex-col items-center justify-center gap-2">
           <h2 className="text-center font-poppins text-[20px] font-medium leading-[1.4] text-blue">
             {header}
@@ -41,7 +49,10 @@ export const Dialogue = ({
             {errorText && <div className="text-red-500">{errorText}</div>}
           </div>
         </div>
-        <DialogActions className="mt-9 h-[36px] w-full !p-0">
+
+        <DialogActions
+          className={`mt-9 h-[36px] w-full !p-0 ${actionsClassName}`}
+        >
           {children}
         </DialogActions>
       </div>

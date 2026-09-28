@@ -1,13 +1,13 @@
 import { client } from "@/client";
 import jwt_decode from "jwt-decode";
-import { REFRESH_MUTATION } from "@/queries/base";
+import {
+  RefreshDocument,
+  type RefreshMutation,
+  type RefreshMutationVariables,
+} from "@/graphql/typeUtils";
 
 type AccessToken = {
   readonly exp: number;
-};
-
-type RefreshMutationData = {
-  refresh: string;
 };
 
 class BaseAPIClient {
@@ -27,10 +27,10 @@ class BaseAPIClient {
 
     try {
       const { data } = await client.mutate<
-        RefreshMutationData,
-        { refreshToken: string }
+        RefreshMutation,
+        RefreshMutationVariables
       >({
-        mutation: REFRESH_MUTATION,
+        mutation: RefreshDocument,
         variables: { refreshToken },
       });
       if (typeof data?.refresh === "string") {

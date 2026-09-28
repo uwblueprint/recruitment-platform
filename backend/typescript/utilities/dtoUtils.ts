@@ -4,14 +4,19 @@ import {
   ApplicantDTO,
   ApplicantRecordDTO,
   ApplicationDTO,
+  FirebaseFileDTO,
   InterviewDelegationDTO,
   InterviewGroupDTO,
+  InterviewNotesDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
+  InterviewDashboardRowDTO,
+  InterviewDashboardSidePanelDTO,
   Review,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewedApplicantRecordDTO,
+  ReviewedApplicantRecordWithReviewerDTO,
   ReviewedApplicantsDTO,
   ReviewStatus,
   SkillCategory,
@@ -20,6 +25,7 @@ import {
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
 import ApplicantRecord from "../models/applicantRecord.model";
+import FirebaseFile from "../models/firebaseFile.model";
 import InterviewDelegation from "../models/interviewDelegation.model";
 import InterviewGroup from "../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
@@ -38,6 +44,15 @@ export function toUserDTO(model: User): UserDTO {
   };
 }
 
+function toShortAnswerQuestions(
+  raw: { question: string; response?: string; answer?: string }[] | undefined,
+): { question: string; answer: string }[] {
+  return (raw ?? []).map(({ question, response, answer }) => ({
+    question,
+    answer: answer ?? response ?? "",
+  }));
+}
+
 export function toApplicantRecordDTO(
   model: ApplicantRecord,
 ): ApplicantRecordDTO {
@@ -45,7 +60,9 @@ export function toApplicantRecordDTO(
     id: model.id,
     applicantId: model.applicant_id,
     position: model.position,
-    roleSpecificQuestions: model.role_specific_questions,
+    roleSpecificQuestions: toShortAnswerQuestions(
+      model.role_specific_questions,
+    ),
     choice: model.choice,
     status: model.status,
     skillCategory: model.skill_category,
@@ -68,7 +85,7 @@ export function toApplicantDTO(model: Applicant): ApplicantDTO {
     pronouns: model.pronouns,
     resumeUrl: model.resume_url,
     timesApplied: model.times_applied,
-    shortAnswerQuestions: model.short_answer_questions,
+    shortAnswerQuestions: toShortAnswerQuestions(model.short_answer_questions),
     term: model.term,
     submittedAt: model.submitted_at,
   };
@@ -131,6 +148,20 @@ export function toReviewedApplicantRecordDTO(
   };
 }
 
+export function toReviewedApplicantRecordWithReviewerDTO(
+  model: ReviewedApplicantRecord,
+): ReviewedApplicantRecordWithReviewerDTO {
+  if (!model.reviewer) {
+    throw new Error(
+      `ReviewedApplicantRecord (applicant_record_id=${model.applicant_record_id}, reviewer_id=${model.reviewer_id}) is missing its reviewer association.`,
+    );
+  }
+  return {
+    reviewer: toUserDTO(model.reviewer),
+    reviewedApplicantRecord: toReviewedApplicantRecordDTO(model),
+  };
+}
+
 export function toApplicationDTO(
   applicant: ApplicantDTO,
   applicantRecord: ApplicantRecordDTO,
@@ -186,6 +217,7 @@ export function toReviewDashboardSidePanelDTO(
     lastName: applicantRecord.applicant.last_name,
     position: applicantRecord.position,
     program: applicantRecord.applicant.program,
+    academicYear: applicantRecord.applicant.academic_year,
     resumeUrl: applicantRecord.applicant.resume_url,
     applicationStatus: applicantRecord.status,
     skillCategory: applicantRecord.skill_category as SkillCategory,
@@ -197,6 +229,7 @@ export function toReviewDashboardRowDTO(
   applicantRecord: ApplicantRecord,
 ): ReviewDashboardRowDTO {
   return {
+    applicantRecordId: applicantRecord.id,
     firstName: applicantRecord.applicant.first_name,
     lastName: applicantRecord.applicant.last_name,
     position: applicantRecord.position,
@@ -212,6 +245,53 @@ export function toReviewDashboardRowDTO(
   };
 }
 
+export function toInterviewDashboardRowDTO(
+  applicantRecord: ApplicantRecord,
+): InterviewDashboardRowDTO {
+  const interviewedApplicantRecord =
+    applicantRecord.interviewed_applicant_record;
+
+  return {
+    applicantRecordId: applicantRecord.id,
+    firstName: applicantRecord.applicant.first_name,
+    lastName: applicantRecord.applicant.last_name,
+    position: applicantRecord.position,
+    applicationStatus: applicantRecord.status,
+    interviewers: (
+      interviewedApplicantRecord?.interview_delegations ?? []
+    ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),
+    interviewScore: interviewedApplicantRecord?.score ?? null,
+  };
+}
+
+export function toInterviewDashboardSidePanelDTO(
+  applicantRecord: ApplicantRecord,
+): InterviewDashboardSidePanelDTO {
+  const interviewedApplicantRecord =
+    applicantRecord.interviewed_applicant_record;
+
+  return {
+    firstName: applicantRecord.applicant.first_name,
+    lastName: applicantRecord.applicant.last_name,
+    term: applicantRecord.applicant.term,
+    program: applicantRecord.applicant.program,
+    position: applicantRecord.position,
+    resumeUrl: applicantRecord.applicant.resume_url,
+    applicationStatus: applicantRecord.status,
+    skillCategory: (applicantRecord.skill_category as SkillCategory) ?? null,
+    isApplicantFlagged: applicantRecord.is_applicant_flagged,
+    isShortlistedForOffer: applicantRecord.is_shortlisted_for_offer,
+    interviewers: (
+      interviewedApplicantRecord?.interview_delegations ?? []
+    ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),
+    interview: interviewedApplicantRecord?.interview_json ?? null,
+    interviewStatus: interviewedApplicantRecord?.status ?? null,
+    interviewScore: interviewedApplicantRecord?.score ?? null,
+    interviewedApplicantRecordId: interviewedApplicantRecord?.id ?? null,
+    interviewDate: interviewedApplicantRecord?.interview_date ?? null,
+  };
+}
+
 export function toInterviewedApplicantDTO(
   model: InterviewedApplicantRecord,
 ): InterviewedApplicantsDTO {
@@ -220,5 +300,26 @@ export function toInterviewedApplicantDTO(
     interviewStatus: model.status,
     applicantFirstName: model.applicant_record.applicant.first_name,
     applicantLastName: model.applicant_record.applicant.last_name,
+  };
+}
+
+export function toFirebaseFileDTO(model: FirebaseFile): FirebaseFileDTO {
+  return {
+    id: model.id,
+    storagePath: model.storage_path,
+    originalFileName: model.original_file_name,
+    uploadedUserId: model.uploaded_user_id,
+    sizeBytes: Number(model.size_bytes), // BIGINT comes back as string from pg driver
+  };
+}
+
+export function toInterviewNotesDTO(
+  model: FirebaseFile,
+  signedUrl: string,
+): InterviewNotesDTO {
+  return {
+    fileId: model.id,
+    fileName: model.original_file_name,
+    signedUrl,
   };
 }

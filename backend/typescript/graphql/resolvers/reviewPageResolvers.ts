@@ -1,4 +1,5 @@
 import {
+  ApplicantRecordWithReviewersDTO,
   ApplicationDTO,
   ReviewedApplicantRecordDTO,
   ReviewedApplicantsDTO,
@@ -33,6 +34,14 @@ const reviewPageResolvers = {
       { userId }: { userId: string },
     ): Promise<ReviewedApplicantsDTO[]> => {
       return reviewCompositeService.getReviewedApplicantsByUserId(userId);
+    },
+    reviewedApplicantRecordsByApplicantRecordId: async (
+      _parent: undefined,
+      { applicantRecordId }: { applicantRecordId: string },
+    ): Promise<ApplicantRecordWithReviewersDTO> => {
+      return reviewCompositeService.getReviewedApplicantRecordsByApplicantRecordId(
+        applicantRecordId,
+      );
     },
   },
   Mutation: {

@@ -1,5 +1,6 @@
 import { makeExecutableSchema, gql } from "apollo-server-express";
 import { applyMiddleware } from "graphql-middleware";
+import { GraphQLUpload } from "graphql-upload";
 import { merge } from "lodash";
 
 import {
@@ -20,13 +21,13 @@ import adminCommentType from "./types/adminCommentType";
 import applicantRecordType from "./types/applicantRecordType";
 import authType from "./types/authType";
 import entityType from "./types/entityType";
-import interviewDashboardTypes from "./types/interviewDashboardTypes";
-import interviewDelegationsTypes from "./types/interviewDelegationTypes";
-import interviewedApplicantRecordsTypes from "./types/interviewedApplicantRecordsTypes";
-import interviewGroupTypes from "./types/interviewGroupTypes";
-import interviewPageType from "./types/interviewPageTypes";
+import interviewDashboardTypes from "./types/interviewDashboardType";
+import interviewDelegationsTypes from "./types/interviewDelegationType";
+import interviewedApplicantRecordsTypes from "./types/interviewedApplicantRecordsType";
+import interviewGroupTypes from "./types/interviewGroupType";
+import interviewPageType from "./types/interviewPageType";
 import reviewDashboardType from "./types/reviewDashboardType";
-import reviewedApplicantRecordTypes from "./types/reviewedApplicantRecordTypes";
+import reviewedApplicantRecordTypes from "./types/reviewedApplicantRecordType";
 import reviewPageType from "./types/reviewPageType";
 import simpleEntityType from "./types/simpleEntityType";
 import userType from "./types/userType";
@@ -68,6 +69,7 @@ const executableSchema = makeExecutableSchema({
     userType,
   ],
   resolvers: merge(
+    { Upload: GraphQLUpload },
     adminCommentResolvers,
     applicantRecordResolvers,
     authResolvers,
@@ -100,10 +102,12 @@ const graphQLMiddlewares = {
     simpleEntities: authorizedByAllRoles(),
     userById: authorizedByAdmin(),
     userByEmail: authorizedByAdmin(),
+    usersByPosition: authorizedByAdmin(),
     users: authorizedByAdmin(),
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
     reviewedApplicantRecord: authorizedByAdmin(),
+    reviewedApplicantRecordsByApplicantRecordId: authorizedByAdmin(),
     reviewedApplicantsByUserId: authorizedByAllRoles(),
     application: authorizedByAllRoles(),
     interviewedApplicantRecord: authorizedByAllRoles(),
@@ -112,8 +116,13 @@ const graphQLMiddlewares = {
     interviewedApplicantsByUserId: authorizedByAllRoles(),
     interviewedPairingsByUserId: authorizedByAllRoles(),
     interviewersByGroupId: authorizedByAllRoles(),
+    interviewNotes: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
+    reviewDashboardFilterOptions: authorizedByAdmin(),
+    interviewDashboard: authorizedByAdmin(),
+    interviewDashboardSidePanel: authorizedByAdmin(),
+    interviewInvites: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),
@@ -132,13 +141,16 @@ const graphQLMiddlewares = {
     updateAdminComment: authorizedByAdmin(),
     deleteAdminCommentById: authorizedByAdmin(),
     updateApplicantRecordStatus: authorizedByAllRoles(),
+    reassignReviewer: authorizedByAdmin(),
     bulkUpdateApplicantRecordsStatus: authorizedByAdmin(),
+    sendRejectionEmails: authorizedByAdmin(),
     updateApplicantRecordIsApplicantFlagged: authorizedByAdmin(),
     createReviewedApplicantRecord: authorizedByAdmin(),
     updateReviewedApplicantRecord: authorizedByAllRoles(),
     deleteReviewedApplicantRecord: authorizedByAdmin(),
     bulkCreateReviewedApplicantRecord: authorizedByAdmin(),
     reportReviewConflict: authorizedByAllRoles(),
+    reportInterviewConflict: authorizedByAllRoles(),
     createInterviewedApplicantRecord: authorizedByAdmin(),
     updateInterviewedApplicantRecord: authorizedByAllRoles(),
     deleteInterviewedApplicantRecordById: authorizedByAdmin(),
@@ -154,6 +166,8 @@ const graphQLMiddlewares = {
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
     delegateInterviewers: authorizedBySuperAdmin(),
+    submitInterviewScores: authorizedByAllRoles(),
+    uploadInterviewNotes: authorizedByAllRoles(),
   },
 };
 

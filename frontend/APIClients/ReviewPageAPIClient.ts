@@ -1,6 +1,14 @@
 import { client } from "@/client";
 import {
+  type ApplicantRecordWithReviewersResult,
   ApplicationDocument,
+  type ApplicationQuery,
+  type ApplicationQueryVariables,
+  type ApplicationResult,
+  ReassignReviewerDocument,
+  type ReassignReviewerMutation,
+  type ReassignReviewerMutationVariables,
+  type ReassignReviewerResult,
   ReportReviewConflictDocument,
   type ApplicationQuery,
   type ApplicationQueryVariables,
@@ -8,14 +16,21 @@ import {
   type ReportReviewConflictMutation,
   type ReportReviewConflictMutationVariables,
   type ReviewConflictReportResult,
+  ReviewedApplicantRecordsByApplicantRecordIdDocument,
+  type ReviewedApplicantRecordsByApplicantRecordIdQuery,
+  type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables,
+  UsersByPositionDocument,
+  type UsersByPositionQuery,
+  type UsersByPositionQueryVariables,
+  type UsersByPositionResult,
 } from "@/graphql/typeUtils";
 
 import BaseAPIClient from "./BaseAPIClient";
 
 class ReviewPageAPIClient {
-  static async getApplicationByApplicantRecordId(
+  static async getApplication(
     applicantRecordId: string,
-  ): Promise<ApplicationDTO> {
+  ): Promise<ApplicationResult> {
     await BaseAPIClient.handleAuthRefresh();
 
     try {
@@ -34,7 +49,7 @@ class ReviewPageAPIClient {
 
       return data.application;
     } catch {
-      throw new Error("Failed to get application");
+      throw new Error("Failed to fetch application");
     }
   }
 
@@ -60,6 +75,82 @@ class ReviewPageAPIClient {
       return data.reportReviewConflict;
     } catch {
       throw new Error("Failed to report review conflict");
+    }
+  }
+
+  static async getReviewedApplicantRecordsByApplicantRecordId(
+    applicantRecordId: string,
+  ): Promise<ApplicantRecordWithReviewersResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        ReviewedApplicantRecordsByApplicantRecordIdQuery,
+        ReviewedApplicantRecordsByApplicantRecordIdQueryVariables
+      >({
+        query: ReviewedApplicantRecordsByApplicantRecordIdDocument,
+        variables: { applicantRecordId },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.reviewedApplicantRecordsByApplicantRecordId) {
+        throw new Error("No data returned");
+      }
+
+      return data.reviewedApplicantRecordsByApplicantRecordId;
+    } catch {
+      throw new Error("Failed to fetch reviewed applicant records");
+    }
+  }
+
+  static async getUsersByPosition(
+    position: string,
+  ): Promise<UsersByPositionResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.query<
+        UsersByPositionQuery,
+        UsersByPositionQueryVariables
+      >({
+        query: UsersByPositionDocument,
+        variables: { position },
+        fetchPolicy: "network-only",
+      });
+
+      if (!data?.usersByPosition) {
+        throw new Error("No data returned");
+      }
+
+      return data.usersByPosition;
+    } catch {
+      throw new Error(`Failed to fetch users with position ${position}`);
+    }
+  }
+
+  static async reassignReviewer(
+    applicantRecordId: string,
+    oldReviewerId: string,
+    newReviewerId: string,
+  ): Promise<ReassignReviewerResult> {
+    await BaseAPIClient.handleAuthRefresh();
+
+    try {
+      const { data } = await client.mutate<
+        ReassignReviewerMutation,
+        ReassignReviewerMutationVariables
+      >({
+        mutation: ReassignReviewerDocument,
+        variables: { applicantRecordId, oldReviewerId, newReviewerId },
+      });
+
+      if (!data?.reassignReviewer) {
+        throw new Error("No data returned");
+      }
+
+      return data.reassignReviewer;
+    } catch {
+      throw new Error("Failed to reassign reviewer");
     }
   }
 }

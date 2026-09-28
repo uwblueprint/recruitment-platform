@@ -22,17 +22,17 @@ export const INTERVIEW_NAV_ITEMS: NavItem[] = [
   {
     label: "Applicant Profile",
     step: InterviewStep.PROFILE,
-    path: "/interview/profile",
+    path: "/interview/[applicantRecordId]/profile",
   },
   {
     label: "Interview Assessment",
     step: InterviewStep.ASSESSMENT,
-    path: "/interview/assessment",
+    path: "/interview/[applicantRecordId]/assessment",
   },
   {
     label: "Report Issues",
     step: InterviewStep.REPORT,
-    path: "/interview/report",
+    path: "/interview/[applicantRecordId]/report",
   },
 ];
 
