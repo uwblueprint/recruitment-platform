@@ -1,3 +1,5 @@
+import { ReviewStatus, SkillCategory } from "@/graphql/typeUtils";
+import type { Dispatch, SetStateAction } from "react";
 import useUpdateReviewedApplicantRecord from "@/APIClients/useUpdateReviewedApplicantRecord";
 import useReviewApplication from "@/APIClients/useReviewApplication";
 import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
@@ -40,11 +42,11 @@ const initialScores: ReviewScores = {
 const ReviewsPages: NextPage = () => {
   const router = useRouter();
   const [stage, setStage] = useState<ReviewStage>(ReviewStage.INFO);
-  const [endData, setEndData] = useState<ReviewEndData>({
-    comments: "",
-    skillsCategory: "",
-    secondChoiceRole: "",
-  });
+  const [endDataEdits, setEndDataEdits] = useState<{
+    applicantRecordId: string | null;
+    reviewerId: string | undefined;
+    values: ReviewEndData;
+  }>();
   const [scoreEdits, setScoreEdits] = useState<{
     applicantRecordId: string | null;
     reviewerId: string | undefined;
@@ -78,6 +80,30 @@ const ReviewsPages: NextPage = () => {
     ({ reviewer }) => reviewer.id === reviewerId,
   )?.reviewedApplicantRecord;
   const savedReview = reviewerRecord?.review;
+  const savedEndData: ReviewEndData = {
+    comments: savedReview?.comments ?? "",
+    skillsCategory: savedReview?.skillCategory?.toLowerCase() ?? "",
+    secondChoiceRole: "",
+  };
+  const endData =
+    endDataEdits?.applicantRecordId === applicantRecordId &&
+    endDataEdits?.reviewerId === reviewerId
+      ? endDataEdits.values
+      : savedEndData;
+  const setEndData: Dispatch<SetStateAction<ReviewEndData>> = (action) => {
+    setEndDataEdits((previous) => {
+      const current =
+        previous?.applicantRecordId === applicantRecordId &&
+        previous?.reviewerId === reviewerId
+          ? previous.values
+          : savedEndData;
+      return {
+        applicantRecordId,
+        reviewerId,
+        values: typeof action === "function" ? action(current) : action,
+      };
+    });
+  };
   const scores: ReviewScores = {
     ...initialScores,
     [ReviewStage.PFSG]: savedReview?.passionFSG ?? 0,
@@ -113,17 +139,27 @@ const ReviewsPages: NextPage = () => {
     reset: resetUpdate,
   } = useUpdateReviewedApplicantRecord();
 
-  const updateReview = (onCompleted: () => void) => {
+  const updateReview = (onCompleted: () => void, complete = false) => {
     if (!applicantRecordId || !reviewerId || !reviewerRecord) return;
+    const skillCategory = {
+      junior: SkillCategory.Junior,
+      intermediate: SkillCategory.Intermediate,
+      senior: SkillCategory.Senior,
+    }[endData.skillsCategory];
+    if (complete && !skillCategory) return;
     // The server checks the latest conflict status and reports mutation errors.
     updateReviewedApplicantRecord(
       applicantRecordId,
       reviewerId,
       {
-        passionFSG: scores[ReviewStage.PFSG],
-        teamPlayer: scores[ReviewStage.TP],
-        desireToLearn: scores[ReviewStage.D2L],
-        skill: scores[ReviewStage.SKL],
+        ...(complete ? { status: ReviewStatus.Done } : {}),
+        review: {
+          passionFSG: scores[ReviewStage.PFSG],
+          teamPlayer: scores[ReviewStage.TP],
+          desireToLearn: scores[ReviewStage.D2L],
+          skill: scores[ReviewStage.SKL],
+          ...(complete ? { skillCategory, comments: endData.comments } : {}),
+        },
       },
       onCompleted,
     );
@@ -257,6 +293,7 @@ const ReviewsPages: NextPage = () => {
     <UpdateReviewedApplicantRecordContext.Provider
       value={{
         update: updateReview,
+        complete: (onCompleted) => updateReview(onCompleted, true),
         loading: updating,
         error: updateError,
         reset: resetUpdate,

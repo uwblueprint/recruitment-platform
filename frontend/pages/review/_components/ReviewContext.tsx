@@ -11,6 +11,7 @@ export const ReviewSetScoresContext = createContext<
 
 export const UpdateReviewedApplicantRecordContext = createContext<null | {
   update: (onCompleted: () => void) => void;
+  complete: (onCompleted: () => void) => void;
   loading: boolean;
   error?: { message: string };
   reset: () => void;

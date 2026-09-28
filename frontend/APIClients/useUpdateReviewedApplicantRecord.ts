@@ -20,9 +20,7 @@ export default function useUpdateReviewedApplicantRecord() {
   const updateReviewedApplicantRecord = (
     applicantRecordId: string,
     reviewerId: string,
-    review: NonNullable<
-      UpdateReviewedApplicantRecordMutationVariables["reviewedApplicantRecord"]["review"]
-    >,
+    reviewedApplicantRecord: UpdateReviewedApplicantRecordMutationVariables["reviewedApplicantRecord"],
     onCompleted: () => void,
   ): void => {
     void mutate({
@@ -30,7 +28,7 @@ export default function useUpdateReviewedApplicantRecord() {
       variables: {
         applicantRecordId,
         reviewerId,
-        reviewedApplicantRecord: { review },
+        reviewedApplicantRecord,
       },
       refetchQueries: [
         {

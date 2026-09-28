@@ -95,16 +95,18 @@ export const ReviewStepper = ({
         ) : currentStage === ReviewStage.END ? (
           <Button
             size="sm"
-            disabled={isUpdating || !endData?.skillsCategory}
+            disabled={isUpdating || !endData?.skillsCategory || !reviewMutation}
             className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-400 hover:border-transparent disabled:opacity-60"
             onClick={() => {
               if (onValidate && !onValidate()) {
                 return;
               }
-              setStage?.(ReviewStage.END_SUCCESS);
+              reviewMutation?.complete(() =>
+                setStage?.(ReviewStage.END_SUCCESS),
+              );
             }}
           >
-            Finish
+            {isUpdating ? "Submitting..." : "Finish"}
           </Button>
         ) : (
           <Button
