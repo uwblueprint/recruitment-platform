@@ -1,3 +1,4 @@
+import type { ReviewActions } from "../types";
 import Image from "next/image";
 import { ApplicationDTO } from "@/types";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
@@ -13,6 +14,7 @@ export interface ReviewStageProps {
   scores: ReviewScores;
   onReportConflict?: () => void;
   viewOnly?: boolean;
+  actions?: ReviewActions;
 }
 
 const InfoBanner = () => (
@@ -56,6 +58,7 @@ export const ReviewInfoStage = ({
   scores,
   onReportConflict,
   viewOnly = false,
+  actions,
 }: ReviewStageProps) => {
   const firstShortAnswer = application?.shortAnswerQuestions[0];
   const questions = [
@@ -77,6 +80,7 @@ export const ReviewInfoStage = ({
 
   return (
     <ReviewPageLayout
+      actions={actions}
       currentStage={ReviewStage.INFO}
       scores={scores}
       viewOnly={viewOnly}

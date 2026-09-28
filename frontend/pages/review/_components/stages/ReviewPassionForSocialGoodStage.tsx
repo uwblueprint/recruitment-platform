@@ -1,3 +1,4 @@
+import type { ReviewActions } from "../types";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ApplicationDTO } from "@/types";
 import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
@@ -20,6 +21,7 @@ export interface Props {
   scores: ReviewScores;
   onReportConflict?: () => void;
   viewOnly?: boolean;
+  actions?: ReviewActions;
   reviewers?: ReviewedApplicantRecordWithReviewerResult[];
 }
 
@@ -29,6 +31,7 @@ export const ReviewPassionForSocialGoodStage = ({
   scores,
   onReportConflict,
   viewOnly = false,
+  actions,
   reviewers = [],
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
@@ -44,6 +47,7 @@ export const ReviewPassionForSocialGoodStage = ({
   );
   return (
     <ReviewPageLayout
+      actions={actions}
       currentStage={ReviewStage.PFSG}
       scores={scores}
       viewOnly={viewOnly}
@@ -94,9 +98,7 @@ export const ReviewPassionForSocialGoodStage = ({
               ariaLabel="Passion for social good score"
               onChange={(v) => updateScore?.(ReviewStage.PFSG, v)}
             />
-            <span className="text-xl leading-none text-red-500">
-              *
-            </span>
+            <span className="text-xl leading-none text-red-500">*</span>
           </div>
         )}
       </PanelLayout>

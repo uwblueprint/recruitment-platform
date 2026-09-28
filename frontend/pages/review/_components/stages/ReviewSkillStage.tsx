@@ -13,7 +13,6 @@ import { ReviewStageProps } from "./ReviewInfoStage";
 import { ReviewRubric } from "../common/ReviewRubric";
 import { EditIcon } from "@/components/icons/edit.icon";
 
-
 const ResumeLink = ({ resumeLink }: { resumeLink: string }) => {
   return (
     <div className="flex flex-col gap-8">
@@ -24,8 +23,7 @@ const ResumeLink = ({ resumeLink }: { resumeLink: string }) => {
         href={resumeLink}
       >
         <div className="flex justify-center items-center gap-2">
-          <EditIcon className="w-4 h-4 text-blue"/> View
-          Candidate Resume
+          <EditIcon className="w-4 h-4 text-blue" /> View Candidate Resume
         </div>
       </Button>
     </div>
@@ -43,6 +41,7 @@ export const ReviewSkillStage = ({
   scores,
   header,
   viewOnly = false,
+  actions,
   reviewers = [],
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
@@ -76,6 +75,7 @@ export const ReviewSkillStage = ({
 
   return (
     <ReviewPageLayout
+      actions={actions}
       currentStage={ReviewStage.SKL}
       scores={scores}
       viewOnly={viewOnly}
@@ -114,9 +114,7 @@ export const ReviewSkillStage = ({
               ariaLabel="Skill score"
               onChange={(v) => updateScore?.(ReviewStage.SKL, v)}
             />
-            <span className="text-xl leading-none text-red-500">
-              *
-            </span>
+            <span className="text-xl leading-none text-red-500">*</span>
           </div>
         )}
       </PanelLayout>
