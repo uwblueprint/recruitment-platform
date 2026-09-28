@@ -173,15 +173,9 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
         );
       }
 
-      // Score-only saves start a pending review without reopening completed reviews.
-      const nextStatus =
-        review && status === undefined && reviewedRecord.status === "TODO"
-          ? "IN_PROGRESS"
-          : status;
-
       await reviewedRecord.update(
         {
-          status: nextStatus,
+          status,
           reviewer_has_conflict: reviewerHasConflict,
         },
         { transaction },

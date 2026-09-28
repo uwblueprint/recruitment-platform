@@ -147,12 +147,17 @@ const ReviewsPages: NextPage = () => {
       senior: SkillCategory.Senior,
     }[endData.skillsCategory];
     if (complete && !skillCategory) return;
+    const status = complete
+      ? ReviewStatus.Done
+      : reviewerRecord.status === ReviewStatus.Todo
+      ? ReviewStatus.InProgress
+      : undefined;
     // The server checks the latest conflict status and reports mutation errors.
     updateReviewedApplicantRecord(
       applicantRecordId,
       reviewerId,
       {
-        ...(complete ? { status: ReviewStatus.Done } : {}),
+        ...(status ? { status } : {}),
         review: {
           passionFSG: scores[ReviewStage.PFSG],
           teamPlayer: scores[ReviewStage.TP],
