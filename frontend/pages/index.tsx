@@ -1,16 +1,13 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { SplitPanelLayout } from "@/components/layouts/SplitPageLayout";
 import { InterviewHeader } from "@/pages/interview/_components/layout";
-import HomeAPIClient from "@/APIClients/HomeAPIClient";
-import {
-  type InterviewedApplicantsDTO,
-  type InterviewedPairingResult,
-  type ReviewedApplicantResult,
-} from "@/graphql/typeUtils";
+import useReviewedApplicantsByUserId from "@/APIClients/useReviewedApplicantsByUserId";
+import useInterviewedApplicantsByUserId from "@/APIClients/useInterviewedApplicantsByUserId";
+import useInterviewedPairingsByUserId from "@/APIClients/useInterviewedPairingsByUserId";
 import { NextPageWithLayout } from "./_app";
 import IllustrationPanel from "./home/_components/IllustrationPanel";
 import Tabs from "@/components/common/Tabs";
@@ -75,26 +72,9 @@ const HomePage: NextPageWithLayout = () => {
   const user = useAuthenticatedUser();
 
   const [activeTab, setActiveTab] = useState<Tab>(HomeTab.APPLICATION_REVIEW);
-  const [reviewedApplicants, setReviewedApplicants] = useState<ReviewedApplicantResult[]>([]);
-  const [interviewedApplicants, setInterviewedApplicants] = useState<InterviewedApplicantsDTO[]>([]);
-  const [interviewedPairings, setInterviewedPairings] = useState<InterviewedPairingResult[]>([]);
-
-  useEffect(() => {
-    if (!user?.id) return;
-    const fetchData = async () => {
-      try {
-        const [reviewed, interviewed, pairings] = await Promise.all([
-          HomeAPIClient.getReviewedApplicantsByUserId(user.id),
-          HomeAPIClient.getInterviewedApplicantsByUserId(user.id),
-          HomeAPIClient.getInterviewedPairingsByUserId(user.id),
-        ]);
-        setReviewedApplicants(reviewed);
-        setInterviewedApplicants(interviewed);
-        setInterviewedPairings(pairings);
-      } catch {}
-    };
-    fetchData();
-  }, [user?.id]);
+  const { reviewedApplicants } = useReviewedApplicantsByUserId(user?.id);
+  const { interviewedApplicants } = useInterviewedApplicantsByUserId(user?.id);
+  const { interviewedPairings } = useInterviewedPairingsByUserId(user?.id);
 
   const tabCounts: Record<Tab, number> = {
     [HomeTab.APPLICATION_REVIEW]: reviewedApplicants.length,

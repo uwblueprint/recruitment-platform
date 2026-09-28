@@ -1,6 +1,10 @@
-import { useEffect, useState } from "react";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import type { ReviewDashboardSidePanelResult } from "@/graphql/typeUtils";
+import { skipToken, useQuery } from "@apollo/client/react";
+import {
+  ReviewDashboardSidePanelDocument,
+  type ReviewDashboardSidePanelQuery,
+  type ReviewDashboardSidePanelQueryVariables,
+  type ReviewDashboardSidePanelResult,
+} from "@/graphql/typeUtils";
 
 type UseReviewDashboardSidePanelResult = {
   details?: ReviewDashboardSidePanelResult;
@@ -17,40 +21,33 @@ type UseReviewDashboardSidePanelResult = {
 const useReviewDashboardSidePanel = (
   applicantRecordId: string | undefined,
 ): UseReviewDashboardSidePanelResult => {
-  const [state, setState] = useState<UseReviewDashboardSidePanelResult>({
-    details: undefined,
-    isLoading: false,
-    error: false,
-  });
+  const { data, loading, error } = useQuery<
+    ReviewDashboardSidePanelQuery,
+    ReviewDashboardSidePanelQueryVariables
+  >(
+    ReviewDashboardSidePanelDocument,
+    !applicantRecordId
+      ? skipToken
+      : {
+          variables: { applicantRecordId },
+          fetchPolicy: "network-only",
+          context: { refreshAuth: true },
+        },
+  );
 
-  useEffect(() => {
-    if (!applicantRecordId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setState({ details: undefined, isLoading: false, error: false });
-      return;
-    }
+  // skipToken retains previous data; never expose it without a current ID.
+  if (!applicantRecordId) {
+    return { details: undefined, isLoading: false, error: false };
+  }
 
-    let isCurrent = true;
-    setState((prev) => ({ ...prev, isLoading: true, error: false }));
+  const details = data?.reviewDashboardSidePanel;
+  const hasError = !!error || (!loading && !details);
 
-    ReviewDashboardAPIClient.getReviewDashboardSidePanel(applicantRecordId)
-      .then((details) => {
-        if (isCurrent) {
-          setState({ details, isLoading: false, error: false });
-        }
-      })
-      .catch(() => {
-        if (isCurrent) {
-          setState({ details: undefined, isLoading: false, error: true });
-        }
-      });
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [applicantRecordId]);
-
-  return state;
+  return {
+    details: !loading && !hasError ? details : undefined,
+    isLoading: loading,
+    error: hasError,
+  };
 };
 
 export default useReviewDashboardSidePanel;

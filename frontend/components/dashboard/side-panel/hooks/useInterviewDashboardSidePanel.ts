@@ -1,6 +1,10 @@
-import { useEffect, useState } from "react";
-import InterviewDashboardAPIClient from "@/APIClients/InterviewDashboardAPIClient";
-import type { InterviewDashboardSidePanelResult } from "@/graphql/typeUtils";
+import { skipToken, useQuery } from "@apollo/client/react";
+import {
+  InterviewDashboardSidePanelDocument,
+  type InterviewDashboardSidePanelQuery,
+  type InterviewDashboardSidePanelQueryVariables,
+  type InterviewDashboardSidePanelResult,
+} from "@/graphql/typeUtils";
 
 type UseInterviewDashboardSidePanelResult = {
   data: InterviewDashboardSidePanelResult | null;
@@ -11,43 +15,33 @@ type UseInterviewDashboardSidePanelResult = {
 const useInterviewDashboardSidePanel = (
   applicantRecordId: string | null,
 ): UseInterviewDashboardSidePanelResult => {
-  const [state, setState] = useState<UseInterviewDashboardSidePanelResult>({
-    data: null,
-    isLoading: false,
-    hasError: false,
-  });
+  const { data, loading, error } = useQuery<
+    InterviewDashboardSidePanelQuery,
+    InterviewDashboardSidePanelQueryVariables
+  >(
+    InterviewDashboardSidePanelDocument,
+    !applicantRecordId
+      ? skipToken
+      : {
+          variables: { applicantRecordId },
+          fetchPolicy: "network-only",
+          context: { refreshAuth: true },
+        },
+  );
 
-  useEffect(() => {
-    if (!applicantRecordId) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setState({ data: null, isLoading: false, hasError: false });
-      return undefined;
-    }
+  // skipToken retains previous data; never expose it without a current ID.
+  if (!applicantRecordId) {
+    return { data: null, isLoading: false, hasError: false };
+  }
 
-    let isCurrentRequest = true;
+  const details = data?.interviewDashboardSidePanel;
+  const hasError = !!error || (!loading && !details);
 
-    setState({ data: null, isLoading: true, hasError: false });
-
-    InterviewDashboardAPIClient.getInterviewDashboardSidePanel(
-      applicantRecordId,
-    )
-      .then((data) => {
-        if (isCurrentRequest) {
-          setState({ data, isLoading: false, hasError: false });
-        }
-      })
-      .catch(() => {
-        if (isCurrentRequest) {
-          setState({ data: null, isLoading: false, hasError: true });
-        }
-      });
-
-    return () => {
-      isCurrentRequest = false;
-    };
-  }, [applicantRecordId]);
-
-  return state;
+  return {
+    data: !loading && !hasError ? details ?? null : null,
+    isLoading: loading,
+    hasError,
+  };
 };
 
 export default useInterviewDashboardSidePanel;

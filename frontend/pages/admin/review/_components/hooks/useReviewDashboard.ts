@@ -1,11 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import type {
-  ApplicationStatus,
-  DashboardView,
-  ReviewDashboardFilters,
-  ReviewDashboardResult,
-  ReviewDashboardSortBy,
+import { useCallback } from "react";
+import { useQuery } from "@apollo/client/react";
+import {
+  ReviewDashboardDocument,
+  type ReviewDashboardQuery,
+  type ReviewDashboardQueryVariables,
+  type ApplicationStatus,
+  type DashboardView,
+  type ReviewDashboardFilters,
+  type ReviewDashboardResult,
+  type ReviewDashboardSortBy,
 } from "@/graphql/typeUtils";
 
 type ReviewDashboardState = {
@@ -17,11 +20,9 @@ type ReviewDashboardState = {
 
 type UseReviewDashboardResult = ReviewDashboardState & {
   /**
-   * Patches the status of a single already-fetched row. The dashboard owns the
-   * rows in local state, so the table and the side panel both read the new
-   * value immediately without waiting for a refetch. Every fetch replaces
-   * `rows` wholesale, so server truth wins the moment the page or sort
-   * changes.
+   * Patches the status of an already-fetched row in Apollo's query cache so
+   * the table and side panel update immediately. A network fetch replaces
+   * these values with server data.
    */
   setRowStatus: (applicantRecordId: string, status: ApplicationStatus) => void;
 };
@@ -32,64 +33,66 @@ const useReviewDashboard = (
   sortBy?: ReviewDashboardSortBy,
   sortAscending?: boolean,
   filters?: ReviewDashboardFilters,
-  view?: DashboardView,
+  view?: DashboardView
 ): UseReviewDashboardResult => {
-  const [state, setState] = useState<Omit<ReviewDashboardState, "refetch">>({
-    rows: [],
-    isLoading: true,
-    error: false,
-  });
-  const [refreshKey, setRefreshKey] = useState(0);
-  const refetch = useCallback(() => {
-    setRefreshKey((previous) => previous + 1);
-  }, []);
-
-  useEffect(() => {
-    let isCurrent = true;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState((previous) => ({ ...previous, isLoading: true, error: false }));
-
-    ReviewDashboardAPIClient.getReviewDashboard(
-      pageNumber,
-      resultsPerPage,
-      sortBy,
-      sortAscending,
-      filters,
-      view,
-    )
-      .then((rows) => {
-        if (isCurrent) {
-          setState({ rows, isLoading: false, error: false });
-        }
-      })
-      .catch(() => {
-        if (isCurrent) {
-          setState({ rows: [], isLoading: false, error: true });
-        }
-      });
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending, filters, view, refreshKey]);
-
-  // Stable across renders so callers can build memoized column definitions
-  // on top of it.
-  const setRowStatus = useCallback(
-    (applicantRecordId: string, status: ApplicationStatus) => {
-      setState((prev) => ({
-        ...prev,
-        rows: prev.rows.map((row) =>
-          row.applicantRecordId === applicantRecordId
-            ? { ...row, applicationStatus: status }
-            : row,
-        ),
-      }));
-    },
-    [],
+  const {
+    data,
+    previousData,
+    loading,
+    error,
+    refetch: refetchQuery,
+    updateQuery,
+  } = useQuery<ReviewDashboardQuery, ReviewDashboardQueryVariables>(
+    ReviewDashboardDocument,
+    {
+      variables: {
+        pageNumber,
+        resultsPerPage,
+        sortBy,
+        sortAscending,
+        filters,
+        view,
+      },
+      fetchPolicy: "network-only",
+      context: { refreshAuth: true },
+    }
   );
 
-  return { ...state, setRowStatus, refetch };
+  const refetch = useCallback(() => {
+    // Apollo exposes failures through `error`; callers fire and forget.
+    void refetchQuery().catch(() => {});
+  }, [refetchQuery]);
+
+  // Stable across renders so callers can build memoized column definitions.
+  const setRowStatus = useCallback(
+    (applicantRecordId: string, status: ApplicationStatus) => {
+      updateQuery((_, { complete, previousData: previous }) => {
+        if (!complete) return;
+        return {
+          ...previous,
+          reviewDashboard: previous.reviewDashboard.map((row) =>
+            row.applicantRecordId === applicantRecordId
+              ? { ...row, applicationStatus: status }
+              : row
+          ),
+        };
+      });
+    },
+    [updateQuery]
+  );
+
+  const rows = data?.reviewDashboard;
+  const hasError = !!error || (!loading && !rows);
+
+  return {
+    rows: hasError
+      ? []
+      : rows ?? (loading ? previousData?.reviewDashboard : undefined) ?? [],
+    isLoading: loading,
+    error: hasError,
+    setRowStatus,
+    refetch,
+  };
 };
 
 export default useReviewDashboard;

@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
-import InterviewDashboardAPIClient from "@/APIClients/InterviewDashboardAPIClient";
-import type {
-  InterviewDashboardResult,
-  InterviewDashboardSortBy,
+import { useQuery } from "@apollo/client/react";
+import {
+  InterviewDashboardDocument,
+  type InterviewDashboardQuery,
+  type InterviewDashboardQueryVariables,
+  type InterviewDashboardResult,
+  type InterviewDashboardSortBy,
 } from "@/graphql/typeUtils";
 
 type UseInterviewDashboardResult = {
@@ -17,47 +19,25 @@ const useInterviewDashboard = (
   sortBy?: InterviewDashboardSortBy,
   sortAscending?: boolean,
 ): UseInterviewDashboardResult => {
-  const [state, setState] = useState<UseInterviewDashboardResult>({
-    rows: [],
-    isLoading: false,
-    hasError: false,
+  const { data, previousData, loading, error } = useQuery<
+    InterviewDashboardQuery,
+    InterviewDashboardQueryVariables
+  >(InterviewDashboardDocument, {
+    variables: { pageNumber, resultsPerPage, sortBy, sortAscending },
+    fetchPolicy: "network-only",
+    context: { refreshAuth: true },
   });
 
-  useEffect(() => {
-    let isCurrentRequest = true;
+  const rows = data?.interviewDashboard;
+  const hasError = !!error || (!loading && !rows);
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState((previousState) => ({
-      ...previousState,
-      isLoading: true,
-      hasError: false,
-    }));
-
-    InterviewDashboardAPIClient.getInterviewDashboard(
-      pageNumber,
-      resultsPerPage,
-      sortBy,
-      sortAscending,
-    )
-      .then((rows) => {
-        if (isCurrentRequest) {
-          setState({ rows, isLoading: false, hasError: false });
-        }
-      })
-      .catch((e) => {
-        // eslint-disable-next-line no-console
-        console.error("useInterviewDashboard error:", e);
-        if (isCurrentRequest) {
-          setState({ rows: [], isLoading: false, hasError: true });
-        }
-      });
-
-    return () => {
-      isCurrentRequest = false;
-    };
-  }, [pageNumber, resultsPerPage, sortBy, sortAscending]);
-
-  return state;
+  return {
+    rows: hasError
+      ? []
+      : rows ?? (loading ? previousData?.interviewDashboard : undefined) ?? [],
+    isLoading: loading,
+    hasError,
+  };
 };
 
 export default useInterviewDashboard;

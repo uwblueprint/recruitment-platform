@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
-import InterviewPageAPIClient from "@/APIClients/InterviewPageAPIClient";
+import useInterviewPartner from "@/APIClients/useInterviewPartner";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
-import { InterviewGroupMemberResult } from "@/graphql/typeUtils";
 
 interface InterviewPartnerCardProps {
   className?: string;
@@ -14,50 +12,7 @@ export const InterviewPartnerCard = ({
   className,
 }: InterviewPartnerCardProps) => {
   const curUser = useAuthenticatedUser();
-  const [partner, setPartner] = useState<InterviewGroupMemberResult | null>(
-    null,
-  );
-  const [interviewingNames, setInterviewingNames] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (!curUser?.id) return;
-    let cancelled = false;
-
-    const fetchPartner = async () => {
-      try {
-        const pairings =
-          await InterviewPageAPIClient.getInterviewedPairingsByUserId(curUser.id);
-        const foundPartner =
-          pairings
-            .flatMap((pairing) => pairing.groupMembers)
-            .find((member) => member.id !== curUser.id);
-        if (cancelled) return;
-        setPartner(foundPartner ?? null);
-
-        if (foundPartner) {
-          const applicants =
-            await InterviewPageAPIClient.getInterviewedApplicantsByUserId(
-              foundPartner.id,
-            );
-          if (cancelled) return;
-          setInterviewingNames(
-            applicants.map(
-              (applicant) =>
-                `${applicant.applicantFirstName} ${applicant.applicantLastName}`,
-            ),
-          );
-        }
-      } catch (error) {
-        if (cancelled) return;
-        console.error("Failed to load interview partner:", error);
-      }
-    };
-
-    fetchPartner();
-    return () => {
-      cancelled = true;
-    };
-  }, [curUser?.id]);
+  const { partner, interviewingNames } = useInterviewPartner(curUser?.id);
 
   if (!partner) return null;
 

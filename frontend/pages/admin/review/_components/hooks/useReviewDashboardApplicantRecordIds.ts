@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import type {
-  ReviewDashboardFilters,
-  ReviewDashboardSortBy,
+import { useQuery } from "@apollo/client/react";
+import {
+  ReviewDashboardApplicantRecordIdsDocument,
+  type ReviewDashboardApplicantRecordIdsQuery,
+  type ReviewDashboardApplicantRecordIdsQueryVariables,
+  type ReviewDashboardFilters,
+  type ReviewDashboardSortBy,
 } from "@/graphql/typeUtils";
 
 /**
@@ -21,33 +23,18 @@ const useReviewDashboardApplicantRecordIds = (
   sortAscending?: boolean,
   filters?: ReviewDashboardFilters,
 ): string[] => {
-  const [applicantRecordIds, setApplicantRecordIds] = useState<string[]>([]);
+  const { data, loading, error } = useQuery<
+    ReviewDashboardApplicantRecordIdsQuery,
+    ReviewDashboardApplicantRecordIdsQueryVariables
+  >(ReviewDashboardApplicantRecordIdsDocument, {
+    variables: { sortBy, sortAscending, filters },
+    fetchPolicy: "network-only",
+    context: { refreshAuth: true },
+  });
 
-  useEffect(() => {
-    let isCurrent = true;
-
-    ReviewDashboardAPIClient.getReviewDashboardApplicantRecordIds(
-      sortBy,
-      sortAscending,
-      filters,
-    )
-      .then((ids) => {
-        if (isCurrent) {
-          setApplicantRecordIds(ids);
-        }
-      })
-      .catch(() => {
-        if (isCurrent) {
-          setApplicantRecordIds([]);
-        }
-      });
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [sortBy, sortAscending, filters]);
-
-  return applicantRecordIds;
+  return !loading && !error
+    ? data?.reviewDashboardApplicantRecordIds ?? []
+    : [];
 };
 
 export default useReviewDashboardApplicantRecordIds;

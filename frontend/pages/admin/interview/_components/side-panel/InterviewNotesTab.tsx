@@ -1,4 +1,4 @@
-import useInterviewNotes from "../../../../../components/dashboard/side-panel/hooks/useInterviewNotes";
+import useInterviewNotes from "@/APIClients/useInterviewNotes";
 
 type InterviewNotesTabProps = {
   interviewedApplicantRecordId: string | null;

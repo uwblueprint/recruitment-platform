@@ -2,7 +2,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
   type Dispatch,
   type ReactNode,
@@ -10,8 +9,10 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import { getApplicantRecordId } from "@/pages/review/_components/utils";
-import InterviewAssessmentAPIClient from "@/APIClients/InterviewAssessmentAPIClient";
-import { type InterviewInput } from "@/graphql/typeUtils";
+import useInterviewAssessmentRecord from "@/APIClients/useInterviewAssessmentRecord";
+import useSubmitInterviewScores from "@/APIClients/useSubmitInterviewScores";
+import useInterviewNotes from "@/APIClients/useInterviewNotes";
+import type { InterviewInput } from "@/graphql/typeUtils";
 import {
   EMPTY_SCORE_FORM,
   type ScoreFormState,
@@ -22,21 +23,20 @@ export type AssessmentContextValue = {
   setForm: Dispatch<SetStateAction<ScoreFormState>>;
   recordId: string | null;
   isSubmitting: boolean;
-  isUploadingNotes: boolean;
-  setIsUploadingNotes: Dispatch<SetStateAction<boolean>>;
+  interviewNotes: ReturnType<typeof useInterviewNotes>;
   error: string | null;
   submitScores: () => Promise<void>;
 };
 
 export const AssessmentContext = createContext<AssessmentContextValue | null>(
-  null,
+  null
 );
 
 export const useInterviewAssessment = (): AssessmentContextValue => {
   const ctx = useContext(AssessmentContext);
   if (!ctx)
     throw new Error(
-      "useInterviewAssessment must be used inside AssessmentProvider",
+      "useInterviewAssessment must be used inside AssessmentProvider"
     );
   return ctx;
 };
@@ -47,67 +47,71 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
     ? getApplicantRecordId(router.query)
     : undefined;
 
-  const [form, setForm] = useState<ScoreFormState>(EMPTY_SCORE_FORM);
-  const [recordId, setRecordId] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isUploadingNotes, setIsUploadingNotes] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { record, hasError: loadFailed } =
+    useInterviewAssessmentRecord(applicantRecordId);
+  const {
+    submitInterviewScores,
+    isSubmitting,
+    hasError: submitFailed,
+  } = useSubmitInterviewScores();
+  const recordId = record?.id ?? null;
+  const interviewNotes = useInterviewNotes(recordId);
 
-  useEffect(() => {
-    if (!applicantRecordId) return;
-    const fetchAssessmentRecord = async () => {
-      try {
-        const record =
-          await InterviewAssessmentAPIClient.getInterviewedApplicantRecordByApplicantRecordId(
-            applicantRecordId,
-          );
-        setRecordId(record.id);
-        const j = record.interviewJson;
-        if (j) {
-          setForm({
-            passionFSG: j.passionFSG ?? "",
-            teamPlayer: j.teamPlayer ?? "",
-            desireToLearn: j.desireToLearn ?? "",
-            skill: j.skill ?? "",
-            skillCategory: j.skillCategory ?? "",
-            comments: j.comments ?? "",
-          });
-        }
-      } catch (e) {
-        console.error("Failed to load assessment record:", e);
-        const detail = e instanceof Error ? e.message : String(e);
-        setError(`Failed to load assessment record. ${detail}`);
+  // Derive the initial form from the query; keep user edits separate from
+  // cache updates and discard the draft when navigating to another applicant.
+  const [draft, setDraft] = useState<{
+    applicantRecordId: typeof applicantRecordId;
+    form: ScoreFormState | null;
+  }>({ applicantRecordId, form: null });
+  if (draft.applicantRecordId !== applicantRecordId) {
+    setDraft({ applicantRecordId, form: null });
+  }
+  const saved = record?.interviewJson;
+  const initialForm: ScoreFormState = saved
+    ? {
+        passionFSG: saved.passionFSG ?? "",
+        teamPlayer: saved.teamPlayer ?? "",
+        desireToLearn: saved.desireToLearn ?? "",
+        skill: saved.skill ?? "",
+        skillCategory: saved.skillCategory ?? "",
+        comments: saved.comments ?? "",
       }
-    };
-
-    fetchAssessmentRecord();
-  }, [applicantRecordId]);
+    : EMPTY_SCORE_FORM;
+  const form =
+    draft.applicantRecordId === applicantRecordId
+      ? draft.form ?? initialForm
+      : initialForm;
+  const setForm: Dispatch<SetStateAction<ScoreFormState>> = (next) => {
+    setDraft((previous) => ({
+      applicantRecordId,
+      form:
+        typeof next === "function"
+          ? next(
+              previous.applicantRecordId === applicantRecordId
+                ? previous.form ?? initialForm
+                : initialForm
+            )
+          : next,
+    }));
+  };
 
   const submitScores = useCallback(async () => {
-    if (!recordId) return;
-    setIsSubmitting(true);
-    setError(null);
-    try {
-      await InterviewAssessmentAPIClient.submitInterviewScores(
-        recordId,
-        {
-          passionFSG: form.passionFSG === "" ? undefined : form.passionFSG,
-          teamPlayer: form.teamPlayer === "" ? undefined : form.teamPlayer,
-          desireToLearn:
-            form.desireToLearn === "" ? undefined : form.desireToLearn,
-          skill: form.skill === "" ? undefined : form.skill,
-          skillCategory:
-            form.skillCategory === "" ? undefined : form.skillCategory,
-          comments: form.comments || undefined,
-        } as InterviewInput,
-      );
-    } catch {
-      setError("Failed to submit scores. Please try again.");
-      throw new Error("submit failed");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }, [recordId, form]);
+    if (!recordId) throw new Error("Assessment record is not loaded");
+    await submitInterviewScores(recordId, {
+      passionFSG: form.passionFSG === "" ? undefined : form.passionFSG,
+      teamPlayer: form.teamPlayer === "" ? undefined : form.teamPlayer,
+      desireToLearn: form.desireToLearn === "" ? undefined : form.desireToLearn,
+      skill: form.skill === "" ? undefined : form.skill,
+      skillCategory: form.skillCategory === "" ? undefined : form.skillCategory,
+      comments: form.comments || undefined,
+    } as InterviewInput);
+  }, [recordId, form, submitInterviewScores]);
+
+  const error = loadFailed
+    ? "Failed to load assessment record. Please try again."
+    : submitFailed
+    ? "Failed to submit scores. Please try again."
+    : null;
 
   return (
     <AssessmentContext.Provider
@@ -116,8 +120,7 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
         setForm,
         recordId,
         isSubmitting,
-        isUploadingNotes,
-        setIsUploadingNotes,
+        interviewNotes,
         error,
         submitScores,
       }}

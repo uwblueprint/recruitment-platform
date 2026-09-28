@@ -1,6 +1,10 @@
-import { useEffect, useState } from "react";
-import InterviewInvitesAPIClient from "@/APIClients/InterviewInvitesAPIClient";
-import type { InterviewInviteResult } from "@/graphql/typeUtils";
+import { useQuery } from "@apollo/client/react";
+import {
+  InterviewInvitesDocument,
+  type InterviewInvitesQuery,
+  type InterviewInvitesQueryVariables,
+  type InterviewInviteResult,
+} from "@/graphql/typeUtils";
 
 type UseInterviewInvitesResult = {
   invites: InterviewInviteResult[];
@@ -9,27 +13,22 @@ type UseInterviewInvitesResult = {
 };
 
 const useInterviewInvites = (): UseInterviewInvitesResult => {
-  const [state, setState] = useState<UseInterviewInvitesResult>({
-    invites: [],
-    isLoading: false,
-    error: false,
+  const { data, loading, error } = useQuery<
+    InterviewInvitesQuery,
+    InterviewInvitesQueryVariables
+  >(InterviewInvitesDocument, {
+    fetchPolicy: "network-only",
+    context: { refreshAuth: true },
   });
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState((prev) => ({ ...prev, isLoading: true, error: false }));
+  const invites = data?.interviewInvites;
+  const hasError = !!error || (!loading && !invites);
 
-    InterviewInvitesAPIClient.getInterviewInvites()
-      .then((invites) => {
-        setState({ invites, isLoading: false, error: false });
-      })
-      .catch((err) => {
-        console.error("[interviewInvites] fetch failed:", err);
-        setState({ invites: [], isLoading: false, error: true });
-      });
-  }, []);
-
-  return state;
+  return {
+    invites: !loading && !hasError ? invites ?? [] : [],
+    isLoading: loading,
+    error: hasError,
+  };
 };
 
 export default useInterviewInvites;

@@ -1,14 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
-import { ValueOf } from "next/dist/shared/lib/constants";
 
-import InterviewAssessmentAPIClient from "@/APIClients/InterviewAssessmentAPIClient";
+import type useInterviewNotes from "@/APIClients/useInterviewNotes";
 import { Button } from "@/components/common/Button";
 import { CloudUploadIcon } from "@/components/icons/cloud-upload.icon";
 import { CheckIcon } from "@/components/icons/check.icon";
 import { PdfBadgeIcon } from "@/components/icons/pdf-badge.icon";
 import { CloseXIcon } from "@/components/icons/close-x.icon";
-import type { InterviewNotesResult } from "@/graphql/typeUtils";
 
 import {
   INTERVIEW_NOTES_DROPZONE_ACCEPT,
@@ -17,23 +15,7 @@ import {
 
 type Props = {
   interviewedApplicantRecordId: string | null;
-  onUploadingChange?: (uploading: boolean) => void;
-};
-
-const RemoteStateKind = {
-  EMPTY: "empty",
-  FILLED: "filled",
-  ERROR: "error",
-} as const;
-
-type RemoteStateKind = ValueOf<typeof RemoteStateKind>;
-
-type RemoteStateBase = { recordId: string };
-
-type RemoteState =
-  | (RemoteStateBase & { kind: typeof RemoteStateKind.EMPTY })
-  | (RemoteStateBase & { kind: typeof RemoteStateKind.FILLED; notes: InterviewNotesResult })
-  | (RemoteStateBase & { kind: typeof RemoteStateKind.ERROR; message: string });
+} & ReturnType<typeof useInterviewNotes>;
 
 const formatBytes = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
@@ -55,65 +37,14 @@ const OrDivider = () => (
 
 export const NotesUploader = ({
   interviewedApplicantRecordId,
-  onUploadingChange,
+  notes,
+  isLoading,
+  hasError,
+  uploadNotes,
+  isUploading,
+  uploadError,
 }: Props) => {
-  const [remote, setRemote] = useState<RemoteState | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-
-  useEffect(() => {
-    onUploadingChange?.(isUploading);
-  }, [isUploading, onUploadingChange]);
-
-  // Fetch existing notes asynchronously. The loading state is derived below
-  // by comparing the recordId on remote against the current prop.
-  useEffect(() => {
-    if (!interviewedApplicantRecordId) return;
-    const recordId = interviewedApplicantRecordId;
-    let cancelled = false;
-    const fetchNotes = async () => {
-      try {
-        const notes = await InterviewAssessmentAPIClient.getInterviewNotes(recordId);
-        if (cancelled) return;
-        setRemote(
-          notes
-            ? { kind: RemoteStateKind.FILLED, recordId, notes }
-            : { kind: RemoteStateKind.EMPTY, recordId },
-        );
-      } catch (e) {
-        if (cancelled) return;
-        const detail = e instanceof Error ? e.message : String(e);
-        setRemote({ kind: RemoteStateKind.ERROR, recordId, message: detail });
-      }
-    };
-
-    fetchNotes();
-    return () => {
-      cancelled = true;
-    };
-  }, [interviewedApplicantRecordId]);
-
-  const handleFile = useCallback(
-    async (file: File) => {
-      if (!interviewedApplicantRecordId) return;
-      const recordId = interviewedApplicantRecordId;
-      setUploadError(null);
-      setIsUploading(true);
-      try {
-        const result = await InterviewAssessmentAPIClient.uploadInterviewNotes(
-          recordId,
-          file,
-        );
-        setRemote({ kind: RemoteStateKind.FILLED, recordId, notes: result });
-      } catch (e) {
-        const detail = e instanceof Error ? e.message : String(e);
-        setUploadError(detail);
-      } finally {
-        setIsUploading(false);
-      }
-    },
-    [interviewedApplicantRecordId],
-  );
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const onDrop = useCallback(
     (accepted: File[], rejections: FileRejection[]) => {
@@ -122,18 +53,19 @@ export const NotesUploader = ({
         const map: Record<string, string> = {
           "file-invalid-type": "Only PDF files are accepted.",
           "file-too-large": `File exceeds the ${formatBytes(
-            INTERVIEW_NOTES_MAX_BYTES,
+            INTERVIEW_NOTES_MAX_BYTES
           )} limit.`,
           "too-many-files": "Upload one file at a time.",
         };
-        setUploadError(map[code] ?? `Upload failed: ${code}`);
+        setValidationError(map[code] ?? `Upload failed: ${code}`);
         return;
       }
       if (accepted.length > 0) {
-        void handleFile(accepted[0]);
+        setValidationError(null);
+        uploadNotes(accepted[0]);
       }
     },
-    [handleFile],
+    [uploadNotes]
   );
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
@@ -147,23 +79,21 @@ export const NotesUploader = ({
     disabled: isUploading || !interviewedApplicantRecordId,
   });
 
-  const loaded =
-    remote && remote.recordId === interviewedApplicantRecordId ? remote : null;
-
-  if (!loaded) {
+  if (!interviewedApplicantRecordId || isLoading) {
     return (
       <p className="font-poppins text-sm text-charcoal-500">Loading notes…</p>
     );
   }
-  if (loaded.kind === RemoteStateKind.ERROR) {
+  if (hasError) {
     return (
       <p className="font-poppins text-sm text-error">
-        Failed to load existing notes: {loaded.message}
+        Failed to load existing notes. Please try again.
       </p>
     );
   }
 
-  const isFilled = loaded.kind === RemoteStateKind.FILLED;
+  const isFilled = notes !== null;
+  const errorMessage = validationError ?? uploadError?.message;
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -196,8 +126,8 @@ export const NotesUploader = ({
         {isFilled ? (
           <>
             <FileChip
-              fileName={loaded.notes.fileName}
-              signedUrl={loaded.notes.signedUrl}
+              fileName={notes.fileName}
+              signedUrl={notes.signedUrl}
               onRemove={open}
               disabled={isUploading}
             />
@@ -230,8 +160,8 @@ export const NotesUploader = ({
         )}
       </div>
 
-      {uploadError && (
-        <p className="font-poppins text-sm text-error">{uploadError}</p>
+      {errorMessage && (
+        <p className="font-poppins text-sm text-error">{errorMessage}</p>
       )}
     </div>
   );
