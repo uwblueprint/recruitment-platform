@@ -1,3 +1,4 @@
+import { Toast } from "@/components/common/Toast";
 import { ReviewStatus, SkillCategory } from "@/graphql/typeUtils";
 import type { Dispatch, SetStateAction } from "react";
 import useUpdateReviewedApplicantRecord from "@/APIClients/useUpdateReviewedApplicantRecord";
@@ -15,7 +16,6 @@ import { BACK_TO_HOME_HREF, ReviewStage } from "../_components/constants";
 import { ReportConflictDialogue } from "../_components/dialogues/ReportConflictDialogue";
 import { ReportConflictSuccessDialogue } from "../_components/dialogues/ReportConflictSuccessDialogue";
 import {
-  UpdateReviewedApplicantRecordContext,
   ReviewSetScoresContext,
   ReviewSetStageContext,
 } from "../_components/ReviewContext";
@@ -26,7 +26,11 @@ import { ReviewInfoStage } from "../_components/stages/ReviewInfoStage";
 import { ReviewPassionForSocialGoodStage } from "../_components/stages/ReviewPassionForSocialGoodStage";
 import { ReviewSkillStage } from "../_components/stages/ReviewSkillStage";
 import { ReviewTeamPlayerStage } from "../_components/stages/ReviewTeamPlayerStage";
-import { ReviewEndData, ReviewScores } from "../_components/types";
+import {
+  ReviewActions,
+  ReviewEndData,
+  ReviewScores,
+} from "../_components/types";
 import { getApplicantRecordId } from "../_components/utils";
 
 const initialScores: ReviewScores = {
@@ -194,11 +198,18 @@ const ReviewsPages: NextPage = () => {
     );
   }
 
+  const actions: ReviewActions = {
+    onContinue: updateReview,
+    onFinish: (onCompleted) => updateReview(onCompleted, true),
+    isUpdating: updating,
+  };
+
   const getReviewStage = () => {
     switch (stage) {
       case ReviewStage.INFO:
         return (
           <ReviewInfoStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -208,6 +219,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.PFSG:
         return (
           <ReviewPassionForSocialGoodStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -217,6 +229,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.TP:
         return (
           <ReviewTeamPlayerStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -226,6 +239,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.D2L:
         return (
           <ReviewDriveToLearnStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -235,6 +249,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.SKL:
         return (
           <ReviewSkillStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -255,6 +270,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.END:
         return (
           <ReviewEndStage
+            actions={actions}
             name={applicantName}
             reviewerName={reviewerName}
             scores={scores}
@@ -295,15 +311,14 @@ const ReviewsPages: NextPage = () => {
   };
 
   return (
-    <UpdateReviewedApplicantRecordContext.Provider
-      value={{
-        update: updateReview,
-        complete: (onCompleted) => updateReview(onCompleted, true),
-        loading: updating,
-        error: updateError,
-        reset: resetUpdate,
-      }}
-    >
+    <>
+      <Toast
+        open={!!updateError}
+        title="Unable to save review"
+        description={updateError?.message ?? ""}
+        severity="error"
+        onClose={resetUpdate}
+      />
       <ReviewSetScoresContext.Provider value={updateScores}>
         <ReviewSetStageContext.Provider value={setStage}>
           {getReviewStage()}
@@ -319,7 +334,7 @@ const ReviewsPages: NextPage = () => {
           />
         </ReviewSetStageContext.Provider>
       </ReviewSetScoresContext.Provider>
-    </UpdateReviewedApplicantRecordContext.Provider>
+    </>
   );
 };
 

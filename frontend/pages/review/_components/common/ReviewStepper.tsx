@@ -1,15 +1,11 @@
-import { Toast } from "@/components/common/Toast";
 import { Button } from "@/components/common/Button";
 import { LongLeftIcon } from "@/components/icons/long-left.icon";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ReactElement, useContext } from "react";
 import { BACK_TO_HOME_HREF, REVIEW_STAGES, ReviewStage } from "../constants";
-import {
-  UpdateReviewedApplicantRecordContext,
-  ReviewSetStageContext,
-} from "../ReviewContext";
-import { ReviewEndData, ReviewScores } from "../types";
+import { ReviewSetStageContext } from "../ReviewContext";
+import { ReviewActions, ReviewEndData, ReviewScores } from "../types";
 
 interface Props {
   currentStage: ReviewStage;
@@ -17,6 +13,7 @@ interface Props {
   endData?: ReviewEndData;
   onValidate?: () => boolean;
   viewOnly?: boolean;
+  actions?: ReviewActions;
 }
 
 export const ReviewStepper = ({
@@ -25,10 +22,9 @@ export const ReviewStepper = ({
   endData,
   onValidate,
   viewOnly = false,
+  actions,
 }: Props): ReactElement | null => {
-  const reviewMutation = useContext(UpdateReviewedApplicantRecordContext);
-  const isUpdating = reviewMutation?.loading ?? false;
-  const errorMessage = reviewMutation?.error?.message ?? "";
+  const isUpdating = actions?.isUpdating ?? false;
   const router = useRouter();
   const setStage = useContext(ReviewSetStageContext);
 
@@ -52,13 +48,6 @@ export const ReviewStepper = ({
 
   return (
     <div className="border-t border-neutral-200 bg-white px-6 py-4">
-      <Toast
-        open={!!errorMessage}
-        title="Unable to save review"
-        description={errorMessage}
-        severity="error"
-        onClose={() => reviewMutation?.reset()}
-      />
       <div className="flex justify-end items-center gap-3 flex-nowrap">
         {currentStageIndex === 0 && (
           <Link
@@ -95,15 +84,13 @@ export const ReviewStepper = ({
         ) : currentStage === ReviewStage.END ? (
           <Button
             size="sm"
-            disabled={isUpdating || !endData?.skillsCategory || !reviewMutation}
+            disabled={isUpdating || !endData?.skillsCategory || !actions}
             className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-400 hover:border-transparent disabled:opacity-60"
             onClick={() => {
               if (onValidate && !onValidate()) {
                 return;
               }
-              reviewMutation?.complete(() =>
-                setStage?.(ReviewStage.END_SUCCESS),
-              );
+              actions?.onFinish(() => setStage?.(ReviewStage.END_SUCCESS));
             }}
           >
             {isUpdating ? "Submitting..." : "Finish"}
@@ -111,8 +98,8 @@ export const ReviewStepper = ({
         ) : (
           <Button
             size="sm"
-            disabled={isButtonDisabled || isUpdating || !reviewMutation}
-            onClick={() => reviewMutation?.update(() => setStage?.(nextStage))}
+            disabled={isButtonDisabled || isUpdating || !actions}
+            onClick={() => actions?.onContinue(() => setStage?.(nextStage))}
             className="shrink-0 whitespace-nowrap !px-4 !py-2 hover:bg-sky-400 hover:border-transparent disabled:opacity-60"
           >
             {isUpdating ? "Saving..." : "Save & Continue"}

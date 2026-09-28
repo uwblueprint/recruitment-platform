@@ -7,3 +7,9 @@ export type ReviewEndData = {
   skillsCategory: string;
   secondChoiceRole: string;
 };
+
+export type ReviewActions = {
+  onContinue: (onCompleted: () => void) => void;
+  onFinish: (onCompleted: () => void) => void;
+  isUpdating: boolean;
+};

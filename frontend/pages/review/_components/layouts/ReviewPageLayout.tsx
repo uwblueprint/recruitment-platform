@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { ReviewStage } from "../constants";
 import { ReviewProgressHeader } from "../common/ReviewProgressHeader";
 import { ReviewStepper } from "../common/ReviewStepper";
-import { ReviewEndData, ReviewScores } from "../types";
+import { ReviewActions, ReviewEndData, ReviewScores } from "../types";
 import { SplitPanelLayout } from "@/components/layouts/SplitPageLayout";
 
 interface ReviewPageLayoutProps {
@@ -12,6 +12,7 @@ interface ReviewPageLayoutProps {
   onValidate?: () => boolean;
   children: ReactNode;
   viewOnly?: boolean;
+  actions?: ReviewActions;
 }
 
 export const ReviewPageLayout = ({
@@ -21,12 +22,14 @@ export const ReviewPageLayout = ({
   onValidate,
   children,
   viewOnly = false,
+  actions,
 }: ReviewPageLayoutProps) => {
   return (
     <SplitPanelLayout
       header={<ReviewProgressHeader currentStage={currentStage} />}
       footer={
         <ReviewStepper
+          actions={actions}
           currentStage={currentStage}
           scores={scores}
           endData={endData}

@@ -8,11 +8,3 @@ export const ReviewSetStageContext = createContext<
 export const ReviewSetScoresContext = createContext<
   null | ((newKey: ReviewStage, newValue: number) => void)
 >(null);
-
-export const UpdateReviewedApplicantRecordContext = createContext<null | {
-  update: (onCompleted: () => void) => void;
-  complete: (onCompleted: () => void) => void;
-  loading: boolean;
-  error?: { message: string };
-  reset: () => void;
-}>(null);
