@@ -1,4 +1,4 @@
-import useInterviewPartner from "@/APIClients/useInterviewPartner";
+import useInterviewPartner from "../hooks/useInterviewPartner";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 
 interface InterviewPartnerCardProps {
