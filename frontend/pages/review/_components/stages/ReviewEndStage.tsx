@@ -1,3 +1,4 @@
+import type { ReviewActions } from "../types";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import { ReviewStage } from "../constants";
 import { ReviewEndData, ReviewScores } from "../types";
@@ -16,6 +17,7 @@ interface Props {
   setEndData: Dispatch<SetStateAction<ReviewEndData>>;
   onReportConflict?: () => void;
   viewOnly?: boolean;
+  actions?: ReviewActions;
   reviewers?: ReviewedApplicantRecordWithReviewerResult[];
   combinedReviewScore?: number | null;
 }
@@ -87,9 +89,12 @@ const LeftPanelContent = ({
   return (
     <div className="flex flex-col gap-6 p-3 w-full">
       <div className="flex justify-between items-center w-full gap-4 shrink-0">
-        <Link href="/" className="w-fit shrink-0 flex items-center gap-2 py-2 px-4 rounded-full border-2 border-blue bg-white hover:bg-gray-50 transition-colors text-blue text-base font-normal leading-snug no-underline">
-            <ArrowLeftIcon className="w-6 h-6 text-blue" />
-            Back to home
+        <Link
+          href="/"
+          className="w-fit shrink-0 flex items-center gap-2 py-2 px-4 rounded-full border-2 border-blue bg-white hover:bg-gray-50 transition-colors text-blue text-base font-normal leading-snug no-underline"
+        >
+          <ArrowLeftIcon className="w-6 h-6 text-blue" />
+          Back to home
         </Link>
         <ReportConflictButton
           name={name}
@@ -355,13 +360,19 @@ export const ReviewEndStage = ({
   setEndData,
   onReportConflict,
   viewOnly = false,
+  actions,
   reviewers = [],
   combinedReviewScore = null,
 }: Props) => {
   const [validationError, setValidationError] = useState(false);
 
   return viewOnly ? (
-    <ReviewPageLayout currentStage={ReviewStage.END} scores={scores} viewOnly>
+    <ReviewPageLayout
+      actions={actions}
+      currentStage={ReviewStage.END}
+      scores={scores}
+      viewOnly
+    >
       <PanelLayout borderRight>
         <ViewOnlyLeftPanel
           name={name}
@@ -375,6 +386,7 @@ export const ReviewEndStage = ({
     </ReviewPageLayout>
   ) : (
     <ReviewPageLayout
+      actions={actions}
       currentStage={ReviewStage.END}
       scores={scores}
       endData={endData}

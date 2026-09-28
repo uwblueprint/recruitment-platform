@@ -1,3 +1,4 @@
+import type { ReviewActions } from "../types";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ApplicationDTO } from "@/types";
 import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
@@ -20,6 +21,7 @@ interface Props {
   scores: ReviewScores;
   onReportConflict?: () => void;
   viewOnly?: boolean;
+  actions?: ReviewActions;
   reviewers?: ReviewedApplicantRecordWithReviewerResult[];
 }
 
@@ -29,6 +31,7 @@ export const ReviewDriveToLearnStage = ({
   scores,
   onReportConflict,
   viewOnly = false,
+  actions,
   reviewers = [],
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
@@ -44,6 +47,7 @@ export const ReviewDriveToLearnStage = ({
   );
   return (
     <ReviewPageLayout
+      actions={actions}
       currentStage={ReviewStage.D2L}
       scores={scores}
       viewOnly={viewOnly}
@@ -94,9 +98,7 @@ export const ReviewDriveToLearnStage = ({
               ariaLabel="Drive to learn score"
               onChange={(v) => updateScore?.(ReviewStage.D2L, v)}
             />
-            <span className="text-xl leading-none text-red-500">
-              *
-            </span>
+            <span className="text-xl leading-none text-red-500">*</span>
           </div>
         )}
       </PanelLayout>

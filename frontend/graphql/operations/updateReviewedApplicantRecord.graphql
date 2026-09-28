@@ -1,0 +1,17 @@
+mutation UpdateReviewedApplicantRecord(
+  $applicantRecordId: ID!
+  $reviewerId: ID!
+  $reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!
+) {
+  updateReviewedApplicantRecord(
+    applicantRecordId: $applicantRecordId
+    reviewerId: $reviewerId
+    reviewedApplicantRecord: $reviewedApplicantRecord
+  ) {
+    applicantRecordId
+    reviewerId
+    status
+    score
+    reviewerHasConflict
+  }
+}

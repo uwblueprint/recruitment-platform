@@ -1,17 +1,18 @@
+import { Toast } from "@/components/common/Toast";
+import { ReviewStatus, SkillCategory } from "@/graphql/typeUtils";
+import type { Dispatch, SetStateAction } from "react";
+import useUpdateReviewedApplicantRecord from "@/APIClients/useUpdateReviewedApplicantRecord";
+import useReviewApplication from "@/APIClients/useReviewApplication";
 import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import { ApplicationDTO, AuthStatus } from "@/types";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ReportConflictButton } from "../_components/common/ReportConflictButton";
 import { ReviewStageHeader } from "../_components/common/ReviewStageHeader";
-import {
-  BACK_TO_HOME_HREF,
-  ReviewStage,
-} from "../_components/constants";
+import { BACK_TO_HOME_HREF, ReviewStage } from "../_components/constants";
 import { ReportConflictDialogue } from "../_components/dialogues/ReportConflictDialogue";
 import { ReportConflictSuccessDialogue } from "../_components/dialogues/ReportConflictSuccessDialogue";
 import {
@@ -25,58 +26,12 @@ import { ReviewInfoStage } from "../_components/stages/ReviewInfoStage";
 import { ReviewPassionForSocialGoodStage } from "../_components/stages/ReviewPassionForSocialGoodStage";
 import { ReviewSkillStage } from "../_components/stages/ReviewSkillStage";
 import { ReviewTeamPlayerStage } from "../_components/stages/ReviewTeamPlayerStage";
-import { ReviewEndData, ReviewScores } from "../_components/types";
+import {
+  ReviewActions,
+  ReviewEndData,
+  ReviewScores,
+} from "../_components/types";
 import { getApplicantRecordId } from "../_components/utils";
-
-const sampleApplication: ApplicationDTO = {
-  id: 1,
-  academicOrCoop: "Academic",
-  academicYear: "2A",
-  email: "kushalgoel786@gmail.com",
-  firstChoiceRole: "Project Developer",
-  firstName: "Kushal",
-  heardFrom: "Word of mouth",
-  lastName: "Goel",
-  locationPreference: "In-Person (Waterloo)",
-  program: "Computer Science",
-  timesApplied: "This is my first time!",
-  pronouns: "He/Him/His",
-  pronounsSpecified: "",
-  resumeUrl:
-    "https://firebasestorage.googleapis.com/v0/b/uw-blueprint.appspot.com/o/resumes%2F01b3e17a-73c3-477a-a84d-cbf6ef2d7bda?alt=media&token=d90e50ca-e221-4fb6-b3a0-05dec3bf06c8",
-  roleSpecificQuestions: [
-    '[{"id":"1","questions":[{"options":["Frontend","Backend","Fullstack","Mobile"],"other":true,"question":"Which areas of a project are you interested in working in?","response":["Frontend","Backend","Fullstack","Mobile"],"type":"multi-select"},{"maxLength":1000,"question":"Tell us about a challenging technical problem that you\'ve worked on in the past and how you solved it.","response":"In the face of limited data availability for mutual fund investing, I tackled the challenge by developing a project that leveraged Net Asset Values (NAVs) to calculate crucial performance metrics. Using Python and data analysis tools, I created an algorithm to process NAV data and derive metrics like historical performance, return on investment, volatility, etc. These metrics enabled me to assess fund performance, risk levels, and cost-effectiveness, aiding informed investment decisions. Additionally, I incorporated data visualization techniques to present the metrics visually, facilitating easy comparison and identification of investment opportunities. Overall, this project effectively addressed the challenge, providing valuable insights within the constraints of limited data, and empowering me to make informed investment choices.","uniqueId":1}],"role":"Project Developer"}]',
-  ],
-  secondChoiceRole: "",
-  shortAnswerQuestions: [
-    {
-      question: "What timezone will you be based out of next term?",
-      response:
-        "I will be based in Waterloo only, which means Eastern Time (ET)",
-    },
-    {
-      question: "Tell us about a cause that resonates with you.",
-      response:
-        "I am passionate about spreading financial knowledge, specifically in the area of personal finance. Financial literacy is crucial for individuals to lead secure and empowered lives. I believe that by promoting financial education, we can empower people to make informed decisions about budgeting, saving, investing, and debt management. This knowledge helps individuals build emergency funds, avoid predatory loans, and plan for their future. ",
-    },
-    {
-      question:
-        "Tell us about a community you're proud to be a part of and how you contributed to it.",
-      response:
-        "I am proud to be a part of the FlutterFever community, which I initiated. Through this community, I taught app development to over 200 students, providing workshops, curriculum, and ongoing support. The inclusive and supportive environment encouraged collaboration and learning. Students were able to apply their skills through coding challenges, receiving personalized feedback and mentorship. It has been incredibly rewarding to witness their progress and enthusiasm as they built their own apps.",
-    },
-    {
-      question:
-        "Tell us about a time you learned a new skill. What was your motivation to learn it and what was your approach?",
-      response:
-        "I learned personal budget management and finance. My motivation was to take control of my financial well-being. I approached it by watching YouTube tutorials and talking to knowledgeable people. Applying the concepts to my own finances helped solidify my understanding. It has empowered me to make informed decisions and work towards my financial goals.",
-    },
-  ],
-  status: "pending",
-  term: "Fall 2023",
-  secondChoiceStatus: "",
-  timestamp: BigInt(1728673405),
-};
 
 const initialScores: ReviewScores = {
   [ReviewStage.INFO]: 0,
@@ -91,17 +46,16 @@ const initialScores: ReviewScores = {
 const ReviewsPages: NextPage = () => {
   const router = useRouter();
   const [stage, setStage] = useState<ReviewStage>(ReviewStage.INFO);
-  const [application, setApplication] = useState<ApplicationDTO>();
-  const [authStatus, setAuthStatus] = useState<AuthStatus>({
-    loading: true,
-    isAuthorized: false,
-  });
-  const [endData, setEndData] = useState<ReviewEndData>({
-    comments: "",
-    skillsCategory: "",
-    secondChoiceRole: "",
-  });
-  const [scores, setScores] = useState<ReviewScores>(initialScores);
+  const [endDataEdits, setEndDataEdits] = useState<{
+    applicantRecordId: string | null;
+    reviewerId: string | undefined;
+    values: ReviewEndData;
+  }>();
+  const [scoreEdits, setScoreEdits] = useState<{
+    applicantRecordId: string | null;
+    reviewerId: string | undefined;
+    values: Partial<ReviewScores>;
+  }>();
   const [reportConflictDialogueOpen, setReportConflictDialogueOpen] =
     useState(false);
   const [
@@ -114,6 +68,8 @@ const ReviewsPages: NextPage = () => {
   const applicantRecordId = router.isReady
     ? getApplicantRecordId(router.query)
     : null;
+  const { application, reviewersData, loading, error } =
+    useReviewApplication(applicantRecordId);
   const applicantName = application
     ? `${application.firstName} ${application.lastName}`
     : "Applicant";
@@ -123,32 +79,137 @@ const ReviewsPages: NextPage = () => {
     ? authenticatedUser.firstName
     : "Reviewer";
 
-  const updateScores = (key: ReviewStage, value: number) => {
-    setScores((prev) => {
-      if (isNaN(value) || value < 0 || value > 5) {
-        return prev;
-      }
-      return { ...prev, [key]: value };
+  const reviewerId = authenticatedUser?.id;
+  const reviewerRecord = reviewersData?.reviewedApplicantRecords.find(
+    ({ reviewer }) => reviewer.id === reviewerId,
+  )?.reviewedApplicantRecord;
+  const savedReview = reviewerRecord?.review;
+  const savedEndData: ReviewEndData = {
+    comments: savedReview?.comments ?? "",
+    skillsCategory: savedReview?.skillCategory?.toLowerCase() ?? "",
+    secondChoiceRole: "",
+  };
+  const endData =
+    endDataEdits?.applicantRecordId === applicantRecordId &&
+    endDataEdits?.reviewerId === reviewerId
+      ? endDataEdits.values
+      : savedEndData;
+  const setEndData: Dispatch<SetStateAction<ReviewEndData>> = (action) => {
+    setEndDataEdits((previous) => {
+      const current =
+        previous?.applicantRecordId === applicantRecordId &&
+        previous?.reviewerId === reviewerId
+          ? previous.values
+          : savedEndData;
+      return {
+        applicantRecordId,
+        reviewerId,
+        values: typeof action === "function" ? action(current) : action,
+      };
     });
   };
+  const scores: ReviewScores = {
+    ...initialScores,
+    [ReviewStage.PFSG]: savedReview?.passionFSG ?? 0,
+    [ReviewStage.TP]: savedReview?.teamPlayer ?? 0,
+    [ReviewStage.D2L]: savedReview?.desireToLearn ?? 0,
+    [ReviewStage.SKL]: savedReview?.skill ?? 0,
+    // Keep local edits over query updates, scoped to this applicant and reviewer.
+    ...(scoreEdits?.applicantRecordId === applicantRecordId &&
+    scoreEdits?.reviewerId === reviewerId
+      ? scoreEdits?.values
+      : {}),
+  };
 
-  useEffect(() => {
-    if (applicantRecordId === null) return;
-    // TODO: replace with actual API call to fetch application data
-    const fetchApplication = async () => {
-      const appInfo = sampleApplication;
-      setApplication(appInfo);
-    };
-    fetchApplication();
-  }, [applicantRecordId]);
+  const updateScores = (key: ReviewStage, value: number) => {
+    if (isNaN(value) || value < 0 || value > 5) return;
+    setScoreEdits((prev) => ({
+      applicantRecordId,
+      reviewerId,
+      values: {
+        ...(prev?.applicantRecordId === applicantRecordId &&
+        prev?.reviewerId === reviewerId
+          ? prev?.values
+          : {}),
+        [key]: value,
+      },
+    }));
+  };
+
+  const {
+    updateReviewedApplicantRecord,
+    loading: updating,
+    error: updateError,
+    reset: resetUpdate,
+  } = useUpdateReviewedApplicantRecord();
+
+  const updateReview = (onCompleted: () => void, complete = false) => {
+    if (!applicantRecordId || !reviewerId || !reviewerRecord) return;
+    const skillCategory = {
+      junior: SkillCategory.Junior,
+      intermediate: SkillCategory.Intermediate,
+      senior: SkillCategory.Senior,
+    }[endData.skillsCategory];
+    if (complete && !skillCategory) return;
+    const status = complete
+      ? ReviewStatus.Done
+      : reviewerRecord.status === ReviewStatus.Todo
+      ? ReviewStatus.InProgress
+      : undefined;
+    // The server checks the latest conflict status and reports mutation errors.
+    updateReviewedApplicantRecord(
+      applicantRecordId,
+      reviewerId,
+      {
+        ...(status ? { status } : {}),
+        review: {
+          passionFSG: scores[ReviewStage.PFSG],
+          teamPlayer: scores[ReviewStage.TP],
+          desireToLearn: scores[ReviewStage.D2L],
+          skill: scores[ReviewStage.SKL],
+          ...(complete ? { skillCategory, comments: endData.comments } : {}),
+        },
+      },
+      onCompleted,
+    );
+  };
 
   if (!router.isReady) return null;
+  if (applicantRecordId === null || error) {
+    return (
+      <p role="alert" className="p-8">
+        Unable to load this application. Please try again.
+      </p>
+    );
+  }
+  if (loading) {
+    return (
+      <p role="status" className="p-8">
+        Loading application…
+      </p>
+    );
+  }
+
+  if (!reviewerId || !reviewerRecord) {
+    return (
+      <p role="alert" className="p-8">
+        No assigned review found for the current user.
+      </p>
+    );
+  }
+
+  const actions: ReviewActions = {
+    onContinue: updateReview,
+    onFinish: (onCompleted) => updateReview(onCompleted, true),
+    isUpdating: updating,
+  };
 
   const getReviewStage = () => {
     switch (stage) {
       case ReviewStage.INFO:
         return (
           <ReviewInfoStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -158,6 +219,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.PFSG:
         return (
           <ReviewPassionForSocialGoodStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -167,6 +229,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.TP:
         return (
           <ReviewTeamPlayerStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -176,6 +239,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.D2L:
         return (
           <ReviewDriveToLearnStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -185,6 +249,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.SKL:
         return (
           <ReviewSkillStage
+            actions={actions}
             name={applicantName}
             application={application}
             scores={scores}
@@ -205,6 +270,7 @@ const ReviewsPages: NextPage = () => {
       case ReviewStage.END:
         return (
           <ReviewEndStage
+            actions={actions}
             name={applicantName}
             reviewerName={reviewerName}
             scores={scores}
@@ -234,7 +300,7 @@ const ReviewsPages: NextPage = () => {
       );
       setReportConflictDialogueOpen(false);
       setReportConflictSuccessDialogueOpen(true);
-    } catch (error) {
+    } catch {
       setReportConflictHasErrored(true);
     }
   };
@@ -245,31 +311,40 @@ const ReviewsPages: NextPage = () => {
   };
 
   return (
-    <ReviewSetScoresContext.Provider value={updateScores}>
-      <ReviewSetStageContext.Provider value={setStage}>
-        {getReviewStage()}
-        <ReportConflictDialogue
-          open={reportConflictDialogueOpen}
-          hasError={reportConflictHasErrored}
-          onClose={() => setReportConflictDialogueOpen(false)}
-          onConfirm={reportConflict}
-        />
-        <ReportConflictSuccessDialogue
-          open={reportConflictSuccessDialogueOpen}
-          onClose={onReportConflictSuccessClose}
-        />
-      </ReviewSetStageContext.Provider>
-    </ReviewSetScoresContext.Provider>
+    <>
+      <Toast
+        open={!!updateError}
+        title="Unable to save review"
+        description={updateError?.message ?? ""}
+        severity="error"
+        onClose={resetUpdate}
+      />
+      <ReviewSetScoresContext.Provider value={updateScores}>
+        <ReviewSetStageContext.Provider value={setStage}>
+          {getReviewStage()}
+          <ReportConflictDialogue
+            open={reportConflictDialogueOpen}
+            hasError={reportConflictHasErrored}
+            onClose={() => setReportConflictDialogueOpen(false)}
+            onConfirm={reportConflict}
+          />
+          <ReportConflictSuccessDialogue
+            open={reportConflictSuccessDialogueOpen}
+            onClose={onReportConflictSuccessClose}
+          />
+        </ReviewSetStageContext.Provider>
+      </ReviewSetScoresContext.Provider>
+    </>
   );
 };
 
 const Reviews: NextPage = () => {
   return (
-        <ProtectedRoute allowedRoles={["Admin", "User"]}>
-          <ProtectedApplication>
-            <ReviewsPages />
-          </ProtectedApplication>
-        </ProtectedRoute>
+    <ProtectedRoute allowedRoles={["Admin", "User"]}>
+      <ProtectedApplication>
+        <ReviewsPages />
+      </ProtectedApplication>
+    </ProtectedRoute>
   );
 };
 

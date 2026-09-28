@@ -1,3 +1,4 @@
+import type { ReviewActions } from "../types";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import { ApplicationDTO } from "@/types";
 import { ReviewedApplicantRecordWithReviewerResult } from "@/graphql/typeUtils";
@@ -20,6 +21,7 @@ interface Props {
   scores: ReviewScores;
   onReportConflict?: () => void;
   viewOnly?: boolean;
+  actions?: ReviewActions;
   reviewers?: ReviewedApplicantRecordWithReviewerResult[];
 }
 
@@ -29,6 +31,7 @@ export const ReviewTeamPlayerStage = ({
   scores,
   onReportConflict,
   viewOnly = false,
+  actions,
   reviewers = [],
 }: Props) => {
   const updateScore = useContext(ReviewSetScoresContext);
@@ -44,7 +47,12 @@ export const ReviewTeamPlayerStage = ({
   );
   const { TP } = ReviewStage;
   return (
-    <ReviewPageLayout currentStage={TP} scores={scores} viewOnly={viewOnly}>
+    <ReviewPageLayout
+      actions={actions}
+      currentStage={TP}
+      scores={scores}
+      viewOnly={viewOnly}
+    >
       <PanelLayout
         header={
           <ReviewStageHeader
@@ -91,11 +99,7 @@ export const ReviewTeamPlayerStage = ({
               ariaLabel="Team player score"
               onChange={(v) => updateScore?.(TP, v)}
             />
-            <span
-              className="text-xl leading-none text-red-500"
-            >
-              *
-            </span>
+            <span className="text-xl leading-none text-red-500">*</span>
           </div>
         )}
       </PanelLayout>

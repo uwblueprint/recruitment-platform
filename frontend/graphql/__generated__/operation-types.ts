@@ -271,6 +271,15 @@ export type UpdateInterviewGroupSchedulingLinkMutationVariables = Exact<{
 
 export type UpdateInterviewGroupSchedulingLinkMutation = { updateInterviewGroupSchedulingLink: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
 
+export type UpdateReviewedApplicantRecordMutationVariables = Exact<{
+  applicantRecordId: string | number;
+  reviewerId: string | number;
+  reviewedApplicantRecord: Types.UpdateReviewedApplicantRecordDto;
+}>;
+
+
+export type UpdateReviewedApplicantRecordMutation = { updateReviewedApplicantRecord: { applicantRecordId: string, reviewerId: string, status: string, score: number | null, reviewerHasConflict: boolean } };
+
 export type UploadInterviewNotesMutationVariables = Exact<{
   interviewedApplicantRecordId: string | number;
   file: File;

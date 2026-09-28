@@ -154,11 +154,22 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
           reviewer_id: Number(reviewerId),
         },
         transaction,
+        lock: transaction.LOCK.UPDATE,
       });
 
       if (!reviewedRecord) {
         throw new Error(
           `ReviewedApplicantRecord not found for applicantRecordId: ${applicantRecordId} and reviewerId: ${reviewerId}`,
+        );
+      }
+
+      if (
+        review &&
+        (reviewedRecord.status === "CONFLICT" ||
+          reviewedRecord.reviewer_has_conflict)
+      ) {
+        throw new Error(
+          "Conflict of interest is reported, this application cannot be reviewed anymore",
         );
       }
 
