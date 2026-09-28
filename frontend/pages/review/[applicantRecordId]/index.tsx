@@ -1,17 +1,14 @@
+import useReviewApplication from "@/APIClients/useReviewApplication";
 import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
-import { ApplicationDTO, AuthStatus } from "@/types";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ReportConflictButton } from "../_components/common/ReportConflictButton";
 import { ReviewStageHeader } from "../_components/common/ReviewStageHeader";
-import {
-  BACK_TO_HOME_HREF,
-  ReviewStage,
-} from "../_components/constants";
+import { BACK_TO_HOME_HREF, ReviewStage } from "../_components/constants";
 import { ReportConflictDialogue } from "../_components/dialogues/ReportConflictDialogue";
 import { ReportConflictSuccessDialogue } from "../_components/dialogues/ReportConflictSuccessDialogue";
 import {
@@ -41,11 +38,6 @@ const initialScores: ReviewScores = {
 const ReviewsPages: NextPage = () => {
   const router = useRouter();
   const [stage, setStage] = useState<ReviewStage>(ReviewStage.INFO);
-  const [application, setApplication] = useState<ApplicationDTO>();
-  const [authStatus, setAuthStatus] = useState<AuthStatus>({
-    loading: true,
-    isAuthorized: false,
-  });
   const [endData, setEndData] = useState<ReviewEndData>({
     comments: "",
     skillsCategory: "",
@@ -64,6 +56,8 @@ const ReviewsPages: NextPage = () => {
   const applicantRecordId = router.isReady
     ? getApplicantRecordId(router.query)
     : null;
+  const { application, loading, error } =
+    useReviewApplication(applicantRecordId);
   const applicantName = application
     ? `${application.firstName} ${application.lastName}`
     : "Applicant";
@@ -82,51 +76,21 @@ const ReviewsPages: NextPage = () => {
     });
   };
 
-  useEffect(() => {
-    if (applicantRecordId === null) return;
-    let cancelled = false;
-    const fetchApplication = async () => {
-      try {
-        const [data, record] = await Promise.all([
-          ReviewPageAPIClient.getApplication(applicantRecordId),
-          ReviewPageAPIClient.getReviewedApplicantRecordsByApplicantRecordId(
-            applicantRecordId,
-          ),
-        ]);
-        if (cancelled) return;
-        setApplication({
-          ...data,
-          id: Number(data.id),
-          firstChoiceRole: record.applicantRecord.position ?? "",
-          secondChoiceRole: "",
-          secondChoiceStatus: "",
-          timestamp: BigInt(0),
-          shortAnswerQuestions: data.shortAnswerQuestions.map(
-            ({ question, answer }) => ({ question, response: answer }),
-          ),
-          roleSpecificQuestions: [
-            JSON.stringify([
-              {
-                questions: data.roleSpecificQuestions.map(
-                  ({ question, answer }) => ({ question, response: answer }),
-                ),
-              },
-            ]),
-          ],
-        });
-      } catch (error) {
-        if (cancelled) return;
-        console.error("Failed to fetch application:", error);
-        setApplication(undefined);
-      }
-    };
-    fetchApplication();
-    return () => {
-      cancelled = true;
-    };
-  }, [applicantRecordId]);
-
   if (!router.isReady) return null;
+  if (applicantRecordId === null || error) {
+    return (
+      <p role="alert" className="p-8">
+        Unable to load this application. Please try again.
+      </p>
+    );
+  }
+  if (loading) {
+    return (
+      <p role="status" className="p-8">
+        Loading application…
+      </p>
+    );
+  }
 
   const getReviewStage = () => {
     switch (stage) {
@@ -218,7 +182,7 @@ const ReviewsPages: NextPage = () => {
       );
       setReportConflictDialogueOpen(false);
       setReportConflictSuccessDialogueOpen(true);
-    } catch (error) {
+    } catch {
       setReportConflictHasErrored(true);
     }
   };
@@ -249,11 +213,11 @@ const ReviewsPages: NextPage = () => {
 
 const Reviews: NextPage = () => {
   return (
-        <ProtectedRoute allowedRoles={["Admin", "User"]}>
-          <ProtectedApplication>
-            <ReviewsPages />
-          </ProtectedApplication>
-        </ProtectedRoute>
+    <ProtectedRoute allowedRoles={["Admin", "User"]}>
+      <ProtectedApplication>
+        <ReviewsPages />
+      </ProtectedApplication>
+    </ProtectedRoute>
   );
 };
 
