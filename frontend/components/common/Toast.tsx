@@ -1,3 +1,4 @@
+import ErrorOutline from "@mui/icons-material/ErrorOutline";
 import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
 import Close from "@mui/icons-material/Close";
 import Snackbar from "@mui/material/Snackbar";
@@ -8,6 +9,7 @@ type ToastProps = {
   description: string;
   onClose: () => void;
   autoHideDuration?: number;
+  severity?: "success" | "error";
 };
 
 export const Toast = ({
@@ -16,6 +18,7 @@ export const Toast = ({
   description,
   onClose,
   autoHideDuration = 6000,
+  severity = "success",
 }: ToastProps) => (
   <Snackbar
     open={open}
@@ -24,10 +27,18 @@ export const Toast = ({
     anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
   >
     <div
-      role="status"
-      className="flex min-w-[380px] items-start gap-3 rounded-lg border border-green-500 bg-green-50 px-4 py-3 text-neutral-800 shadow-md"
+      role={severity === "error" ? "alert" : "status"}
+      className={`flex min-w-[380px] items-start gap-3 rounded-lg border px-4 py-3 text-neutral-800 shadow-md ${
+        severity === "error"
+          ? "border-red-500 bg-red-50"
+          : "border-green-500 bg-green-50"
+      }`}
     >
-      <CheckCircleOutline className="mt-0.5 text-green-500" />
+      {severity === "error" ? (
+        <ErrorOutline className="mt-0.5 text-red-500" />
+      ) : (
+        <CheckCircleOutline className="mt-0.5 text-green-500" />
+      )}
       <div className="min-w-0 flex-1">
         <p className="font-poppins text-base font-medium">{title}</p>
         <p className="font-source text-sm">{description}</p>

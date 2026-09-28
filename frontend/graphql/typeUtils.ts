@@ -357,3 +357,9 @@ export type AdminCommentResult = ArrayElement<
     "adminCommentsByApplicantRecordId"
   >
 >;
+
+export { UpdateReviewedApplicantRecordDocument } from "./__generated__/graphql";
+export type {
+  UpdateReviewedApplicantRecordMutation,
+  UpdateReviewedApplicantRecordMutationVariables,
+} from "./__generated__/operation-types";

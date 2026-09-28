@@ -1,3 +1,4 @@
+import useUpdateReviewedApplicantRecord from "@/APIClients/useUpdateReviewedApplicantRecord";
 import useReviewApplication from "@/APIClients/useReviewApplication";
 import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
@@ -12,6 +13,7 @@ import { BACK_TO_HOME_HREF, ReviewStage } from "../_components/constants";
 import { ReportConflictDialogue } from "../_components/dialogues/ReportConflictDialogue";
 import { ReportConflictSuccessDialogue } from "../_components/dialogues/ReportConflictSuccessDialogue";
 import {
+  UpdateReviewedApplicantRecordContext,
   ReviewSetScoresContext,
   ReviewSetStageContext,
 } from "../_components/ReviewContext";
@@ -43,7 +45,11 @@ const ReviewsPages: NextPage = () => {
     skillsCategory: "",
     secondChoiceRole: "",
   });
-  const [scores, setScores] = useState<ReviewScores>(initialScores);
+  const [scoreEdits, setScoreEdits] = useState<{
+    applicantRecordId: string | null;
+    reviewerId: string | undefined;
+    values: Partial<ReviewScores>;
+  }>();
   const [reportConflictDialogueOpen, setReportConflictDialogueOpen] =
     useState(false);
   const [
@@ -56,7 +62,7 @@ const ReviewsPages: NextPage = () => {
   const applicantRecordId = router.isReady
     ? getApplicantRecordId(router.query)
     : null;
-  const { application, loading, error } =
+  const { application, reviewersData, loading, error } =
     useReviewApplication(applicantRecordId);
   const applicantName = application
     ? `${application.firstName} ${application.lastName}`
@@ -67,13 +73,60 @@ const ReviewsPages: NextPage = () => {
     ? authenticatedUser.firstName
     : "Reviewer";
 
+  const reviewerId = authenticatedUser?.id;
+  const reviewerRecord = reviewersData?.reviewedApplicantRecords.find(
+    ({ reviewer }) => reviewer.id === reviewerId,
+  )?.reviewedApplicantRecord;
+  const savedReview = reviewerRecord?.review;
+  const scores: ReviewScores = {
+    ...initialScores,
+    [ReviewStage.PFSG]: savedReview?.passionFSG ?? 0,
+    [ReviewStage.TP]: savedReview?.teamPlayer ?? 0,
+    [ReviewStage.D2L]: savedReview?.desireToLearn ?? 0,
+    [ReviewStage.SKL]: savedReview?.skill ?? 0,
+    // Keep local edits over query updates, scoped to this applicant and reviewer.
+    ...(scoreEdits?.applicantRecordId === applicantRecordId &&
+    scoreEdits?.reviewerId === reviewerId
+      ? scoreEdits?.values
+      : {}),
+  };
+
   const updateScores = (key: ReviewStage, value: number) => {
-    setScores((prev) => {
-      if (isNaN(value) || value < 0 || value > 5) {
-        return prev;
-      }
-      return { ...prev, [key]: value };
-    });
+    if (isNaN(value) || value < 0 || value > 5) return;
+    setScoreEdits((prev) => ({
+      applicantRecordId,
+      reviewerId,
+      values: {
+        ...(prev?.applicantRecordId === applicantRecordId &&
+        prev?.reviewerId === reviewerId
+          ? prev?.values
+          : {}),
+        [key]: value,
+      },
+    }));
+  };
+
+  const {
+    updateReviewedApplicantRecord,
+    loading: updating,
+    error: updateError,
+    reset: resetUpdate,
+  } = useUpdateReviewedApplicantRecord();
+
+  const updateReview = (onCompleted: () => void) => {
+    if (!applicantRecordId || !reviewerId || !reviewerRecord) return;
+    // The server checks the latest conflict status and reports mutation errors.
+    updateReviewedApplicantRecord(
+      applicantRecordId,
+      reviewerId,
+      {
+        passionFSG: scores[ReviewStage.PFSG],
+        teamPlayer: scores[ReviewStage.TP],
+        desireToLearn: scores[ReviewStage.D2L],
+        skill: scores[ReviewStage.SKL],
+      },
+      onCompleted,
+    );
   };
 
   if (!router.isReady) return null;
@@ -88,6 +141,14 @@ const ReviewsPages: NextPage = () => {
     return (
       <p role="status" className="p-8">
         Loading application…
+      </p>
+    );
+  }
+
+  if (!reviewerId || !reviewerRecord) {
+    return (
+      <p role="alert" className="p-8">
+        No assigned review found for the current user.
       </p>
     );
   }
@@ -193,21 +254,30 @@ const ReviewsPages: NextPage = () => {
   };
 
   return (
-    <ReviewSetScoresContext.Provider value={updateScores}>
-      <ReviewSetStageContext.Provider value={setStage}>
-        {getReviewStage()}
-        <ReportConflictDialogue
-          open={reportConflictDialogueOpen}
-          hasError={reportConflictHasErrored}
-          onClose={() => setReportConflictDialogueOpen(false)}
-          onConfirm={reportConflict}
-        />
-        <ReportConflictSuccessDialogue
-          open={reportConflictSuccessDialogueOpen}
-          onClose={onReportConflictSuccessClose}
-        />
-      </ReviewSetStageContext.Provider>
-    </ReviewSetScoresContext.Provider>
+    <UpdateReviewedApplicantRecordContext.Provider
+      value={{
+        update: updateReview,
+        loading: updating,
+        error: updateError,
+        reset: resetUpdate,
+      }}
+    >
+      <ReviewSetScoresContext.Provider value={updateScores}>
+        <ReviewSetStageContext.Provider value={setStage}>
+          {getReviewStage()}
+          <ReportConflictDialogue
+            open={reportConflictDialogueOpen}
+            hasError={reportConflictHasErrored}
+            onClose={() => setReportConflictDialogueOpen(false)}
+            onConfirm={reportConflict}
+          />
+          <ReportConflictSuccessDialogue
+            open={reportConflictSuccessDialogueOpen}
+            onClose={onReportConflictSuccessClose}
+          />
+        </ReviewSetStageContext.Provider>
+      </ReviewSetScoresContext.Provider>
+    </UpdateReviewedApplicantRecordContext.Provider>
   );
 };
 

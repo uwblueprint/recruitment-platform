@@ -49,6 +49,7 @@ type Documents = {
     "mutation UpdateApplicantRecordStatus($id: ID!, $status: ApplicationStatus!) {\n  updateApplicantRecordStatus(id: $id, status: $status) {\n    id\n    status\n  }\n}": typeof types.UpdateApplicantRecordStatusDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupDocument,
     "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}": typeof types.UpdateInterviewGroupSchedulingLinkDocument,
+    "mutation UpdateReviewedApplicantRecord($applicantRecordId: ID!, $reviewerId: ID!, $reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!) {\n  updateReviewedApplicantRecord(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n    reviewedApplicantRecord: $reviewedApplicantRecord\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": typeof types.UpdateReviewedApplicantRecordDocument,
     "mutation UploadInterviewNotes($interviewedApplicantRecordId: ID!, $file: Upload!) {\n  uploadInterviewNotes(\n    interviewedApplicantRecordId: $interviewedApplicantRecordId\n    file: $file\n  ) {\n    fileId\n    fileName\n    signedUrl\n  }\n}": typeof types.UploadInterviewNotesDocument,
     "query UsersByPosition($position: String!) {\n  usersByPosition(position: $position) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": typeof types.UsersByPositionDocument,
 };
@@ -88,6 +89,7 @@ const documents: Documents = {
     "mutation UpdateApplicantRecordStatus($id: ID!, $status: ApplicationStatus!) {\n  updateApplicantRecordStatus(id: $id, status: $status) {\n    id\n    status\n  }\n}": types.UpdateApplicantRecordStatusDocument,
     "mutation UpdateInterviewGroup($id: ID!, $interviewGroup: UpdateInterviewGroupDTO!) {\n  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupDocument,
     "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}": types.UpdateInterviewGroupSchedulingLinkDocument,
+    "mutation UpdateReviewedApplicantRecord($applicantRecordId: ID!, $reviewerId: ID!, $reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!) {\n  updateReviewedApplicantRecord(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n    reviewedApplicantRecord: $reviewedApplicantRecord\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}": types.UpdateReviewedApplicantRecordDocument,
     "mutation UploadInterviewNotes($interviewedApplicantRecordId: ID!, $file: Upload!) {\n  uploadInterviewNotes(\n    interviewedApplicantRecordId: $interviewedApplicantRecordId\n    file: $file\n  ) {\n    fileId\n    fileName\n    signedUrl\n  }\n}": types.UploadInterviewNotesDocument,
     "query UsersByPosition($position: String!) {\n  usersByPosition(position: $position) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n  }\n}": types.UsersByPositionDocument,
 };
@@ -246,6 +248,10 @@ export function gql(source: "mutation UpdateInterviewGroup($id: ID!, $interviewG
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}"): (typeof documents)["mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {\n  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {\n    id\n    schedulingLink\n    status\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation UpdateReviewedApplicantRecord($applicantRecordId: ID!, $reviewerId: ID!, $reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!) {\n  updateReviewedApplicantRecord(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n    reviewedApplicantRecord: $reviewedApplicantRecord\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}"): (typeof documents)["mutation UpdateReviewedApplicantRecord($applicantRecordId: ID!, $reviewerId: ID!, $reviewedApplicantRecord: UpdateReviewedApplicantRecordDTO!) {\n  updateReviewedApplicantRecord(\n    applicantRecordId: $applicantRecordId\n    reviewerId: $reviewerId\n    reviewedApplicantRecord: $reviewedApplicantRecord\n  ) {\n    applicantRecordId\n    reviewerId\n    status\n    score\n    reviewerHasConflict\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

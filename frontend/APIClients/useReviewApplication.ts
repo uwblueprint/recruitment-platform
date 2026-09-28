@@ -54,7 +54,16 @@ export default function useReviewApplication(applicantRecordId: string | null) {
   const recordQuery = useQuery<
     ReviewedApplicantRecordsByApplicantRecordIdQuery,
     ReviewedApplicantRecordsByApplicantRecordIdQueryVariables
-  >(ReviewedApplicantRecordsByApplicantRecordIdDocument, options);
+  >(
+    ReviewedApplicantRecordsByApplicantRecordIdDocument,
+    options === skipToken
+      ? skipToken
+      : {
+          ...options,
+          // Keep the form mounted while a successful save refreshes reviewer data.
+          notifyOnNetworkStatusChange: false,
+        },
+  );
 
   // skipToken retains previous data; never expose it without a current ID.
   if (applicantRecordId === null) {

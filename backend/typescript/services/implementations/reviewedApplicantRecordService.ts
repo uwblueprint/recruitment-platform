@@ -154,6 +154,7 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
           reviewer_id: Number(reviewerId),
         },
         transaction,
+        lock: transaction.LOCK.UPDATE,
       });
 
       if (!reviewedRecord) {
@@ -162,9 +163,25 @@ class ReviewedApplicantRecordService implements IReviewApplicantRecordService {
         );
       }
 
+      if (
+        review &&
+        (reviewedRecord.status === "CONFLICT" ||
+          reviewedRecord.reviewer_has_conflict)
+      ) {
+        throw new Error(
+          "Conflict of interest is reported, this application cannot be reviewed anymore",
+        );
+      }
+
+      // Score-only saves start a pending review without reopening completed reviews.
+      const nextStatus =
+        review && status === undefined && reviewedRecord.status === "TODO"
+          ? "IN_PROGRESS"
+          : status;
+
       await reviewedRecord.update(
         {
-          status,
+          status: nextStatus,
           reviewer_has_conflict: reviewerHasConflict,
         },
         { transaction },
