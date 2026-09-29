@@ -1,19 +1,11 @@
 import { useCallback } from "react";
-import { skipToken, useMutation, useQuery } from "@apollo/client/react";
+import useAdminCommentsByApplicantRecordId from "@/APIClients/useAdminCommentsByApplicantRecordId";
+import useCreateAdminComment from "@/APIClients/useCreateAdminComment";
+import useUpdateAdminComment from "@/APIClients/useUpdateAdminComment";
+import useDeleteAdminComment from "@/APIClients/useDeleteAdminComment";
 import {
   AdminCommentsByApplicantRecordIdDocument,
-  CreateAdminCommentDocument,
-  UpdateAdminCommentDocument,
-  DeleteAdminCommentByIdDocument,
   type AdminCommentResult,
-  type AdminCommentsByApplicantRecordIdQuery,
-  type AdminCommentsByApplicantRecordIdQueryVariables,
-  type CreateAdminCommentMutation,
-  type CreateAdminCommentMutationVariables,
-  type UpdateAdminCommentMutation,
-  type UpdateAdminCommentMutationVariables,
-  type DeleteAdminCommentByIdMutation,
-  type DeleteAdminCommentByIdMutationVariables,
 } from "@/graphql/typeUtils";
 
 type UseAdminCommentsResult = {
@@ -51,33 +43,14 @@ const refreshComments = (applicantRecordId: string) => ({
 const useAdminComments = (
   applicantRecordId: string | null
 ): UseAdminCommentsResult => {
-  const { data, loading, error } = useQuery<
-    AdminCommentsByApplicantRecordIdQuery,
-    AdminCommentsByApplicantRecordIdQueryVariables
-  >(
-    AdminCommentsByApplicantRecordIdDocument,
-    !applicantRecordId
-      ? skipToken
-      : {
-          variables: { applicantRecordId },
-          fetchPolicy: "network-only",
-          context: { refreshAuth: true },
-          // Keep comment forms mounted while a mutation refreshes the list.
-          notifyOnNetworkStatusChange: false,
-        }
-  );
-  const [create] = useMutation<
-    CreateAdminCommentMutation,
-    CreateAdminCommentMutationVariables
-  >(CreateAdminCommentDocument, { context: { refreshAuth: true } });
-  const [update] = useMutation<
-    UpdateAdminCommentMutation,
-    UpdateAdminCommentMutationVariables
-  >(UpdateAdminCommentDocument, { context: { refreshAuth: true } });
-  const [remove] = useMutation<
-    DeleteAdminCommentByIdMutation,
-    DeleteAdminCommentByIdMutationVariables
-  >(DeleteAdminCommentByIdDocument, { context: { refreshAuth: true } });
+  const { data: rows, loading: isLoading, error } =
+    useAdminCommentsByApplicantRecordId(applicantRecordId ?? undefined, {
+      // Keep comment forms mounted while a mutation refreshes the list.
+      notifyOnNetworkStatusChange: false,
+    });
+  const { mutate: create } = useCreateAdminComment();
+  const { mutate: update } = useUpdateAdminComment();
+  const { mutate: remove } = useDeleteAdminComment();
 
   const createComment = useCallback(
     async (userId: string, comment: string) => {
@@ -121,12 +94,7 @@ const useAdminComments = (
     [applicantRecordId, remove]
   );
 
-  // skipToken retains previous data; never expose it without a current ID.
-  const rows = applicantRecordId
-    ? data?.adminCommentsByApplicantRecordId
-    : undefined;
-  const isLoading = !!applicantRecordId && loading;
-  const hasError = !!applicantRecordId && (!!error || (!loading && !rows));
+  const hasError = !!error;
 
   return {
     comments:
