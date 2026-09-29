@@ -1,12 +1,9 @@
-import { useMutation, useQuery } from "@apollo/client/react";
+import useUsersByPosition from "@/APIClients/useUsersByPosition";
+import useReassignReviewerMutation from "@/APIClients/useReassignReviewer";
 import {
-  UsersByPositionDocument,
-  type UsersByPositionQuery,
-  type UsersByPositionQueryVariables,
+  ReviewedApplicantRecordsByApplicantRecordIdDocument,
+  ReviewDashboardSidePanelDocument,
   type UsersByPositionResult,
-  ReassignReviewerDocument,
-  type ReassignReviewerMutation,
-  type ReassignReviewerMutationVariables,
 } from "@/graphql/typeUtils";
 
 type ReviewerUser = NonNullable<UsersByPositionResult[number]>;
@@ -15,25 +12,10 @@ export default function useReassignReviewer(
   position: string,
   currentReviewerId: string
 ) {
-  const usersQuery = useQuery<
-    UsersByPositionQuery,
-    UsersByPositionQueryVariables
-  >(UsersByPositionDocument, {
-    variables: { position },
-    fetchPolicy: "network-only",
-    context: { refreshAuth: true },
-  });
-  const users = usersQuery.data?.usersByPosition;
-  const usersError = !!usersQuery.error || (!usersQuery.loading && !users);
-
-  const [mutate, { data, called, loading, error }] = useMutation<
-    ReassignReviewerMutation,
-    ReassignReviewerMutationVariables
-  >(ReassignReviewerDocument, {
-    context: { refreshAuth: true },
-    // Apollo exposes failures through `error`; event handlers need no catch.
-    onError: () => {},
-  });
+  const usersQuery = useUsersByPosition(position);
+  const users = usersQuery.data;
+  const usersError = !!usersQuery.error;
+  const { mutate, loading, error } = useReassignReviewerMutation();
 
   const reassignReviewer = (
     applicantRecordId: string,
@@ -41,8 +23,25 @@ export default function useReassignReviewer(
     newReviewerId: string,
     onCompleted: () => void
   ): void => {
+    if (
+      loading ||
+      !users?.some(
+        (user) =>
+          user &&
+          !user.isArchived &&
+          user.id === newReviewerId &&
+          user.id !== currentReviewerId
+      )
+    )
+      return;
     void mutate({
       variables: { applicantRecordId, oldReviewerId, newReviewerId },
+      // Refresh mounted detail views; the page callback refreshes dashboard rows and IDs.
+      refetchQueries: [
+        ReviewedApplicantRecordsByApplicantRecordIdDocument,
+        ReviewDashboardSidePanelDocument,
+      ],
+      awaitRefetchQueries: true,
       onCompleted: (result) => {
         if (result.reassignReviewer) onCompleted();
       },
@@ -67,10 +66,6 @@ export default function useReassignReviewer(
     usersError,
     reassignReviewer,
     isSubmitting: loading,
-    updateError:
-      error ??
-      (called && !loading && !data?.reassignReviewer
-        ? new Error("No reassigned reviewer returned")
-        : undefined),
+    updateError: error,
   };
 }
