@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/router";
 import { getApplicantRecordId } from "@/pages/review/_components/utils";
 import useInterviewNotes from "@/APIClients/useInterviewNotes";
+import type { InterviewNotesState } from "../../_components/assessment/types";
 import useInterviewAssessmentRecord from "@/APIClients/useInterviewAssessmentRecord";
 import useSubmitInterviewScores from "@/APIClients/useSubmitInterviewScores";
 import type { InterviewInput } from "@/graphql/typeUtils";
@@ -29,7 +30,7 @@ export type AssessmentContextValue = {
   canSubmit: boolean;
   error: string | null;
   submitScores: () => Promise<void>;
-  interviewNotes: ReturnType<typeof useInterviewNotes>;
+  interviewNotes: InterviewNotesState;
 };
 
 export const AssessmentContext = createContext<AssessmentContextValue | null>(
@@ -141,8 +142,10 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
     loading: isUploading,
     error: uploadError,
   } = useUploadInterviewNotes(recordId);
-  const interviewNotes = {
-    ...notesQuery,
+  const interviewNotes: InterviewNotesState = {
+    notes: notesQuery.data ?? null,
+    isLoading: notesQuery.loading,
+    hasError: !!notesQuery.error,
     uploadNotes,
     uploadError,
     isUploading,

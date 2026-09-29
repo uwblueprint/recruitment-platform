@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { useDropzone, type FileRejection } from "react-dropzone";
 
-import type useInterviewNotes from "@/APIClients/useInterviewNotes";
+import type { InterviewNotesState } from "./types";
 import { Button } from "@/components/common/Button";
 import { CloudUploadIcon } from "@/components/icons/cloud-upload.icon";
 import { CheckIcon } from "@/components/icons/check.icon";
@@ -15,7 +15,7 @@ import {
 
 type Props = {
   interviewedApplicantRecordId: string | null;
-} & ReturnType<typeof useInterviewNotes>;
+} & InterviewNotesState;
 
 const formatBytes = (bytes: number): string => {
   if (bytes < 1024) return `${bytes} B`;
