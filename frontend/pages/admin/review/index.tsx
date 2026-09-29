@@ -1,6 +1,7 @@
 import { ReviewDashboardSidePanel } from "./_components/side-panel/ReviewDashboardSidePanel";
 import { Toast } from "@/components/common/Toast";
 import { DashboardTable } from "@/components/dashboard/table";
+import { DashboardSwitcher, DASHBOARD_ENUM } from "@/components/dashboard/common/DashboardSwitcher";
 import {
   FilterCategoryVariant,
   type SelectedFilters,
@@ -299,6 +300,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
+        <DashboardSwitcher currentDashboard={DASHBOARD_ENUM.REVIEW} />
         <DashboardTabs
           activeView={activeView}
           onViewChange={handleViewChange}
