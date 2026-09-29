@@ -3,19 +3,12 @@ import {
   InterviewDashboardSidePanelDocument,
   type InterviewDashboardSidePanelQuery,
   type InterviewDashboardSidePanelQueryVariables,
-  type InterviewDashboardSidePanelResult,
 } from "@/graphql/typeUtils";
 
-type UseInterviewDashboardSidePanelResult = {
-  data: InterviewDashboardSidePanelResult | null;
-  isLoading: boolean;
-  hasError: boolean;
-};
-
-const useInterviewDashboardSidePanel = (
-  applicantRecordId: string | null,
-): UseInterviewDashboardSidePanelResult => {
-  const { data, loading, error } = useQuery<
+export default function useInterviewDashboardSidePanel(
+  applicantRecordId?: string
+) {
+  const { data, loading, error, refetch } = useQuery<
     InterviewDashboardSidePanelQuery,
     InterviewDashboardSidePanelQueryVariables
   >(
@@ -26,22 +19,26 @@ const useInterviewDashboardSidePanel = (
           variables: { applicantRecordId },
           fetchPolicy: "network-only",
           context: { refreshAuth: true },
-        },
+          notifyOnNetworkStatusChange: false,
+        }
   );
 
   // skipToken retains previous data; never expose it without a current ID.
   if (!applicantRecordId) {
-    return { data: null, isLoading: false, hasError: false };
+    return { data: undefined, loading: false, error: undefined, refetch };
   }
 
   const details = data?.interviewDashboardSidePanel;
-  const hasError = !!error || (!loading && !details);
+  const queryError =
+    error ??
+    (!loading && !details
+      ? new Error("No interview details returned")
+      : undefined);
 
   return {
-    data: !loading && !hasError ? details ?? null : null,
-    isLoading: loading,
-    hasError,
+    data: !loading && !queryError ? details : undefined,
+    loading,
+    error: queryError,
+    refetch,
   };
-};
-
-export default useInterviewDashboardSidePanel;
+}
