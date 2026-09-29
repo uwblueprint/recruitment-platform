@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Tab, Tabs } from "@mui/material";
 import { InterviewInvite } from "./types";
 import { InterviewInviteRow } from "./InterviewInviteRow";
@@ -6,58 +5,26 @@ import { theme } from "@/styles/Theme";
 import { SearchIcon } from "@/components/icons/search.icon";
 import { FilterIcon } from "@/components/icons/filter.icon";
 
-const READY_STATUSES = new Set(["AVAILABILITY_PENDING", "READY_TO_INTERVIEW"]);
-
-type TabValue = "ready" | "sent";
+import useInterviewInviteList, { type TabValue } from "./hooks/useInterviewInviteList";
 
 type InterviewInviteListProps = {
   invites: InterviewInvite[];
 };
 
 export const InterviewInviteList = ({ invites }: InterviewInviteListProps) => {
-  const [activeTab, setActiveTab] = useState<TabValue>("ready");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-
-  const readyInvites = invites.filter((i) => READY_STATUSES.has(i.status));
-  const sentInvites = invites.filter((i) => !READY_STATUSES.has(i.status));
-
-  const activeInvites = activeTab === "ready" ? readyInvites : sentInvites;
-  const filteredInvites = searchQuery.trim()
-    ? activeInvites.filter((i) =>
-        i.interviewers.some((name) =>
-          name.toLowerCase().includes(searchQuery.toLowerCase()),
-        ),
-      )
-    : activeInvites;
-
-  const allSelected =
-    filteredInvites.length > 0 &&
-    filteredInvites.every((i) => selectedIds.has(i.id));
-
-  const handleSelectAll = () => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (allSelected) {
-        filteredInvites.forEach((i) => next.delete(i.id));
-      } else {
-        filteredInvites.forEach((i) => next.add(i.id));
-      }
-      return next;
-    });
-  };
-
-  const toggleSelect = (id: string, checked: boolean) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (checked) {
-        next.add(id);
-      } else {
-        next.delete(id);
-      }
-      return next;
-    });
-  };
+  const {
+    activeTab,
+    setActiveTab,
+    searchQuery,
+    setSearchQuery,
+    selectedIds,
+    readyInvites,
+    sentInvites,
+    filteredInvites,
+    allSelected,
+    handleSelectAll,
+    toggleSelect,
+  } = useInterviewInviteList(invites);
 
   return (
     <div className="w-full flex flex-col gap-4">

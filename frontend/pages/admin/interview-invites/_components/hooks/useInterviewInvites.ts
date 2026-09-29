@@ -1,34 +1,22 @@
-import { useQuery } from "@apollo/client/react";
-import {
-  InterviewInvitesDocument,
-  type InterviewInvitesQuery,
-  type InterviewInvitesQueryVariables,
-  type InterviewInviteResult,
-} from "@/graphql/typeUtils";
+import useInterviewInvitesData from "@/APIClients/useInterviewInvites";
+import type { InterviewInvite } from "../types";
 
-type UseInterviewInvitesResult = {
-  invites: InterviewInviteResult[];
-  isLoading: boolean;
-  error: boolean;
-};
+export default function useInterviewInvites() {
+  const { data, loading, error, refetch } = useInterviewInvitesData();
 
-const useInterviewInvites = (): UseInterviewInvitesResult => {
-  const { data, loading, error } = useQuery<
-    InterviewInvitesQuery,
-    InterviewInvitesQueryVariables
-  >(InterviewInvitesDocument, {
-    fetchPolicy: "network-only",
-    context: { refreshAuth: true },
-  });
+  const invites: InterviewInvite[] = (data ?? []).map((invite) => ({
+    id: invite.id,
+    interviewers: invite.interviewers.map(
+      (u) => `${u.firstName} ${u.lastName}`,
+    ),
+    interviewees: invite.interviewees.map((ie) => ({
+      name: `${ie.firstName} ${ie.lastName}`,
+      role: ie.position,
+    })),
+    interviewType: invite.position,
+    calendlyLink: invite.schedulingLink ?? "",
+    status: invite.status,
+  }));
 
-  const invites = data?.interviewInvites;
-  const hasError = !!error || (!loading && !invites);
-
-  return {
-    invites: !loading && !hasError ? invites ?? [] : [],
-    isLoading: loading,
-    error: hasError,
-  };
-};
-
-export default useInterviewInvites;
+  return { invites, isLoading: loading, error, refetch };
+}

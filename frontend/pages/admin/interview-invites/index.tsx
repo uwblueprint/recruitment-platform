@@ -1,25 +1,11 @@
 import { NextPageWithLayout } from "../../_app";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
-import { InterviewInvite } from "./_components/types";
 import { InterviewInviteList } from "./_components/InterviewInviteList";
 import useInterviewInvites from "./_components/hooks/useInterviewInvites";
 
 const InterviewInvites: NextPageWithLayout = () => {
-  const { invites: rawInvites, isLoading, error } = useInterviewInvites();
+  const { invites, isLoading, error } = useInterviewInvites();
 
-  const invites: InterviewInvite[] = rawInvites.map((invite) => ({
-    id: invite.id,
-    interviewers: invite.interviewers.map(
-      (u) => `${u.firstName} ${u.lastName}`,
-    ),
-    interviewees: invite.interviewees.map((ie) => ({
-      name: `${ie.firstName} ${ie.lastName}`,
-      role: ie.position,
-    })),
-    interviewType: invite.position,
-    calendlyLink: invite.schedulingLink ?? "",
-    status: invite.status,
-  }));
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
