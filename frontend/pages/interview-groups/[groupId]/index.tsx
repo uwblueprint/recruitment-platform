@@ -17,6 +17,7 @@ import CalendlySection from "../_components/CalendlySection";
 import InterviewGroupIllustrationPanel from "../_components/InterviewGroupIllustrationPanel";
 import InterviewPageHeader from "../_components/InterviewPageHeader";
 import PartnerSection from "../_components/PartnerSection";
+import { Role } from "@/graphql/__generated__/types";
 
 const InterviewGroupContent = ({
   interviewGroupId,
@@ -125,7 +126,7 @@ const InterviewGroupPage: NextPageWithLayout = () => {
 };
 
 InterviewGroupPage.getLayout = (page: ReactElement) => (
-  <ProtectedRoute allowedRoles={["Admin", "User"]}>
+  <ProtectedRoute allowedRoles={[Role.Admin, Role.User]}>
     <SplitPanelLayout
       leftWidth={SPLIT_PANEL_WIDTHS.interview.left}
       header={<InterviewHeader steps={[]} />}

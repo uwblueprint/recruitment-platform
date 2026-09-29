@@ -7,6 +7,7 @@ import {
   isAuthorizedByEmail,
   isAuthorizedByRole,
   isAuthorizedByUserId,
+  isAuthorizedForApplicantReview,
 } from "../middlewares/auth";
 import adminCommentResolvers from "./resolvers/adminCommentResolvers";
 import applicantRecordResolvers from "./resolvers/applicantRecordResolvers";
@@ -107,7 +108,7 @@ const graphQLMiddlewares = {
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
     reviewedApplicantRecord: authorizedByAdmin(),
-    reviewedApplicantRecordsByApplicantRecordId: authorizedByAdmin(),
+    reviewedApplicantRecordsByApplicantRecordId: isAuthorizedForApplicantReview(),
     reviewedApplicantsByUserId: authorizedByAllRoles(),
     application: authorizedByAllRoles(),
     interviewedApplicantRecord: authorizedByAllRoles(),

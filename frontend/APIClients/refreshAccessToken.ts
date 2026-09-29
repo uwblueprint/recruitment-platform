@@ -3,7 +3,7 @@ import jwt_decode from "jwt-decode";
 type RefreshToken = (token: string) => Promise<string | null | undefined>;
 let pendingRefresh: Promise<void> | undefined;
 
-// Shared by imperative API clients and queries that opt into auth refresh.
+// Deduplicates concurrent refreshes for operations that opt into auth refresh.
 export async function refreshAccessToken(refresh: RefreshToken): Promise<void> {
   if (pendingRefresh) return pendingRefresh;
 
