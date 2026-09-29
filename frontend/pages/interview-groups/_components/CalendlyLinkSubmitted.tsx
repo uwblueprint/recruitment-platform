@@ -2,6 +2,7 @@ import { EditIcon } from "@/components/icons/edit.icon";
 import { CheckCircleIcon } from "@/components/icons/check-circle.icon";
 
 type CalendlyLinkSubmittedProps = {
+  disabled?: boolean;
   linkInput: string;
   onLinkChange: (value: string) => void;
   isEditing: boolean;
@@ -10,6 +11,7 @@ type CalendlyLinkSubmittedProps = {
 };
 
 const CalendlyLinkSubmitted = ({
+  disabled = false,
   linkInput,
   onLinkChange,
   isEditing,
@@ -35,6 +37,7 @@ const CalendlyLinkSubmitted = ({
           <input
             type="text"
             value={linkInput}
+            disabled={disabled}
             onChange={(e) => onLinkChange(e.target.value)}
             className="w-full border border-input rounded-[5px] py-[10px] px-5 text-sm text-charcoal-400 font-normal leading-[1.43] outline-none focus:border-blue"
           />
@@ -55,10 +58,10 @@ const CalendlyLinkSubmitted = ({
       </div>
       <div className="flex justify-end">
         <button
-          disabled={!isEditing || !linkInput}
+          disabled={disabled || !isEditing || !linkInput}
           onClick={onResubmit}
           className={`rounded-full py-2 px-4 bg-blue text-white font-source text-base font-normal leading-[1.4] ${
-            !isEditing || !linkInput
+            disabled || !isEditing || !linkInput
               ? "opacity-50 cursor-not-allowed"
               : "hover:opacity-90"
           }`}
