@@ -1,4 +1,4 @@
-import useInterviewInvitesData from "@/APIClients/useInterviewInvites";
+import useInterviewInvitesData from "@/APIClients/queries/useInterviewInvites";
 import type { InterviewInvite } from "../types";
 
 export default function useInterviewInvites() {

@@ -1,7 +1,7 @@
 import { useReducer, useRef, useState } from "react";
 
-import useSendRejectionEmails from "@/APIClients/useSendRejectionEmails";
-import useBulkUpdateApplicantRecordsStatus from "@/APIClients/useBulkUpdateApplicantRecordsStatus";
+import useSendRejectionEmails from "@/APIClients/mutations/useSendRejectionEmails";
+import useBulkUpdateApplicantRecordsStatus from "@/APIClients/mutations/useBulkUpdateApplicantRecordsStatus";
 import type {
   BulkStatusApplicant,
   BulkStatusConfirmationDialogueProps,

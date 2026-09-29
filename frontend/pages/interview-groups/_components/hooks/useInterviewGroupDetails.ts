@@ -1,6 +1,6 @@
-import useInterviewGroup from "@/APIClients/useInterviewGroup";
-import useInterviewersByGroupId from "@/APIClients/useInterviewersByGroupId";
-import useInterviewedApplicantsByUserId from "@/APIClients/useInterviewedApplicantsByUserId";
+import useInterviewGroup from "@/APIClients/queries/useInterviewGroup";
+import useInterviewersByGroupId from "@/APIClients/queries/useInterviewersByGroupId";
+import useInterviewedApplicantsByUserId from "@/APIClients/queries/useInterviewedApplicantsByUserId";
 
 export default function useInterviewGroupDetails(
   groupId: string,

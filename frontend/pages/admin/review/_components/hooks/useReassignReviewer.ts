@@ -1,5 +1,5 @@
-import useUsersByPosition from "@/APIClients/useUsersByPosition";
-import useReassignReviewerMutation from "@/APIClients/useReassignReviewer";
+import useUsersByPosition from "@/APIClients/queries/useUsersByPosition";
+import useReassignReviewerMutation from "@/APIClients/mutations/useReassignReviewer";
 import {
   ReviewedApplicantRecordsByApplicantRecordIdDocument,
   ReviewDashboardSidePanelDocument,

@@ -1,6 +1,6 @@
-import useReviewedApplicantsByUserId from "@/APIClients/useReviewedApplicantsByUserId";
-import useInterviewedApplicantsByUserId from "@/APIClients/useInterviewedApplicantsByUserId";
-import useInterviewedPairingsByUserId from "@/APIClients/useInterviewedPairingsByUserId";
+import useReviewedApplicantsByUserId from "@/APIClients/queries/useReviewedApplicantsByUserId";
+import useInterviewedApplicantsByUserId from "@/APIClients/queries/useInterviewedApplicantsByUserId";
+import useInterviewedPairingsByUserId from "@/APIClients/queries/useInterviewedPairingsByUserId";
 import { HomeTab, type Tab } from "../constants";
 
 export default function useHomeDashboard(userId?: string) {

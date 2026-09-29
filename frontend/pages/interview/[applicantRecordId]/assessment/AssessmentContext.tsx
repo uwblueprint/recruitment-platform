@@ -9,17 +9,17 @@ import {
 } from "react";
 import { useRouter } from "next/router";
 import { getApplicantRecordId } from "@/pages/review/_components/utils";
-import useInterviewNotes from "@/APIClients/useInterviewNotes";
+import useInterviewNotes from "@/APIClients/queries/useInterviewNotes";
 import type { InterviewNotesState } from "../../_components/assessment/types";
-import useInterviewAssessmentRecord from "@/APIClients/useInterviewAssessmentRecord";
-import useSubmitInterviewScores from "@/APIClients/useSubmitInterviewScores";
+import useInterviewAssessmentRecord from "@/APIClients/queries/useInterviewAssessmentRecord";
+import useSubmitInterviewScores from "@/APIClients/mutations/useSubmitInterviewScores";
 import type { InterviewInput } from "@/graphql/typeUtils";
 import {
   EMPTY_SCORE_FORM,
   isScoreFormComplete,
   type ScoreFormState,
 } from "../../_components/assessment/constants";
-import useUploadInterviewNotes from "@/APIClients/useUploadInterviewNotes";
+import useUploadInterviewNotes from "@/APIClients/mutations/useUploadInterviewNotes";
 
 export type AssessmentContextValue = {
   form: ScoreFormState;

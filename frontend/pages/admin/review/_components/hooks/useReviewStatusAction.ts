@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 
-import useSendRejectionEmails from "@/APIClients/useSendRejectionEmails";
-import useUpdateApplicantRecordStatus from "@/APIClients/useUpdateApplicantRecordStatus";
+import useSendRejectionEmails from "@/APIClients/mutations/useSendRejectionEmails";
+import useUpdateApplicantRecordStatus from "@/APIClients/mutations/useUpdateApplicantRecordStatus";
 import { ApplicationStatus } from "@/graphql/typeUtils";
 
 type UseReviewStatusActionOptions = {

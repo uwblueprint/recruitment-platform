@@ -1,5 +1,5 @@
-import useInterviewedPairingsByUserId from "@/APIClients/useInterviewedPairingsByUserId";
-import useInterviewedApplicantsByUserId from "@/APIClients/useInterviewedApplicantsByUserId";
+import useInterviewedPairingsByUserId from "@/APIClients/queries/useInterviewedPairingsByUserId";
+import useInterviewedApplicantsByUserId from "@/APIClients/queries/useInterviewedApplicantsByUserId";
 
 export default function useInterviewPartner(userId?: string) {
   const pairings = useInterviewedPairingsByUserId(userId);

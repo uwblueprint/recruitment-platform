@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import useReviewDashboardData from "@/APIClients/useReviewDashboard";
+import useReviewDashboardData from "@/APIClients/queries/useReviewDashboard";
 import {
   type ApplicationStatus,
   type DashboardView,

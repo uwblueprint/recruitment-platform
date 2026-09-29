@@ -4,7 +4,7 @@ import {
   COLUMN_ID_TO_SORT_BY,
   INTERVIEW_DASHBOARD_COLUMNS,
 } from "@/components/dashboard/interview-dashboard/columns";
-import useInterviewDashboard from "@/APIClients/useInterviewDashboard";
+import useInterviewDashboard from "@/APIClients/queries/useInterviewDashboard";
 import type { InterviewDashboardResult } from "@/graphql/typeUtils";
 import {
   OnChangeFn,

@@ -1,8 +1,8 @@
 import { useCallback } from "react";
-import useAdminCommentsByApplicantRecordId from "@/APIClients/useAdminCommentsByApplicantRecordId";
-import useCreateAdminComment from "@/APIClients/useCreateAdminComment";
-import useUpdateAdminComment from "@/APIClients/useUpdateAdminComment";
-import useDeleteAdminComment from "@/APIClients/useDeleteAdminComment";
+import useAdminCommentsByApplicantRecordId from "@/APIClients/queries/useAdminCommentsByApplicantRecordId";
+import useCreateAdminComment from "@/APIClients/mutations/useCreateAdminComment";
+import useUpdateAdminComment from "@/APIClients/mutations/useUpdateAdminComment";
+import useDeleteAdminComment from "@/APIClients/mutations/useDeleteAdminComment";
 import {
   AdminCommentsByApplicantRecordIdDocument,
   type AdminCommentResult,

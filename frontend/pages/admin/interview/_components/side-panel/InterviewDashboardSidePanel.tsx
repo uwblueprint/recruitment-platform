@@ -2,7 +2,7 @@ import {
   DashboardSidePanel,
   type SidePanelNavigation,
 } from "@/components/dashboard/side-panel";
-import useInterviewDashboardSidePanel from "@/APIClients/useInterviewDashboardSidePanel";
+import useInterviewDashboardSidePanel from "@/APIClients/queries/useInterviewDashboardSidePanel";
 import { useId, useState } from "react";
 import Tabs, { tabsClasses } from "@mui/material/Tabs";
 import Tab, { tabClasses } from "@mui/material/Tab";

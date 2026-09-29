@@ -1,5 +1,5 @@
-import useApplication from "@/APIClients/useApplication";
-import useReviewedApplicantRecordsByApplicantRecordId from "@/APIClients/useReviewedApplicantRecordsByApplicantRecordId";
+import useApplication from "@/APIClients/queries/useApplication";
+import useReviewedApplicantRecordsByApplicantRecordId from "@/APIClients/queries/useReviewedApplicantRecordsByApplicantRecordId";
 
 export default function useInterviewProfile(applicantRecordId?: string) {
   const applicationQuery = useApplication(applicantRecordId);

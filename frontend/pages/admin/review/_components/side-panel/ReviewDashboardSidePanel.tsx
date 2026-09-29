@@ -7,7 +7,7 @@ import type {
   ApplicationStatus,
   ReviewDashboardResult,
 } from "@/graphql/typeUtils";
-import useReviewDashboardSidePanel from "@/APIClients/useReviewDashboardSidePanel";
+import useReviewDashboardSidePanel from "@/APIClients/queries/useReviewDashboardSidePanel";
 
 type ReviewDashboardSidePanelProps = {
   applicantRecordId?: string;

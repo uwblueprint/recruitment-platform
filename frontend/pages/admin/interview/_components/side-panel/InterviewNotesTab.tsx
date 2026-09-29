@@ -1,4 +1,4 @@
-import useInterviewNotes from "@/APIClients/useInterviewNotes";
+import useInterviewNotes from "@/APIClients/queries/useInterviewNotes";
 
 type InterviewNotesTabProps = {
   interviewedApplicantRecordId: string | null;

@@ -1,7 +1,7 @@
 import { Toast } from "@/components/common/Toast";
 import { ReviewStatus, SkillCategory } from "@/graphql/typeUtils";
 import type { Dispatch, SetStateAction } from "react";
-import useUpdateReviewedApplicantRecord from "@/APIClients/useUpdateReviewedApplicantRecord";
+import useUpdateReviewedApplicantRecord from "@/APIClients/mutations/useUpdateReviewedApplicantRecord";
 import useReviewApplication from "../_components/hooks/useReviewApplication";
 import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";

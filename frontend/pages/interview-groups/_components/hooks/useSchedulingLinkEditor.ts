@@ -1,5 +1,5 @@
 import { useState } from "react";
-import useUpdateInterviewGroupSchedulingLink from "@/APIClients/useUpdateInterviewGroupSchedulingLink";
+import useUpdateInterviewGroupSchedulingLink from "@/APIClients/mutations/useUpdateInterviewGroupSchedulingLink";
 import type { InterviewGroupResult } from "@/graphql/typeUtils";
 
 export default function useSchedulingLinkEditor(group?: InterviewGroupResult) {

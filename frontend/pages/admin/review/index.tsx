@@ -5,7 +5,7 @@ import {
   FilterCategoryVariant,
   type SelectedFilters,
 } from "@/components/dashboard/filters";
-import useUpdateApplicantRecordStatus from "@/APIClients/useUpdateApplicantRecordStatus";
+import useUpdateApplicantRecordStatus from "@/APIClients/mutations/useUpdateApplicantRecordStatus";
 import type { ApplicationStatus } from "@/graphql/typeUtils";
 import { DashboardView } from "@/graphql/typeUtils";
 import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
@@ -29,8 +29,8 @@ import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReview
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
 import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
-import useReviewDashboardApplicantRecordIds from "@/APIClients/useReviewDashboardApplicantRecordIds";
-import useReviewDashboardFilterOptions from "@/APIClients/useReviewDashboardFilterOptions";
+import useReviewDashboardApplicantRecordIds from "@/APIClients/queries/useReviewDashboardApplicantRecordIds";
+import useReviewDashboardFilterOptions from "@/APIClients/queries/useReviewDashboardFilterOptions";
 import useTabCounts from "./_components/hooks/useTabCounts";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
 
