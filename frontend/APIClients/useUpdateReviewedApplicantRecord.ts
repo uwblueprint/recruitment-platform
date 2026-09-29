@@ -7,7 +7,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useUpdateReviewedApplicantRecord() {
-  const [mutate, { loading, error, reset }] = useMutation<
+  const [mutate, { data, called, loading, error, reset }] = useMutation<
     UpdateReviewedApplicantRecordMutation,
     UpdateReviewedApplicantRecordMutationVariables
   >(UpdateReviewedApplicantRecordDocument, {
@@ -21,10 +21,12 @@ export default function useUpdateReviewedApplicantRecord() {
     applicantRecordId: string,
     reviewerId: string,
     reviewedApplicantRecord: UpdateReviewedApplicantRecordMutationVariables["reviewedApplicantRecord"],
-    onCompleted: () => void,
+    onCompleted: () => void
   ): void => {
     void mutate({
-      onCompleted,
+      onCompleted: (result) => {
+        if (result.updateReviewedApplicantRecord) onCompleted();
+      },
       variables: {
         applicantRecordId,
         reviewerId,
@@ -40,5 +42,15 @@ export default function useUpdateReviewedApplicantRecord() {
     });
   };
 
-  return { updateReviewedApplicantRecord, loading, error, reset };
+  return {
+    updateReviewedApplicantRecord,
+    data: data?.updateReviewedApplicantRecord,
+    loading,
+    error:
+      error ??
+      (called && !loading && !data?.updateReviewedApplicantRecord
+        ? new Error("No updated review returned")
+        : undefined),
+    reset,
+  };
 }

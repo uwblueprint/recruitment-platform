@@ -6,7 +6,8 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useReviewedApplicantRecordsByApplicantRecordId(
-  applicantRecordId?: string
+  applicantRecordId?: string,
+  options: { notifyOnNetworkStatusChange?: boolean } = {}
 ) {
   const { data, loading, error, refetch } = useQuery<
     ReviewedApplicantRecordsByApplicantRecordIdQuery,
@@ -18,6 +19,7 @@ export default function useReviewedApplicantRecordsByApplicantRecordId(
           variables: { applicantRecordId },
           fetchPolicy: "network-only",
           context: { refreshAuth: true },
+          ...options,
         }
       : skipToken
   );

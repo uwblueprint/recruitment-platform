@@ -1,4 +1,4 @@
-import useReviewApplication from "@/APIClients/useReviewApplication";
+import useReviewApplication from "../_components/hooks/useReviewApplication";
 import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { NextPage } from "next";
