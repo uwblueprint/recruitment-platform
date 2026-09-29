@@ -1,9 +1,6 @@
 import { useCallback } from "react";
-import { useQuery } from "@apollo/client/react";
+import useReviewDashboardData from "@/APIClients/useReviewDashboard";
 import {
-  ReviewDashboardDocument,
-  type ReviewDashboardQuery,
-  type ReviewDashboardQueryVariables,
   type ApplicationStatus,
   type DashboardView,
   type ReviewDashboardFilters,
@@ -42,21 +39,14 @@ const useReviewDashboard = (
     error,
     refetch: refetchQuery,
     updateQuery,
-  } = useQuery<ReviewDashboardQuery, ReviewDashboardQueryVariables>(
-    ReviewDashboardDocument,
-    {
-      variables: {
-        pageNumber,
-        resultsPerPage,
-        sortBy,
-        sortAscending,
-        filters,
-        view,
-      },
-      fetchPolicy: "network-only",
-      context: { refreshAuth: true },
-    }
-  );
+  } = useReviewDashboardData({
+    pageNumber,
+    resultsPerPage,
+    sortBy,
+    sortAscending,
+    filters,
+    view,
+  });
 
   const refetch = useCallback(() => {
     // Apollo exposes failures through `error`; callers fire and forget.
@@ -81,13 +71,11 @@ const useReviewDashboard = (
     [updateQuery]
   );
 
-  const rows = data?.reviewDashboard;
+  const rows = data;
   const hasError = !!error || (!loading && !rows);
 
   return {
-    rows: hasError
-      ? []
-      : rows ?? (loading ? previousData?.reviewDashboard : undefined) ?? [],
+    rows: hasError ? [] : rows ?? (loading ? previousData : undefined) ?? [],
     isLoading: loading,
     error: hasError,
     setRowStatus,
