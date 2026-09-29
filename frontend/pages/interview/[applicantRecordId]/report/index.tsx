@@ -18,7 +18,9 @@ import { Button } from "@/components/common/Button";
 import { useInterviewProgress } from "../../_components/InterviewProgressContext";
 import { useRouter } from "next/router";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
-import InterviewPageAPIClient from "@/APIClients/InterviewPageAPIClient";
+import useReportInterviewConflict from "@/APIClients/useReportInterviewConflict";
+import useInterviewAssessmentRecord from "@/APIClients/useInterviewAssessmentRecord";
+import { getApplicantRecordId } from "@/pages/review/_components/utils";
 import { IssueSubmitted } from "./_components";
 import { theme } from "@/styles/Theme";
 
@@ -55,7 +57,9 @@ const ReportIssueFooter = () => {
   const { setReportDialogOpen, reportIssueSubmitted } = useInterviewProgress();
   return (
     <InterviewFooter
-      onContinue={reportIssueSubmitted ? undefined : () => setReportDialogOpen(true)}
+      onContinue={
+        reportIssueSubmitted ? undefined : () => setReportDialogOpen(true)
+      }
       continueLabel="Submit Issue"
     />
   );
@@ -66,8 +70,11 @@ const InterviewReportPage: NextPageWithLayout = () => {
   const authenticatedUser = useAuthenticatedUser();
   const [selectedConflict, setSelectedConflict] =
     useState<InterviewConflict | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [reportError, setReportError] = useState(false);
+  const {
+    mutate: reportConflict,
+    loading,
+    error: reportError,
+  } = useReportInterviewConflict();
   const {
     reportDialogOpen,
     setReportDialogOpen,
@@ -75,35 +82,32 @@ const InterviewReportPage: NextPageWithLayout = () => {
     setReportIssueSubmitted,
   } = useInterviewProgress();
 
-  const interviewedApplicantRecordId = router.isReady
-    ? (router.query.applicantRecordId as string)
-    : null;
+  const applicantRecordId = router.isReady
+    ? getApplicantRecordId(router.query)
+    : undefined;
+  const {
+    data: record,
+    loading: loadingRecord,
+    error: recordError,
+  } = useInterviewAssessmentRecord(applicantRecordId);
+
+  const handleConfirmReport = () => {
+    if (!selectedConflict || !record || !authenticatedUser || loading) return;
+    void reportConflict({
+      variables: {
+        interviewedApplicantRecordId: record.id,
+        interviewerId: authenticatedUser.id,
+        interviewHasConflict: selectedConflict,
+      },
+      onCompleted: (result) => {
+        if (!result.reportInterviewConflict) return;
+        setReportDialogOpen(false);
+        setReportIssueSubmitted(true);
+      },
+    });
+  };
 
   if (!router.isReady) return null;
-
-  const handleConfirmReport = async () => {
-    if (
-      !selectedConflict ||
-      !interviewedApplicantRecordId ||
-      !authenticatedUser
-    )
-      return;
-    setLoading(true);
-    try {
-      await InterviewPageAPIClient.reportInterviewConflict(
-        interviewedApplicantRecordId,
-        authenticatedUser.id,
-        selectedConflict
-      );
-      setReportDialogOpen(false);
-      setReportIssueSubmitted(true);
-      setReportError(false);
-    } catch {
-      setReportError(true);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (reportIssueSubmitted) {
     return <IssueSubmitted />;
@@ -160,7 +164,9 @@ const InterviewReportPage: NextPageWithLayout = () => {
 
       <Dialogue
         open={reportDialogOpen}
-        onClose={() => setReportDialogOpen(false)}
+        onClose={() => {
+          if (!loading) setReportDialogOpen(false);
+        }}
         header="Report issue?"
         text={
           !selectedConflict
@@ -168,7 +174,11 @@ const InterviewReportPage: NextPageWithLayout = () => {
             : "Clicking yes will notify admins and cannot be undone."
         }
         errorText={
-          reportError ? "Something went wrong. Please try again." : undefined
+          recordError
+            ? "Failed to load interview details. Please refresh and try again."
+            : reportError
+            ? "Something went wrong. Please try again."
+            : undefined
         }
       >
         <div className="flex w-full gap-4">
@@ -186,7 +196,13 @@ const InterviewReportPage: NextPageWithLayout = () => {
             size="sm"
             onClick={handleConfirmReport}
             className="flex-1 min-w-0 flex justify-center items-center whitespace-nowrap !m-0"
-            disabled={loading || !selectedConflict}
+            disabled={
+              loading ||
+              loadingRecord ||
+              !record ||
+              !authenticatedUser ||
+              !selectedConflict
+            }
           >
             <span className="font-source text-[16px] font-normal">
               {loading ? "Submitting..." : "Yes, report"}
