@@ -1,8 +1,11 @@
 import { useReducer, useRef, useState } from "react";
 
-import EmailAPIClient from "@/APIClients/EmailAPIClient";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
-import type { BulkStatusApplicant, BulkStatusConfirmationDialogueProps } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
+import useSendRejectionEmails from "@/APIClients/mutations/useSendRejectionEmails";
+import useBulkUpdateApplicantRecordsStatus from "@/APIClients/mutations/useBulkUpdateApplicantRecordsStatus";
+import type {
+  BulkStatusApplicant,
+  BulkStatusConfirmationDialogueProps,
+} from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 
 import {
   BULK_ACTIONS,
@@ -113,6 +116,9 @@ type UseBulkStatusActionResult = {
 const useBulkStatusAction = ({
   onSuccess,
 }: UseBulkStatusActionOptions): UseBulkStatusActionResult => {
+  const { bulkUpdateApplicantRecordsStatus } =
+    useBulkUpdateApplicantRecordsStatus();
+  const { sendRejectionEmails } = useSendRejectionEmails();
   const [state, dispatch] = useReducer(dialogueReducer, {
     status: DialogueStatus.Closed,
   });
@@ -128,22 +134,23 @@ const useBulkStatusAction = ({
   };
 
   const confirm = async () => {
-    if (state.status !== DialogueStatus.Confirming || submitting.current) return;
+    if (state.status !== DialogueStatus.Confirming || submitting.current)
+      return;
     submitting.current = true;
     const { action, applicants } = state;
     const config = BULK_ACTIONS[action];
 
     dispatch({ type: DialogueEventType.Submit });
     try {
-      await ReviewDashboardAPIClient.bulkUpdateApplicantRecordsStatus(
+      await bulkUpdateApplicantRecordsStatus(
         applicants.map((applicant) => applicant.id),
         config.status
       );
       let emailFailed = false;
       if (action === BulkAction.Reject) {
         try {
-          await EmailAPIClient.sendRejectionEmails(
-            applicants.map((applicant) => applicant.id),
+          await sendRejectionEmails(
+            applicants.map((applicant) => applicant.id)
           );
         } catch {
           emailFailed = true;

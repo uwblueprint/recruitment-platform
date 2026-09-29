@@ -5,7 +5,7 @@ import {
   FilterCategoryVariant,
   type SelectedFilters,
 } from "@/components/dashboard/filters";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
+import useUpdateApplicantRecordStatus from "@/APIClients/mutations/useUpdateApplicantRecordStatus";
 import type { ApplicationStatus } from "@/graphql/typeUtils";
 import { DashboardView } from "@/graphql/typeUtils";
 import type { ReviewDashboardFilters } from "@/graphql/typeUtils";
@@ -29,8 +29,8 @@ import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReview
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
 import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
-import useReviewDashboardApplicantRecordIds from "./_components/hooks/useReviewDashboardApplicantRecordIds";
-import useReviewDashboardFilterOptions from "./_components/hooks/useReviewDashboardFilterOptions";
+import useReviewDashboardApplicantRecordIds from "@/APIClients/queries/useReviewDashboardApplicantRecordIds";
+import useReviewDashboardFilterOptions from "@/APIClients/queries/useReviewDashboardFilterOptions";
 import useTabCounts from "./_components/hooks/useTabCounts";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
 
@@ -74,7 +74,8 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
   const [statusError, setStatusError] = useState(false);
 
-  const { filterOptions } = useReviewDashboardFilterOptions();
+  const { data: filterOptions } = useReviewDashboardFilterOptions({});
+  const { updateApplicantRecordStatus } = useUpdateApplicantRecordStatus();
 
   // build filter categories from backend options
   const filterCategories = useMemo(() => {
@@ -140,11 +141,17 @@ const AdminReviewPage: NextPageWithLayout = () => {
     activeView
   );
 
-  const applicantRecordIds = useReviewDashboardApplicantRecordIds(
+  const idsQuery = useReviewDashboardApplicantRecordIds({
     sortBy,
     sortAscending,
-    backendFilters
-  );
+    filters: backendFilters,
+  });
+  const applicantRecordIds =
+    !idsQuery.loading && !idsQuery.error ? idsQuery.data ?? [] : [];
+  const refreshDashboard = () => {
+    refetch();
+    void idsQuery.refetch().catch(() => {});
+  };
   const activeRow = rows.find((row) => row.applicantRecordId === activeId);
   const activeNavigationIndex =
     activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
@@ -176,11 +183,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
       setRowStatus(applicantRecordId, nextStatus);
 
       try {
-        const confirmedStatus =
-          await ReviewDashboardAPIClient.updateApplicantRecordStatus(
-            applicantRecordId,
-            nextStatus
-          );
+        const confirmedStatus = await updateApplicantRecordStatus(
+          applicantRecordId,
+          nextStatus
+        );
         setRowStatus(applicantRecordId, confirmedStatus);
         return confirmedStatus;
       } catch (error) {
@@ -189,7 +195,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         throw error;
       }
     },
-    [setRowStatus]
+    [setRowStatus, updateApplicantRecordStatus]
   );
 
   // TanStack Table expects a stable `columns` reference, so build it once from
@@ -230,7 +236,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   } = useBulkStatusAction({
     onSuccess: () => {
       clearSelection();
-      refetch();
+      refreshDashboard();
     },
   });
 
@@ -379,7 +385,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
           onClose={() => setReviewerReassignmentTarget(null)}
           onUpdated={() => {
             setReviewerReassignmentTarget(null);
-            refetch();
+            refreshDashboard();
           }}
         />
       ) : null}

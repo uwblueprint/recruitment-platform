@@ -1,11 +1,11 @@
-import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
 import { Button } from "@/components/common/Button";
 import { Dialogue } from "@/components/common/Dialogue";
 import type { UsersByPositionResult } from "@/graphql/typeUtils";
 import { theme } from "@/styles/Theme";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import Autocomplete from "@mui/material/Autocomplete";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import useReassignReviewer from "../hooks/useReassignReviewer";
 
 type ReassignReviewerDialogueProps = {
   open: boolean;
@@ -33,79 +33,27 @@ export const ReassignReviewerDialogue = ({
   onClose,
   onUpdated,
 }: ReassignReviewerDialogueProps) => {
-  const [users, setUsers] = useState<ReviewerUser[]>([]);
+  const {
+    users,
+    isLoadingUsers,
+    usersError,
+    reassignReviewer,
+    isSubmitting,
+    updateError,
+  } = useReassignReviewer(position, currentReviewerId);
   const [selectedUser, setSelectedUser] = useState<ReviewerUser | null>(null);
   const [inputValue, setInputValue] = useState("");
-  const [isLoadingUsers, setIsLoadingUsers] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorText, setErrorText] = useState<string | null>(null);
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadUsers = async () => {
-      if (!isMounted) {
-        return;
-      }
-
-      setIsLoadingUsers(true);
-      setErrorText(null);
-
-      try {
-        const result = await ReviewPageAPIClient.getUsersByPosition(position);
-
-        if (!isMounted) {
-          return;
-        }
-
-        const eligibleUsers = result
-          .filter((user): user is ReviewerUser => user !== null)
-          .filter((user) => !user.isArchived && user.id !== currentReviewerId)
-          .sort((left, right) =>
-            getUserLabel(left)
-              .toLowerCase()
-              .localeCompare(getUserLabel(right).toLowerCase()),
-          );
-
-        setUsers(eligibleUsers);
-      } catch {
-        if (isMounted) {
-          setErrorText("Failed to load reviewers. Please try again.");
-        }
-      } finally {
-        if (isMounted) {
-          setIsLoadingUsers(false);
-        }
-      }
-    };
-
-    void loadUsers();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [currentReviewerId, position]);
-
-  const handleUpdate = async () => {
+  const handleUpdate = () => {
     if (!selectedUser || isSubmitting) {
       return;
     }
 
-    setIsSubmitting(true);
-    setErrorText(null);
-
-    try {
-      await ReviewPageAPIClient.reassignReviewer(
-        applicantRecordId,
-        currentReviewerId,
-        selectedUser.id,
-      );
-      onUpdated();
-    } catch {
-      setErrorText("Failed to update reviewer. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    reassignReviewer(
+      applicantRecordId,
+      currentReviewerId,
+      selectedUser.id,
+      onUpdated,
+    );
   };
 
   return (
@@ -118,7 +66,13 @@ export const ReassignReviewerDialogue = ({
           ? `A conflict has been reported. Reassign ${currentReviewerName}.`
           : `Search a new reviewer below to replace ${currentReviewerName}.`
       }
-      errorText={errorText ?? undefined}
+      errorText={
+        updateError
+          ? "Failed to update reviewer. Please try again."
+          : usersError
+            ? "Failed to load reviewers. Please try again."
+            : undefined
+      }
       width="340px"
       className="!p-8 gap-4"
       actionsClassName="!mt-2 !h-auto"
@@ -217,9 +171,7 @@ export const ReassignReviewerDialogue = ({
           <Button
             variant="primary"
             size="sm"
-            onClick={() => {
-              void handleUpdate();
-            }}
+            onClick={handleUpdate}
             disabled={!selectedUser || isSubmitting}
             className="flex-1 min-w-0 !m-0 flex items-center justify-center whitespace-nowrap px-8 py-[13px] disabled:!bg-neutral-200 disabled:border-transparent"
           >

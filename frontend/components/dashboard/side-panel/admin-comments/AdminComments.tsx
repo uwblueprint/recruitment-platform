@@ -1,7 +1,7 @@
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { AdminCommentComposer } from "./AdminCommentComposer";
 import { AdminCommentItem } from "./AdminCommentItem";
-import useAdminComments from "./useAdminComments";
+import useAdminComments from "../hooks/useAdminComments";
 
 type AdminCommentsProps = {
   applicantRecordId: string;

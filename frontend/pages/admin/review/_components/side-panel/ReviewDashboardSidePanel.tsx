@@ -7,7 +7,7 @@ import type {
   ApplicationStatus,
   ReviewDashboardResult,
 } from "@/graphql/typeUtils";
-import useReviewDashboardSidePanel from "../hooks/useReviewDashboardSidePanel";
+import useReviewDashboardSidePanel from "@/APIClients/queries/useReviewDashboardSidePanel";
 
 type ReviewDashboardSidePanelProps = {
   applicantRecordId?: string;
@@ -28,8 +28,11 @@ export const ReviewDashboardSidePanel = ({
   navigation,
   onStatusChange,
 }: ReviewDashboardSidePanelProps) => {
-  const { details, isLoading, error } =
-    useReviewDashboardSidePanel(applicantRecordId);
+  const {
+    data: details,
+    loading: isLoading,
+    error,
+  } = useReviewDashboardSidePanel(applicantRecordId);
   return (
     <DashboardSidePanel
       open={applicantRecordId !== undefined}
@@ -38,7 +41,7 @@ export const ReviewDashboardSidePanel = ({
       details={details}
       onStatusChange={onStatusChange}
       isLoading={isLoading}
-      hasError={error}
+      hasError={!!error}
       navigation={navigation}
     >
       {details ? (

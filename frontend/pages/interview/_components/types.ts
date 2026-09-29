@@ -31,7 +31,6 @@ type InterviewProgressState = {
   reportIssueSubmitted: boolean;
   setReportIssueSubmitted: (submitted: boolean) => void;
   candidateName?: string;
-  setCandidateName: (name?: string) => void;
   application?: ApplicationResult;
   reviewers: ReviewedApplicantRecordWithReviewerResult[];
   combinedReviewScore?: number;

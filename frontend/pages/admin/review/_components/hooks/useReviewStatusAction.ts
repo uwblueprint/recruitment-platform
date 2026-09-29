@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 
-import EmailAPIClient from "@/APIClients/EmailAPIClient";
-import ReviewDashboardAPIClient from "@/APIClients/ReviewDashboardAPIClient";
+import useSendRejectionEmails from "@/APIClients/mutations/useSendRejectionEmails";
+import useUpdateApplicantRecordStatus from "@/APIClients/mutations/useUpdateApplicantRecordStatus";
 import { ApplicationStatus } from "@/graphql/typeUtils";
 
 type UseReviewStatusActionOptions = {
@@ -10,7 +10,7 @@ type UseReviewStatusActionOptions = {
   onChange?: (
     applicantRecordId: string,
     nextStatus: ApplicationStatus,
-    previousStatus: ApplicationStatus,
+    previousStatus: ApplicationStatus
   ) => Promise<ApplicationStatus>;
 };
 
@@ -19,6 +19,8 @@ const useReviewStatusAction = ({
   status,
   onChange,
 }: UseReviewStatusActionOptions) => {
+  const { updateApplicantRecordStatus } = useUpdateApplicantRecordStatus();
+  const { sendRejectionEmails } = useSendRejectionEmails();
   const [localStatus, setSelectedStatus] = useState(status);
   const selectedStatus = onChange ? status : localStatus;
   const [isConfirming, setIsConfirming] = useState(false);
@@ -34,17 +36,14 @@ const useReviewStatusAction = ({
     try {
       const confirmedStatus = onChange
         ? await onChange(applicantRecordId, newStatus, status)
-        : await ReviewDashboardAPIClient.updateApplicantRecordStatus(
-            applicantRecordId,
-            newStatus,
-          );
+        : await updateApplicantRecordStatus(applicantRecordId, newStatus);
       setSelectedStatus(confirmedStatus);
       if (confirmedStatus === ApplicationStatus.Rejected) {
         try {
-          await EmailAPIClient.sendRejectionEmails([applicantRecordId]);
+          await sendRejectionEmails([applicantRecordId]);
         } catch {
           setErrorText(
-            "The applicant was marked as rejected, but email sending could not be confirmed. Contact an administrator before resending.",
+            "The applicant was marked as rejected, but email sending could not be confirmed. Contact an administrator before resending."
           );
         }
       }
@@ -58,7 +57,8 @@ const useReviewStatusAction = ({
   };
 
   const handleChange = (newStatus: ApplicationStatus) => {
-    if (submitting.current || isConfirming || newStatus === selectedStatus) return;
+    if (submitting.current || isConfirming || newStatus === selectedStatus)
+      return;
     setErrorText(undefined);
     if (newStatus === ApplicationStatus.Rejected) {
       setIsConfirming(true);

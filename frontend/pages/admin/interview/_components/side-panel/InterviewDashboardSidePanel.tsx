@@ -2,7 +2,7 @@ import {
   DashboardSidePanel,
   type SidePanelNavigation,
 } from "@/components/dashboard/side-panel";
-import useInterviewDashboardSidePanel from "@/components/dashboard/side-panel/hooks/useInterviewDashboardSidePanel";
+import useInterviewDashboardSidePanel from "@/APIClients/queries/useInterviewDashboardSidePanel";
 import { useId, useState } from "react";
 import Tabs, { tabsClasses } from "@mui/material/Tabs";
 import Tab, { tabClasses } from "@mui/material/Tab";
@@ -73,9 +73,9 @@ export const InterviewDashboardSidePanel = ({
 }: InterviewDashboardSidePanelProps) => {
   const {
     data: details,
-    isLoading,
-    hasError,
-  } = useInterviewDashboardSidePanel(row?.applicantRecordId ?? null);
+    loading: isLoading,
+    error,
+  } = useInterviewDashboardSidePanel(row?.applicantRecordId);
   return (
     <DashboardSidePanel
       showDetailsDivider={false}
@@ -85,7 +85,7 @@ export const InterviewDashboardSidePanel = ({
       details={details ? { ...details, academicYear: details.term } : undefined}
       maxScore={20}
       isLoading={isLoading}
-      hasError={hasError}
+      hasError={!!error}
       navigation={navigation}
       showScoreOnHeader={false}
     >

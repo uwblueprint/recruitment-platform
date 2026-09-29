@@ -401,7 +401,6 @@ class ReviewCompositeService implements IReviewCompositeService {
       const positionRecords = await Position.findAll({
         where: {
           is_archived: false,
-          department: _department ?? { [Op.ne]: null },
         },
       });
 

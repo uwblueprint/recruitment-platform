@@ -1,16 +1,6 @@
-import {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { useRouter } from "next/router";
-import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
-import {
-  ApplicationResult,
-  ReviewedApplicantRecordWithReviewerResult,
-} from "@/graphql/typeUtils";
+import useInterviewProfile from "./hooks/useInterviewProfile";
 import { InterviewStep, INTERVIEW_NAV_ITEMS } from "./constants";
 import {
   InterviewProgressState,
@@ -46,17 +36,9 @@ export const InterviewProgressProvider = ({
   const [stepStatuses, setStepStatuses] = useState(INITIAL_STATUSES);
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [reportIssueSubmitted, setReportIssueSubmitted] = useState(false);
-  const [candidateName, setCandidateName] = useState<string>();
   const [subStepsBySection, setSubStepsBySection] = useState<
     Partial<Record<InterviewStepType, string>>
   >({});
-
-  const [application, setApplication] = useState<ApplicationResult>();
-  const [reviewers, setReviewers] = useState<
-    ReviewedApplicantRecordWithReviewerResult[]
-  >([]);
-  const [combinedReviewScore, setCombinedReviewScore] = useState<number>();
-  const [position, setPosition] = useState("");
 
   // The record id is the path segment shared across the profile/assessment/report
   // tabs, so this provider (which lives in the persistent layout) fetches once per
@@ -66,42 +48,13 @@ export const InterviewProgressProvider = ({
     ? getApplicantRecordId(router.query)
     : undefined;
 
-  useEffect(() => {
-    if (!applicantRecordId) return;
-    let cancelled = false;
-
-    const fetchAll = async () => {
-      try {
-        const [app, reviewersData] = await Promise.all([
-          ReviewPageAPIClient.getApplication(applicantRecordId),
-          ReviewPageAPIClient.getReviewedApplicantRecordsByApplicantRecordId(
-            applicantRecordId,
-          ),
-        ]);
-        if (cancelled) return;
-
-        setApplication(app);
-        setReviewers(reviewersData.reviewedApplicantRecords ?? []);
-        setCombinedReviewScore(
-          reviewersData.applicantRecord.combinedReviewScore ?? undefined,
-        );
-        setPosition(reviewersData.applicantRecord.position ?? "");
-        setCandidateName(`${app.firstName} ${app.lastName}`);
-      } catch (error) {
-        if (cancelled) return;
-        console.error("Failed to load interview profile data:", error);
-        setApplication(undefined);
-        setReviewers([]);
-        setCombinedReviewScore(undefined);
-        setPosition("");
-      }
-    };
-
-    fetchAll();
-    return () => {
-      cancelled = true;
-    };
-  }, [applicantRecordId]);
+  const {
+    application,
+    reviewers,
+    combinedReviewScore,
+    position,
+    candidateName,
+  } = useInterviewProfile(applicantRecordId);
 
   const currentStep = PATH_TO_STEP[router.pathname] ?? InterviewStep.PROFILE;
 
@@ -130,7 +83,6 @@ export const InterviewProgressProvider = ({
         reportIssueSubmitted,
         setReportIssueSubmitted,
         candidateName,
-        setCandidateName,
         application,
         reviewers,
         combinedReviewScore,
@@ -146,7 +98,7 @@ export const useInterviewProgress = (): InterviewProgressState => {
   const context = useContext(InterviewProgressContext);
   if (!context) {
     throw new Error(
-      "useInterviewProgress must be used within an InterviewProgressProvider",
+      "useInterviewProgress must be used within an InterviewProgressProvider"
     );
   }
   return context;

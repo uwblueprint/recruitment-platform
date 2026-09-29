@@ -3,7 +3,6 @@ import {
   ReactNode,
   ReactElement,
   useContext,
-  useEffect,
   useState,
 } from "react";
 import { UserDTO } from "@/types";
@@ -11,7 +10,6 @@ import { UserDTO } from "@/types";
 export type AuthenticatedUser = UserDTO;
 
 const AUTHENTICATED_USER_KEY = "authenticatedUser";
-const HOUR_MS = 3300000;
 
 type Props = {
   children: ReactNode;
@@ -66,30 +64,6 @@ export const AuthProvider = ({ children }: Props): ReactElement => {
     localStorage.removeItem("refreshToken");
     setAuthenticatedUser(null);
   };
-
-  // Set up automatic token/user refresh every ~55 minutes
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      if (authenticatedUser) {
-        try {
-          const accessToken = localStorage.getItem("accessToken");
-          if (accessToken) {
-            // TODO: finish implementing token refresh flow - need backend support for refresh token rotation and a new query to get user info with access token
-            // const result = await fetchGraphql(queries.getCurrentUser, {
-            //   accessToken,
-            // });
-            // if (result.data && result.data.getCurrentUser) {
-            //   setAuthenticatedUser(result.data.getCurrentUser);
-            // }
-          }
-        } catch (error) {
-          console.warn("Auto-refresh user failed", error);
-        }
-      }
-    }, HOUR_MS);
-
-    return () => clearInterval(interval);
-  }, [authenticatedUser]);
 
   return (
     <AuthContext.Provider

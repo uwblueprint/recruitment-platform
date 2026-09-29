@@ -4,7 +4,7 @@ import {
   COLUMN_ID_TO_SORT_BY,
   INTERVIEW_DASHBOARD_COLUMNS,
 } from "@/components/dashboard/interview-dashboard/columns";
-import useInterviewDashboard from "@/components/dashboard/interview-dashboard/hooks/useInterviewDashboard";
+import useInterviewDashboard from "@/APIClients/queries/useInterviewDashboard";
 import type { InterviewDashboardResult } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
@@ -33,12 +33,21 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort ? !activeSort.desc : undefined;
 
-  const { rows, isLoading, hasError } = useInterviewDashboard(
+  const {
+    data,
+    previousData,
+    loading: isLoading,
+    error,
+  } = useInterviewDashboard({
     pageNumber,
     resultsPerPage,
     sortBy,
-    sortAscending
-  );
+    sortAscending,
+  });
+  const rows = error
+    ? []
+    : data ?? (isLoading ? previousData : undefined) ?? [];
+  const hasError = !!error;
 
   const activeRow: InterviewDashboardResult | null =
     activeIndex !== null ? rows[activeIndex] ?? null : null;

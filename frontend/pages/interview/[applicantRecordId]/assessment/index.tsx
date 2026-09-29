@@ -17,7 +17,6 @@ import {
   AssessmentProvider,
   useInterviewAssessment,
 } from "./AssessmentContext";
-import { isScoreFormComplete } from "../../_components/assessment/constants";
 
 const SCORES = AssessmentHeaderStep.SCORES;
 const NOTES = AssessmentHeaderStep.NOTES;
@@ -29,10 +28,8 @@ const SUBMITTED = "SUBMITTED";
 
 const AssessmentFooter = () => {
   const { currentSubStep, setCurrentSubStep } = useInterviewProgress();
-  const { form, isSubmitting, isUploadingNotes, submitScores } =
+  const { canSubmit, isSubmitting, interviewNotes, submitScores } =
     useInterviewAssessment();
-
-  const formComplete = isScoreFormComplete(form);
 
   const handleSubmitAndContinue = async () => {
     try {
@@ -52,8 +49,10 @@ const AssessmentFooter = () => {
           onBack={() => setCurrentSubStep(SCORES)}
           backLabel="Previous Page"
           onContinue={() => setCurrentSubStep(SUBMITTED)}
-          continueLabel={isUploadingNotes ? "Uploading…" : "Submit & Finish"}
-          continueDisabled={isUploadingNotes}
+          continueLabel={
+            interviewNotes.isUploading ? "Uploading…" : "Submit & Finish"
+          }
+          continueDisabled={interviewNotes.isUploading}
         />
       );
     default:
@@ -62,7 +61,7 @@ const AssessmentFooter = () => {
           onBack={() => {}}
           onContinue={handleSubmitAndContinue}
           continueLabel={isSubmitting ? "Submitting..." : "Submit & Continue"}
-          continueDisabled={!formComplete || isSubmitting}
+          continueDisabled={!canSubmit}
         />
       );
   }
@@ -90,7 +89,7 @@ const AssessmentSubmitted = () => {
 
 const InterviewAssessmentPage: NextPageWithLayout = () => {
   const { currentSubStep } = useInterviewProgress();
-  const { form, setForm, recordId, error, setIsUploadingNotes } =
+  const { form, setForm, recordId, error, interviewNotes } =
     useInterviewAssessment();
 
   switch (currentSubStep) {
@@ -101,7 +100,7 @@ const InterviewAssessmentPage: NextPageWithLayout = () => {
         <PanelLayout>
           <NotesUploader
             interviewedApplicantRecordId={recordId}
-            onUploadingChange={setIsUploadingNotes}
+            {...interviewNotes}
           />
         </PanelLayout>
       );
@@ -123,7 +122,7 @@ InterviewAssessmentPage.getLayout = (page) => (
   <AssessmentProvider>
     {getInterviewLayout(
       <InterviewHeader steps={ASSESSMENT_HEADER_STEPS} />,
-      <AssessmentFooter />,
+      <AssessmentFooter />
     )(page)}
   </AssessmentProvider>
 );

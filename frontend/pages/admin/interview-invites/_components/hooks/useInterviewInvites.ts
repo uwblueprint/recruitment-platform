@@ -1,35 +1,22 @@
-import { useEffect, useState } from "react";
-import InterviewInvitesAPIClient from "@/APIClients/InterviewInvitesAPIClient";
-import type { InterviewInviteResult } from "@/graphql/typeUtils";
+import useInterviewInvitesData from "@/APIClients/queries/useInterviewInvites";
+import type { InterviewInvite } from "../types";
 
-type UseInterviewInvitesResult = {
-  invites: InterviewInviteResult[];
-  isLoading: boolean;
-  error: boolean;
-};
+export default function useInterviewInvites() {
+  const { data, loading, error, refetch } = useInterviewInvitesData();
 
-const useInterviewInvites = (): UseInterviewInvitesResult => {
-  const [state, setState] = useState<UseInterviewInvitesResult>({
-    invites: [],
-    isLoading: false,
-    error: false,
-  });
+  const invites: InterviewInvite[] = (data ?? []).map((invite) => ({
+    id: invite.id,
+    interviewers: invite.interviewers.map(
+      (u) => `${u.firstName} ${u.lastName}`,
+    ),
+    interviewees: invite.interviewees.map((ie) => ({
+      name: `${ie.firstName} ${ie.lastName}`,
+      role: ie.position,
+    })),
+    interviewType: invite.position,
+    calendlyLink: invite.schedulingLink ?? "",
+    status: invite.status,
+  }));
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setState((prev) => ({ ...prev, isLoading: true, error: false }));
-
-    InterviewInvitesAPIClient.getInterviewInvites()
-      .then((invites) => {
-        setState({ invites, isLoading: false, error: false });
-      })
-      .catch((err) => {
-        console.error("[interviewInvites] fetch failed:", err);
-        setState({ invites: [], isLoading: false, error: true });
-      });
-  }, []);
-
-  return state;
-};
-
-export default useInterviewInvites;
+  return { invites, isLoading: loading, error, refetch };
+}

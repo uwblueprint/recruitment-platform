@@ -1,4 +1,4 @@
-import useInterviewNotes from "../../../../../components/dashboard/side-panel/hooks/useInterviewNotes";
+import useInterviewNotes from "@/APIClients/queries/useInterviewNotes";
 
 type InterviewNotesTabProps = {
   interviewedApplicantRecordId: string | null;
@@ -7,9 +7,11 @@ type InterviewNotesTabProps = {
 export const InterviewNotesTab = ({
   interviewedApplicantRecordId,
 }: InterviewNotesTabProps) => {
-  const { notes, isLoading, hasError } = useInterviewNotes(
-    interviewedApplicantRecordId
-  );
+  const {
+    data: notes,
+    loading: isLoading,
+    error,
+  } = useInterviewNotes(interviewedApplicantRecordId);
 
   if (isLoading) {
     return (
@@ -19,7 +21,7 @@ export const InterviewNotesTab = ({
     );
   }
 
-  if (hasError) {
+  if (error) {
     return (
       <div className="flex p-12 items-center justify-center text-sm text-alert-errorText">
         Failed to load interview notes.

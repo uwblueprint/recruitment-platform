@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DashboardView } from "@/graphql/typeUtils";
 import type { ReviewDashboardResult } from "@/graphql/typeUtils";
 
 const useTabCounts = (
   rows: ReviewDashboardResult[],
   isLoading: boolean,
-  activeView: DashboardView,
+  activeView: DashboardView
 ): Record<DashboardView, number> => {
   const [tabCounts, setTabCounts] = useState<Record<DashboardView, number>>({
     [DashboardView.All]: 0,
@@ -13,12 +13,11 @@ const useTabCounts = (
     [DashboardView.Conflicts]: 0,
   });
 
-  useEffect(() => {
-    if (!isLoading) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setTabCounts((prev) => ({ ...prev, [activeView]: rows.length }));
-    }
-  }, [rows, isLoading, activeView]);
+  if (!isLoading && tabCounts[activeView] !== rows.length) {
+    const nextCounts = { ...tabCounts, [activeView]: rows.length };
+    setTabCounts(nextCounts);
+    return nextCounts;
+  }
 
   return tabCounts;
 };
