@@ -1,6 +1,6 @@
 import { createContext, ReactNode, useContext, useState } from "react";
 import { useRouter } from "next/router";
-import useInterviewProfile from "@/APIClients/useInterviewProfile";
+import useInterviewProfile from "./hooks/useInterviewProfile";
 import { InterviewStep, INTERVIEW_NAV_ITEMS } from "./constants";
 import {
   InterviewProgressState,
