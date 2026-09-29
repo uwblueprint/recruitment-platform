@@ -1,0 +1,7 @@
+query InterviewDashboardCounts {
+  interviewDashboardCounts {
+    all
+    shortlisted
+    conflicts
+  }
+}

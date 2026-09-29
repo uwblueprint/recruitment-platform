@@ -44,11 +44,17 @@ export type InterviewDashboardQueryVariables = Exact<{
   pageNumber: number;
   resultsPerPage: number;
   sortBy?: Types.InterviewDashboardSortBy | null | undefined;
+  view?: Types.DashboardView | null | undefined;
   sortAscending?: boolean | null | undefined;
 }>;
 
 
 export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
+
+export type InterviewDashboardCountsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InterviewDashboardCountsQuery = { interviewDashboardCounts: { all: number, shortlisted: number, conflicts: number } };
 
 export type InterviewDashboardSidePanelQueryVariables = Exact<{
   applicantRecordId: string | number;
@@ -187,6 +193,13 @@ export type ReviewDashboardApplicantRecordIdsQueryVariables = Exact<{
 
 
 export type ReviewDashboardApplicantRecordIdsQuery = { reviewDashboardApplicantRecordIds: Array<string> };
+
+export type ReviewDashboardCountsQueryVariables = Exact<{
+  filters?: Types.ReviewDashboardFilters | null | undefined;
+}>;
+
+
+export type ReviewDashboardCountsQuery = { reviewDashboardCounts: { all: number, shortlisted: number, conflicts: number } };
 
 export type ReviewDashboardFilterOptionsQueryVariables = Exact<{
   department?: string | null | undefined;

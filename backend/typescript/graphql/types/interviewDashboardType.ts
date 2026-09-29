@@ -55,11 +55,19 @@ const interviewDashboardTypes = gql`
     status: InterviewGroupStatus!
   }
 
+  type InterviewDashboardCountsDTO {
+    all: Int!
+    shortlisted: Int!
+    conflicts: Int!
+  }
+
   extend type Query {
+    interviewDashboardCounts: InterviewDashboardCountsDTO!
     interviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
       sortBy: InterviewDashboardSortBy
+      view: DashboardView
       sortAscending: Boolean
     ): [InterviewDashboardRowDTO!]!
 

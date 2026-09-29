@@ -3,6 +3,7 @@ import {
   DashboardView,
   ReviewDashboardFilterOptionsDTO,
   ReviewDashboardFilters,
+  ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -12,6 +13,11 @@ import {
 const reviewCompositeService = new ReviewCompositeService();
 const reviewDashboardResolvers = {
   Query: {
+    reviewDashboardCounts: (
+      _parent: undefined,
+      { filters }: { filters?: ReviewDashboardFilters },
+    ): Promise<ReviewDashboardCountsDTO> =>
+      reviewCompositeService.getReviewDashboardCounts(filters),
     reviewDashboard: async (
       _parent: undefined,
       {

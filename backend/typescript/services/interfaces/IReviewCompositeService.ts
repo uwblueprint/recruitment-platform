@@ -3,6 +3,7 @@ import {
   DashboardView,
   ReviewDashboardFilterOptionsDTO,
   ReviewDashboardFilters,
+  ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -11,6 +12,10 @@ import {
 } from "../../types";
 
 interface IReviewCompositeService {
+  getReviewDashboardCounts(
+    filters?: ReviewDashboardFilters,
+  ): Promise<ReviewDashboardCountsDTO>;
+
   /**
    * Fetches the applicant record along with all of its reviewers (with the
    * reviewer's user info attached to each reviewed applicant record).

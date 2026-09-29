@@ -20,6 +20,7 @@ import {
   DashboardViewEnum,
   ReviewDashboardFilterOptionsDTO,
   ReviewDashboardFilters,
+  ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
   ReviewDashboardSortBy,
@@ -173,6 +174,29 @@ function buildApplicantWhere(filters?: ReviewDashboardFilters): WhereOptions {
   return where;
 }
 
+async function buildReviewDashboardViewWhere(
+  view?: DashboardView,
+): Promise<WhereOptions> {
+  if (view === DashboardViewEnum.SHORTLISTED) {
+    return { is_shortlisted_for_interview: true };
+  }
+  if (view === DashboardViewEnum.CONFLICTS) {
+    const records = await ReviewedApplicantRecord.findAll({
+      attributes: ["applicant_record_id"],
+      where: { reviewer_has_conflict: true },
+      raw: true,
+    });
+    return {
+      id: {
+        [Op.in]: [
+          ...new Set(records.map((record) => record.applicant_record_id)),
+        ],
+      },
+    };
+  }
+  return {};
+}
+
 class ReviewCompositeService implements IReviewCompositeService {
   /* eslint-disable class-methods-use-this */
 
@@ -265,17 +289,7 @@ class ReviewCompositeService implements IReviewCompositeService {
       // separate: true runs the hasMany as a second query, so the main query is a
       // plain BelongsTo join — Sequelize won't wrap it in a subquery, which lets
       // ORDER BY reference the "applicant" table directly.
-      const viewWhere: WhereOptions = {};
-      if (view === DashboardViewEnum.SHORTLISTED) {
-        viewWhere.is_shortlisted_for_interview = true;
-      } else if (view === DashboardViewEnum.CONFLICTS) {
-        viewWhere.id = {
-          [Op.in]: literal(`(
-            SELECT applicant_record_id FROM reviewed_applicant_records
-            WHERE reviewer_has_conflict = true
-          )`),
-        };
-      }
+      const viewWhere = await buildReviewDashboardViewWhere(view);
 
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: { exclude: ["createdAt", "updatedAt"] },
@@ -313,6 +327,32 @@ class ReviewCompositeService implements IReviewCompositeService {
       );
       throw error;
     }
+  }
+
+  async getReviewDashboardCounts(
+    filters?: ReviewDashboardFilters,
+  ): Promise<ReviewDashboardCountsDTO> {
+    const countView = async (view: DashboardView) =>
+      ApplicantRecord.count({
+        where: {
+          ...buildApplicantRecordWhere(filters),
+          ...(await buildReviewDashboardViewWhere(view)),
+        },
+        include: [
+          {
+            model: Applicant,
+            attributes: [],
+            required: true,
+            where: buildApplicantWhere(filters),
+          },
+        ],
+      });
+    const [all, shortlisted, conflicts] = await Promise.all([
+      countView(DashboardViewEnum.ALL),
+      countView(DashboardViewEnum.SHORTLISTED),
+      countView(DashboardViewEnum.CONFLICTS),
+    ]);
+    return { all, shortlisted, conflicts };
   }
 
   async getReviewDashboardApplicantRecordIds(

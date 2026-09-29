@@ -1,7 +1,10 @@
 import { useCallback } from "react";
 import { useMutation } from "@apollo/client/react";
 import {
+  ReviewDashboardCountsDocument,
   UpdateApplicantRecordStatusDocument,
+  InterviewDashboardCountsDocument,
+  InterviewDashboardDocument,
   type UpdateApplicantRecordStatusMutation,
   type UpdateApplicantRecordStatusMutationVariables,
   type ApplicationStatus,
@@ -11,7 +14,14 @@ export default function useUpdateApplicantRecordStatus() {
   const [mutate, { data, loading, error, reset }] = useMutation<
     UpdateApplicantRecordStatusMutation,
     UpdateApplicantRecordStatusMutationVariables
-  >(UpdateApplicantRecordStatusDocument, { context: { refreshAuth: true } });
+  >(UpdateApplicantRecordStatusDocument, {
+    context: { refreshAuth: true },
+    refetchQueries: [
+      ReviewDashboardCountsDocument,
+      InterviewDashboardCountsDocument,
+      InterviewDashboardDocument,
+    ],
+  });
   const updateApplicantRecordStatus = useCallback(
     async (id: string, status: ApplicationStatus) => {
       const { data } = await mutate({ variables: { id, status } });

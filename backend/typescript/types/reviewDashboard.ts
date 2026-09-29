@@ -78,3 +78,9 @@ export type ReviewDashboardFilters = {
   years?: string[];
   bookmarked?: boolean;
 };
+
+export type ReviewDashboardCountsDTO = {
+  all: number;
+  shortlisted: number;
+  conflicts: number;
+};

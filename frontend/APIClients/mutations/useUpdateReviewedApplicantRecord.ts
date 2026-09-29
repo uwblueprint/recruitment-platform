@@ -1,5 +1,6 @@
 import { useMutation } from "@apollo/client/react";
 import {
+  ReviewDashboardCountsDocument,
   UpdateReviewedApplicantRecordDocument,
   ReviewedApplicantRecordsByApplicantRecordIdDocument,
   type UpdateReviewedApplicantRecordMutation,
@@ -33,6 +34,7 @@ export default function useUpdateReviewedApplicantRecord() {
         reviewedApplicantRecord,
       },
       refetchQueries: [
+        ReviewDashboardCountsDocument,
         {
           query: ReviewedApplicantRecordsByApplicantRecordIdDocument,
           variables: { applicantRecordId },
