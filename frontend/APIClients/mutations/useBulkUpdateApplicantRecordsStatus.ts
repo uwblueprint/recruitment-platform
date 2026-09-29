@@ -8,7 +8,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useBulkUpdateApplicantRecordsStatus() {
-  const [mutate, { data, loading, error }] = useMutation<
+  const [mutate, { data, loading, error, reset }] = useMutation<
     BulkUpdateApplicantRecordsStatusMutation,
     BulkUpdateApplicantRecordsStatusMutationVariables
   >(BulkUpdateApplicantRecordsStatusDocument, {
@@ -32,6 +32,7 @@ export default function useBulkUpdateApplicantRecordsStatus() {
     [mutate]
   );
   return {
+    reset,
     bulkUpdateApplicantRecordsStatus,
     data: data?.bulkUpdateApplicantRecordsStatus,
     loading,

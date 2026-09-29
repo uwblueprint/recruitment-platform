@@ -182,6 +182,8 @@ export type {
   LoginMutationVariables,
   LoginWithGoogleMutation,
   LoginWithGoogleMutationVariables,
+  LogoutMutation,
+  LogoutMutationVariables,
   ReassignReviewerMutation,
   ReassignReviewerMutationVariables,
   RefreshMutation,

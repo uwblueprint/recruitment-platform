@@ -1,3 +1,4 @@
+import type { QueryOptions } from "../types";
 import { skipToken, useQuery } from "@apollo/client/react";
 import {
   AdminCommentsByApplicantRecordIdDocument,
@@ -6,8 +7,8 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useAdminCommentsByApplicantRecordId(
-  applicantRecordId?: string,
-  options: { notifyOnNetworkStatusChange?: boolean } = {}
+  applicantRecordId?: string | null,
+  options: QueryOptions = {}
 ) {
   const { data, loading, error, refetch } = useQuery<
     AdminCommentsByApplicantRecordIdQuery,
@@ -33,9 +34,7 @@ export default function useAdminCommentsByApplicantRecordId(
   const queryError =
     error ??
     (!loading && !result
-      ? new Error(
-          "No adminCommentsByApplicantRecordId data returned"
-        )
+      ? new Error("No adminCommentsByApplicantRecordId data returned")
       : undefined);
   return {
     data: !loading && !queryError ? result : undefined,

@@ -3,10 +3,7 @@ import useAdminCommentsByApplicantRecordId from "@/APIClients/queries/useAdminCo
 import useCreateAdminComment from "@/APIClients/mutations/useCreateAdminComment";
 import useUpdateAdminComment from "@/APIClients/mutations/useUpdateAdminComment";
 import useDeleteAdminComment from "@/APIClients/mutations/useDeleteAdminComment";
-import {
-  AdminCommentsByApplicantRecordIdDocument,
-  type AdminCommentResult,
-} from "@/graphql/typeUtils";
+import { type AdminCommentResult } from "@/graphql/typeUtils";
 
 type UseAdminCommentsResult = {
   comments: AdminCommentResult[];
@@ -29,35 +26,26 @@ const parseDate = (value: string) => {
 const sortByCreatedAtDesc = (a: AdminCommentResult, b: AdminCommentResult) =>
   parseDate(b.createdAt) - parseDate(a.createdAt);
 
-const refreshComments = (applicantRecordId: string) => ({
-  awaitRefetchQueries: true,
-  refetchQueries: [
-    {
-      query: AdminCommentsByApplicantRecordIdDocument,
-      variables: { applicantRecordId },
-      context: { refreshAuth: true },
-    },
-  ],
-});
-
 const useAdminComments = (
   applicantRecordId: string | null
 ): UseAdminCommentsResult => {
-  const { data: rows, loading: isLoading, error } =
-    useAdminCommentsByApplicantRecordId(applicantRecordId ?? undefined, {
-      // Keep comment forms mounted while a mutation refreshes the list.
-      notifyOnNetworkStatusChange: false,
-    });
-  const { mutate: create } = useCreateAdminComment();
-  const { mutate: update } = useUpdateAdminComment();
-  const { mutate: remove } = useDeleteAdminComment();
+  const {
+    data: rows,
+    loading: isLoading,
+    error,
+  } = useAdminCommentsByApplicantRecordId(applicantRecordId, {
+    // Keep comment forms mounted while a mutation refreshes the list.
+    notifyOnNetworkStatusChange: false,
+  });
+  const { mutate: create } = useCreateAdminComment(applicantRecordId);
+  const { mutate: update } = useUpdateAdminComment(applicantRecordId);
+  const { mutate: remove } = useDeleteAdminComment(applicantRecordId);
 
   const createComment = useCallback(
     async (userId: string, comment: string) => {
       if (!applicantRecordId) return;
       const { data } = await create({
         variables: { adminComment: { userId, applicantRecordId, comment } },
-        ...refreshComments(applicantRecordId),
       });
       if (!data?.createAdminComment) {
         throw new Error("Failed to create admin comment");
@@ -71,7 +59,6 @@ const useAdminComments = (
       if (!applicantRecordId) return;
       const { data } = await update({
         variables: { id, adminComment: { comment } },
-        ...refreshComments(applicantRecordId),
       });
       if (!data?.updateAdminComment) {
         throw new Error("Failed to update admin comment");
@@ -85,7 +72,6 @@ const useAdminComments = (
       if (!applicantRecordId) return;
       const { data } = await remove({
         variables: { id },
-        ...refreshComments(applicantRecordId),
       });
       if (!data?.deleteAdminCommentById) {
         throw new Error("Failed to delete admin comment");
