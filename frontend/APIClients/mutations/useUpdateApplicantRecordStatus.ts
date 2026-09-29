@@ -8,7 +8,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useUpdateApplicantRecordStatus() {
-  const [mutate, { data, loading, error }] = useMutation<
+  const [mutate, { data, loading, error, reset }] = useMutation<
     UpdateApplicantRecordStatusMutation,
     UpdateApplicantRecordStatusMutationVariables
   >(UpdateApplicantRecordStatusDocument, { context: { refreshAuth: true } });
@@ -22,6 +22,7 @@ export default function useUpdateApplicantRecordStatus() {
     [mutate]
   );
   return {
+    reset,
     updateApplicantRecordStatus,
     data: data?.updateApplicantRecordStatus,
     loading,

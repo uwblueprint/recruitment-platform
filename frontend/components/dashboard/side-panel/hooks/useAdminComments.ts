@@ -27,7 +27,7 @@ const sortByCreatedAtDesc = (a: AdminCommentResult, b: AdminCommentResult) =>
   parseDate(b.createdAt) - parseDate(a.createdAt);
 
 const useAdminComments = (
-  applicantRecordId: string | null
+  applicantRecordId?: string
 ): UseAdminCommentsResult => {
   const {
     data: rows,

@@ -6,12 +6,13 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useSubmitInterviewScores() {
-  const [mutate, { data, called, loading, error }] = useMutation<
+  const [mutate, { data, called, loading, error, reset }] = useMutation<
     SubmitInterviewScoresMutation,
     SubmitInterviewScoresMutationVariables
   >(SubmitInterviewScoresDocument, { context: { refreshAuth: true } });
 
   return {
+    reset,
     mutate,
     data: data?.submitInterviewScores,
     loading,

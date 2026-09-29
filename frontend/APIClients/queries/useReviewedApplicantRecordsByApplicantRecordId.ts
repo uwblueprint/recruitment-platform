@@ -1,3 +1,4 @@
+import type { QueryOptions } from "../types";
 import { skipToken, useQuery } from "@apollo/client/react";
 import {
   ReviewedApplicantRecordsByApplicantRecordIdDocument,
@@ -7,7 +8,7 @@ import {
 
 export default function useReviewedApplicantRecordsByApplicantRecordId(
   applicantRecordId?: string,
-  options: { notifyOnNetworkStatusChange?: boolean } = {}
+  options: QueryOptions = {}
 ) {
   const { data, loading, error, refetch } = useQuery<
     ReviewedApplicantRecordsByApplicantRecordIdQuery,

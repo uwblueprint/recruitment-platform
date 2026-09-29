@@ -24,7 +24,7 @@ import useUploadInterviewNotes from "@/APIClients/mutations/useUploadInterviewNo
 export type AssessmentContextValue = {
   form: ScoreFormState;
   setForm: Dispatch<SetStateAction<ScoreFormState>>;
-  recordId: string | null;
+  recordId?: string;
   isLoading: boolean;
   isSubmitting: boolean;
   canSubmit: boolean;
@@ -61,7 +61,7 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
     loading: isSubmitting,
     error: submitFailed,
   } = useSubmitInterviewScores();
-  const recordId = record?.id ?? null;
+  const recordId = record?.id ?? undefined;
 
   // Derive the initial form from the query; keep user edits separate from
   // cache updates and discard the draft when navigating to another applicant.

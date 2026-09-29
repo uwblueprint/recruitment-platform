@@ -7,8 +7,8 @@ import {
   type UploadInterviewNotesMutationVariables,
 } from "@/graphql/typeUtils";
 
-export default function useUploadInterviewNotes(recordId: string | null) {
-  const [mutate, { data, called, loading, error }] = useMutation<
+export default function useUploadInterviewNotes(recordId?: string) {
+  const [mutate, { data, called, loading, error, reset }] = useMutation<
     UploadInterviewNotesMutation,
     UploadInterviewNotesMutationVariables
   >(UploadInterviewNotesDocument, {
@@ -35,6 +35,7 @@ export default function useUploadInterviewNotes(recordId: string | null) {
   );
 
   return {
+    reset,
     uploadNotes,
     data: data?.uploadInterviewNotes,
     loading,

@@ -6,7 +6,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useReassignReviewer() {
-  const [mutate, { data, called, loading, error }] = useMutation<
+  const [mutate, { data, called, loading, error, reset }] = useMutation<
     ReassignReviewerMutation,
     ReassignReviewerMutationVariables
   >(ReassignReviewerDocument, {
@@ -14,6 +14,7 @@ export default function useReassignReviewer() {
     onError: () => {},
   });
   return {
+    reset,
     mutate,
     data: data?.reassignReviewer,
     loading,

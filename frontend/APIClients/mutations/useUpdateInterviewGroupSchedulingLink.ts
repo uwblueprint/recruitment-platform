@@ -6,7 +6,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useUpdateInterviewGroupSchedulingLink() {
-  const [mutate, { data, called, loading, error }] = useMutation<
+  const [mutate, { data, called, loading, error, reset }] = useMutation<
     UpdateInterviewGroupSchedulingLinkMutation,
     UpdateInterviewGroupSchedulingLinkMutationVariables
   >(UpdateInterviewGroupSchedulingLinkDocument, {
@@ -15,6 +15,7 @@ export default function useUpdateInterviewGroupSchedulingLink() {
     onError: () => {},
   });
   return {
+    reset,
     mutate,
     data: data?.updateInterviewGroupSchedulingLink,
     loading,

@@ -8,7 +8,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useUpdateApplicantRecordIsApplicantFlagged() {
-  const [mutate, { data, called, loading, error }] = useMutation<
+  const [mutate, { data, called, loading, error, reset }] = useMutation<
     UpdateApplicantRecordIsApplicantFlaggedMutation,
     UpdateApplicantRecordIsApplicantFlaggedMutationVariables
   >(UpdateApplicantRecordIsApplicantFlaggedDocument, {
@@ -33,7 +33,9 @@ export default function useUpdateApplicantRecordIsApplicantFlagged() {
     [mutate, loading]
   );
   return {
+    reset,
     updateFlag,
+    data: data?.updateApplicantRecordIsApplicantFlagged,
     loading,
     error:
       error ??

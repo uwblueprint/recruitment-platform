@@ -7,7 +7,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useAdminCommentsByApplicantRecordId(
-  applicantRecordId?: string | null,
+  applicantRecordId?: string,
   options: QueryOptions = {}
 ) {
   const { data, loading, error, refetch } = useQuery<

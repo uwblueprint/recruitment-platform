@@ -7,7 +7,7 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useSendRejectionEmails() {
-  const [mutate, { data, loading, error }] = useMutation<
+  const [mutate, { data, loading, error, reset }] = useMutation<
     SendRejectionEmailsMutation,
     SendRejectionEmailsMutationVariables
   >(SendRejectionEmailsDocument, { context: { refreshAuth: true } });
@@ -27,6 +27,7 @@ export default function useSendRejectionEmails() {
     [mutate]
   );
   return {
+    reset,
     sendRejectionEmails,
     data: data?.sendRejectionEmails,
     loading,

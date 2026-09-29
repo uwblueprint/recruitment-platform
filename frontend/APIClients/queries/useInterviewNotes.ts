@@ -1,3 +1,4 @@
+import type { QueryOptions } from "../types";
 import { skipToken, useQuery } from "@apollo/client/react";
 import {
   InterviewNotesDocument,
@@ -6,8 +7,8 @@ import {
 } from "@/graphql/typeUtils";
 
 export default function useInterviewNotes(
-  interviewedApplicantRecordId?: string | null,
-  options: { notifyOnNetworkStatusChange?: boolean } = {}
+  interviewedApplicantRecordId?: string,
+  options: QueryOptions = {}
 ) {
   const { data, loading, error, refetch } = useQuery<
     InterviewNotesQuery,
@@ -28,11 +29,16 @@ export default function useInterviewNotes(
   if (!interviewedApplicantRecordId) {
     return { data: undefined, loading: false, error: undefined, refetch };
   }
+  const queryError =
+    error ??
+    (!loading && !data
+      ? new Error("No interview notes response returned")
+      : undefined);
   return {
     // No uploaded notes is a valid empty state.
-    data: !loading && !error ? data?.interviewNotes ?? null : undefined,
+    data: !loading && !queryError ? data?.interviewNotes ?? null : undefined,
     loading,
-    error,
+    error: queryError,
     refetch,
   };
 }

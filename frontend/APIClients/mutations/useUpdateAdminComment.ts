@@ -1,4 +1,4 @@
-import { refreshAdminComments } from "../adminCommentsCache";
+import { refreshAdminComments } from "../caches/adminCommentsCache";
 import { useMutation } from "@apollo/client/react";
 import {
   UpdateAdminCommentDocument,
