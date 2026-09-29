@@ -2,12 +2,14 @@ query InterviewDashboard(
   $pageNumber: Int!
   $resultsPerPage: Int!
   $sortBy: InterviewDashboardSortBy
+  $view: DashboardView
   $sortAscending: Boolean
 ) {
   interviewDashboard(
     pageNumber: $pageNumber
     resultsPerPage: $resultsPerPage
     sortBy: $sortBy
+    view: $view
     sortAscending: $sortAscending
   ) {
     applicantRecordId

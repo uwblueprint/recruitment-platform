@@ -122,6 +122,7 @@ const graphQLMiddlewares = {
     reviewDashboardSidePanel: authorizedByAdmin(),
     reviewDashboardFilterOptions: authorizedByAdmin(),
     interviewDashboard: authorizedByAdmin(),
+    interviewDashboardCounts: authorizedByAdmin(),
     interviewDashboardSidePanel: authorizedByAdmin(),
     interviewInvites: authorizedByAdmin(),
   },

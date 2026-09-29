@@ -6,7 +6,7 @@ import {
   INTERVIEW_DASHBOARD_COLUMNS,
 } from "@/components/dashboard/interview-dashboard/columns";
 import useInterviewDashboard from "@/APIClients/queries/useInterviewDashboard";
-import type { InterviewDashboardResult } from "@/graphql/typeUtils";
+import { DashboardView, type InterviewDashboardResult } from "@/graphql/typeUtils";
 import {
   OnChangeFn,
   RowSelectionState,
@@ -15,6 +15,8 @@ import {
 import { useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
+import { DashboardTab, DashboardTabs } from "@/components/dashboard/common/DashboardTabs";
+import useInterviewDashboardCounts from "@/APIClients/queries/useInterviewDashboardCounts";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 
@@ -26,6 +28,17 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [sorting, setSorting] = useState<SortingState>([]);
+
+   const [activeView, setActiveView] = useState<DashboardView>(
+    DashboardView.All
+  );
+
+    const handleViewChange = (view: DashboardView) => {
+    setActiveView(view);
+    setPageNumber(1);
+    setRowSelection({});
+    setActiveIndex(null);
+  };
 
   // The table is single-sort, so only the first SortingState entry is used.
   // Unsortable columns are absent from COLUMN_ID_TO_SORT_BY, so sortBy is
@@ -44,6 +57,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     resultsPerPage,
     sortBy,
     sortAscending,
+    view: activeView,
   });
   const rows = error
     ? []
@@ -67,6 +81,15 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     setRowSelection({});
   };
 
+  const { counts: tabCounts, error: countsError } = useInterviewDashboardCounts();
+
+  const INTERVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
+  const tabs: DashboardTab[] = [
+    { view: DashboardView.All, label: "All Applicants", count: tabCounts[DashboardView.All], unit: INTERVIEW_DASHBOARD_TABS_UNIT },
+    { view: DashboardView.Shortlisted, label: "Shortlisted", count: tabCounts[DashboardView.Shortlisted], unit: INTERVIEW_DASHBOARD_TABS_UNIT },
+    { view: DashboardView.Conflicts, label: "Conflicts", count: tabCounts[DashboardView.Conflicts], unit: INTERVIEW_DASHBOARD_TABS_UNIT },
+  ];
+
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
@@ -77,6 +100,20 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             Failed to load interview dashboard
           </div>
         ) : null}
+
+        {countsError ? (
+          <p role="alert" className="text-sm text-alert-errorText">
+            Failed to load dashboard counts.
+          </p>
+        ) : null}
+
+        <DashboardTabs
+          activeView={activeView}
+          onViewChange={handleViewChange}
+          selectedCount={Object.keys(rowSelection).length}
+          onClearAll={() => setRowSelection({})}
+          tabs={tabs}
+        />
 
         <DashboardTable
           data={rows}

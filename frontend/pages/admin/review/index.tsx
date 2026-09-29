@@ -24,7 +24,7 @@ import {
   COLUMN_ID_TO_SORT_BY,
   createReviewDashboardColumns,
 } from "./_components/columns";
-import { DashboardTabs } from "./_components/DashboardTabs";
+import { DashboardTab, DashboardTabs } from "../../../components/dashboard/common/DashboardTabs";
 import useDebouncedValue from "./_components/hooks/useDebouncedValue";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
@@ -297,6 +297,15 @@ const AdminReviewPage: NextPageWithLayout = () => {
       }))
     );
 
+  
+  const REVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
+
+  const tabs: DashboardTab[] = [
+    { view: DashboardView.All, label: "All Applicants", count: tabCounts[DashboardView.All], unit: REVIEW_DASHBOARD_TABS_UNIT },
+    { view: DashboardView.Shortlisted, label: "Shortlisted", count: tabCounts[DashboardView.Shortlisted], unit: REVIEW_DASHBOARD_TABS_UNIT },
+    { view: DashboardView.Conflicts, label: "Conflicts", count: tabCounts[DashboardView.Conflicts], unit: REVIEW_DASHBOARD_TABS_UNIT },
+  ];
+
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
@@ -304,9 +313,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
         <DashboardTabs
           activeView={activeView}
           onViewChange={handleViewChange}
-          counts={tabCounts}
           selectedCount={selectedCount}
           onClearAll={() => setRowSelection({})}
+          tabs={tabs}
         />
 
         <ReviewDashboardToolbar

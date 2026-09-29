@@ -1,31 +1,33 @@
 import { DashboardView } from "@/graphql/typeUtils";
 
-type Tab = {
+type Unit = {
+  singular: string;
+  plural: string;
+}
+
+export type DashboardTab = {
   view: DashboardView;
   label: string;
-  count: number;
+  count: number | undefined;
+  unit: Unit;
 };
 
 type DashboardTabsProps = {
   activeView: DashboardView;
   onViewChange: (view: DashboardView) => void;
-  counts: Record<DashboardView, number>;
-  selectedCount: number;
+  selectedCount?: number;
   onClearAll: () => void;
+  tabs?: DashboardTab[]; // Optional prop to allow for custom tabs
 };
 
 export const DashboardTabs = ({
   activeView,
   onViewChange,
-  counts,
   selectedCount,
   onClearAll,
+  tabs = [],
 }: DashboardTabsProps) => {
-  const tabs: Tab[] = [
-    { view: DashboardView.All, label: "All Applicants", count: counts[DashboardView.All] },
-    { view: DashboardView.Shortlisted, label: "Shortlisted", count: counts[DashboardView.Shortlisted] },
-    { view: DashboardView.Conflicts, label: "Conflicts", count: counts[DashboardView.Conflicts] },
-  ];
+
 
   return (
     <div className="flex items-end justify-between border-b border-neutral-200">
@@ -53,7 +55,9 @@ export const DashboardTabs = ({
                   isActive ? "text-blue" : "text-neutral-400"
                 }`}
               >
-                {tab.count} {tab.count === 1 ? "Entry" : "Entries"}
+                {tab.count === undefined
+                  ? "—"
+                  : `${tab.count} ${tab.count === 1 ? tab.unit.singular : tab.unit.plural}`}
               </span>
             </button>
           );
@@ -61,14 +65,20 @@ export const DashboardTabs = ({
       </div>
 
       <div className="flex items-center gap-3 pb-2">
-        <span className="text-sm text-neutral-500">{selectedCount} selected</span>
-        <button
+        {selectedCount !== undefined ? <span className="text-sm text-neutral-500">{selectedCount} selected</span> : null}
+        
+        {onClearAll ? (
+
+           <button
           type="button"
           onClick={onClearAll}
           className="text-sm text-neutral-500 hover:text-black"
         >
           Clear all
         </button>
+        ) : null}
+        
+
       </div>
     </div>
   );

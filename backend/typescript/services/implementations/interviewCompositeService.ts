@@ -10,6 +10,9 @@ import User from "../../models/user.model";
 import {
   CreateInterviewDelegationDTO,
   ApplicationStatusEnum,
+  DashboardView,
+  DashboardViewEnum,
+  InterviewDashboardCountsDTO,
   InterviewDashboardRowDTO,
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
@@ -48,6 +51,50 @@ import {
 } from "../../constants/interviewNotes";
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
 import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedApplicantRecordService";
+
+const buildInterviewDashboardWhere = async (view?: DashboardView) => {
+  // Resolve matching IDs separately so the hasMany join cannot duplicate rows
+  // or interfere with pagination and interviewer sorting in the main query.
+  const conflictingRecords =
+    view === DashboardViewEnum.CONFLICTS
+      ? await InterviewedApplicantRecord.findAll({
+          attributes: ["applicant_record_id"],
+          include: [
+            {
+              model: InterviewDelegation,
+              as: "interview_delegations",
+              attributes: [],
+              required: true,
+              where: { interview_has_conflict: { [Op.ne]: null } },
+            },
+          ],
+          raw: true,
+        })
+      : undefined;
+
+  return {
+    status: {
+      [Op.in]: [
+        ApplicationStatusEnum.INTERVIEWED,
+        ApplicationStatusEnum.SELECTED,
+      ],
+    },
+    ...(view === DashboardViewEnum.SHORTLISTED
+      ? { is_shortlisted_for_offer: true }
+      : {}),
+    ...(conflictingRecords
+      ? {
+          id: {
+            [Op.in]: [
+              ...new Set(
+                conflictingRecords.map((record) => record.applicant_record_id),
+              ),
+            ],
+          },
+        }
+      : {}),
+  };
+};
 
 const Logger = logger(__filename);
 
@@ -178,6 +225,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
     resultsPerPage: number,
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
+    view?: DashboardView,
   ): Promise<InterviewDashboardRowDTO[]> {
     try {
       if (
@@ -193,14 +241,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
 
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: ["id", "position", "status"],
-        where: {
-          status: {
-            [Op.in]: [
-              ApplicationStatusEnum.INTERVIEWED,
-              ApplicationStatusEnum.SELECTED,
-            ],
-          },
-        },
+        where: await buildInterviewDashboardWhere(view),
         include: [
           {
             attributes: ["first_name", "last_name"],
@@ -263,6 +304,20 @@ class InterviewCompositeService implements IInterviewCompositeService {
       );
       throw error;
     }
+  }
+
+  async getInterviewDashboardCounts(): Promise<InterviewDashboardCountsDTO> {
+    const countView = async (view: DashboardView) =>
+      ApplicantRecord.count({
+        where: await buildInterviewDashboardWhere(view),
+        include: [{ model: Applicant, required: true, attributes: [] }],
+      });
+    const [all, shortlisted, conflicts] = await Promise.all([
+      countView(DashboardViewEnum.ALL),
+      countView(DashboardViewEnum.SHORTLISTED),
+      countView(DashboardViewEnum.CONFLICTS),
+    ]);
+    return { all, shortlisted, conflicts };
   }
 
   async getInterviewDashboardSidePanel(

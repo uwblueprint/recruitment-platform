@@ -45,3 +45,9 @@ export type InterviewDashboardSidePanelDTO = {
   interviewedApplicantRecordId: string | null;
   interviewDate: Date | null;
 };
+
+export type InterviewDashboardCountsDTO = {
+  all: number;
+  shortlisted: number;
+  conflicts: number;
+};
