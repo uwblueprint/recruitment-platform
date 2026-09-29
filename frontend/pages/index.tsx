@@ -24,6 +24,7 @@ import { ArrowRightIcon } from "@/components/icons/arrow-right.icon";
 import StatusBadge from "./home/_components/StatusBadge";
 import HomeTable from "./home/_components/HomeTable";
 import useHomeDashboard from "./home/_components/hooks/useHomeDashboard";
+import { Role } from "@/graphql/typeUtils";
 
 const HomeHeader = () => {
   const user = useAuthenticatedUser();
@@ -32,7 +33,7 @@ const HomeHeader = () => {
     <InterviewHeader
       steps={[]}
       actions={
-        user?.role === "Admin" ? (
+        user?.role === Role.Admin ? (
           <Link
             href="/admin"
             className="font-poppins text-base font-medium text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
@@ -197,7 +198,7 @@ const HomePage: NextPageWithLayout = () => {
 };
 
 HomePage.getLayout = (page: ReactElement) => (
-  <ProtectedRoute allowedRoles={["Admin", "User"]}>
+  <ProtectedRoute allowedRoles={[Role.Admin, Role.User, Role.SuperAdmin]}>
     <SplitPanelLayout header={<HomeHeader />}>
       <IllustrationPanel />
       {page}

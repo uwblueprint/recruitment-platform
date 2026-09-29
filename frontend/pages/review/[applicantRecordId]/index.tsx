@@ -1,5 +1,5 @@
 import { Toast } from "@/components/common/Toast";
-import { ReviewStatus, SkillCategory } from "@/graphql/typeUtils";
+import { ReviewStatus, Role, SkillCategory } from "@/graphql/typeUtils";
 import type { Dispatch, SetStateAction } from "react";
 import useUpdateReviewedApplicantRecord from "@/APIClients/mutations/useUpdateReviewedApplicantRecord";
 import useReviewApplication from "../_components/hooks/useReviewApplication";
@@ -344,7 +344,7 @@ const ReviewsPages: NextPage = () => {
 
 const Reviews: NextPage = () => {
   return (
-    <ProtectedRoute allowedRoles={["Admin", "User"]}>
+    <ProtectedRoute allowedRoles={[Role.Admin, Role.User]}>
       <ProtectedApplication>
         <ReviewsPages />
       </ProtectedApplication>

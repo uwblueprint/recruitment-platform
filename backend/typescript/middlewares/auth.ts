@@ -6,6 +6,7 @@ import AuthService from "../services/implementations/authService";
 import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import { Role } from "../types";
+import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 
 const authService: IAuthService = new AuthService(new UserService());
 
@@ -72,6 +73,49 @@ export const isAuthorizedByRole = (roles: Set<Role>) => {
     }
 
     return resolve(parent, args, context, info);
+  };
+};
+
+/** Review details are available to admins and the applicant's assigned reviewers/interviewers. */
+export const isAuthorizedForApplicantReview = () => {
+  return async (
+    resolve: (
+      parent: any,
+      args: { [key: string]: any },
+      context: ExpressContext,
+      info: GraphQLResolveInfo,
+    ) => any,
+    parent: any,
+    args: { [key: string]: any },
+    context: ExpressContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    const accessToken = getAccessToken(context.req);
+    if (accessToken) {
+      if (
+        await authService.isAuthorizedByRole(
+          accessToken,
+          new Set(["Admin", "SuperAdmin"]),
+        )
+      ) {
+        return resolve(parent, args, context, info);
+      }
+      if (
+        await authService.isAuthorizedByRole(accessToken, new Set(["User"]))
+      ) {
+        const userId = await authService.getUserIdByAccessToken(accessToken);
+        const review = await ReviewedApplicantRecord.findOne({
+          where: {
+            applicant_record_id: args.applicantRecordId,
+            reviewer_id: userId,
+          },
+        });
+        if (review) return resolve(parent, args, context, info);
+      }
+    }
+    throw new AuthenticationError(
+      "Failed authentication and/or authorization for applicant review",
+    );
   };
 };
 

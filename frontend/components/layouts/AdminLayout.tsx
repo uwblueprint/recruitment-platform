@@ -1,11 +1,11 @@
 import { ReactElement, ReactNode } from "react";
 import { Navbar } from "@/components/common/Navbar";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import { Role } from "@/graphql/typeUtils";
 
-const ADMIN_ROLES: Array<"Admin"> = ["Admin"];
 
 export const AdminLayout = ({ children }: { children: ReactNode }) => (
-  <ProtectedRoute allowedRoles={ADMIN_ROLES}>
+  <ProtectedRoute allowedRoles={[Role.Admin]}>
     <div className="flex h-screen flex-col bg-white">
       <Navbar />
       <div className="flex min-h-0 flex-1 flex-col overflow-auto">

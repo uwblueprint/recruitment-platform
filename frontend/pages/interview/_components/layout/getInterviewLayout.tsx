@@ -3,6 +3,7 @@ import { ReactElement } from "react";
 import { InterviewFooter } from "./InterviewFooter";
 import { InterviewHeader } from "./InterviewHeader";
 import { InterviewLayout } from "./InterviewLayout";
+import { Role } from "@/graphql/__generated__/types";
 
 export const getInterviewLayout =
   (
@@ -11,7 +12,7 @@ export const getInterviewLayout =
   ) => {
   const InterviewPageLayout = (page: ReactElement) =>
     (
-        <ProtectedRoute allowedRoles={["Admin", "User"]}>
+        <ProtectedRoute allowedRoles={[Role.Admin, Role.User]}>
           <InterviewLayout header={header} footer={footer ?? undefined}>
             {page}
           </InterviewLayout>

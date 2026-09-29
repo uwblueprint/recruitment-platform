@@ -18,6 +18,7 @@ import { ReviewSkillStage } from "../_components/stages/ReviewSkillStage";
 import { ReviewTeamPlayerStage } from "../_components/stages/ReviewTeamPlayerStage";
 import { ReviewEndData, ReviewScores } from "../_components/types";
 import { getApplicantRecordId } from "../_components/utils";
+import { Role } from "@/graphql/__generated__/types";
 
 const initialScores: ReviewScores = {
   [ReviewStage.INFO]: 0,
@@ -146,7 +147,7 @@ const ReviewViewPage: NextPage = () => {
 
 const ReviewView: NextPage = () => {
   return (
-    <ProtectedRoute allowedRoles={["Admin"]}>
+    <ProtectedRoute allowedRoles={[Role.Admin, Role.User]}>
       <ProtectedApplication>
         <ReviewViewPage />
       </ProtectedApplication>
