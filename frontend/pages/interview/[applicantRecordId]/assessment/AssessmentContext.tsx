@@ -18,6 +18,7 @@ import {
   isScoreFormComplete,
   type ScoreFormState,
 } from "../../_components/assessment/constants";
+import useUploadInterviewNotes from "@/APIClients/useUploadInterviewNotes";
 
 export type AssessmentContextValue = {
   form: ScoreFormState;
@@ -131,7 +132,21 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
     ? "Failed to submit scores. Please try again."
     : null;
 
-  const interviewNotes = useInterviewNotes(recordId);
+  const notesQuery = useInterviewNotes(recordId, {
+    // Keep the uploader mounted during its post-upload refresh.
+    notifyOnNetworkStatusChange: false,
+  });
+  const {
+    uploadNotes,
+    loading: isUploading,
+    error: uploadError,
+  } = useUploadInterviewNotes(recordId);
+  const interviewNotes = {
+    ...notesQuery,
+    uploadNotes,
+    uploadError,
+    isUploading,
+  };
 
   return (
     <AssessmentContext.Provider
