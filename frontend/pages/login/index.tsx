@@ -1,4 +1,4 @@
-import AuthAPIClient from "@/APIClients/AuthAPIClient";
+import useLoginWithGoogle from "@/APIClients/mutations/useLoginWithGoogle";
 import { Button } from "@/components/common/Button";
 import { useAuthUserContext } from "@/components/contexts/AuthUserContext";
 import { auth } from "@/utils/firebase";
@@ -9,6 +9,7 @@ import { useRouter } from "next/router";
 
 const LoginPage: NextPage = () => {
   const router = useRouter();
+  const { mutate: loginWithGoogle } = useLoginWithGoogle();
   const { setAuthenticatedUser } = useAuthUserContext();
 
   const signInWithGoogle = async () => {
@@ -22,7 +23,9 @@ const LoginPage: NextPage = () => {
         return;
       }
 
-      const result = await AuthAPIClient.loginWithGoogle(oauthIdToken);
+      const { data } = await loginWithGoogle({ variables: { idToken: oauthIdToken } });
+      const result = data?.loginWithGoogle;
+      if (!result) throw new Error("Login Error");
       localStorage.setItem("accessToken", result.accessToken);
       localStorage.setItem("refreshToken", result.refreshToken);
       setAuthenticatedUser({

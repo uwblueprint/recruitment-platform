@@ -4,8 +4,7 @@ import { NavbarPopover } from "@/components/common/NavbarPopover";
 import { NavbarPopoverItem } from "@/components/common/NavbarPopoverItem";
 import { BlueprintWordmark } from "@/components/common/BlueprintWordmark";
 import { useRouter } from "next/router";
-import { client } from "@/client";
-import { LogoutDocument } from "@/graphql/typeUtils";
+import useLogout from "@/APIClients/mutations/useLogout";
 import { useAuthUserContext, useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { UserIcon } from "@/components/icons/user.icon";
 import { LogoutIcon } from "@/components/icons/logout.icon";
@@ -39,7 +38,8 @@ export const Navbar = () => {
     setRecruitmentAnchor(null);
     setProfileAnchor(null);
   };
-  const { setAuthenticatedUser } = useAuthUserContext();
+  const { logout } = useAuthUserContext();
+  const { mutate: logoutMutation } = useLogout();
   const authenticatedUser = useAuthenticatedUser();
   const userName = authenticatedUser
     ? `${authenticatedUser.firstName} ${authenticatedUser.lastName.charAt(0)}`
@@ -59,15 +59,14 @@ export const Navbar = () => {
     closeMenus();
     try {
       if (authenticatedUser?.id) {
-        await client.mutate({
-          mutation: LogoutDocument,
+        await logoutMutation({
           variables: { userId: authenticatedUser.id }
         });
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setAuthenticatedUser(null);
+      logout();
       router.push("/login");
     }
   };

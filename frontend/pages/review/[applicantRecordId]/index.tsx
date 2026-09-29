@@ -3,7 +3,7 @@ import { ReviewStatus, SkillCategory } from "@/graphql/typeUtils";
 import type { Dispatch, SetStateAction } from "react";
 import useUpdateReviewedApplicantRecord from "@/APIClients/mutations/useUpdateReviewedApplicantRecord";
 import useReviewApplication from "../_components/hooks/useReviewApplication";
-import ReviewPageAPIClient from "@/APIClients/ReviewPageAPIClient";
+import useReportReviewConflict from "@/APIClients/mutations/useReportReviewConflict";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
@@ -45,6 +45,7 @@ const initialScores: ReviewScores = {
 
 const ReviewsPages: NextPage = () => {
   const router = useRouter();
+  const { mutate: reportReviewConflict, loading: reportingConflict } = useReportReviewConflict();
   const [stage, setStage] = useState<ReviewStage>(ReviewStage.INFO);
   const [endDataEdits, setEndDataEdits] = useState<{
     applicantRecordId: string | null;
@@ -286,6 +287,7 @@ const ReviewsPages: NextPage = () => {
   };
 
   const reportConflict = async () => {
+    if (reportingConflict) return;
     try {
       setReportConflictHasErrored(false);
       if (applicantRecordId == null) {
@@ -294,10 +296,12 @@ const ReviewsPages: NextPage = () => {
       if (authenticatedUser == null) {
         throw new Error("Missing authenticated reviewer ID");
       }
-      await ReviewPageAPIClient.reportReviewConflict(
-        applicantRecordId,
-        authenticatedUser.id,
-      );
+      const { data } = await reportReviewConflict({
+        variables: { applicantRecordId, reviewerId: authenticatedUser.id },
+      });
+      if (!data?.reportReviewConflict) {
+        throw new Error("Failed to report review conflict");
+      }
       setReportConflictDialogueOpen(false);
       setReportConflictSuccessDialogueOpen(true);
     } catch {
