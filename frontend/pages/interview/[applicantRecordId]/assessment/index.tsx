@@ -17,7 +17,6 @@ import {
   AssessmentProvider,
   useInterviewAssessment,
 } from "./AssessmentContext";
-import { isScoreFormComplete } from "../../_components/assessment/constants";
 
 const SCORES = AssessmentHeaderStep.SCORES;
 const NOTES = AssessmentHeaderStep.NOTES;
@@ -29,10 +28,8 @@ const SUBMITTED = "SUBMITTED";
 
 const AssessmentFooter = () => {
   const { currentSubStep, setCurrentSubStep } = useInterviewProgress();
-  const { form, isSubmitting, interviewNotes, submitScores } =
+  const { canSubmit, isSubmitting, interviewNotes, submitScores } =
     useInterviewAssessment();
-
-  const formComplete = isScoreFormComplete(form);
 
   const handleSubmitAndContinue = async () => {
     try {
@@ -64,7 +61,7 @@ const AssessmentFooter = () => {
           onBack={() => {}}
           onContinue={handleSubmitAndContinue}
           continueLabel={isSubmitting ? "Submitting..." : "Submit & Continue"}
-          continueDisabled={!formComplete || isSubmitting}
+          continueDisabled={!canSubmit}
         />
       );
   }

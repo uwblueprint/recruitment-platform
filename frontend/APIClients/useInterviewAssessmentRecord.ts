@@ -8,7 +8,7 @@ import {
 export default function useInterviewAssessmentRecord(
   applicantRecordId?: string
 ) {
-  const { data, loading, error } = useQuery<
+  const { data, loading, error, refetch } = useQuery<
     InterviewedApplicantRecordByApplicantRecordIdQuery,
     InterviewedApplicantRecordByApplicantRecordIdQueryVariables
   >(
@@ -24,14 +24,19 @@ export default function useInterviewAssessmentRecord(
 
   // skipToken retains previous data; never expose it without a current ID.
   if (!applicantRecordId) {
-    return { record: undefined, isLoading: false, hasError: false };
+    return { data: undefined, loading: false, error: undefined, refetch };
   }
 
   const record = data?.interviewedApplicantRecordByApplicantRecordId;
-  const hasError = !!error || (!loading && !record);
+  const queryError =
+    error ??
+    (!loading && !record
+      ? new Error("No assessment record returned")
+      : undefined);
   return {
-    record: !loading && !hasError ? record : undefined,
-    isLoading: loading,
-    hasError,
+    data: !loading && !queryError ? record : undefined,
+    loading,
+    error: queryError,
+    refetch,
   };
 }
