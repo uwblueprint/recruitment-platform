@@ -72,7 +72,16 @@ const reviewDashboardType = gql`
     CONFLICTS
   }
 
+  type ReviewDashboardCountsDTO {
+    all: Int!
+    shortlisted: Int!
+    conflicts: Int!
+  }
+
   extend type Query {
+    reviewDashboardCounts(
+      filters: ReviewDashboardFilters
+    ): ReviewDashboardCountsDTO!
     reviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!

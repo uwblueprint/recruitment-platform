@@ -1,0 +1,7 @@
+query ReviewDashboardCounts($filters: ReviewDashboardFilters) {
+  reviewDashboardCounts(filters: $filters) {
+    all
+    shortlisted
+    conflicts
+  }
+}

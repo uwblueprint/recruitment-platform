@@ -32,7 +32,7 @@ import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "@/APIClients/queries/useReviewDashboardApplicantRecordIds";
 import useReviewDashboardFilterOptions from "@/APIClients/queries/useReviewDashboardFilterOptions";
-import useTabCounts from "./_components/hooks/useTabCounts";
+import useReviewDashboardCount from "@/APIClients/queries/useReviewDashboardCount";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
@@ -149,7 +149,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
   });
   const applicantRecordIds =
     !idsQuery.loading && !idsQuery.error ? idsQuery.data ?? [] : [];
+  const { counts: tabCounts, error: countsError, refetch: refetchCounts } = useReviewDashboardCount(backendFilters);
   const refreshDashboard = () => {
+    void refetchCounts().catch(() => {});
     refetch();
     void idsQuery.refetch().catch(() => {});
   };
@@ -157,7 +159,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   const activeNavigationIndex =
     activeId !== undefined ? applicantRecordIds.indexOf(activeId) : -1;
 
-  const tabCounts = useTabCounts(rows, isLoading, activeView);
+
 
   // Jumps the side panel to the applicant at `index` and keeps the table on
   // the page that applicant lives on.
@@ -310,6 +312,11 @@ const AdminReviewPage: NextPageWithLayout = () => {
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
         <DashboardSwitcher currentDashboard={DASHBOARD_ENUM.REVIEW} />
+        {countsError ? (
+          <p role="alert" className="text-sm text-alert-errorText">
+            Failed to load dashboard counts.
+          </p>
+        ) : null}
         <DashboardTabs
           activeView={activeView}
           onViewChange={handleViewChange}

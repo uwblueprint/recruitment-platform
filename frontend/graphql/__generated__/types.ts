@@ -651,6 +651,7 @@ export type Query = {
   isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
+  reviewDashboardCounts: ReviewDashboardCountsDto;
   reviewDashboardFilterOptions: ReviewDashboardFilterOptionsDto;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
@@ -776,6 +777,11 @@ export type QueryReviewDashboardApplicantRecordIdsArgs = {
 };
 
 
+export type QueryReviewDashboardCountsArgs = {
+  filters?: InputMaybe<ReviewDashboardFilters>;
+};
+
+
 export type QueryReviewDashboardFilterOptionsArgs = {
   department?: InputMaybe<Scalars['String']['input']>;
 };
@@ -848,6 +854,13 @@ export type Review = {
   skill?: Maybe<Scalars['Int']['output']>;
   skillCategory?: Maybe<SkillCategory>;
   teamPlayer?: Maybe<Scalars['Int']['output']>;
+};
+
+export type ReviewDashboardCountsDto = {
+  __typename?: 'ReviewDashboardCountsDTO';
+  all: Scalars['Int']['output'];
+  conflicts: Scalars['Int']['output'];
+  shortlisted: Scalars['Int']['output'];
 };
 
 export type ReviewDashboardFilterOptionsDto = {
