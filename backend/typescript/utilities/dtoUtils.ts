@@ -221,6 +221,7 @@ export function toReviewDashboardSidePanelDTO(
     applicationStatus: applicantRecord.status,
     skillCategory: applicantRecord.skill_category as SkillCategory,
     reviewDetails,
+    shortlistedForInterview: applicantRecord.is_shortlisted_for_interview,
   };
 }
 

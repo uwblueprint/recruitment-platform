@@ -213,7 +213,7 @@ export type ReviewDashboardSidePanelQueryVariables = Exact<{
 }>;
 
 
-export type ReviewDashboardSidePanelQuery = { reviewDashboardSidePanel: { firstName: string, lastName: string, position: string, program: string, academicYear: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, reviewDetails: Array<{ reviewStatus: Types.ReviewStatus, reviewer: { id: string, firstName: string, lastName: string }, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null }> } };
+export type ReviewDashboardSidePanelQuery = { reviewDashboardSidePanel: { firstName: string, lastName: string, position: string, program: string, academicYear: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, shortlistedForInterview: boolean, reviewDetails: Array<{ reviewStatus: Types.ReviewStatus, reviewer: { id: string, firstName: string, lastName: string }, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null }> } };
 
 export type ReviewedApplicantRecordsByApplicantRecordIdQueryVariables = Exact<{
   applicantRecordId: string | number;
