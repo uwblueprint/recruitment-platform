@@ -29,6 +29,7 @@ const reviewDashboardType = gql`
     applicationStatus: ApplicationStatus!
     skillCategory: SkillCategory
     reviewDetails: [ReviewDashboardReviewDetails!]!
+    shortlistedForInterview: Boolean!
   }
 
   type FilterOption {

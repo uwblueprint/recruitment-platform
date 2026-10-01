@@ -913,6 +913,7 @@ export type ReviewDashboardSidePanelDto = {
   program: Scalars['String']['output'];
   resumeUrl: Scalars['String']['output'];
   reviewDetails: Array<ReviewDashboardReviewDetails>;
+  shortlistedForInterview: Scalars['Boolean']['output'];
   skillCategory?: Maybe<SkillCategory>;
 };
 

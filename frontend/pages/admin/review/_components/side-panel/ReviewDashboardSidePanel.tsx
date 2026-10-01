@@ -8,6 +8,34 @@ import type {
   ReviewDashboardResult,
 } from "@/graphql/typeUtils";
 import useReviewDashboardSidePanel from "@/APIClients/queries/useReviewDashboardSidePanel";
+import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
+import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
+import { Button } from "@/components/common/Button";
+
+type ShortlistApplicantButtonProps = {
+  isShortlisted: boolean;
+};
+
+const ShortlistApplicantButton = ({
+  isShortlisted,
+}: ShortlistApplicantButtonProps) => {
+  return (
+    <Button size="sm" className="flex items-center gap-2">
+      {isShortlisted ? (
+        <>
+          <HighlightOffOutlinedIcon sx={{ fontSize: 19 }} />
+          Remove from Interview Shortlist
+        </>
+
+      ) : (
+        <>
+          <CheckCircleOutline sx={{ fontSize: 19 }} />
+          Shortlist Applicant for Interview
+        </>
+      )}
+    </Button>
+  );
+};
 
 type ReviewDashboardSidePanelProps = {
   applicantRecordId?: string;
@@ -43,6 +71,13 @@ export const ReviewDashboardSidePanel = ({
       isLoading={isLoading}
       hasError={!!error}
       navigation={navigation}
+      applicantAction={
+        details ? (
+          <ShortlistApplicantButton
+            isShortlisted={details.shortlistedForInterview}
+          />
+        ) : null
+      }
     >
       {details ? (
         <div className="flex flex-col gap-10 md:flex-row">

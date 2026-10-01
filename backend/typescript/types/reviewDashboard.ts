@@ -52,6 +52,7 @@ export type ReviewDashboardSidePanelDTO = {
   applicationStatus: ApplicationStatus;
   skillCategory: SkillCategory | null;
   reviewDetails: ReviewDetails[];
+  shortlistedForInterview: boolean;
 };
 
 export type FilterOption = {
