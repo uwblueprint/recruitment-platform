@@ -24,7 +24,7 @@ import {
   COLUMN_ID_TO_SORT_BY,
   createReviewDashboardColumns,
 } from "./_components/columns";
-import { DashboardTab, DashboardTabs } from "../../../components/dashboard/common/DashboardTabs";
+import { Tab, Tabs } from "../../../components/dashboard/common/Tabs";
 import useDebouncedValue from "./_components/hooks/useDebouncedValue";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
@@ -219,8 +219,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
     [handleStatusChange]
   );
 
-  const handleViewChange = (view: DashboardView) => {
-    setActiveView(view);
+  const handleViewChange = (view: string) => {
+    const dashboardView = Object.values(DashboardView).find((value) => value === view);
+    if (!dashboardView) return;
+    setActiveView(dashboardView);
     setPageNumber(1);
     setRowSelection({});
     setActiveId(undefined);
@@ -302,7 +304,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   
   const REVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
 
-  const tabs: DashboardTab[] = [
+  const tabs: Tab[] = [
     { view: DashboardView.All, label: "All Applicants", count: tabCounts[DashboardView.All], unit: REVIEW_DASHBOARD_TABS_UNIT },
     { view: DashboardView.Shortlisted, label: "Shortlisted", count: tabCounts[DashboardView.Shortlisted], unit: REVIEW_DASHBOARD_TABS_UNIT },
     { view: DashboardView.Conflicts, label: "Conflicts", count: tabCounts[DashboardView.Conflicts], unit: REVIEW_DASHBOARD_TABS_UNIT },
@@ -317,7 +319,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
             Failed to load dashboard counts.
           </p>
         ) : null}
-        <DashboardTabs
+        <Tabs
           activeView={activeView}
           onViewChange={handleViewChange}
           selectedCount={selectedCount}

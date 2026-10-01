@@ -7,9 +7,8 @@ import { SplitPanelLayout } from "@/components/layouts/SplitPageLayout";
 import { InterviewHeader } from "@/pages/interview/_components/layout";
 import { NextPageWithLayout } from "./_app";
 import IllustrationPanel from "./home/_components/IllustrationPanel";
-import Tabs from "@/components/common/Tabs";
+import { Tabs } from "@/components/dashboard/common/Tabs";
 import {
-  Tab,
   HomeTab,
   TABS,
   REVIEW_STATUS_LABEL,
@@ -70,7 +69,7 @@ const HomePage: NextPageWithLayout = () => {
   const router = useRouter();
   const user = useAuthenticatedUser();
 
-  const [activeTab, setActiveTab] = useState<Tab>(HomeTab.APPLICATION_REVIEW);
+  const [activeTab, setActiveTab] = useState<string>(HomeTab.APPLICATION_REVIEW);
   const {
     reviewedApplicants,
     interviewedApplicants,
@@ -99,10 +98,16 @@ const HomePage: NextPageWithLayout = () => {
       <div>
 
       <Tabs
-        tabs={TABS}
-        activeTab={activeTab}
-        onChange={setActiveTab}
-        counts={tabCounts}
+        tabs={TABS.map((tab) => ({
+          view: tab,
+          label: tab,
+          count: tabCounts[tab],
+          unit: tab === HomeTab.INTERVIEW_PAIRING
+            ? { singular: "pairing", plural: "pairings" }
+            : { singular: "application", plural: "applications" },
+        }))}
+        activeView={activeTab}
+        onViewChange={setActiveTab}
       />
 
       <div className="mt-6">

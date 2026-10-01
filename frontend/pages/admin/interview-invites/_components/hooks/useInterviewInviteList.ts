@@ -2,10 +2,9 @@ import { useState } from "react";
 import type { InterviewInvite } from "../types";
 
 const READY_STATUSES = new Set(["AVAILABILITY_PENDING", "READY_TO_INTERVIEW"]);
-export type TabValue = "ready" | "sent";
 
 export default function useInterviewInviteList(invites: InterviewInvite[]) {
-  const [activeTab, setActiveTab] = useState<TabValue>("ready");
+  const [activeTab, setActiveTab] = useState<string>("ready");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
