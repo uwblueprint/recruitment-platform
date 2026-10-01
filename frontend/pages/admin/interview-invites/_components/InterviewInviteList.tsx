@@ -1,11 +1,11 @@
-import { Tab, Tabs } from "@mui/material";
+import { Tabs } from "@/components/dashboard/common/Tabs";
 import { InterviewInvite } from "./types";
 import { InterviewInviteRow } from "./InterviewInviteRow";
 import { theme } from "@/styles/Theme";
 import { SearchIcon } from "@/components/icons/search.icon";
 import { FilterIcon } from "@/components/icons/filter.icon";
 
-import useInterviewInviteList, { type TabValue } from "./hooks/useInterviewInviteList";
+import useInterviewInviteList from "./hooks/useInterviewInviteList";
 
 type InterviewInviteListProps = {
   invites: InterviewInvite[];
@@ -28,88 +28,25 @@ export const InterviewInviteList = ({ invites }: InterviewInviteListProps) => {
 
   return (
     <div className="w-full flex flex-col gap-4">
-      {/* Tabs */}
-      <div className="relative">
-        {/* grey baseline sits at the exact same edge as the MUI indicator */}
-        <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-neutral-200 z-0" />
-
-        <Tabs
-          value={activeTab}
-          onChange={(_, v: TabValue) => setActiveTab(v)}
-          TabIndicatorProps={{
-            style: {
-              backgroundColor: theme.colors.B10,
-              height: "2px",
-              bottom: 0,
-              zIndex: 2,
-            },
-          }}
-          sx={{ minHeight: "unset", position: "relative" }}
-        >
-          <Tab
-            value="ready"
-            disableRipple
-            label={
-              <div className="flex flex-col items-start text-left pb-2 gap-0">
-                <span
-                  className={`font-source font-medium text-base leading-6 ${
-                    activeTab === "ready"
-                      ? "text-neutral-800"
-                      : "text-neutral-500"
-                  }`}
-                >
-                  Ready for Invite
-                </span>
-                <span
-                  className={`font-source font-semibold text-xs ${
-                    activeTab === "ready" ? "text-blue" : "text-neutral-500"
-                  }`}
-                >
-                  {readyInvites.length} Entries
-                </span>
-              </div>
-            }
-            sx={{
-              textTransform: "none",
-              minWidth: "unset",
-              p: 0,
-              pr: 2.5,
-              alignItems: "flex-start",
-            }}
-          />
-          <Tab
-            value="sent"
-            disableRipple
-            label={
-              <div className="flex flex-col items-start text-left pb-2 gap-0">
-                <span
-                  className={`font-source font-medium text-base leading-6 ${
-                    activeTab === "sent"
-                      ? "text-neutral-800"
-                      : "text-neutral-500"
-                  }`}
-                >
-                  Invites Sent
-                </span>
-                <span
-                  className={`font-source font-semibold text-xs ${
-                    activeTab === "sent" ? "text-blue" : "text-neutral-500"
-                  }`}
-                >
-                  {sentInvites.length} Entries
-                </span>
-              </div>
-            }
-            sx={{
-              textTransform: "none",
-              minWidth: "unset",
-              p: 0,
-              pr: 2.5,
-              alignItems: "flex-start",
-            }}
-          />
-        </Tabs>
-      </div>
+      <Tabs
+        activeView={activeTab}
+        onViewChange={setActiveTab}
+        tabs={[
+          {
+            view: "ready",
+            label: "Ready for Invite",
+            count: readyInvites.length,
+            unit: { singular: "Entry", plural: "Entries" },
+          },
+          {
+            view: "sent",
+            label: "Invites Sent",
+            count: sentInvites.length,
+            unit: { singular: "Entry", plural: "Entries" },
+          },
+        ]}
+        selectedCount={selectedIds.size}
+      />
 
       {/* Toolbar */}
       <div className="flex justify-between items-center">
