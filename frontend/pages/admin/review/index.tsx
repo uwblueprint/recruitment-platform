@@ -43,6 +43,7 @@ type ReviewerReassignmentTarget = {
   position: string;
   reviewerId: string;
   reviewerName: string;
+  conflict: boolean;
 };
 
 const AdminReviewPage: NextPageWithLayout = () => {
@@ -213,6 +214,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
             position: row.position,
             reviewerId: reviewer.userInfo.id,
             reviewerName: `${reviewer.userInfo.firstName} ${reviewer.userInfo.lastName}`,
+            conflict: reviewer.reviewerHasConflict,
           });
         },
       }),
@@ -397,6 +399,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
       {reviewerReassignmentTarget ? (
         <ReassignReviewerDialogue
+          conflict={reviewerReassignmentTarget.conflict}
           open={!!reviewerReassignmentTarget}
           applicantRecordId={reviewerReassignmentTarget.applicantRecordId}
           position={reviewerReassignmentTarget.position}
