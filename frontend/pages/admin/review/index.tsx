@@ -211,8 +211,8 @@ const AdminReviewPage: NextPageWithLayout = () => {
           setReviewerReassignmentTarget({
             applicantRecordId: row.applicantRecordId,
             position: row.position,
-            reviewerId: reviewer.id,
-            reviewerName: `${reviewer.firstName} ${reviewer.lastName}`,
+            reviewerId: reviewer.userInfo.id,
+            reviewerName: `${reviewer.userInfo.firstName} ${reviewer.userInfo.lastName}`,
           });
         },
       }),

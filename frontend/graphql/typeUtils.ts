@@ -57,6 +57,8 @@ export type InterviewedApplicantsDTO =
 export type ReviewDTO = WithoutTypename<Schema.Review>;
 export type ReviewDashboardRowDTO =
   WithoutTypename<Schema.ReviewDashboardRowDto>;
+export type ReviewDashboardReviewerDTO =
+  WithoutTypename<Schema.ReviewDashboardReviewerDto>;
 export type ReviewDashboardSidePanelDTO =
   WithoutTypename<Schema.ReviewDashboardSidePanelDto>;
 export type ReviewDashboardReviewDetailsDTO =

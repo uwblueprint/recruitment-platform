@@ -890,6 +890,12 @@ export type ReviewDashboardReviewDetails = {
   reviewer: UserDto;
 };
 
+export type ReviewDashboardReviewerDto = {
+  __typename?: 'ReviewDashboardReviewerDTO';
+  reviewerHasConflict: Scalars['Boolean']['output'];
+  userInfo: UserDto;
+};
+
 export type ReviewDashboardRowDto = {
   __typename?: 'ReviewDashboardRowDTO';
   applicantRecordId: Scalars['ID']['output'];
@@ -898,7 +904,7 @@ export type ReviewDashboardRowDto = {
   firstName: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
-  reviewers: Array<UserDto>;
+  reviewers: Array<ReviewDashboardReviewerDto>;
   timesApplied: Scalars['String']['output'];
   totalScore?: Maybe<Scalars['Int']['output']>;
 };
