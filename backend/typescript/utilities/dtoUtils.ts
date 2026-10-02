@@ -222,6 +222,7 @@ export function toReviewDashboardSidePanelDTO(
     skillCategory: applicantRecord.skill_category as SkillCategory,
     reviewDetails,
     shortlistedForInterview: applicantRecord.is_shortlisted_for_interview,
+    isApplicantFlagged: applicantRecord.is_applicant_flagged,
   };
 }
 
@@ -243,6 +244,7 @@ export function toReviewDashboardRowDTO(
       }),
     ),
     totalScore: applicantRecord.combined_review_score ?? null,
+    isApplicantFlagged: applicantRecord.is_applicant_flagged,
   };
 }
 

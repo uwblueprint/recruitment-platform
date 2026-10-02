@@ -45,6 +45,7 @@ export type ReviewDashboardRowDTO = {
   choice: number;
   reviewers: ReviewDashboardReviewerDTO[];
   totalScore: number | null;
+  isApplicantFlagged: boolean;
 };
 
 export type ReviewDashboardSidePanelDTO = {
@@ -58,6 +59,7 @@ export type ReviewDashboardSidePanelDTO = {
   skillCategory: SkillCategory | null;
   reviewDetails: ReviewDetails[];
   shortlistedForInterview: boolean;
+  isApplicantFlagged: boolean;
 };
 
 export type FilterOption = {

@@ -64,6 +64,7 @@ export const createReviewDashboardColumns = ({
           row.original.firstName,
           row.original.lastName,
         )}
+        isBookmarked={row.original.isApplicantFlagged}
       />
     ),
   },
