@@ -22,6 +22,7 @@ const reviewDashboardType = gql`
     choice: Int!
     reviewers: [ReviewDashboardReviewerDTO!]!
     totalScore: Int
+    isApplicantFlagged: Boolean!
   }
 
   type ReviewDashboardSidePanelDTO {
@@ -35,6 +36,7 @@ const reviewDashboardType = gql`
     skillCategory: SkillCategory
     reviewDetails: [ReviewDashboardReviewDetails!]!
     shortlistedForInterview: Boolean!
+    isApplicantFlagged: Boolean!
   }
 
   type FilterOption {

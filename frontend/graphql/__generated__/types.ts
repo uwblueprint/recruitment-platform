@@ -902,6 +902,7 @@ export type ReviewDashboardRowDto = {
   applicationStatus: ApplicationStatus;
   choice: Scalars['Int']['output'];
   firstName: Scalars['String']['output'];
+  isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
   reviewers: Array<ReviewDashboardReviewerDto>;
@@ -914,6 +915,7 @@ export type ReviewDashboardSidePanelDto = {
   academicYear: Scalars['String']['output'];
   applicationStatus: ApplicationStatus;
   firstName: Scalars['String']['output'];
+  isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
   program: Scalars['String']['output'];

@@ -47,6 +47,7 @@ type ApplicantRow = Pick<
   | "position"
   | "applicationStatus"
   | "totalScore"
+  | "isApplicantFlagged"
 >;
 type ApplicantDetails = Pick<
   ReviewDashboardSidePanelResult,
@@ -238,7 +239,7 @@ const SidePanelApplicantBar = ({
           />
         )}
       </div>
-      <BookmarkButton key={row.applicantRecordId} />
+      <BookmarkButton key={row.applicantRecordId} isApplicantFlagged={row.isApplicantFlagged} />
     </div>
   );
 };
@@ -297,8 +298,8 @@ const InfoField = ({ label, value }: { label: string; value: string }) => (
  * Visual-only bookmark toggle. Persisting the bookmark is handled in a future
  * ticket.
  */
-const BookmarkButton = () => {
-  const [isBookmarked, setIsBookmarked] = useState(false);
+const BookmarkButton = ({ isApplicantFlagged }: { isApplicantFlagged: boolean }) => {
+  const [isBookmarked, setIsBookmarked] = useState(isApplicantFlagged);
 
   return (
     <button

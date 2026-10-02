@@ -9,6 +9,7 @@ query ReviewDashboardSidePanel($applicantRecordId: ID!) {
     applicationStatus
     skillCategory
     shortlistedForInterview
+    isApplicantFlagged
     reviewDetails {
       reviewStatus
       reviewer {
