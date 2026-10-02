@@ -14,7 +14,7 @@ const applicantName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
 
 const reviewerName = (row: ReviewDashboardResult, index: number) => {
-  const reviewer = row.reviewers[index];
+  const reviewer = row.reviewers[index]?.userInfo;
   return reviewer ? applicantName(reviewer.firstName, reviewer.lastName) : "-";
 };
 
@@ -101,6 +101,7 @@ export const createReviewDashboardColumns = ({
       return (
         <ReviewerCell
           reviewerName={reviewerName(row.original, 0)}
+          reviewerHasConflict={reviewer?.reviewerHasConflict}
           onClick={
             reviewer
               ? () => onReviewerClick(row.original, reviewer)
@@ -120,6 +121,7 @@ export const createReviewDashboardColumns = ({
       return (
         <ReviewerCell
           reviewerName={reviewerName(row.original, 1)}
+          reviewerHasConflict={reviewer?.reviewerHasConflict}
           onClick={
             reviewer
               ? () => onReviewerClick(row.original, reviewer)

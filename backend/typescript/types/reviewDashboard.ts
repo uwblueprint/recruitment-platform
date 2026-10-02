@@ -30,6 +30,11 @@ export type ReviewDetails = {
   reviewStatus: ReviewStatus;
 };
 
+export type ReviewDashboardReviewerDTO = {
+  userInfo: UserDTO;
+  reviewerHasConflict: boolean;
+};
+
 export type ReviewDashboardRowDTO = {
   applicantRecordId: string;
   firstName: string;
@@ -38,7 +43,7 @@ export type ReviewDashboardRowDTO = {
   timesApplied: string;
   applicationStatus: ApplicationStatus;
   choice: number;
-  reviewers: UserDTO[];
+  reviewers: ReviewDashboardReviewerDTO[];
   totalScore: number | null;
 };
 

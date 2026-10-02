@@ -183,7 +183,7 @@ export type ReviewDashboardQueryVariables = Exact<{
 }>;
 
 
-export type ReviewDashboardQuery = { reviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, timesApplied: string, applicationStatus: Types.ApplicationStatus, choice: number, totalScore: number | null, reviewers: Array<{ id: string, firstName: string, lastName: string, email: string, position: string | null, role: Types.Role, isArchived: boolean }> }> };
+export type ReviewDashboardQuery = { reviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, timesApplied: string, applicationStatus: Types.ApplicationStatus, choice: number, totalScore: number | null, reviewers: Array<{ reviewerHasConflict: boolean, userInfo: { id: string, firstName: string, lastName: string, email: string, position: string | null, role: Types.Role, isArchived: boolean } }> }> };
 
 export type ReviewDashboardApplicantRecordIdsQueryVariables = Exact<{
   sortBy?: Types.ReviewDashboardSortBy | null | undefined;
