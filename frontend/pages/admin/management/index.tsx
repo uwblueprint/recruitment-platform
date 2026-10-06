@@ -3,9 +3,24 @@ import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import { MembersTable, type Member } from "@/pages/admin/management/_components/MembersDashboard";
+import { MembersDashboardToolbar } from "./_components/MembersDashboardToolbar";
+import type { FilterCategory, SelectedFilters } from "@/components/dashboard/filters";
 
 // Replace with management member data when the data source is connected.
 const members: Member[] = [];
+
+const memberFilterCategories: FilterCategory[] = [
+  { key: "role", label: "Role", options: [] },
+  { key: "team", label: "Team", options: [] },
+  {
+    key: "status",
+    label: "Status",
+    options: [
+      { value: "Active", label: "Active" },
+      { value: "Archived", label: "Archived" },
+    ],
+  },
+];
 
 enum ManagementView {
   MEMBERS = "Members",
@@ -14,6 +29,8 @@ enum ManagementView {
 }
 
 const ManagementPage: NextPageWithLayout = () => {
+  const [search, setSearch] = useState("");
+  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const [activeView, setActiveView] = useState<ManagementView>(
     ManagementView.MEMBERS
   );
@@ -59,8 +76,29 @@ const ManagementPage: NextPageWithLayout = () => {
           tabs={tabs}
         />
         {activeView === ManagementView.MEMBERS && (
-          <div className="min-h-0 flex-1">
-            <MembersTable members={members} />
+          <div className="flex min-h-0 flex-1 flex-col gap-5">
+            <MembersDashboardToolbar
+              search={{ value: search, onChange: setSearch }}
+              filters={{
+                categories: memberFilterCategories,
+                selected: selectedFilters,
+                onChange: (categoryKey, values) =>
+                  setSelectedFilters((previous) => ({
+                    ...previous,
+                    [categoryKey]: values,
+                  })),
+                onRemove: (categoryKey, value) =>
+                  setSelectedFilters((previous) => ({
+                    ...previous,
+                    [categoryKey]: (previous[categoryKey] ?? []).filter(
+                      (selectedValue) => selectedValue !== value
+                    ),
+                  })),
+              }}
+            />
+            <div className="min-h-0 flex-1">
+              <MembersTable members={members} />
+            </div>
           </div>
         )}
       </main>
