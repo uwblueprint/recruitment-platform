@@ -33,6 +33,13 @@ export type CreateAdminCommentMutationVariables = Exact<{
 
 export type CreateAdminCommentMutation = { createAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
 
+export type CreateTeamMemberMutationVariables = Exact<{
+  teamMember: Types.CreateTeamMemberDto;
+}>;
+
+
+export type CreateTeamMemberMutation = { createTeamMember: { id: string, firstName: string, lastName: string, teamRole: Types.TeamRole } };
+
 export type DeleteAdminCommentByIdMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -243,6 +250,11 @@ export type SubmitInterviewScoresMutationVariables = Exact<{
 
 
 export type SubmitInterviewScoresMutation = { submitInterviewScores: { id: string, score: number | null, status: Types.InterviewStatus, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
+
+export type TeamMembersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TeamMembersQuery = { teamMembers: Array<{ id: string, firstName: string, lastName: string, teamRole: Types.TeamRole }> };
 
 export type UpdateAdminCommentMutationVariables = Exact<{
   id: string | number;

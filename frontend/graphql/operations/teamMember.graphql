@@ -1,0 +1,8 @@
+query TeamMembers {
+  teamMembers {
+    id
+    firstName
+    lastName
+    teamRole
+  }
+}

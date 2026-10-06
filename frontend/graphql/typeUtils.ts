@@ -371,3 +371,29 @@ export type {
   UpdateReviewedApplicantRecordMutation,
   UpdateReviewedApplicantRecordMutationVariables,
 } from "./__generated__/operation-types";
+
+export {
+  TeamRole,
+} from "./__generated__/types";
+export type CreateTeamMemberDTO = WithoutTypename<Schema.CreateTeamMemberDto>;
+export type TeamMemberDTO = WithoutTypename<Schema.TeamMemberDto>;
+
+export {
+  CreateTeamMemberDocument,
+  TeamMembersDocument,
+} from "./__generated__/graphql";
+
+export type {
+  CreateTeamMemberMutation,
+  CreateTeamMemberMutationVariables,
+  TeamMembersQuery,
+  TeamMembersQueryVariables,
+} from "./__generated__/operation-types";
+
+export type TeamMemberResult = ArrayElement<
+  OperationField<Operations.TeamMembersQuery, "teamMembers">
+>;
+export type CreateTeamMemberResult = OperationField<
+  Operations.CreateTeamMemberMutation,
+  "createTeamMember"
+>;

@@ -18,6 +18,7 @@ type Documents = {
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": typeof types.ApplicationDocument,
     "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}": typeof types.BulkUpdateApplicantRecordsStatusDocument,
     "mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": typeof types.CreateAdminCommentDocument,
+    "mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {\n  createTeamMember(teamMember: $teamMember) {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}": typeof types.CreateTeamMemberDocument,
     "mutation DeleteAdminCommentById($id: ID!) {\n  deleteAdminCommentById(id: $id) {\n    id\n  }\n}": typeof types.DeleteAdminCommentByIdDocument,
     "query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!, $sortBy: InterviewDashboardSortBy, $view: DashboardView, $sortAscending: Boolean) {\n  interviewDashboard(\n    pageNumber: $pageNumber\n    resultsPerPage: $resultsPerPage\n    sortBy: $sortBy\n    view: $view\n    sortAscending: $sortAscending\n  ) {\n    applicantRecordId\n    firstName\n    lastName\n    position\n    applicationStatus\n    interviewers {\n      firstName\n      lastName\n    }\n    interviewScore\n  }\n}": typeof types.InterviewDashboardDocument,
     "query InterviewDashboardCounts {\n  interviewDashboardCounts {\n    all\n    shortlisted\n    conflicts\n  }\n}": typeof types.InterviewDashboardCountsDocument,
@@ -46,6 +47,7 @@ type Documents = {
     "query ReviewedApplicantsByUserId($userId: ID!) {\n  reviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    reviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": typeof types.ReviewedApplicantsByUserIdDocument,
     "mutation SendRejectionEmails($ids: [ID!]!) {\n  sendRejectionEmails(ids: $ids) {\n    sent\n    failed {\n      to\n      error\n    }\n  }\n}": typeof types.SendRejectionEmailsDocument,
     "mutation SubmitInterviewScores($id: ID!, $interviewJson: InterviewInput!) {\n  submitInterviewScores(id: $id, interviewJson: $interviewJson) {\n    id\n    score\n    status\n    interviewJson {\n      passionFSG\n      teamPlayer\n      desireToLearn\n      skill\n      skillCategory\n      comments\n    }\n  }\n}": typeof types.SubmitInterviewScoresDocument,
+    "query TeamMembers {\n  teamMembers {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}": typeof types.TeamMembersDocument,
     "mutation UpdateAdminComment($id: ID!, $adminComment: UpdateAdminCommentDTO!) {\n  updateAdminComment(id: $id, adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": typeof types.UpdateAdminCommentDocument,
     "mutation UpdateApplicantRecordIsApplicantFlagged($id: ID!, $flagValue: Boolean!) {\n  updateApplicantRecordIsApplicantFlagged(id: $id, flagValue: $flagValue) {\n    id\n    isApplicantFlagged\n  }\n}": typeof types.UpdateApplicantRecordIsApplicantFlaggedDocument,
     "mutation UpdateApplicantRecordStatus($id: ID!, $status: ApplicationStatus!) {\n  updateApplicantRecordStatus(id: $id, status: $status) {\n    id\n    status\n  }\n}": typeof types.UpdateApplicantRecordStatusDocument,
@@ -60,6 +62,7 @@ const documents: Documents = {
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": types.ApplicationDocument,
     "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}": types.BulkUpdateApplicantRecordsStatusDocument,
     "mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": types.CreateAdminCommentDocument,
+    "mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {\n  createTeamMember(teamMember: $teamMember) {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}": types.CreateTeamMemberDocument,
     "mutation DeleteAdminCommentById($id: ID!) {\n  deleteAdminCommentById(id: $id) {\n    id\n  }\n}": types.DeleteAdminCommentByIdDocument,
     "query InterviewDashboard($pageNumber: Int!, $resultsPerPage: Int!, $sortBy: InterviewDashboardSortBy, $view: DashboardView, $sortAscending: Boolean) {\n  interviewDashboard(\n    pageNumber: $pageNumber\n    resultsPerPage: $resultsPerPage\n    sortBy: $sortBy\n    view: $view\n    sortAscending: $sortAscending\n  ) {\n    applicantRecordId\n    firstName\n    lastName\n    position\n    applicationStatus\n    interviewers {\n      firstName\n      lastName\n    }\n    interviewScore\n  }\n}": types.InterviewDashboardDocument,
     "query InterviewDashboardCounts {\n  interviewDashboardCounts {\n    all\n    shortlisted\n    conflicts\n  }\n}": types.InterviewDashboardCountsDocument,
@@ -88,6 +91,7 @@ const documents: Documents = {
     "query ReviewedApplicantsByUserId($userId: ID!) {\n  reviewedApplicantsByUserId(userId: $userId) {\n    applicantRecordId\n    reviewStatus\n    applicantFirstName\n    applicantLastName\n  }\n}": types.ReviewedApplicantsByUserIdDocument,
     "mutation SendRejectionEmails($ids: [ID!]!) {\n  sendRejectionEmails(ids: $ids) {\n    sent\n    failed {\n      to\n      error\n    }\n  }\n}": types.SendRejectionEmailsDocument,
     "mutation SubmitInterviewScores($id: ID!, $interviewJson: InterviewInput!) {\n  submitInterviewScores(id: $id, interviewJson: $interviewJson) {\n    id\n    score\n    status\n    interviewJson {\n      passionFSG\n      teamPlayer\n      desireToLearn\n      skill\n      skillCategory\n      comments\n    }\n  }\n}": types.SubmitInterviewScoresDocument,
+    "query TeamMembers {\n  teamMembers {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}": types.TeamMembersDocument,
     "mutation UpdateAdminComment($id: ID!, $adminComment: UpdateAdminCommentDTO!) {\n  updateAdminComment(id: $id, adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": types.UpdateAdminCommentDocument,
     "mutation UpdateApplicantRecordIsApplicantFlagged($id: ID!, $flagValue: Boolean!) {\n  updateApplicantRecordIsApplicantFlagged(id: $id, flagValue: $flagValue) {\n    id\n    isApplicantFlagged\n  }\n}": types.UpdateApplicantRecordIsApplicantFlaggedDocument,
     "mutation UpdateApplicantRecordStatus($id: ID!, $status: ApplicationStatus!) {\n  updateApplicantRecordStatus(id: $id, status: $status) {\n    id\n    status\n  }\n}": types.UpdateApplicantRecordStatusDocument,
@@ -128,6 +132,10 @@ export function gql(source: "mutation BulkUpdateApplicantRecordsStatus($ids: [ID
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}"): (typeof documents)["mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {\n  createTeamMember(teamMember: $teamMember) {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}"): (typeof documents)["mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {\n  createTeamMember(teamMember: $teamMember) {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -240,6 +248,10 @@ export function gql(source: "mutation SendRejectionEmails($ids: [ID!]!) {\n  sen
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation SubmitInterviewScores($id: ID!, $interviewJson: InterviewInput!) {\n  submitInterviewScores(id: $id, interviewJson: $interviewJson) {\n    id\n    score\n    status\n    interviewJson {\n      passionFSG\n      teamPlayer\n      desireToLearn\n      skill\n      skillCategory\n      comments\n    }\n  }\n}"): (typeof documents)["mutation SubmitInterviewScores($id: ID!, $interviewJson: InterviewInput!) {\n  submitInterviewScores(id: $id, interviewJson: $interviewJson) {\n    id\n    score\n    status\n    interviewJson {\n      passionFSG\n      teamPlayer\n      desireToLearn\n      skill\n      skillCategory\n      comments\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query TeamMembers {\n  teamMembers {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}"): (typeof documents)["query TeamMembers {\n  teamMembers {\n    id\n    firstName\n    lastName\n    teamRole\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
