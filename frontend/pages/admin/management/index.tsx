@@ -2,6 +2,10 @@ import { useState } from "react";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
+import { MembersTable, type Member } from "@/pages/admin/management/_components/MembersDashboard";
+
+// Replace with management member data when the data source is connected.
+const members: Member[] = [];
 
 enum ManagementView {
   MEMBERS = "Members",
@@ -27,7 +31,7 @@ const ManagementPage: NextPageWithLayout = () => {
     {
       view: ManagementView.MEMBERS,
       label: "All Members",
-      count: 0,
+      count: members.length,
       unit: { singular: "Member", plural: "Members" },
     },
     {
@@ -54,6 +58,11 @@ const ManagementPage: NextPageWithLayout = () => {
           onViewChange={handleViewChange}
           tabs={tabs}
         />
+        {activeView === ManagementView.MEMBERS && (
+          <div className="min-h-0 flex-1">
+            <MembersTable members={members} />
+          </div>
+        )}
       </main>
     </div>
   );
