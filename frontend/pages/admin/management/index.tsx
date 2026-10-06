@@ -2,25 +2,8 @@ import { useState } from "react";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
-import { MembersTable, type Member } from "@/pages/admin/management/_components/MembersDashboard";
-import { MembersDashboardToolbar } from "./_components/MembersDashboardToolbar";
-import type { FilterCategory, SelectedFilters } from "@/components/dashboard/filters";
-
-// Replace with management member data when the data source is connected.
-const members: Member[] = [];
-
-const memberFilterCategories: FilterCategory[] = [
-  { key: "role", label: "Role", options: [] },
-  { key: "team", label: "Team", options: [] },
-  {
-    key: "status",
-    label: "Status",
-    options: [
-      { value: "Active", label: "Active" },
-      { value: "Archived", label: "Archived" },
-    ],
-  },
-];
+import useMembersDashboardCount from "@/APIClients/queries/useMembersDashboardCount";
+import { MembersDashboard } from "./_components/MembersDashboard";
 
 enum ManagementView {
   MEMBERS = "Members",
@@ -29,8 +12,7 @@ enum ManagementView {
 }
 
 const ManagementPage: NextPageWithLayout = () => {
-  const [search, setSearch] = useState("");
-  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const { count: memberCount, error: countsError } = useMembersDashboardCount();
   const [activeView, setActiveView] = useState<ManagementView>(
     ManagementView.MEMBERS
   );
@@ -48,7 +30,7 @@ const ManagementPage: NextPageWithLayout = () => {
     {
       view: ManagementView.MEMBERS,
       label: "All Members",
-      count: members.length,
+      count: countsError ? undefined : memberCount,
       unit: { singular: "Member", plural: "Members" },
     },
     {
@@ -68,38 +50,20 @@ const ManagementPage: NextPageWithLayout = () => {
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
         <h1 className="font-poppins text-[28px] font-semibold leading-[140%] text-blue">
-          Management
+          User Management
         </h1>
+        {countsError ? (
+          <p role="alert" className="text-sm text-alert-errorText">
+            Failed to load member count.
+          </p>
+        ) : null}
         <Tabs
           activeView={activeView}
           onViewChange={handleViewChange}
           tabs={tabs}
         />
         {activeView === ManagementView.MEMBERS && (
-          <div className="flex min-h-0 flex-1 flex-col gap-5">
-            <MembersDashboardToolbar
-              search={{ value: search, onChange: setSearch }}
-              filters={{
-                categories: memberFilterCategories,
-                selected: selectedFilters,
-                onChange: (categoryKey, values) =>
-                  setSelectedFilters((previous) => ({
-                    ...previous,
-                    [categoryKey]: values,
-                  })),
-                onRemove: (categoryKey, value) =>
-                  setSelectedFilters((previous) => ({
-                    ...previous,
-                    [categoryKey]: (previous[categoryKey] ?? []).filter(
-                      (selectedValue) => selectedValue !== value
-                    ),
-                  })),
-              }}
-            />
-            <div className="min-h-0 flex-1">
-              <MembersTable members={members} />
-            </div>
-          </div>
+          <MembersDashboard />
         )}
       </main>
     </div>
