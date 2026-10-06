@@ -1,9 +1,63 @@
+import { useState } from "react";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
+import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 
-const ManagementPage: NextPageWithLayout = () => (
-  <main className="min-h-0 flex-1" />
-);
+enum ManagementView {
+  MEMBERS = "Members",
+  ACTIVE_TEAMS = "Active Teams",
+  ARCHIVED_PROJECTS = "Archived Projects",
+}
+
+const ManagementPage: NextPageWithLayout = () => {
+  const [activeView, setActiveView] = useState<ManagementView>(
+    ManagementView.MEMBERS
+  );
+
+  const handleViewChange = (view: string) => {
+    const managementView = Object.values(ManagementView).find(
+      (value) => value === view
+    );
+    if (managementView) {
+      setActiveView(managementView);
+    }
+  };
+
+  const tabs: Tab[] = [
+    {
+      view: ManagementView.MEMBERS,
+      label: "All Members",
+      count: 0,
+      unit: { singular: "Member", plural: "Members" },
+    },
+    {
+      view: ManagementView.ACTIVE_TEAMS,
+      label: "Active Teams",
+      count: 0,
+      unit: { singular: "Team", plural: "Teams" },
+    },
+    {
+      view: ManagementView.ARCHIVED_PROJECTS,
+      label: "Archived Projects",
+      count: 0,
+      unit: { singular: "Project", plural: "Projects" },
+    },
+  ];
+  return (
+    <div className="flex min-h-0 flex-1 flex-col bg-white">
+      <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
+        <h1 className="font-poppins text-[28px] font-semibold leading-[140%] text-blue">
+          Management
+        </h1>
+        <Tabs
+          activeView={activeView}
+          onViewChange={handleViewChange}
+          tabs={tabs}
+        />
+      </main>
+    </div>
+  );
+};
 
 ManagementPage.getLayout = getAdminLayout;
 
