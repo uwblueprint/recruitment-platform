@@ -6,7 +6,7 @@ import type { SelectedFilters } from "@/components/dashboard/filters";
 import type { MembersDashboardFilters } from "@/types/membersDashboard";
 import { createMembersDashboardColumns } from "./columns";
 import useMembersDashboardFilterOptions from "@/APIClients/queries/useMembersDashboardFilterOptions";
-import useDebouncedValue from "../../review/_components/hooks/useDebouncedValue";
+import useDebouncedValue from "@/hooks/useDebouncedValue";
 import { MembersDashboardToolbar } from "./MembersDashboardToolbar";
 import useMembersDashboard from "./hooks/useMembersDashboard";
 import type { MemberActionCallbacks } from "./columns/MemberActionsCell";

@@ -1,24 +1,44 @@
 import { InterviewDashboardSidePanel } from "./_components/side-panel/InterviewDashboardSidePanel";
+import { InterviewDashboardToolbar } from "./_components/InterviewDashboardToolbar";
 import { DashboardTable } from "@/components/dashboard/table";
 import { DASHBOARD_ENUM, DashboardSwitcher } from "@/components/dashboard/common/DashboardSwitcher";
 import {
   COLUMN_ID_TO_SORT_BY,
   INTERVIEW_DASHBOARD_COLUMNS,
 } from "@/components/dashboard/interview-dashboard/columns";
+import {
+  FilterCategoryVariant,
+  type SelectedFilters,
+} from "@/components/dashboard/filters";
 import useInterviewDashboard from "@/APIClients/queries/useInterviewDashboard";
-import { DashboardView, type InterviewDashboardResult } from "@/graphql/typeUtils";
+import useReviewDashboardFilterOptions from "@/APIClients/queries/useReviewDashboardFilterOptions";
+import {
+  ApplicationStatus,
+  DashboardView,
+  type InterviewDashboardFilters,
+  type InterviewDashboardResult,
+} from "@/graphql/typeUtils";
+import useDebouncedValue from "@/hooks/useDebouncedValue";
 import {
   OnChangeFn,
   RowSelectionState,
   SortingState,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useInterviewDashboardCounts from "@/APIClients/queries/useInterviewDashboardCounts";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
+const SEARCH_DEBOUNCE_MS = 500;
+
+// The interview dashboard only lists these statuses, so offering the rest as
+// filters would only ever produce an empty table.
+const INTERVIEW_APPLICATION_STATUSES: string[] = [
+  ApplicationStatus.Interviewed,
+  ApplicationStatus.Selected,
+];
 
 const InterviewDashboardPage: NextPageWithLayout = () => {
   const [pageNumber, setPageNumber] = useState(1);
@@ -26,8 +46,15 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     DEFAULT_RESULTS_PER_PAGE
   );
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  // Tracked by id rather than position so a refetch that reorders or replaces
+  // the rows can't silently swap which applicant the side panel shows.
+  const [activeId, setActiveId] = useState<string | undefined>(undefined);
   const [sorting, setSorting] = useState<SortingState>([]);
+  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const [search, setSearch] = useState("");
+
+  // The query fires on the settled text; the input keeps the raw value.
+  const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
 
    const [activeView, setActiveView] = useState<DashboardView>(
     DashboardView.All
@@ -39,7 +66,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     setActiveView(dashboardView);
     setPageNumber(1);
     setRowSelection({});
-    setActiveIndex(null);
+    setActiveId(undefined);
   };
 
   // The table is single-sort, so only the first SortingState entry is used.
@@ -48,6 +75,60 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const activeSort = sorting[0];
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort ? !activeSort.desc : undefined;
+
+  const { data: filterOptions } = useReviewDashboardFilterOptions({});
+
+  // Score ranges are left out: they bucket the combined review score, which
+  // doesn't map onto interview scores.
+  const filterCategories = useMemo(() => {
+    if (!filterOptions) return [];
+    return [
+      { key: "position", label: "Role", options: filterOptions.positions },
+      {
+        key: "applicationStatus",
+        label: "Application Status",
+        options: filterOptions.applicationStatuses.filter((option) =>
+          INTERVIEW_APPLICATION_STATUSES.includes(option.value)
+        ),
+      },
+      {
+        key: "skillCategory",
+        label: "Skill Category",
+        options: filterOptions.skillCategories,
+      },
+      { key: "year", label: "Year", options: filterOptions.years },
+      {
+        key: "bookmarked",
+        label: "Bookmarked",
+        options: filterOptions.bookmarked,
+        variant: FilterCategoryVariant.Toggle,
+      },
+    ];
+  }, [filterOptions]);
+
+  // convert SelectedFilters to InterviewDashboardFilters for the backend
+  const backendFilters = useMemo(
+    (): InterviewDashboardFilters => ({
+      search: debouncedSearch.trim() ? debouncedSearch : undefined,
+      positions: selectedFilters.position?.length
+        ? selectedFilters.position
+        : undefined,
+      applicationStatuses: selectedFilters.applicationStatus?.length
+        ? (selectedFilters.applicationStatus as InterviewDashboardFilters["applicationStatuses"])
+        : undefined,
+      skillCategories: selectedFilters.skillCategory?.length
+        ? (selectedFilters.skillCategory as InterviewDashboardFilters["skillCategories"])
+        : undefined,
+      years: selectedFilters.year?.length ? selectedFilters.year : undefined,
+      bookmarked: selectedFilters.bookmarked?.includes("true")
+        ? true
+        : undefined,
+    }),
+    [selectedFilters, debouncedSearch]
+  );
+  const hasActiveFilters = Object.values(backendFilters).some(
+    (value) => value !== undefined
+  );
 
   const {
     data,
@@ -60,20 +141,32 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     sortBy,
     sortAscending,
     view: activeView,
+    filters: backendFilters,
   });
   const rows = error
     ? []
     : data ?? (isLoading ? previousData : undefined) ?? [];
   const hasError = !!error;
 
-  const activeRow: InterviewDashboardResult | null =
-    activeIndex !== null ? rows[activeIndex] ?? null : null;
+  const activeIndex =
+    activeId !== undefined
+      ? rows.findIndex((row) => row.applicantRecordId === activeId)
+      : -1;
+  const activeRow: InterviewDashboardResult | undefined = rows[activeIndex];
 
   const handleResultsPerPageChange = (nextResultsPerPage: number) => {
     setResultsPerPage(nextResultsPerPage);
     setPageNumber(1);
     setRowSelection({});
-    setActiveIndex(null);
+    setActiveId(undefined);
+  };
+
+  // The side panel only walks the current page, so a page change closes it
+  // rather than leaving it on an applicant who is about to leave the table.
+  const handlePageChange = (nextPageNumber: number) => {
+    setPageNumber(nextPageNumber);
+    setRowSelection({});
+    setActiveId(undefined);
   };
 
   // Changing the sort reorders the whole result set, so return to the first page.
@@ -81,9 +174,40 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     setSorting(updater);
     setPageNumber(1);
     setRowSelection({});
+    setActiveId(undefined);
   };
 
-  const { counts: tabCounts, error: countsError } = useInterviewDashboardCounts();
+  // Filtering and searching change which rows exist, so return to the first
+  // page and drop any selection or open side panel tied to the old rows.
+  const resetForNewResults = () => {
+    setPageNumber(1);
+    setRowSelection({});
+    setActiveId(undefined);
+  };
+
+  const handleFilterCategoryChange = (
+    categoryKey: string,
+    values: string[]
+  ) => {
+    setSelectedFilters((prev) => ({ ...prev, [categoryKey]: values }));
+    resetForNewResults();
+  };
+
+  const handleRemoveFilter = (categoryKey: string, value: string) => {
+    setSelectedFilters((prev) => ({
+      ...prev,
+      [categoryKey]: (prev[categoryKey] ?? []).filter((v) => v !== value),
+    }));
+    resetForNewResults();
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearch(value);
+    resetForNewResults();
+  };
+
+  const { counts: tabCounts, error: countsError } =
+    useInterviewDashboardCounts(backendFilters);
 
   const INTERVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
   const tabs: Tab[] = [
@@ -117,48 +241,55 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           tabs={tabs}
         />
 
+        <InterviewDashboardToolbar
+          search={{ value: search, onChange: handleSearchChange }}
+          filters={{
+            categories: filterCategories,
+            selected: selectedFilters,
+            onChange: handleFilterCategoryChange,
+            onRemove: handleRemoveFilter,
+          }}
+        />
+
         <DashboardTable
           data={rows}
           columns={INTERVIEW_DASHBOARD_COLUMNS}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
-          onRowClick={(row) =>
-            setActiveIndex(
-              rows.findIndex(
-                (r) => r.applicantRecordId === row.applicantRecordId
-              )
-            )
-          }
+          onRowClick={(row) => setActiveId(row.applicantRecordId)}
           isLoading={isLoading}
           sorting={sorting}
           onSortingChange={handleSortingChange}
-          emptyMessage="No interviewed applicants found."
+          emptyMessage={
+            hasActiveFilters
+              ? "No applicants match your search or filters."
+              : "No interviewed applicants found."
+          }
           pagination={{
             pageNumber,
             resultsPerPage,
             canGoNext: rows.length === resultsPerPage,
-            onPageChange: setPageNumber,
+            onPageChange: handlePageChange,
             onResultsPerPageChange: handleResultsPerPageChange,
           }}
         />
       </main>
 
       <InterviewDashboardSidePanel
-        row={activeRow ?? undefined}
-        onClose={() => setActiveIndex(null)}
+        row={activeRow}
+        onClose={() => setActiveId(undefined)}
         navigation={
-          activeIndex !== null
+          activeIndex >= 0
             ? {
                 current: activeIndex + 1,
                 canPrev: activeIndex > 0,
                 canNext: activeIndex < rows.length - 1,
                 total: rows.length,
-                onPrev: () => setActiveIndex((i) => Math.max((i ?? 0) - 1, 0)),
+                onPrev: () =>
+                  setActiveId(rows[activeIndex - 1]?.applicantRecordId),
                 onNext: () =>
-                  setActiveIndex((i) =>
-                    Math.min((i ?? 0) + 1, rows.length - 1)
-                  ),
+                  setActiveId(rows[activeIndex + 1]?.applicantRecordId),
               }
             : undefined
         }

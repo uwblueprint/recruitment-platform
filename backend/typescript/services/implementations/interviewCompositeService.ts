@@ -1,4 +1,12 @@
-import { Op, Order, OrderItem, col, literal, Transaction } from "sequelize";
+import {
+  Op,
+  Order,
+  OrderItem,
+  WhereOptions,
+  col,
+  literal,
+  Transaction,
+} from "sequelize";
 import { sequelize } from "../../models";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
@@ -13,6 +21,7 @@ import {
   DashboardView,
   DashboardViewEnum,
   InterviewDashboardCountsDTO,
+  InterviewDashboardFilters,
   InterviewDashboardRowDTO,
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
@@ -35,6 +44,10 @@ import {
   toInterviewNotesDTO,
   toUserDTO,
 } from "../../utilities/dtoUtils";
+import {
+  buildApplicantRecordWhere,
+  buildApplicantWhere,
+} from "../../utilities/dashboardFilterUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";
@@ -52,7 +65,10 @@ import {
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
 import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedApplicantRecordService";
 
-const buildInterviewDashboardWhere = async (view?: DashboardView) => {
+const buildInterviewDashboardWhere = async (
+  view?: DashboardView,
+  filters?: InterviewDashboardFilters,
+): Promise<WhereOptions> => {
   // Resolve matching IDs separately so the hasMany join cannot duplicate rows
   // or interfere with pagination and interviewer sorting in the main query.
   const conflictingRecords =
@@ -72,7 +88,7 @@ const buildInterviewDashboardWhere = async (view?: DashboardView) => {
         })
       : undefined;
 
-  return {
+  const dashboardWhere: WhereOptions = {
     status: {
       [Op.in]: [
         ApplicationStatusEnum.INTERVIEWED,
@@ -93,6 +109,12 @@ const buildInterviewDashboardWhere = async (view?: DashboardView) => {
           },
         }
       : {}),
+  };
+
+  // AND-ed rather than spread so an application status filter narrows the
+  // interviewed/selected set instead of replacing it.
+  return {
+    [Op.and]: [dashboardWhere, buildApplicantRecordWhere(filters)],
   };
 };
 
@@ -226,6 +248,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
     view?: DashboardView,
+    filters?: InterviewDashboardFilters,
   ): Promise<InterviewDashboardRowDTO[]> {
     try {
       if (
@@ -240,13 +263,14 @@ class InterviewCompositeService implements IInterviewCompositeService {
       }
 
       const applicantRecords = await ApplicantRecord.findAll({
-        attributes: ["id", "position", "status"],
-        where: await buildInterviewDashboardWhere(view),
+        attributes: ["id", "position", "status", "is_applicant_flagged"],
+        where: await buildInterviewDashboardWhere(view, filters),
         include: [
           {
             attributes: ["first_name", "last_name"],
             model: Applicant,
             required: true,
+            where: buildApplicantWhere(filters),
           },
           {
             attributes: ["id", "applicant_record_id", "score"],
@@ -306,11 +330,20 @@ class InterviewCompositeService implements IInterviewCompositeService {
     }
   }
 
-  async getInterviewDashboardCounts(): Promise<InterviewDashboardCountsDTO> {
+  async getInterviewDashboardCounts(
+    filters?: InterviewDashboardFilters,
+  ): Promise<InterviewDashboardCountsDTO> {
     const countView = async (view: DashboardView) =>
       ApplicantRecord.count({
-        where: await buildInterviewDashboardWhere(view),
-        include: [{ model: Applicant, required: true, attributes: [] }],
+        where: await buildInterviewDashboardWhere(view, filters),
+        include: [
+          {
+            model: Applicant,
+            required: true,
+            attributes: [],
+            where: buildApplicantWhere(filters),
+          },
+        ],
       });
     const [all, shortlisted, conflicts] = await Promise.all([
       countView(DashboardViewEnum.ALL),

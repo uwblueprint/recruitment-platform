@@ -1,6 +1,7 @@
 import { ValueOf } from "../utilities/typingUtils";
 import { ApplicationStatus, SkillCategory } from "./applicantRecord";
 import { Interview, InterviewStatus } from "./interviewedApplicantRecord";
+import { ReviewDashboardFilters } from "./reviewDashboard";
 import { UserDTO } from "./user";
 
 export const InterviewDashboardSortByEnum = {
@@ -23,6 +24,7 @@ export type InterviewDashboardRowDTO = {
   lastName: string;
   position: string;
   applicationStatus: ApplicationStatus;
+  isApplicantFlagged: boolean;
   interviewers: UserDTO[];
   interviewScore: number | null;
 };
@@ -45,6 +47,15 @@ export type InterviewDashboardSidePanelDTO = {
   interviewedApplicantRecordId: string | null;
   interviewDate: Date | null;
 };
+
+/**
+ * The review dashboard filters minus score ranges, which are bucketed on the
+ * combined review score and don't apply to interview scores.
+ */
+export type InterviewDashboardFilters = Omit<
+  ReviewDashboardFilters,
+  "scoreRanges"
+>;
 
 export type InterviewDashboardCountsDTO = {
   all: number;

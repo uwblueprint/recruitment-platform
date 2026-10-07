@@ -46,12 +46,15 @@ export type InterviewDashboardQueryVariables = Exact<{
   sortBy?: Types.InterviewDashboardSortBy | null | undefined;
   view?: Types.DashboardView | null | undefined;
   sortAscending?: boolean | null | undefined;
+  filters?: Types.InterviewDashboardFilters | null | undefined;
 }>;
 
 
-export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
+export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, isApplicantFlagged: boolean, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
 
-export type InterviewDashboardCountsQueryVariables = Exact<{ [key: string]: never; }>;
+export type InterviewDashboardCountsQueryVariables = Exact<{
+  filters?: Types.InterviewDashboardFilters | null | undefined;
+}>;
 
 
 export type InterviewDashboardCountsQuery = { interviewDashboardCounts: { all: number, shortlisted: number, conflicts: number } };

@@ -77,6 +77,7 @@ export type UserDTO = WithoutTypename<Schema.UserDto>;
 export type ReviewDashboardReviewDetails =
   WithoutTypename<Schema.ReviewDashboardReviewDetails>;
 export type ReviewDashboardFilters = Schema.ReviewDashboardFilters;
+export type InterviewDashboardFilters = Schema.InterviewDashboardFilters;
 
 /**
  * Clean aliases for generated GraphQL input types.
