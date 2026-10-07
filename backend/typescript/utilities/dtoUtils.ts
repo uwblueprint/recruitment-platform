@@ -260,6 +260,7 @@ export function toInterviewDashboardRowDTO(
     lastName: applicantRecord.applicant.last_name,
     position: applicantRecord.position,
     applicationStatus: applicantRecord.status,
+    isApplicantFlagged: applicantRecord.is_applicant_flagged,
     interviewers: (
       interviewedApplicantRecord?.interview_delegations ?? []
     ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),

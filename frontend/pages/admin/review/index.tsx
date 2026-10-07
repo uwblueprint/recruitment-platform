@@ -25,7 +25,7 @@ import {
   createReviewDashboardColumns,
 } from "./_components/columns";
 import { Tab, Tabs } from "../../../components/dashboard/common/Tabs";
-import useDebouncedValue from "./_components/hooks/useDebouncedValue";
+import useDebouncedValue from "@/hooks/useDebouncedValue";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
 import { BulkAction } from "./_components/bulkStatusActions";

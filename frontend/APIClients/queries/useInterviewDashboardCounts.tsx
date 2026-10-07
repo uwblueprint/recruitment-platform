@@ -1,8 +1,15 @@
 import { useQuery } from "@apollo/client/react";
-import { DashboardView, InterviewDashboardCountsDocument } from "@/graphql/typeUtils";
+import {
+  DashboardView,
+  InterviewDashboardCountsDocument,
+  type InterviewDashboardFilters,
+} from "@/graphql/typeUtils";
 
-export default function useInterviewDashboardCounts() {
+export default function useInterviewDashboardCounts(
+  filters?: InterviewDashboardFilters
+) {
   const { data, loading, error } = useQuery(InterviewDashboardCountsDocument, {
+    variables: { filters },
     fetchPolicy: "network-only",
     context: { refreshAuth: true },
   });

@@ -1,5 +1,5 @@
-query InterviewDashboardCounts {
-  interviewDashboardCounts {
+query InterviewDashboardCounts($filters: InterviewDashboardFilters) {
+  interviewDashboardCounts(filters: $filters) {
     all
     shortlisted
     conflicts

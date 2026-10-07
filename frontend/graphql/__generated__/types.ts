@@ -184,6 +184,15 @@ export type InterviewDashboardCountsDto = {
   shortlisted: Scalars['Int']['output'];
 };
 
+export type InterviewDashboardFilters = {
+  applicationStatuses?: InputMaybe<Array<ApplicationStatus>>;
+  bookmarked?: InputMaybe<Scalars['Boolean']['input']>;
+  positions?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  skillCategories?: InputMaybe<Array<SkillCategory>>;
+  years?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type InterviewDashboardRowDto = {
   __typename?: 'InterviewDashboardRowDTO';
   applicantRecordId: Scalars['ID']['output'];
@@ -191,6 +200,7 @@ export type InterviewDashboardRowDto = {
   firstName: Scalars['String']['output'];
   interviewScore?: Maybe<Scalars['Int']['output']>;
   interviewers: Array<UserDto>;
+  isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
 };
@@ -694,11 +704,17 @@ export type QueryFileArgs = {
 
 
 export type QueryInterviewDashboardArgs = {
+  filters?: InputMaybe<InterviewDashboardFilters>;
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<InterviewDashboardSortBy>;
   view?: InputMaybe<DashboardView>;
+};
+
+
+export type QueryInterviewDashboardCountsArgs = {
+  filters?: InputMaybe<InterviewDashboardFilters>;
 };
 
 

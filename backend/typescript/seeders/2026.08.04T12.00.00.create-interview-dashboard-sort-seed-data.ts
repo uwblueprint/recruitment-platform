@@ -1,7 +1,12 @@
-import { DataTypes, Op } from "sequelize";
+import { Op } from "sequelize";
 import { v4 } from "uuid";
 import type { Seeder } from "../umzug-seed";
 import { generateApplicantSeedBundles } from "./factories/applicantSeedBundleFactory";
+import {
+  APPLICANT_BULK_INSERT_FIELD_TYPES,
+  APPLICANT_RECORD_BULK_INSERT_FIELD_TYPES,
+  interviewFromScore,
+} from "./factories/dashboardSeedHelpers";
 import { InterviewGroupStatusEnum } from "../types/interviewGroup";
 import { InterviewStatusEnum } from "../types/interviewedApplicantRecord";
 
@@ -18,18 +23,6 @@ import { InterviewStatusEnum } from "../types/interviewedApplicantRecord";
 const SEED_EMAIL_PREFIX = "interview-dashboard-sort-seed-applicant";
 const INTERVIEWER_AUTH_PREFIX = "interview-dashboard-sort-seed-interviewer";
 const SEED_SCHEDULING_LINK_PREFIX = `${SEED_EMAIL_PREFIX}-scheduling-`;
-
-const APPLICANT_BULK_INSERT_FIELD_TYPES = {
-  short_answer_questions: {
-    type: new DataTypes.ARRAY(DataTypes.JSONB),
-  },
-};
-
-const APPLICANT_RECORD_BULK_INSERT_FIELD_TYPES = {
-  role_specific_questions: {
-    type: new DataTypes.ARRAY(DataTypes.JSONB),
-  },
-};
 
 const IVY = 9990101;
 const JONAH = 9990102;
@@ -189,26 +182,6 @@ const ENTRIES: Entry[] = [
   },
 ];
 
-/**
- * Split an interview total (4-20) into four rubric fields each in [1,5], so the
- * stored interview_json is consistent with how the app derives the score
- * (passionFSG + teamPlayer + desireToLearn + skill).
- */
-const interviewFromScore = (score: number) => {
-  const base = Math.floor(score / 4);
-  const remainder = score - base * 4;
-  const fields = [0, 1, 2, 3].map((i) => base + (i < remainder ? 1 : 0));
-  const [passionFSG, teamPlayer, desireToLearn, skill] = fields;
-  return {
-    passionFSG,
-    teamPlayer,
-    desireToLearn,
-    skill,
-    skillCategory: "INTERMEDIATE",
-    comments: "Interview dashboard sort seed data.",
-  };
-};
-
 export const up: Seeder = async ({ context: sequelize }) => {
   const now = new Date();
 
@@ -250,7 +223,12 @@ export const up: Seeder = async ({ context: sequelize }) => {
             interview_json:
               entry.score === null
                 ? null
-                : JSON.stringify(interviewFromScore(entry.score)),
+                : JSON.stringify(
+                    interviewFromScore(
+                      entry.score,
+                      "Interview dashboard sort seed data.",
+                    ),
+                  ),
             status:
               entry.score === null
                 ? InterviewStatusEnum.IN_PROGRESS
