@@ -1,10 +1,15 @@
 import type { ColumnDef } from "@tanstack/react-table";
 import type { Member } from "@/types/membersDashboard";
-import Edit from "@mui/icons-material/Edit";
-import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import {
+  MemberActionsCell,
+  type MemberActionCallbacks,
+} from "./MemberActionsCell";
 import { MemberStatusCell } from "./MemberStatusCell";
 
-export const MEMBERS_DASHBOARD_COLUMNS: ColumnDef<Member, unknown>[] = [
+export const createMembersDashboardColumns = ({
+  onEdit,
+  onDelete,
+}: MemberActionCallbacks = {}): ColumnDef<Member, unknown>[] => [
   {
     accessorKey: "name",
     header: "Name",
@@ -20,9 +25,7 @@ export const MEMBERS_DASHBOARD_COLUMNS: ColumnDef<Member, unknown>[] = [
     accessorKey: "status",
     header: "Status",
     enableSorting: false,
-    cell: ({ row }) => (
-      <MemberStatusCell status={row.original.status} />
-    ),
+    cell: ({ row }) => <MemberStatusCell status={row.original.status} />,
   },
   {
     id: "actions",
@@ -30,27 +33,11 @@ export const MEMBERS_DASHBOARD_COLUMNS: ColumnDef<Member, unknown>[] = [
     size: 112,
     enableSorting: false,
     cell: ({ row }) => (
-      <div className="pointer-events-none flex items-center justify-end gap-2 opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 [&:has(:focus-visible)]:pointer-events-auto [&:has(:focus-visible)]:opacity-100">
-        {/* Action behavior will be connected when editing/deletion is implemented. */}
-        <button
-          type="button"
-          aria-label={`Edit ${row.original.name}`}
-          title="Edit member"
-          onClick={(event) => event.stopPropagation()}
-          className="flex h-8 w-8 items-center justify-center rounded text-blue hover:bg-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue"
-        >
-          <Edit sx={{ fontSize: 22 }} />
-        </button>
-        <button
-          type="button"
-          aria-label={`Delete ${row.original.name}`}
-          title="Delete member"
-          onClick={(event) => event.stopPropagation()}
-          className="flex h-8 w-8 items-center justify-center rounded text-blue hover:bg-blue-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue"
-        >
-          <DeleteOutline sx={{ fontSize: 22 }} />
-        </button>
-      </div>
+      <MemberActionsCell
+        member={row.original}
+        onEdit={onEdit}
+        onDelete={onDelete}
+      />
     ),
   },
 ];

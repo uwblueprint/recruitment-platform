@@ -4,16 +4,24 @@ import { DashboardSidePanel } from "@/components/dashboard/side-panel";
 import type { RowSelectionState } from "@tanstack/react-table";
 import type { SelectedFilters } from "@/components/dashboard/filters";
 import type { MembersDashboardFilters } from "@/types/membersDashboard";
-import { MEMBERS_DASHBOARD_COLUMNS } from "./columns";
+import { createMembersDashboardColumns } from "./columns";
 import useMembersDashboardFilterOptions from "@/APIClients/queries/useMembersDashboardFilterOptions";
 import useDebouncedValue from "../../review/_components/hooks/useDebouncedValue";
 import { MembersDashboardToolbar } from "./MembersDashboardToolbar";
 import useMembersDashboard from "./hooks/useMembersDashboard";
+import type { MemberActionCallbacks } from "./columns/MemberActionsCell";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
 
-export const MembersDashboard = () => {
+export const MembersDashboard = ({
+  onEdit,
+  onDelete,
+}: MemberActionCallbacks) => {
+  const columns = useMemo(
+    () => createMembersDashboardColumns({ onEdit, onDelete }),
+    [onEdit, onDelete]
+  );
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(
@@ -116,7 +124,7 @@ export const MembersDashboard = () => {
       <div className="min-h-0 flex-1">
         <DashboardTable
           data={rows}
-          columns={MEMBERS_DASHBOARD_COLUMNS}
+          columns={columns}
           columnWidths={{
             status: 160,
             actions: 112,
