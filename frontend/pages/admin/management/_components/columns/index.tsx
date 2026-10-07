@@ -2,6 +2,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import type { Member } from "@/types/membersDashboard";
 import Edit from "@mui/icons-material/Edit";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
+import { MemberStatusCell } from "./MemberStatusCell";
 
 export const MEMBERS_DASHBOARD_COLUMNS: ColumnDef<Member, unknown>[] = [
   {
@@ -20,9 +21,7 @@ export const MEMBERS_DASHBOARD_COLUMNS: ColumnDef<Member, unknown>[] = [
     header: "Status",
     enableSorting: false,
     cell: ({ row }) => (
-      <span className="inline-flex h-7 min-w-[112px] items-center justify-center rounded bg-neutral-100 px-4 text-xs text-neutral-800">
-        {row.original.status}
-      </span>
+      <MemberStatusCell status={row.original.status} />
     ),
   },
   {

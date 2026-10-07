@@ -26,6 +26,8 @@ export type DashboardPaginationState = {
 type DashboardTableProps<TData extends RowData> = {
   data: TData[];
   columns: ColumnDef<TData, unknown>[];
+  /** CSS widths by column ID; unspecified columns default to "auto". */
+  columnWidths?: Record<string, number>;
   getRowId: (row: TData) => string;
   rowSelection: RowSelectionState;
   onRowSelectionChange: OnChangeFn<RowSelectionState>;
@@ -40,6 +42,7 @@ type DashboardTableProps<TData extends RowData> = {
 export const DashboardTable = <TData extends RowData>({
   data,
   columns,
+  columnWidths,
   getRowId,
   rowSelection,
   onRowSelectionChange,
@@ -80,7 +83,7 @@ export const DashboardTable = <TData extends RowData>({
                   <th
                     key={header.id}
                     className="h-11 whitespace-nowrap px-4 text-sm font-normal text-neutral-800"
-                    style={{ width: header.getSize() }}
+                    style={{ width: columnWidths?.[header.column.id] ?? "auto" }}
                   >
                     {header.isPlaceholder ? null : header.column.getCanSort() ? (
                       <button

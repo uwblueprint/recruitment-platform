@@ -40,7 +40,7 @@ export const MOCK_MEMBERS: Member[] = [
     role: "Designer",
     team: "Volunteer Hub",
     joined: "May 2026",
-    status: "Archived",
+    status: "Not Active",
   },
   {
     id: "mock-member-6",
@@ -80,7 +80,7 @@ export const MOCK_MEMBERS: Member[] = [
     role: "Developer",
     team: "Food Access",
     joined: "Sep 2026",
-    status: "Archived",
+    status: "Not Active",
   },
   {
     id: "mock-member-11",

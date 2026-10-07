@@ -117,6 +117,10 @@ export const MembersDashboard = () => {
         <DashboardTable
           data={rows}
           columns={MEMBERS_DASHBOARD_COLUMNS}
+          columnWidths={{
+            status: 160,
+            actions: 112,
+          }}
           getRowId={(row) => row.id}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}

@@ -8,15 +8,27 @@ export type DashboardStatusChipProps<TStatus extends string> = {
   value: TStatus;
   options: readonly DashboardStatusChipOption<TStatus>[];
   onChange?: (status: TStatus) => void;
+  readOnly?: boolean;
 };
 
 export const DashboardStatusChip = <TStatus extends string>({
   value,
   options,
   onChange,
+  readOnly = false,
 }: DashboardStatusChipProps<TStatus>) => {
-  const selectedClassName =
-    options.find((option) => option.value === value)?.className ?? "";
+  const selectedOption = options.find((option) => option.value === value);
+  const selectedClassName = selectedOption?.className ?? "";
+
+  if (readOnly) {
+    return (
+      <span
+        className={`inline-flex h-7 min-w-[112px] items-center justify-center rounded border font-source text-xs ${selectedClassName}`}
+      >
+        {selectedOption?.label ?? value}
+      </span>
+    );
+  }
 
   return (
     <select
