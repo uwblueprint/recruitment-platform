@@ -435,6 +435,7 @@ class ReviewCompositeService implements IReviewCompositeService {
 
   async getReviewDashboardFilterOptions(
     // department filtering not yet supported — reserved for future use
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     _department?: string,
   ): Promise<ReviewDashboardFilterOptionsDTO> {
     try {
