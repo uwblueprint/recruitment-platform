@@ -223,6 +223,8 @@ export function toReviewDashboardSidePanelDTO(
     applicationStatus: applicantRecord.status,
     skillCategory: applicantRecord.skill_category as SkillCategory,
     reviewDetails,
+    shortlistedForInterview: applicantRecord.is_shortlisted_for_interview,
+    isApplicantFlagged: applicantRecord.is_applicant_flagged,
   };
 }
 
@@ -237,12 +239,14 @@ export function toReviewDashboardRowDTO(
     timesApplied: applicantRecord.applicant.times_applied.toString(),
     applicationStatus: applicantRecord.status,
     choice: applicantRecord.choice,
-    reviewers: (
-      applicantRecord.reviewed_applicant_records ?? []
-    ).map((reviewedApplicantRecord) =>
-      toUserDTO(reviewedApplicantRecord.reviewer),
+    reviewers: (applicantRecord.reviewed_applicant_records ?? []).map(
+      (reviewedApplicantRecord) => ({
+        userInfo: toUserDTO(reviewedApplicantRecord.reviewer),
+        reviewerHasConflict: reviewedApplicantRecord.reviewer_has_conflict,
+      }),
     ),
     totalScore: applicantRecord.combined_review_score ?? null,
+    isApplicantFlagged: applicantRecord.is_applicant_flagged,
   };
 }
 

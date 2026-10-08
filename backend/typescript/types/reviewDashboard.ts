@@ -30,6 +30,11 @@ export type ReviewDetails = {
   reviewStatus: ReviewStatus;
 };
 
+export type ReviewDashboardReviewerDTO = {
+  userInfo: UserDTO;
+  reviewerHasConflict: boolean;
+};
+
 export type ReviewDashboardRowDTO = {
   applicantRecordId: string;
   firstName: string;
@@ -38,8 +43,9 @@ export type ReviewDashboardRowDTO = {
   timesApplied: string;
   applicationStatus: ApplicationStatus;
   choice: number;
-  reviewers: UserDTO[];
+  reviewers: ReviewDashboardReviewerDTO[];
   totalScore: number | null;
+  isApplicantFlagged: boolean;
 };
 
 export type ReviewDashboardSidePanelDTO = {
@@ -52,6 +58,8 @@ export type ReviewDashboardSidePanelDTO = {
   applicationStatus: ApplicationStatus;
   skillCategory: SkillCategory | null;
   reviewDetails: ReviewDetails[];
+  shortlistedForInterview: boolean;
+  isApplicantFlagged: boolean;
 };
 
 export type FilterOption = {

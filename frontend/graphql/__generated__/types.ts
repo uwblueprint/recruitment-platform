@@ -903,15 +903,22 @@ export type ReviewDashboardReviewDetails = {
   reviewer: UserDto;
 };
 
+export type ReviewDashboardReviewerDto = {
+  __typename?: 'ReviewDashboardReviewerDTO';
+  reviewerHasConflict: Scalars['Boolean']['output'];
+  userInfo: UserDto;
+};
+
 export type ReviewDashboardRowDto = {
   __typename?: 'ReviewDashboardRowDTO';
   applicantRecordId: Scalars['ID']['output'];
   applicationStatus: ApplicationStatus;
   choice: Scalars['Int']['output'];
   firstName: Scalars['String']['output'];
+  isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
-  reviewers: Array<UserDto>;
+  reviewers: Array<ReviewDashboardReviewerDto>;
   timesApplied: Scalars['String']['output'];
   totalScore?: Maybe<Scalars['Int']['output']>;
 };
@@ -921,11 +928,13 @@ export type ReviewDashboardSidePanelDto = {
   academicYear: Scalars['String']['output'];
   applicationStatus: ApplicationStatus;
   firstName: Scalars['String']['output'];
+  isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
   program: Scalars['String']['output'];
   resumeUrl: Scalars['String']['output'];
   reviewDetails: Array<ReviewDashboardReviewDetails>;
+  shortlistedForInterview: Scalars['Boolean']['output'];
   skillCategory?: Maybe<SkillCategory>;
 };
 

@@ -7,6 +7,11 @@ const reviewDashboardType = gql`
     reviewStatus: ReviewStatus!
   }
 
+  type ReviewDashboardReviewerDTO {
+    userInfo: UserDTO!
+    reviewerHasConflict: Boolean!
+  }
+
   type ReviewDashboardRowDTO {
     applicantRecordId: ID!
     firstName: String!
@@ -15,8 +20,9 @@ const reviewDashboardType = gql`
     timesApplied: String!
     applicationStatus: ApplicationStatus!
     choice: Int!
-    reviewers: [UserDTO!]!
+    reviewers: [ReviewDashboardReviewerDTO!]!
     totalScore: Int
+    isApplicantFlagged: Boolean!
   }
 
   type ReviewDashboardSidePanelDTO {
@@ -29,6 +35,8 @@ const reviewDashboardType = gql`
     applicationStatus: ApplicationStatus!
     skillCategory: SkillCategory
     reviewDetails: [ReviewDashboardReviewDetails!]!
+    shortlistedForInterview: Boolean!
+    isApplicantFlagged: Boolean!
   }
 
   type FilterOption {

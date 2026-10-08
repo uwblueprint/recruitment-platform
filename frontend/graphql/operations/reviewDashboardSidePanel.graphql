@@ -8,6 +8,8 @@ query ReviewDashboardSidePanel($applicantRecordId: ID!) {
     resumeUrl
     applicationStatus
     skillCategory
+    shortlistedForInterview
+    isApplicantFlagged
     reviewDetails {
       reviewStatus
       reviewer {

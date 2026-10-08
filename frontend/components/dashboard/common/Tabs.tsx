@@ -1,32 +1,30 @@
-import { DashboardView } from "@/graphql/typeUtils";
-
 type Unit = {
   singular: string;
   plural: string;
 }
 
-export type DashboardTab = {
-  view: DashboardView;
+export type Tab = {
+  view: string;
   label: string;
   count: number | undefined;
   unit: Unit;
 };
 
-type DashboardTabsProps = {
-  activeView: DashboardView;
-  onViewChange: (view: DashboardView) => void;
+type TabsProps = {
+  activeView: string;
+  onViewChange: (view: string) => void;
   selectedCount?: number;
-  onClearAll: () => void;
-  tabs?: DashboardTab[]; // Optional prop to allow for custom tabs
+  onClearAll?: () => void;
+  tabs?: Tab[]; // Optional prop to allow for custom tabs
 };
 
-export const DashboardTabs = ({
+export const Tabs = ({
   activeView,
   onViewChange,
   selectedCount,
   onClearAll,
   tabs = [],
-}: DashboardTabsProps) => {
+}: TabsProps) => {
 
 
   return (
@@ -44,16 +42,12 @@ export const DashboardTabs = ({
               }`}
             >
               <span
-                className={`text-sm font-semibold ${
-                  isActive ? "text-black" : "text-neutral-500"
-                }`}
+                className="font-inter text-base font-medium not-italic leading-6 text-[#5A5A5A] [font-feature-settings:'liga'_off,'clig'_off]"
               >
                 {tab.label}
               </span>
               <span
-                className={`text-xs font-medium ${
-                  isActive ? "text-blue" : "text-neutral-400"
-                }`}
+                className="font-source text-xs font-semibold not-italic leading-[normal] text-[#5A5A5A]"
               >
                 {tab.count === undefined
                   ? "—"
@@ -64,15 +58,15 @@ export const DashboardTabs = ({
         })}
       </div>
 
-      <div className="flex items-center gap-3 pb-2">
-        {selectedCount !== undefined ? <span className="text-sm text-neutral-500">{selectedCount} selected</span> : null}
+      <div className="flex items-center gap-3 pb-2 text-right font-source text-base font-normal not-italic leading-[140%] text-[#767676] [font-feature-settings:'liga'_off,'clig'_off]">
+        {selectedCount !== undefined ? <span>{selectedCount} selected</span> : null}
         
         {onClearAll ? (
 
            <button
           type="button"
           onClick={onClearAll}
-          className="text-sm text-neutral-500 hover:text-black"
+          className="text-right hover:text-black"
         >
           Clear all
         </button>

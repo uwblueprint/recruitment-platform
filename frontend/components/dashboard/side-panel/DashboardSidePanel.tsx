@@ -1,6 +1,5 @@
 import BookmarkBorderOutlined from "@mui/icons-material/BookmarkBorderOutlined";
 import BookmarkOutlined from "@mui/icons-material/BookmarkOutlined";
-import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
 import DescriptionOutlined from "@mui/icons-material/DescriptionOutlined";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
@@ -12,7 +11,6 @@ import { ReactNode, useState } from "react";
 
 import { ReviewStatusCell } from "@/pages/admin/review/_components/columns/ReviewStatusCell";
 
-import { Button } from "@/components/common/Button";
 import type {
   ApplicationStatus,
   ReviewDashboardResult,
@@ -49,6 +47,7 @@ type ApplicantRow = Pick<
   | "position"
   | "applicationStatus"
   | "totalScore"
+  | "isApplicantFlagged"
 >;
 type ApplicantDetails = Pick<
   ReviewDashboardSidePanelResult,
@@ -73,6 +72,7 @@ type DashboardSidePanelProps = {
     nextStatus: ApplicationStatus,
     previousStatus: ApplicationStatus
   ) => Promise<ApplicationStatus>;
+  applicantAction?: ReactNode;
 };
 
 /** Props for sections that only render once an active row exists. */
@@ -96,6 +96,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
     width = 913,
     showDetailsDivider = true,
     showScoreOnHeader = true,
+    applicantAction,
   } = props;
 
   return (
@@ -177,12 +178,9 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
           </div>
         ) : null}
 
-        {row ? (
+        {row && applicantAction ? (
           <footer className="flex shrink-0 justify-end px-8 py-5">
-            <Button size="sm" className="flex items-center gap-2">
-              <CheckCircleOutline sx={{ fontSize: 19 }} />
-              Shortlist Applicant
-            </Button>
+            {applicantAction}
           </footer>
         ) : null}
       </aside>
@@ -241,7 +239,7 @@ const SidePanelApplicantBar = ({
           />
         )}
       </div>
-      <BookmarkButton key={row.applicantRecordId} />
+      <BookmarkButton key={row.applicantRecordId} isApplicantFlagged={row.isApplicantFlagged} />
     </div>
   );
 };
@@ -300,8 +298,8 @@ const InfoField = ({ label, value }: { label: string; value: string }) => (
  * Visual-only bookmark toggle. Persisting the bookmark is handled in a future
  * ticket.
  */
-const BookmarkButton = () => {
-  const [isBookmarked, setIsBookmarked] = useState(false);
+const BookmarkButton = ({ isApplicantFlagged }: { isApplicantFlagged: boolean }) => {
+  const [isBookmarked, setIsBookmarked] = useState(isApplicantFlagged);
 
   return (
     <button

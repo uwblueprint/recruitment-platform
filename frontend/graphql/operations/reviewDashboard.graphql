@@ -22,14 +22,18 @@ query ReviewDashboard(
     applicationStatus
     choice
     reviewers {
-      id
-      firstName
-      lastName
-      email
-      position
-      role
-      isArchived
+      userInfo {
+        id
+        firstName
+        lastName
+        email
+        position
+        role
+        isArchived
+      }
+      reviewerHasConflict
     }
     totalScore
+    isApplicantFlagged
   }
 }

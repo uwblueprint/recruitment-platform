@@ -15,7 +15,7 @@ import {
 import { useState } from "react";
 import { NextPageWithLayout } from "../../_app";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
-import { DashboardTab, DashboardTabs } from "@/components/dashboard/common/DashboardTabs";
+import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useInterviewDashboardCounts from "@/APIClients/queries/useInterviewDashboardCounts";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
@@ -33,8 +33,10 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     DashboardView.All
   );
 
-    const handleViewChange = (view: DashboardView) => {
-    setActiveView(view);
+  const handleViewChange = (view: string) => {
+    const dashboardView = Object.values(DashboardView).find((value) => value === view);
+    if (!dashboardView) return;
+    setActiveView(dashboardView);
     setPageNumber(1);
     setRowSelection({});
     setActiveIndex(null);
@@ -84,7 +86,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const { counts: tabCounts, error: countsError } = useInterviewDashboardCounts();
 
   const INTERVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
-  const tabs: DashboardTab[] = [
+  const tabs: Tab[] = [
     { view: DashboardView.All, label: "All Applicants", count: tabCounts[DashboardView.All], unit: INTERVIEW_DASHBOARD_TABS_UNIT },
     { view: DashboardView.Shortlisted, label: "Shortlisted", count: tabCounts[DashboardView.Shortlisted], unit: INTERVIEW_DASHBOARD_TABS_UNIT },
     { view: DashboardView.Conflicts, label: "Conflicts", count: tabCounts[DashboardView.Conflicts], unit: INTERVIEW_DASHBOARD_TABS_UNIT },
@@ -107,7 +109,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           </p>
         ) : null}
 
-        <DashboardTabs
+        <Tabs
           activeView={activeView}
           onViewChange={handleViewChange}
           selectedCount={Object.keys(rowSelection).length}
