@@ -110,6 +110,12 @@ export type CreateReviewedApplicantRecordDto = {
   status: ReviewStatus;
 };
 
+export type CreateTeamMemberDto = {
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  teamRole: TeamRole;
+};
+
 export type CreateUserDto = {
   email: Scalars['String']['input'];
   firstName: Scalars['String']['input'];
@@ -327,6 +333,7 @@ export type Mutation = {
   createInterviewedApplicantRecord: InterviewedApplicantRecord;
   createReviewedApplicantRecord: ReviewedApplicantRecordDto;
   createSimpleEntity: SimpleEntityResponseDto;
+  createTeamMember: TeamMemberDto;
   createUser: UserDto;
   delegateInterviewers: Array<InterviewDelegationDto>;
   delegateReviewers: Array<ReviewedApplicantRecordDto>;
@@ -424,6 +431,11 @@ export type MutationCreateReviewedApplicantRecordArgs = {
 
 export type MutationCreateSimpleEntityArgs = {
   entity: SimpleEntityRequestDto;
+};
+
+
+export type MutationCreateTeamMemberArgs = {
+  teamMember: CreateTeamMemberDto;
 };
 
 
@@ -660,6 +672,7 @@ export type Query = {
   simpleEntities: Array<SimpleEntityResponseDto>;
   simpleEntitiesCSV: Scalars['String']['output'];
   simpleEntity: SimpleEntityResponseDto;
+  teamMembers: Array<TeamMemberDto>;
   userByEmail: UserDto;
   userById: UserDto;
   users: Array<UserDto>;
@@ -1008,6 +1021,21 @@ export enum SkillCategory {
   Intermediate = 'INTERMEDIATE',
   Junior = 'JUNIOR',
   Senior = 'SENIOR'
+}
+
+export type TeamMemberDto = {
+  __typename?: 'TeamMemberDTO';
+  firstName: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  teamRole: TeamRole;
+};
+
+export enum TeamRole {
+  Designer = 'DESIGNER',
+  Developer = 'DEVELOPER',
+  Pl = 'PL',
+  Pm = 'PM'
 }
 
 export type UpdateAdminCommentDto = {

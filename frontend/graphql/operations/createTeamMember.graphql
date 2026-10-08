@@ -1,0 +1,8 @@
+mutation CreateTeamMember($teamMember: CreateTeamMemberDTO!) {
+  createTeamMember(teamMember: $teamMember) {
+    id
+    firstName
+    lastName
+    teamRole
+  }
+}
