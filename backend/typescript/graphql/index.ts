@@ -37,6 +37,8 @@ import interviewDelegationResolvers from "./resolvers/interviewDelegationResolve
 import interviewGroupResolvers from "./resolvers/interviewGroupResolvers";
 import interviewPageResolvers from "./resolvers/interviewPageResolvers";
 import interviewDashboardResolvers from "./resolvers/interviewDashboardResolvers";
+import teamMemberResolvers from "./resolvers/teamMemberResolvers";
+import teamMemberType from "./types/teamMemberType";
 
 const query = gql`
   type Query {
@@ -68,6 +70,7 @@ const executableSchema = makeExecutableSchema({
     reviewPageType,
     simpleEntityType,
     userType,
+    teamMemberType,
   ],
   resolvers: merge(
     { Upload: GraphQLUpload },
@@ -85,6 +88,7 @@ const executableSchema = makeExecutableSchema({
     interviewGroupResolvers,
     interviewPageResolvers,
     interviewDashboardResolvers,
+    teamMemberResolvers,
   ),
 });
 

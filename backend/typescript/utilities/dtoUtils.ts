@@ -21,6 +21,8 @@ import {
   ReviewStatus,
   SkillCategory,
   UserDTO,
+  TeamMemberDTO,
+  ProjectDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
@@ -31,6 +33,8 @@ import InterviewGroup from "../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 import User from "../models/user.model";
+import TeamMember from "../models/teamMember.model";
+import Project from "../models/project.model";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -326,3 +330,20 @@ export function toInterviewNotesDTO(
     signedUrl,
   };
 }
+
+export const toTeamMemberDTO = (teamMember: TeamMember): TeamMemberDTO => {
+  return {
+    id: teamMember.id,
+    firstName: teamMember.first_name,
+    lastName: teamMember.last_name,
+    teamRole: teamMember.team_role,
+  };
+};
+
+export const toProjectDTO = (project: Project): ProjectDTO => {
+  return {
+    id: project.id,
+    projectName: project.project_name,
+    isArchived: project.is_archived,
+  };
+};

@@ -14,3 +14,5 @@ export * from "./interviewDelegation";
 export * from "./interviewPage";
 export * from "./interviewDashboard";
 export * from "./firebaseFile";
+export * from "./teamMember";
+export * from "./project";
