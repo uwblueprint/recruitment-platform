@@ -1,10 +1,4 @@
-import {
-  AllowNull,
-  Column,
-  DataType,
-  Model,
-  Table,
-} from "sequelize-typescript";
+import { Column, DataType, Model, Table } from "sequelize-typescript";
 
 @Table({ tableName: "projects" })
 export default class Project extends Model {
