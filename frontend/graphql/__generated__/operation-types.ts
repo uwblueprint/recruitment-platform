@@ -194,6 +194,11 @@ export type ReviewDashboardApplicantRecordIdsQueryVariables = Exact<{
 
 export type ReviewDashboardApplicantRecordIdsQuery = { reviewDashboardApplicantRecordIds: Array<string> };
 
+export type ReviewDashboardCsvQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ReviewDashboardCsvQuery = { reviewDashboardCSV: string };
+
 export type ReviewDashboardCountsQueryVariables = Exact<{
   filters?: Types.ReviewDashboardFilters | null | undefined;
 }>;

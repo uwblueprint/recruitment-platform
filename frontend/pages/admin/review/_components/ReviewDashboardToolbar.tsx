@@ -6,6 +6,7 @@ import {
   type FilterCategory,
   type SelectedFilters,
 } from "@/components/dashboard/filters";
+import FileDownloadOutlined from "@mui/icons-material/FileDownloadOutlined";
 import MailOutline from "@mui/icons-material/MailOutline";
 import PersonAddAltOutlined from "@mui/icons-material/PersonAddAltOutlined";
 
@@ -27,6 +28,10 @@ type ReviewDashboardToolbarProps = {
     onReject: () => void;
     onSelectForInterview: () => void;
   };
+  exportCSV: {
+    isExporting: boolean;
+    onExport: () => void;
+  };
 };
 
 export const ReviewDashboardToolbar = ({
@@ -34,6 +39,7 @@ export const ReviewDashboardToolbar = ({
   search,
   filters,
   bulkActions,
+  exportCSV,
 }: ReviewDashboardToolbarProps) => (
   <div className="flex shrink-0 items-start justify-between gap-4">
     {position ? (
@@ -57,6 +63,17 @@ export const ReviewDashboardToolbar = ({
       />
     </div>
     <div className="flex shrink-0 items-center gap-3">
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        disabled={exportCSV.isExporting}
+        onClick={exportCSV.onExport}
+        className="flex items-center gap-2 !px-5"
+      >
+        <FileDownloadOutlined fontSize="small" />
+        {exportCSV.isExporting ? "Exporting..." : "Export CSV"}
+      </Button>
       <Button
         type="button"
         variant="secondary"

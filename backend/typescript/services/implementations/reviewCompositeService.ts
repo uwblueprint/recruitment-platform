@@ -38,6 +38,13 @@ import {
   toReviewedApplicantRecordWithReviewerDTO,
 } from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
+import { generateCSV } from "../../utilities/CSVUtils";
+import {
+  getReviewDashboardCSVFields,
+  getReviewerSlotCount,
+  ReviewDashboardCSVRow,
+  toReviewDashboardCSVRow,
+} from "../../utilities/reviewDashboardCSVUtils";
 import logger from "../../utilities/logger";
 import IReviewCompositeService from "../interfaces/IReviewCompositeService";
 import ReviewedApplicantRecordService from "./reviewedApplicantRecordService";
@@ -324,6 +331,46 @@ class ReviewCompositeService implements IReviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to get dashboard. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getReviewDashboardCSV(): Promise<string> {
+    try {
+      const applicantRecords = await ApplicantRecord.findAll({
+        include: [
+          {
+            model: ReviewedApplicantRecord,
+            separate: true,
+            order: [
+              ["createdAt", "ASC"],
+              ["reviewer_id", "ASC"],
+            ] as Order,
+            include: [{ model: User }],
+          },
+          { model: Applicant, required: true },
+        ],
+        order: [
+          [col("applicant.last_name"), "ASC"],
+          [col("applicant.first_name"), "ASC"],
+          ["id", "ASC"],
+        ],
+      });
+
+      const reviewerSlots = getReviewerSlotCount(applicantRecords);
+      return await generateCSV<ReviewDashboardCSVRow>({
+        data: applicantRecords.map((record) =>
+          toReviewDashboardCSVRow(record, reviewerSlots),
+        ),
+        fields: getReviewDashboardCSVFields(reviewerSlots),
+        opts: { withBOM: true },
+      });
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to generate review dashboard CSV. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }
