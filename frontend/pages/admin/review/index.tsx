@@ -34,6 +34,7 @@ import useReviewDashboardApplicantRecordIds from "@/APIClients/queries/useReview
 import useReviewDashboardFilterOptions from "@/APIClients/queries/useReviewDashboardFilterOptions";
 import useReviewDashboardCount from "@/APIClients/queries/useReviewDashboardCount";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
+import useExportReviewDashboardCSV from "./_components/hooks/useExportReviewDashboardCSV";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -247,6 +248,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
     },
   });
 
+  const { exportCSV, isExporting, exportFailed, dismissExportError } =
+    useExportReviewDashboardCSV();
+
   const handleResultsPerPageChange = (value: number) => {
     setResultsPerPage(value);
     setPageNumber(1);
@@ -344,6 +348,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
             onReject: () => handleBulkAction(BulkAction.Reject),
             onSelectForInterview: () => handleBulkAction(BulkAction.Interview),
           }}
+          exportCSV={{ isExporting, onExport: exportCSV }}
         />
         {error ? (
           <div
@@ -416,6 +421,13 @@ const AdminReviewPage: NextPageWithLayout = () => {
         <BulkStatusConfirmationDialogue {...bulkActionDialogue} />
       ) : null}
       <Toast {...bulkActionToast} onClose={dismissBulkActionToast} />
+      <Toast
+        open={exportFailed}
+        severity="error"
+        title="Export failed"
+        description="The CSV could not be generated. Please try again."
+        onClose={dismissExportError}
+      />
     </div>
   );
 };
