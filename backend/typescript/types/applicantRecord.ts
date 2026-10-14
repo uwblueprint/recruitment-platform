@@ -39,6 +39,7 @@ export type ApplicantRecordDTO = {
   skillCategory?: SkillCategory;
   combinedReviewScore?: number | null;
   isApplicantFlagged: boolean;
+  isShortlistedForInterview: boolean;
 };
 
 export type CreateApplicantRecordDTO = Omit<
@@ -48,7 +49,11 @@ export type CreateApplicantRecordDTO = Omit<
 export type UpdateApplicantRecordDTO = Partial<
   Pick<
     ApplicantRecordDTO,
-    "status" | "skillCategory" | "combinedReviewScore" | "isApplicantFlagged"
+    | "status"
+    | "skillCategory"
+    | "combinedReviewScore"
+    | "isApplicantFlagged"
+    | "isShortlistedForInterview"
   >
 >;
 export type BulkUpdateApplicantRecordDTO = UpdateApplicantRecordDTO &
