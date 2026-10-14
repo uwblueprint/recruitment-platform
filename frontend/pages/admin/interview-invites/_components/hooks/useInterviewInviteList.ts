@@ -1,4 +1,8 @@
 import { useState } from "react";
+import type {
+  FilterCategory,
+  SelectedFilters,
+} from "@/components/dashboard/filters";
 import type { InterviewInvite } from "../types";
 
 const READY_STATUSES = new Set(["AVAILABILITY_PENDING", "READY_TO_INTERVIEW"]);
@@ -8,17 +12,46 @@ export default function useInterviewInviteList(invites: InterviewInvite[]) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const filterCategories: FilterCategory[] = [
+    {
+      key: "interviewType",
+      label: "Interview Type",
+      options: Array.from(
+        new Set(invites.map((invite) => invite.interviewType))
+      )
+        .sort()
+        .map((value) => ({ value, label: value })),
+    },
+  ];
+
+  const handleFilterChange = (categoryKey: string, values: string[]) => {
+    setSelectedFilters((previous) => ({ ...previous, [categoryKey]: values }));
+  };
+
+  const handleFilterRemove = (categoryKey: string, value: string) => {
+    setSelectedFilters((previous) => ({
+      ...previous,
+      [categoryKey]: (previous[categoryKey] ?? []).filter(
+        (item) => item !== value
+      ),
+    }));
+  };
+
   const readyInvites = invites.filter((i) => READY_STATUSES.has(i.status));
   const sentInvites = invites.filter((i) => !READY_STATUSES.has(i.status));
 
   const activeInvites = activeTab === "ready" ? readyInvites : sentInvites;
-  const filteredInvites = searchQuery.trim()
-    ? activeInvites.filter((i) =>
-        i.interviewers.some((name) =>
-          name.toLowerCase().includes(searchQuery.toLowerCase()),
-        ),
-      )
-    : activeInvites;
+  const filteredInvites = activeInvites.filter((invite) => {
+    const matchesSearch = invite.interviewers.some((name) =>
+      name.toLowerCase().includes(searchQuery.trim().toLowerCase())
+    );
+    const types = selectedFilters.interviewType ?? [];
+    return (
+      (!searchQuery.trim() || matchesSearch) &&
+      (types.length === 0 || types.includes(invite.interviewType))
+    );
+  });
 
   const allSelected =
     filteredInvites.length > 0 &&
@@ -60,5 +93,9 @@ export default function useInterviewInviteList(invites: InterviewInvite[]) {
     allSelected,
     handleSelectAll,
     toggleSelect,
+    filterCategories,
+    selectedFilters,
+    handleFilterChange,
+    handleFilterRemove,
   };
 }
