@@ -14,13 +14,10 @@ import type { MemberActionCallbacks } from "./columns/MemberActionsCell";
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
 
-export const MembersDashboard = ({
-  onEdit,
-  onDelete,
-}: MemberActionCallbacks) => {
+export const MembersDashboard = ({ onDelete }: MemberActionCallbacks) => {
   const columns = useMemo(
-    () => createMembersDashboardColumns({ onEdit, onDelete }),
-    [onEdit, onDelete]
+    () => createMembersDashboardColumns({ onDelete }),
+    [onDelete]
   );
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
@@ -127,7 +124,7 @@ export const MembersDashboard = ({
           columns={columns}
           columnWidths={{
             status: 160,
-            actions: 112,
+            actions: 72,
           }}
           getRowId={(row) => row.id}
           rowSelection={rowSelection}
