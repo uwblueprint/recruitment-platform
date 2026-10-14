@@ -81,6 +81,7 @@ class ApplicantRecordService implements IApplicantRecordService {
         skill_category: applicantRecord.skillCategory,
         combined_review_score: applicantRecord.combinedReviewScore,
         is_applicant_flagged: applicantRecord.isApplicantFlagged,
+        is_shortlisted_for_interview: applicantRecord.isShortlistedForInterview,
       });
       return toApplicantRecordDTO(updatedApplicantRecord);
     } catch (error: unknown) {

@@ -47,6 +47,14 @@ const applicantRecordResolvers = {
         isApplicantFlagged: flagValue,
       });
     },
+    updateApplicantRecordShortlistedForInterview: async (
+      _parent: undefined,
+      { id, shortlistedValue }: { id: string; shortlistedValue: boolean },
+    ): Promise<ApplicantRecordDTO> => {
+      return applicantRecordService.updateApplicantRecord(id, {
+        isShortlistedForInterview: shortlistedValue,
+      });
+    },
   },
 };
 

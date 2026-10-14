@@ -68,6 +68,7 @@ export function toApplicantRecordDTO(
     skillCategory: model.skill_category,
     combinedReviewScore: model.combined_review_score,
     isApplicantFlagged: model.is_applicant_flagged,
+    isShortlistedForInterview: model.is_shortlisted_for_interview,
   };
 }
 

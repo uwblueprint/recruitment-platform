@@ -145,6 +145,7 @@ export {
   UsersByPositionDocument,
   UploadInterviewNotesDocument,
   UpdateApplicantRecordIsApplicantFlaggedDocument,
+  UpdateApplicantRecordShortlistedForInterviewDocument,
 } from "./__generated__/graphql";
 
 export type {
@@ -226,6 +227,8 @@ export type {
   UploadInterviewNotesMutationVariables,
   UpdateApplicantRecordIsApplicantFlaggedMutation,
   UpdateApplicantRecordIsApplicantFlaggedMutationVariables,
+  UpdateApplicantRecordShortlistedForInterviewMutation,
+  UpdateApplicantRecordShortlistedForInterviewMutationVariables,
 } from "./__generated__/operation-types";
 
 /**

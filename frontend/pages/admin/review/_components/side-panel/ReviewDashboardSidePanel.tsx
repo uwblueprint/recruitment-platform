@@ -8,25 +8,34 @@ import type {
   ReviewDashboardResult,
 } from "@/graphql/typeUtils";
 import useReviewDashboardSidePanel from "@/APIClients/queries/useReviewDashboardSidePanel";
+import useUpdateApplicantRecordShortlistedForInterview from "@/APIClients/mutations/useUpdateApplicantRecordShortlistedForInterview";
 import CheckCircleOutline from "@mui/icons-material/CheckCircleOutline";
-import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
+import HighlightOffOutlinedIcon from "@mui/icons-material/HighlightOffOutlined";
 import { Button } from "@/components/common/Button";
 
 type ShortlistApplicantButtonProps = {
   isShortlisted: boolean;
+  disabled?: boolean;
+  onClick: () => void;
 };
 
 const ShortlistApplicantButton = ({
   isShortlisted,
+  disabled,
+  onClick,
 }: ShortlistApplicantButtonProps) => {
   return (
-    <Button size="sm" className="flex items-center gap-2">
+    <Button
+      size="sm"
+      className="flex items-center gap-2"
+      disabled={disabled}
+      onClick={onClick}
+    >
       {isShortlisted ? (
         <>
           <HighlightOffOutlinedIcon sx={{ fontSize: 19 }} />
-          Remove from Interview Shortlist
+          Unshortlist Applicant for Interview
         </>
-
       ) : (
         <>
           <CheckCircleOutline sx={{ fontSize: 19 }} />
@@ -61,6 +70,11 @@ export const ReviewDashboardSidePanel = ({
     loading: isLoading,
     error,
   } = useReviewDashboardSidePanel(applicantRecordId);
+  const {
+    updateShortlistedForInterview,
+    loading: isShortlistUpdating,
+  } = useUpdateApplicantRecordShortlistedForInterview();
+
   return (
     <DashboardSidePanel
       open={applicantRecordId !== undefined}
@@ -75,6 +89,14 @@ export const ReviewDashboardSidePanel = ({
         details ? (
           <ShortlistApplicantButton
             isShortlisted={details.shortlistedForInterview}
+            disabled={isShortlistUpdating}
+            onClick={() => {
+              if (!applicantRecordId) return;
+              updateShortlistedForInterview(
+                applicantRecordId,
+                !details.shortlistedForInterview
+              );
+            }}
           />
         ) : null
       }

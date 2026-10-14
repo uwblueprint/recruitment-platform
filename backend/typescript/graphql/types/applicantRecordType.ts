@@ -26,6 +26,7 @@ const applicantRecordType = gql`
     skillCategory: SkillCategory
     combinedReviewScore: Int
     isApplicantFlagged: Boolean!
+    isShortlistedForInterview: Boolean!
   }
 
   type RejectionEmailFailure {
@@ -51,6 +52,10 @@ const applicantRecordType = gql`
     updateApplicantRecordIsApplicantFlagged(
       id: ID!
       flagValue: Boolean!
+    ): ApplicantRecordDTO!
+    updateApplicantRecordShortlistedForInterview(
+      id: ID!
+      shortlistedValue: Boolean!
     ): ApplicantRecordDTO!
   }
 `;
