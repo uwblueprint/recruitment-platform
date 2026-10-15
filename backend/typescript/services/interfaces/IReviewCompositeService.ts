@@ -1,7 +1,7 @@
 import {
   ApplicantRecordWithReviewersDTO,
   DashboardView,
-  ReviewDashboardFilterOptionsDTO,
+  DashboardFilterOptionsDTO,
   ReviewDashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
@@ -81,13 +81,13 @@ interface IReviewCompositeService {
   ): Promise<ReviewDashboardSidePanelDTO>;
 
   /**
-   * Fetches all filter options for the review dashboard
+   * Fetches the shared filter options used by applicant dashboards.
    * @param department optional department to scope position options
-   * @returns ReviewDashboardFilterOptionsDTO with all filter options
+   * @returns DashboardFilterOptionsDTO with all filter options
    */
-  getReviewDashboardFilterOptions(
+  getDashboardFilterOptions(
     department?: string,
-  ): Promise<ReviewDashboardFilterOptionsDTO>;
+  ): Promise<DashboardFilterOptionsDTO>;
 }
 
 export default IReviewCompositeService;

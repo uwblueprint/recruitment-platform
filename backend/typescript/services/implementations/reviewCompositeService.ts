@@ -1,13 +1,4 @@
-import {
-  Op,
-  Order,
-  OrderItem,
-  WhereOptions,
-  col,
-  fn,
-  literal,
-  where as whereFn,
-} from "sequelize";
+import { Op, Order, OrderItem, WhereOptions, col, literal } from "sequelize";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import ReviewedApplicantRecord from "../../models/reviewedApplicantRecord.model";
@@ -18,7 +9,7 @@ import {
   CreateReviewedApplicantRecordDTO,
   DashboardView,
   DashboardViewEnum,
-  ReviewDashboardFilterOptionsDTO,
+  DashboardFilterOptionsDTO,
   ReviewDashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
@@ -37,6 +28,10 @@ import {
   toReviewedApplicantDTO,
   toReviewedApplicantRecordWithReviewerDTO,
 } from "../../utilities/dtoUtils";
+import {
+  buildApplicantRecordWhere,
+  buildApplicantWhere,
+} from "../../utilities/dashboardFilterUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IReviewCompositeService from "../interfaces/IReviewCompositeService";
@@ -108,70 +103,6 @@ function buildReviewDashboardOrder(
     return [sortColumnMap[sortBy], ["id", "ASC"]];
   }
   return [["id", "ASC"]];
-}
-
-function buildApplicantRecordWhere(
-  filters?: ReviewDashboardFilters,
-): WhereOptions {
-  const where: WhereOptions = {};
-
-  if (filters?.positions?.length) {
-    where.position = { [Op.in]: filters.positions };
-  }
-  if (filters?.applicationStatuses?.length) {
-    where.status = { [Op.in]: filters.applicationStatuses };
-  }
-  if (filters?.skillCategories?.length) {
-    where.skill_category = { [Op.in]: filters.skillCategories };
-  }
-  if (filters?.bookmarked !== undefined) {
-    where.is_applicant_flagged = filters.bookmarked;
-  }
-  if (filters?.scoreRanges?.length) {
-    const scoreConditions = filters.scoreRanges.map((range) => {
-      if (range === "gt_25") return { combined_review_score: { [Op.gt]: 25 } };
-      if (range === "20_25")
-        return { combined_review_score: { [Op.between]: [20, 25] } };
-      if (range === "15_20")
-        return { combined_review_score: { [Op.between]: [15, 20] } };
-      if (range === "lt_15") return { combined_review_score: { [Op.lt]: 15 } };
-      return {};
-    });
-    where[(Op.or as unknown) as string] = scoreConditions;
-  }
-
-  return where;
-}
-
-/** Escapes the LIKE wildcards so a searched "%" matches a literal percent sign. */
-function escapeLikeWildcards(term: string): string {
-  return term.replace(/[\\%_]/g, (character) => `\\${character}`);
-}
-
-function buildApplicantWhere(filters?: ReviewDashboardFilters): WhereOptions {
-  const where: WhereOptions = {};
-  if (filters?.years?.length) {
-    where.academic_year = { [Op.in]: filters.years };
-  }
-
-  // First and last names are separate columns, so the term is matched against
-  // them joined, letting "jane doe" hit as readily as "jane" or "doe".
-  const search = filters?.search?.trim().replace(/\s+/g, " ");
-  if (search) {
-    where[(Op.and as unknown) as string] = whereFn(
-      // Qualified because "users" also has first_name/last_name; leaving these
-      // bare would go ambiguous the moment the reviewer join stops being separate.
-      fn(
-        "concat_ws",
-        " ",
-        col("applicant.first_name"),
-        col("applicant.last_name"),
-      ),
-      { [Op.iLike]: `%${escapeLikeWildcards(search)}%` },
-    );
-  }
-
-  return where;
 }
 
 async function buildReviewDashboardViewWhere(
@@ -433,10 +364,10 @@ class ReviewCompositeService implements IReviewCompositeService {
     }
   }
 
-  async getReviewDashboardFilterOptions(
+  async getDashboardFilterOptions(
     // department filtering not yet supported — reserved for future use
     _department?: string,
-  ): Promise<ReviewDashboardFilterOptionsDTO> {
+  ): Promise<DashboardFilterOptionsDTO> {
     try {
       const positionRecords = await Position.findAll({
         where: {
@@ -499,7 +430,7 @@ class ReviewCompositeService implements IReviewCompositeService {
       };
     } catch (error: unknown) {
       Logger.error(
-        `Failed to get review dashboard filter options. Reason = ${getErrorMessage(
+        `Failed to get dashboard filter options. Reason = ${getErrorMessage(
           error,
         )}`,
       );

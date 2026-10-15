@@ -25,13 +25,13 @@ import {
   createReviewDashboardColumns,
 } from "./_components/columns";
 import { Tab, Tabs } from "../../../components/dashboard/common/Tabs";
-import useDebouncedValue from "./_components/hooks/useDebouncedValue";
+import useDebouncedValue from "@/hooks/useDebouncedValue";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
 import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "@/APIClients/queries/useReviewDashboardApplicantRecordIds";
-import useReviewDashboardFilterOptions from "@/APIClients/queries/useReviewDashboardFilterOptions";
+import useDashboardFilterOptions from "@/APIClients/queries/useDashboardFilterOptions";
 import useReviewDashboardCount from "@/APIClients/queries/useReviewDashboardCount";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
 
@@ -76,7 +76,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
   const [statusError, setStatusError] = useState(false);
 
-  const { data: filterOptions } = useReviewDashboardFilterOptions({});
+  const { data: filterOptions } = useDashboardFilterOptions({});
   const { updateApplicantRecordStatus } = useUpdateApplicantRecordStatus();
 
   // build filter categories from backend options

@@ -1,7 +1,7 @@
 import ReviewCompositeService from "../../services/implementations/reviewCompositeService";
 import {
   DashboardView,
-  ReviewDashboardFilterOptionsDTO,
+  DashboardFilterOptionsDTO,
   ReviewDashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
@@ -71,11 +71,11 @@ const reviewDashboardResolvers = {
         applicantRecordId,
       );
     },
-    reviewDashboardFilterOptions: async (
+    dashboardFilterOptions: async (
       _parent: undefined,
       { department }: { department?: string },
-    ): Promise<ReviewDashboardFilterOptionsDTO> => {
-      return reviewCompositeService.getReviewDashboardFilterOptions(department);
+    ): Promise<DashboardFilterOptionsDTO> => {
+      return reviewCompositeService.getDashboardFilterOptions(department);
     },
   },
   Mutation: {

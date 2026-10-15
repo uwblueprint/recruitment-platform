@@ -145,9 +145,12 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
         </header>
 
         {row ? (
+          // Reserve the scrollbar's width even when the content fits, so
+          // switching to a shorter tab doesn't widen the content and shift
+          // right-aligned items like the bookmark button.
           <div
             key={row.applicantRecordId}
-            className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8"
+            className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8 [scrollbar-gutter:stable]"
           >
             <SidePanelApplicantBar
               row={row}

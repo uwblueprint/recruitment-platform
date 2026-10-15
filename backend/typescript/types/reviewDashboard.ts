@@ -67,7 +67,7 @@ export type FilterOption = {
   label: string;
 };
 
-export type ReviewDashboardFilterOptionsDTO = {
+export type DashboardFilterOptionsDTO = {
   positions: FilterOption[];
   applicationStatuses: FilterOption[];
   skillCategories: FilterOption[];
