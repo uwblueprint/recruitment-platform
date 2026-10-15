@@ -7,7 +7,6 @@ import {
 import { MemberStatusCell } from "./MemberStatusCell";
 
 export const createMembersDashboardColumns = ({
-  onEdit,
   onDelete,
 }: MemberActionCallbacks = {}): ColumnDef<Member, unknown>[] => [
   {
@@ -30,14 +29,10 @@ export const createMembersDashboardColumns = ({
   {
     id: "actions",
     header: "",
-    size: 112,
+    size: 72,
     enableSorting: false,
     cell: ({ row }) => (
-      <MemberActionsCell
-        member={row.original}
-        onEdit={onEdit}
-        onDelete={onDelete}
-      />
+      <MemberActionsCell member={row.original} onDelete={onDelete} />
     ),
   },
 ];

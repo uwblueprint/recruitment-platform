@@ -263,6 +263,14 @@ export type UpdateApplicantRecordIsApplicantFlaggedMutationVariables = Exact<{
 
 export type UpdateApplicantRecordIsApplicantFlaggedMutation = { updateApplicantRecordIsApplicantFlagged: { id: string, isApplicantFlagged: boolean } };
 
+export type UpdateApplicantRecordShortlistedForInterviewMutationVariables = Exact<{
+  id: string | number;
+  shortlistedValue: boolean;
+}>;
+
+
+export type UpdateApplicantRecordShortlistedForInterviewMutation = { updateApplicantRecordShortlistedForInterview: { id: string, isShortlistedForInterview: boolean } };
+
 export type UpdateApplicantRecordStatusMutationVariables = Exact<{
   id: string | number;
   status: Types.ApplicationStatus;

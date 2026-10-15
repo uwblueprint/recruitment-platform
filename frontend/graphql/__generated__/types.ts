@@ -27,6 +27,7 @@ export type ApplicantRecordDto = {
   combinedReviewScore?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
   isApplicantFlagged: Scalars['Boolean']['output'];
+  isShortlistedForInterview: Scalars['Boolean']['output'];
   position: Scalars['String']['output'];
   roleSpecificQuestions: Array<ShortAnswerQuestion>;
   skillCategory?: Maybe<SkillCategory>;
@@ -362,6 +363,7 @@ export type Mutation = {
   submitInterviewScores: InterviewedApplicantRecord;
   updateAdminComment: AdminCommentDto;
   updateApplicantRecordIsApplicantFlagged: ApplicantRecordDto;
+  updateApplicantRecordShortlistedForInterview: ApplicantRecordDto;
   updateApplicantRecordStatus: ApplicantRecordDto;
   updateEntity: EntityResponseDto;
   updateInterviewDelegation: InterviewDelegationDto;
@@ -570,6 +572,12 @@ export type MutationUpdateAdminCommentArgs = {
 export type MutationUpdateApplicantRecordIsApplicantFlaggedArgs = {
   flagValue: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateApplicantRecordShortlistedForInterviewArgs = {
+  id: Scalars['ID']['input'];
+  shortlistedValue: Scalars['Boolean']['input'];
 };
 
 

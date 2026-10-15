@@ -1,0 +1,6 @@
+mutation UpdateApplicantRecordShortlistedForInterview($id: ID!, $shortlistedValue: Boolean!) {
+  updateApplicantRecordShortlistedForInterview(id: $id, shortlistedValue: $shortlistedValue) {
+    id
+    isShortlistedForInterview
+  }
+}
