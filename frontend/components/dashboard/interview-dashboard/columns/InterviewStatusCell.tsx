@@ -16,7 +16,7 @@ const APPLICATION_STATUS_OPTIONS = [
   {
     value: ApplicationStatus.Offered,
     label: "Offer",
-    className: "bg-orange-200 text-black",
+    className: "bg-green-200 text-black",
   },
 ] as const;
 
