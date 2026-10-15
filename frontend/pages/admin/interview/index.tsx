@@ -11,7 +11,7 @@ import {
   type SelectedFilters,
 } from "@/components/dashboard/filters";
 import useInterviewDashboard from "@/APIClients/queries/useInterviewDashboard";
-import useReviewDashboardFilterOptions from "@/APIClients/queries/useReviewDashboardFilterOptions";
+import useDashboardFilterOptions from "@/APIClients/queries/useDashboardFilterOptions";
 import {
   ApplicationStatus,
   DashboardView,
@@ -38,6 +38,14 @@ const SEARCH_DEBOUNCE_MS = 500;
 const INTERVIEW_APPLICATION_STATUSES: string[] = [
   ApplicationStatus.Interviewed,
   ApplicationStatus.Selected,
+  ApplicationStatus.Offered,
+];
+
+const INTERVIEW_SCORE_RANGES = [
+  { value: "gt_15", label: "> 15" },
+  { value: "10_15", label: "10 - 15" },
+  { value: "5_10", label: "5 - 10" },
+  { value: "lt_5", label: "< 5" },
 ];
 
 const InterviewDashboardPage: NextPageWithLayout = () => {
@@ -76,10 +84,8 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort ? !activeSort.desc : undefined;
 
-  const { data: filterOptions } = useReviewDashboardFilterOptions({});
+  const { data: filterOptions } = useDashboardFilterOptions({});
 
-  // Score ranges are left out: they bucket the combined review score, which
-  // doesn't map onto interview scores.
   const filterCategories = useMemo(() => {
     if (!filterOptions) return [];
     return [
@@ -95,6 +101,12 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
         key: "skillCategory",
         label: "Skill Category",
         options: filterOptions.skillCategories,
+      },
+      {
+        key: "scoreRange",
+        label: "Score",
+        options: INTERVIEW_SCORE_RANGES,
+        chipPrefix: "Score",
       },
       { key: "year", label: "Year", options: filterOptions.years },
       {
@@ -118,6 +130,9 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
         : undefined,
       skillCategories: selectedFilters.skillCategory?.length
         ? (selectedFilters.skillCategory as InterviewDashboardFilters["skillCategories"])
+        : undefined,
+      scoreRanges: selectedFilters.scoreRange?.length
+        ? selectedFilters.scoreRange
         : undefined,
       years: selectedFilters.year?.length ? selectedFilters.year : undefined,
       bookmarked: selectedFilters.bookmarked?.includes("true")

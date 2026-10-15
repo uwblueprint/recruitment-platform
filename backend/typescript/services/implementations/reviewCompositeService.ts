@@ -9,7 +9,7 @@ import {
   CreateReviewedApplicantRecordDTO,
   DashboardView,
   DashboardViewEnum,
-  ReviewDashboardFilterOptionsDTO,
+  DashboardFilterOptionsDTO,
   ReviewDashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
@@ -364,10 +364,10 @@ class ReviewCompositeService implements IReviewCompositeService {
     }
   }
 
-  async getReviewDashboardFilterOptions(
+  async getDashboardFilterOptions(
     // department filtering not yet supported — reserved for future use
     _department?: string,
-  ): Promise<ReviewDashboardFilterOptionsDTO> {
+  ): Promise<DashboardFilterOptionsDTO> {
     try {
       const positionRecords = await Position.findAll({
         where: {
@@ -430,7 +430,7 @@ class ReviewCompositeService implements IReviewCompositeService {
       };
     } catch (error: unknown) {
       Logger.error(
-        `Failed to get review dashboard filter options. Reason = ${getErrorMessage(
+        `Failed to get dashboard filter options. Reason = ${getErrorMessage(
           error,
         )}`,
       );

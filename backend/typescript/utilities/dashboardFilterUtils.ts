@@ -22,16 +22,25 @@ export function buildApplicantRecordWhere(
     where.is_applicant_flagged = filters.bookmarked;
   }
   if (filters?.scoreRanges?.length) {
-    const scoreConditions = filters.scoreRanges.map((range) => {
-      if (range === "gt_25") return { combined_review_score: { [Op.gt]: 25 } };
-      if (range === "20_25")
-        return { combined_review_score: { [Op.between]: [20, 25] } };
-      if (range === "15_20")
-        return { combined_review_score: { [Op.between]: [15, 20] } };
-      if (range === "lt_15") return { combined_review_score: { [Op.lt]: 15 } };
-      return {};
+    const scoreConditions: WhereOptions[] = [];
+    filters.scoreRanges.forEach((range) => {
+      if (range === "gt_25") {
+        scoreConditions.push({ combined_review_score: { [Op.gt]: 25 } });
+      } else if (range === "20_25") {
+        scoreConditions.push({
+          combined_review_score: { [Op.between]: [20, 25] },
+        });
+      } else if (range === "15_20") {
+        scoreConditions.push({
+          combined_review_score: { [Op.between]: [15, 20] },
+        });
+      } else if (range === "lt_15") {
+        scoreConditions.push({ combined_review_score: { [Op.lt]: 15 } });
+      }
     });
-    where[(Op.or as unknown) as string] = scoreConditions;
+    if (scoreConditions.length) {
+      Object.assign(where, { [Op.or]: scoreConditions });
+    }
   }
 
   return where;

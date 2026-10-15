@@ -10,7 +10,7 @@ const data = {
   statuses: optionsFor("status"),
 };
 
-// Replace with useQuery following useReviewDashboardFilterOptions once available.
+// Replace with useQuery following useDashboardFilterOptions once available.
 export default function useMembersDashboardFilterOptions() {
   return {
     data,

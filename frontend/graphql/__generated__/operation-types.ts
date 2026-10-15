@@ -33,6 +33,13 @@ export type CreateAdminCommentMutationVariables = Exact<{
 
 export type CreateAdminCommentMutation = { createAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
 
+export type DashboardFilterOptionsQueryVariables = Exact<{
+  department?: string | null | undefined;
+}>;
+
+
+export type DashboardFilterOptionsQuery = { dashboardFilterOptions: { positions: Array<{ value: string, label: string }>, applicationStatuses: Array<{ value: string, label: string }>, skillCategories: Array<{ value: string, label: string }>, scoreRanges: Array<{ value: string, label: string }>, years: Array<{ value: string, label: string }>, bookmarked: Array<{ value: string, label: string }> } };
+
 export type DeleteAdminCommentByIdMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -203,13 +210,6 @@ export type ReviewDashboardCountsQueryVariables = Exact<{
 
 
 export type ReviewDashboardCountsQuery = { reviewDashboardCounts: { all: number, shortlisted: number, conflicts: number } };
-
-export type ReviewDashboardFilterOptionsQueryVariables = Exact<{
-  department?: string | null | undefined;
-}>;
-
-
-export type ReviewDashboardFilterOptionsQuery = { reviewDashboardFilterOptions: { positions: Array<{ value: string, label: string }>, applicationStatuses: Array<{ value: string, label: string }>, skillCategories: Array<{ value: string, label: string }>, scoreRanges: Array<{ value: string, label: string }>, years: Array<{ value: string, label: string }>, bookmarked: Array<{ value: string, label: string }> } };
 
 export type ReviewDashboardSidePanelQueryVariables = Exact<{
   applicantRecordId: string | number;

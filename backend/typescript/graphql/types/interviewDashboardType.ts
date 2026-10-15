@@ -61,6 +61,7 @@ const interviewDashboardTypes = gql`
     positions: [String!]
     applicationStatuses: [ApplicationStatus!]
     skillCategories: [SkillCategory!]
+    scoreRanges: [String!]
     years: [String!]
     bookmarked: Boolean
   }

@@ -93,6 +93,7 @@ const buildInterviewDashboardWhere = async (
       [Op.in]: [
         ApplicationStatusEnum.INTERVIEWED,
         ApplicationStatusEnum.SELECTED,
+        ApplicationStatusEnum.OFFERED,
       ],
     },
     ...(view === DashboardViewEnum.SHORTLISTED
@@ -117,6 +118,31 @@ const buildInterviewDashboardWhere = async (
     [Op.and]: [dashboardWhere, buildApplicantRecordWhere(filters)],
   };
 };
+
+function buildInterviewScoreWhere(
+  filters?: InterviewDashboardFilters,
+): WhereOptions | undefined {
+  if (!filters?.scoreRanges?.length) {
+    return undefined;
+  }
+
+  const scoreConditions: WhereOptions[] = [];
+  filters.scoreRanges.forEach((range) => {
+    if (range === "gt_15") {
+      scoreConditions.push({ score: { [Op.gt]: 15 } });
+    } else if (range === "10_15") {
+      scoreConditions.push({ score: { [Op.between]: [10, 15] } });
+    } else if (range === "5_10") {
+      scoreConditions.push({ score: { [Op.between]: [5, 10] } });
+    } else if (range === "lt_5") {
+      scoreConditions.push({ score: { [Op.lt]: 5 } });
+    }
+  });
+
+  return scoreConditions.length
+    ? { ...(({ [Op.or]: scoreConditions } as unknown) as WhereOptions) }
+    : undefined;
+}
 
 const Logger = logger(__filename);
 
@@ -262,6 +288,8 @@ class InterviewCompositeService implements IInterviewCompositeService {
         );
       }
 
+      const interviewScoreWhere = buildInterviewScoreWhere(filters);
+
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: ["id", "position", "status", "is_applicant_flagged"],
         where: await buildInterviewDashboardWhere(view, filters),
@@ -276,6 +304,8 @@ class InterviewCompositeService implements IInterviewCompositeService {
             attributes: ["id", "applicant_record_id", "score"],
             model: InterviewedApplicantRecord,
             as: "interviewed_applicant_record",
+            required: interviewScoreWhere !== undefined,
+            where: interviewScoreWhere,
             include: [
               {
                 attributes: [
@@ -333,6 +363,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
   async getInterviewDashboardCounts(
     filters?: InterviewDashboardFilters,
   ): Promise<InterviewDashboardCountsDTO> {
+    const interviewScoreWhere = buildInterviewScoreWhere(filters);
     const countView = async (view: DashboardView) =>
       ApplicantRecord.count({
         where: await buildInterviewDashboardWhere(view, filters),
@@ -342,6 +373,13 @@ class InterviewCompositeService implements IInterviewCompositeService {
             required: true,
             attributes: [],
             where: buildApplicantWhere(filters),
+          },
+          {
+            model: InterviewedApplicantRecord,
+            as: "interviewed_applicant_record",
+            attributes: [],
+            required: interviewScoreWhere !== undefined,
+            where: interviewScoreWhere,
           },
         ],
       });

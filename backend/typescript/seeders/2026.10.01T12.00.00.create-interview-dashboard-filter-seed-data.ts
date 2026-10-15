@@ -107,7 +107,7 @@ const SKILL_CATEGORIES = [
   null,
 ];
 
-/** Matches the Year filter options in getReviewDashboardFilterOptions. */
+/** Matches the Year filter options in getDashboardFilterOptions. */
 const YEARS = [
   "1A",
   "1B",
@@ -162,14 +162,21 @@ const buildEntry = (i: number): Entry => {
         : [cycle(INTERVIEWERS, i).id, cycle(INTERVIEWERS, i + 2).id];
   }
 
+  const status = cycle(
+    [
+      ApplicationStatusEnum.SELECTED,
+      ApplicationStatusEnum.OFFERED,
+      ApplicationStatusEnum.INTERVIEWED,
+      ApplicationStatusEnum.INTERVIEWED,
+    ],
+    i,
+  );
+
   return {
     firstName: cycle(FIRST_NAMES, i),
     lastName: cycle(LAST_NAMES, i * 7),
     position: cycle(POSITIONS, i),
-    status:
-      i % 3 === 0
-        ? ApplicationStatusEnum.SELECTED
-        : ApplicationStatusEnum.INTERVIEWED,
+    status,
     skillCategory: cycle(SKILL_CATEGORIES, i),
     academicYear: cycle(YEARS, i),
     bookmarked: i % 7 === 0 || i % 7 === 3,

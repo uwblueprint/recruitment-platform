@@ -55,7 +55,9 @@ export type InterviewDashboardSidePanelDTO = {
 export type InterviewDashboardFilters = Omit<
   ReviewDashboardFilters,
   "scoreRanges"
->;
+> & {
+  scoreRanges?: string[];
+};
 
 export type InterviewDashboardCountsDTO = {
   all: number;
