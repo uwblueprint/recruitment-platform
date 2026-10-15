@@ -13,6 +13,11 @@ const APPLICATION_STATUS_OPTIONS = [
     label: "Selected",
     className: "bg-purple-200 text-black",
   },
+  {
+    value: ApplicationStatus.Offered,
+    label: "Offer",
+    className: "bg-orange-200 text-black",
+  },
 ] as const;
 
 type InterviewStatusCellProps = {
