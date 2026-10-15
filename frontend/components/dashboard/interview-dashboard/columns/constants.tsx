@@ -74,7 +74,10 @@ export const INTERVIEW_DASHBOARD_COLUMNS: ColumnDef<
     header: "Status",
     enableSorting: true,
     cell: ({ row }) => (
-      <InterviewStatusCell status={row.original.applicationStatus} />
+      <InterviewStatusCell
+        applicantRecordId={row.original.applicantRecordId}
+        status={row.original.applicationStatus}
+      />
     ),
   },
   {
