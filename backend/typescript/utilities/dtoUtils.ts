@@ -21,7 +21,6 @@ import {
   ReviewStatus,
   SkillCategory,
   UserDTO,
-  TeamMemberDTO,
   ProjectDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
