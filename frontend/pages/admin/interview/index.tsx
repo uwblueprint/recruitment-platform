@@ -93,9 +93,13 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
       {
         key: "applicationStatus",
         label: "Application Status",
-        options: filterOptions.applicationStatuses.filter((option) =>
-          INTERVIEW_APPLICATION_STATUSES.includes(option.value)
-        ),
+        options: filterOptions.applicationStatuses
+          .filter((option) => INTERVIEW_APPLICATION_STATUSES.includes(option.value))
+          .map((option) =>
+            option.value === ApplicationStatus.Offered
+              ? { ...option, label: "Offer" }
+              : option
+          ),
       },
       {
         key: "skillCategory",
