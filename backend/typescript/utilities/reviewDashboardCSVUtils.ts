@@ -38,9 +38,19 @@ const REVIEWER_FIELD_SUFFIXES = [
 type CSVValue = string | number;
 export type ReviewDashboardCSVRow = Record<string, CSVValue>;
 
-/** Missing values become blank cells rather than "null" or "undefined". */
-const toCell = (value: string | number | null | undefined): CSVValue =>
-  value ?? "";
+const FORMULA_PREFIXES = ["=", "+", "-", "@", "\t", "\r"];
+
+/**
+ * Missing values become blank cells rather than "null" or "undefined", and
+ * text that a spreadsheet would run as a formula is prefixed with `'`.
+ */
+const toCell = (value: string | number | null | undefined): CSVValue => {
+  if (value === null || value === undefined) return "";
+  if (typeof value === "number") return value;
+  return FORMULA_PREFIXES.some((prefix) => value.startsWith(prefix))
+    ? `'${value}`
+    : value;
+};
 
 export const getReviewerSlotCount = (
   applicantRecords: ApplicantRecord[],

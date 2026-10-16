@@ -27,6 +27,7 @@ import {
 import { Tab, Tabs } from "../../../components/dashboard/common/Tabs";
 import useDebouncedValue from "./_components/hooks/useDebouncedValue";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
+import { ExportCSVButton } from "./_components/ExportCSVButton";
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
 import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
@@ -319,7 +320,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
-        <DashboardSwitcher currentDashboard={DASHBOARD_ENUM.REVIEW} />
+        <div className="flex shrink-0 items-center justify-between gap-4">
+          <DashboardSwitcher currentDashboard={DASHBOARD_ENUM.REVIEW} />
+          <ExportCSVButton isExporting={isExporting} onExport={exportCSV} />
+        </div>
         {countsError ? (
           <p role="alert" className="text-sm text-alert-errorText">
             Failed to load dashboard counts.
@@ -348,7 +352,6 @@ const AdminReviewPage: NextPageWithLayout = () => {
             onReject: () => handleBulkAction(BulkAction.Reject),
             onSelectForInterview: () => handleBulkAction(BulkAction.Interview),
           }}
-          exportCSV={{ isExporting, onExport: exportCSV }}
         />
         {error ? (
           <div
