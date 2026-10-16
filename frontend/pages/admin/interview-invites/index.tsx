@@ -1,11 +1,10 @@
 import { NextPageWithLayout } from "../../_app";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { InterviewInviteList } from "./_components/InterviewInviteList";
-import useInterviewInvites from "./_components/hooks/useInterviewInvites";
+import useInterviewInvites from "@/APIClients/queries/useInterviewInvites";
 
 const InterviewInvites: NextPageWithLayout = () => {
-  const { invites, isLoading, error } = useInterviewInvites();
-
+  const { data, loading, error } = useInterviewInvites();
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
@@ -20,8 +19,8 @@ const InterviewInvites: NextPageWithLayout = () => {
           </div>
         ) : null}
 
-        {!isLoading && !error ? (
-          <InterviewInviteList invites={invites} />
+        {!loading && !error ? (
+          <InterviewInviteList invites={data ?? []} />
         ) : null}
       </main>
     </div>

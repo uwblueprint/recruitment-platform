@@ -1,12 +1,12 @@
 import { Tabs } from "@/components/dashboard/common/Tabs";
-import { InterviewInvite } from "./types";
+import type { InterviewInviteResult } from "@/graphql/typeUtils";
 import { InterviewInviteRow } from "./InterviewInviteRow";
 import { InterviewInviteToolbar } from "./InterviewInviteToolbar";
 
 import useInterviewInviteList from "./hooks/useInterviewInviteList";
 
 type InterviewInviteListProps = {
-  invites: InterviewInvite[];
+  invites: InterviewInviteResult[];
   onSendInterviewEmails?: (selectedIds: string[]) => void;
   bulkActionsDisabled?: boolean;
 };

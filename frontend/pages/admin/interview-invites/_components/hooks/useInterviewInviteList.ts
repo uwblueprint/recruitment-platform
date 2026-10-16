@@ -3,11 +3,13 @@ import type {
   FilterCategory,
   SelectedFilters,
 } from "@/components/dashboard/filters";
-import type { InterviewInvite } from "../types";
+import type { InterviewInviteResult } from "@/graphql/typeUtils";
 
 const READY_STATUSES = new Set(["AVAILABILITY_PENDING", "READY_TO_INTERVIEW"]);
 
-export default function useInterviewInviteList(invites: InterviewInvite[]) {
+export default function useInterviewInviteList(
+  invites: InterviewInviteResult[]
+) {
   const [activeTab, setActiveTab] = useState<string>("ready");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -17,9 +19,7 @@ export default function useInterviewInviteList(invites: InterviewInvite[]) {
     {
       key: "interviewType",
       label: "Interview Type",
-      options: Array.from(
-        new Set(invites.map((invite) => invite.interviewType))
-      )
+      options: Array.from(new Set(invites.map((invite) => invite.position)))
         .sort()
         .map((value) => ({ value, label: value })),
     },
@@ -43,13 +43,15 @@ export default function useInterviewInviteList(invites: InterviewInvite[]) {
 
   const activeInvites = activeTab === "ready" ? readyInvites : sentInvites;
   const filteredInvites = activeInvites.filter((invite) => {
-    const matchesSearch = invite.interviewers.some((name) =>
-      name.toLowerCase().includes(searchQuery.trim().toLowerCase())
+    const matchesSearch = invite.interviewers.some(({ firstName, lastName }) =>
+      `${firstName} ${lastName}`
+        .toLowerCase()
+        .includes(searchQuery.trim().toLowerCase())
     );
     const types = selectedFilters.interviewType ?? [];
     return (
       (!searchQuery.trim() || matchesSearch) &&
-      (types.length === 0 || types.includes(invite.interviewType))
+      (types.length === 0 || types.includes(invite.position))
     );
   });
 
