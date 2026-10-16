@@ -1,4 +1,4 @@
-import { InterviewInvite } from "./types";
+import { InterviewInvite, Interviewee } from "./types";
 import { theme } from "@/styles/Theme";
 import { CollapsibleRow } from "@/components/common/CollapsibleRow";
 import { Chip, Avatar } from "@mui/material";
@@ -23,10 +23,7 @@ export const InterviewInviteRow = ({
   const { interviewers, interviewees, interviewType, calendlyLink, status } =
     invite;
 
-  const interviewerLabel =
-    interviewers.length === 1
-      ? interviewers[0]
-      : `${interviewers[0]} + ${interviewers[1]}`;
+  const interviewerLabel = interviewers.join(" + ") || "No interviewers";
 
   const statusLabel = STATUS_LABELS[status] ?? status;
 
@@ -34,35 +31,8 @@ export const InterviewInviteRow = ({
     <CollapsibleRow
       title={{
         text: interviewerLabel,
-        supportingText: interviewType,
-        leftSlot: (
-          <span className="flex items-center">
-            <Avatar
-              sx={{
-                width: 42,
-                height: 42,
-                mr: "-10px",
-                zIndex: 1,
-                bgcolor: "#C4C4C4",
-                fontSize: 16,
-              }}
-            >
-              {interviewers[0]?.[0]?.toUpperCase()}
-            </Avatar>
-            {interviewers.length > 1 && (
-              <Avatar
-                sx={{
-                  width: 42,
-                  height: 42,
-                  bgcolor: "#9f9f9f",
-                  fontSize: 16,
-                }}
-              >
-                {interviewers[1]?.[0]?.toUpperCase()}
-              </Avatar>
-            )}
-          </span>
-        ),
+        supportingText: `${interviewType} interviewers`,
+        leftSlot: <InterviewerAvatars interviewers={interviewers} />,
       }}
       subtitles={[
         {
@@ -89,62 +59,108 @@ export const InterviewInviteRow = ({
       }}
       toggleLabel={`Interview details for ${interviewerLabel}`}
     >
-      <div className="grid grid-cols-[0.8fr_1.6fr_1.6fr]">
-        {/* Column 1: Interviewer availability */}
-        <div className="flex flex-col items-start gap-3 self-stretch px-6 py-4 border-r border-neutral-200">
-          <p className="font-source font-semibold text-base text-neutral-800">
-            Interviewer availability:
-          </p>
-          {calendlyLink ? (
-            <a
-              href={calendlyLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-source text-sm text-link underline break-all"
-            >
-              {calendlyLink}
-            </a>
-          ) : (
-            <span className="font-source text-sm text-neutral-500 italic">
-              No link provided
-            </span>
-          )}
-        </div>
-
-        {/* Column 2: Interviewees */}
-        <div className="flex flex-col">
-          <p className="font-source font-semibold text-base text-neutral-800 px-6 py-4">
-            Interviewees:
-          </p>
-          {interviewees.map((interviewee, idx) => (
-            <p
-              key={idx}
-              className={`font-source text-base text-neutral-800 px-6 py-4 h-14 flex items-center ${
-                idx % 2 === 0 ? "bg-charcoal-100" : "bg-white"
-              }`}
-            >
-              {interviewee.name}
-            </p>
-          ))}
-        </div>
-
-        {/* Column 3: Role interviewing for */}
-        <div className="flex flex-col">
-          <p className="font-source font-semibold text-base text-neutral-800 px-6 py-4">
-            Role interviewing for:
-          </p>
-          {interviewees.map((interviewee, idx) => (
-            <p
-              key={idx}
-              className={`font-source text-base text-neutral-800 px-6 py-4 h-14 flex items-center ${
-                idx % 2 === 0 ? "bg-charcoal-100" : "bg-white"
-              }`}
-            >
-              {interviewee.role}
-            </p>
-          ))}
-        </div>
-      </div>
+      <CollapsibleContent
+        calendlyLink={calendlyLink}
+        interviewees={interviewees}
+      />
     </CollapsibleRow>
+  );
+};
+
+const CollapsibleContent = ({
+  calendlyLink,
+  interviewees,
+}: Pick<InterviewInvite, "calendlyLink" | "interviewees">) => (
+  <div className="grid grid-cols-[0.8fr_1.6fr_1.6fr]">
+    <InterviewAvailability calendlyLink={calendlyLink} />
+    <InterviewDetails interviewees={interviewees} />
+  </div>
+);
+
+const InterviewAvailability = ({
+  calendlyLink,
+}: Pick<InterviewInvite, "calendlyLink">) => (
+  <div className="flex flex-col items-start gap-3 self-stretch px-6 py-4 border-r border-neutral-200">
+    <p className="font-source font-semibold text-base text-neutral-800">
+      Interviewer availability:
+    </p>
+    {calendlyLink ? (
+      <a
+        href={calendlyLink}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-source text-sm text-link underline break-all"
+      >
+        {calendlyLink}
+      </a>
+    ) : (
+      <span className="font-source text-sm text-neutral-500 italic">
+        No link provided
+      </span>
+    )}
+  </div>
+);
+
+const InterviewDetails = ({
+  interviewees,
+}: {
+  interviewees: Interviewee[];
+}) => (
+  <>
+    <InterviewDetailColumn
+      heading="Interviewees:"
+      values={interviewees.map(({ name }) => name)}
+    />
+    <InterviewDetailColumn
+      heading="Role interviewing for:"
+      values={interviewees.map(({ role }) => role)}
+    />
+  </>
+);
+
+const InterviewDetailColumn = ({
+  heading,
+  values,
+}: {
+  heading: string;
+  values: string[];
+}) => (
+  <div className="flex flex-col">
+    <p className="font-source font-semibold text-base text-neutral-800 px-6 py-4">
+      {heading}
+    </p>
+    {values.map((value, index) => (
+      <p
+        key={index}
+        className={`font-source text-base text-neutral-800 px-6 py-4 h-14 flex items-center ${
+          index % 2 === 0 ? "bg-charcoal-100" : "bg-white"
+        }`}
+      >
+        {value}
+      </p>
+    ))}
+  </div>
+);
+
+const InterviewerAvatars = ({
+  interviewers,
+}: Pick<InterviewInvite, "interviewers">) => {
+  if (interviewers.length === 0) return null;
+
+  return (
+    <span className="flex shrink-0 items-center">
+      {interviewers.map((interviewer, index) => (
+        <Avatar
+          key={`${interviewer}-${index}`}
+          className="!h-[42px] !w-[42px] !text-base [&:not(:last-child)]:-mr-2.5"
+          sx={{
+            zIndex: interviewers.length - index,
+            bgcolor: index % 2 === 0 ? "#C4C4C4" : "#9f9f9f",
+          }}
+        >
+          {interviewer[0]?.toUpperCase()}
+        </Avatar>
+      ))}
+    </span>
   );
 };
