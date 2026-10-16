@@ -157,10 +157,11 @@ const InterviewerAvatars = ({
       {interviewers.map((interviewer, index) => (
         <Avatar
           key={interviewer.id}
-          className="!h-[42px] !w-[42px] !text-base [&:not(:last-child)]:-mr-2.5"
+          className={`!h-[42px] !w-[42px] !text-base [&:not(:last-child)]:-mr-2.5 ${
+            index % 2 === 0 ? "!bg-neutral-200" : "!bg-neutral-400"
+          }`}
           sx={{
             zIndex: interviewers.length - index,
-            bgcolor: index % 2 === 0 ? "#C4C4C4" : "#9f9f9f",
           }}
         >
           {interviewer.firstName[0]?.toUpperCase()}
