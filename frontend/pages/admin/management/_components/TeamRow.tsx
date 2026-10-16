@@ -1,3 +1,5 @@
+import ArchiveOutlined from "@mui/icons-material/ArchiveOutlined";
+import UnarchiveOutlined from "@mui/icons-material/UnarchiveOutlined";
 import PersonAddAltOutlined from "@mui/icons-material/PersonAddAltOutlined";
 import { Button } from "@/components/common/Button";
 import { Avatar } from "@mui/material";
@@ -7,9 +9,16 @@ import type { ManagementTeam, TeamMember } from "@/types/teamsDashboard";
 type TeamRowProps = {
   team: ManagementTeam;
   onAddMembers?: (team: ManagementTeam) => void;
+  onArchiveTeam?: (team: ManagementTeam) => void;
+  onUnarchiveTeam?: (team: ManagementTeam) => void;
 };
 
-export const TeamRow = ({ team, onAddMembers }: TeamRowProps) => (
+export const TeamRow = ({
+  team,
+  onAddMembers,
+  onArchiveTeam,
+  onUnarchiveTeam,
+}: TeamRowProps) => (
   <CollapsibleRow
     title={{ text: team.name }}
     subtitles={[
@@ -19,29 +28,28 @@ export const TeamRow = ({ team, onAddMembers }: TeamRowProps) => (
         }`,
       },
     ]}
+    expandedActions={
+      <TeamActions
+        team={team}
+        onAddMembers={onAddMembers}
+        onArchiveTeam={onArchiveTeam}
+        onUnarchiveTeam={onUnarchiveTeam}
+      />
+    }
     toggleLabel={`Toggle ${team.name} members`}
   >
-    <CollapsibleContent
-      teamName={team.name}
-      members={team.members}
-      onAddMembers={onAddMembers ? () => onAddMembers(team) : undefined}
-    />
+    <CollapsibleContent teamName={team.name} members={team.members} />
   </CollapsibleRow>
 );
 
 type CollapsibleContentProps = {
   teamName: string;
   members: TeamMember[];
-  onAddMembers?: () => void;
 };
 
-const CollapsibleContent = ({
-  teamName,
-  members,
-  onAddMembers,
-}: CollapsibleContentProps) =>
+const CollapsibleContent = ({ teamName, members }: CollapsibleContentProps) =>
   members.length === 0 ? (
-    <EmptyTeamContent onAddMembers={onAddMembers} />
+    <EmptyTeamContent />
   ) : (
     <div className="overflow-x-auto">
       <table
@@ -78,21 +86,56 @@ const CollapsibleContent = ({
     </div>
   );
 
-const EmptyTeamContent = ({ onAddMembers }: { onAddMembers?: () => void }) => (
-  <div className="flex min-h-[160px] flex-col items-center justify-center gap-6 px-6 py-10">
+const TeamActions = ({
+  team,
+  onAddMembers,
+  onArchiveTeam,
+  onUnarchiveTeam,
+}: TeamRowProps) => (
+  <>
+    {team.status === "Active" ? (
+      <>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onAddMembers?.(team)}
+          className="flex items-center gap-2 !px-5"
+        >
+          <PersonAddAltOutlined fontSize="small" />
+          Add Team Member
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onArchiveTeam?.(team)}
+          className="flex items-center gap-2 !px-5"
+        >
+          <ArchiveOutlined fontSize="small" />
+          Archive Team
+        </Button>
+      </>
+    ) : (
+      <Button
+        type="button"
+        variant="secondary"
+        size="sm"
+        onClick={() => onUnarchiveTeam?.(team)}
+        className="flex items-center gap-2 !px-5"
+      >
+        <UnarchiveOutlined fontSize="small" />
+        Unarchive Team
+      </Button>
+    )}
+  </>
+);
+
+const EmptyTeamContent = () => (
+  <div className="flex min-h-[160px] flex-col items-center justify-center px-6 py-10">
     <p className="text-center font-poppins text-xl text-neutral-800">
       No members added yet
     </p>
-    <Button
-      type="button"
-      variant="secondary"
-      size="md"
-      onClick={onAddMembers}
-      className="flex items-center gap-2 !px-5"
-    >
-      <PersonAddAltOutlined fontSize="small" />
-      Add Members
-    </Button>
   </div>
 );
 

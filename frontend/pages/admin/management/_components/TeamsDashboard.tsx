@@ -11,10 +11,14 @@ export const TeamsDashboard = ({
   status,
   onNewProject,
   onAddMembers,
+  onArchiveTeam,
+  onUnarchiveTeam,
 }: {
   status: TeamStatus;
   onNewProject?: () => void;
   onAddMembers?: (team: ManagementTeam) => void;
+  onArchiveTeam?: (team: ManagementTeam) => void;
+  onUnarchiveTeam?: (team: ManagementTeam) => void;
 }) => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<SelectedFilters>({});
@@ -91,7 +95,13 @@ export const TeamsDashboard = ({
             </p>
           ) : (
             teams.map((team) => (
-              <TeamRow key={team.id} team={team} onAddMembers={onAddMembers} />
+              <TeamRow
+                key={team.id}
+                team={team}
+                onAddMembers={onAddMembers}
+                onArchiveTeam={onArchiveTeam}
+                onUnarchiveTeam={onUnarchiveTeam}
+              />
             ))
           )}
         </div>
