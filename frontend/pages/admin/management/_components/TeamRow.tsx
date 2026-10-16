@@ -107,7 +107,6 @@ const TeamActions = ({
         </Button>
         <Button
           type="button"
-          variant="secondary"
           size="sm"
           onClick={() => onArchiveTeam?.(team)}
           className="flex items-center gap-2 !px-5"
