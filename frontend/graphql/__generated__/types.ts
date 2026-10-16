@@ -659,6 +659,7 @@ export type Query = {
   isAuthorizedToReview: Scalars['Boolean']['output'];
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
+  reviewDashboardCSV: Scalars['String']['output'];
   reviewDashboardCounts: ReviewDashboardCountsDto;
   reviewDashboardFilterOptions: ReviewDashboardFilterOptionsDto;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;

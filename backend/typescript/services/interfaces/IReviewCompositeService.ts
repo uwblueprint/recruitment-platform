@@ -51,6 +51,12 @@ interface IReviewCompositeService {
   ): Promise<ReviewDashboardRowDTO[]>;
 
   /**
+   * Builds a CSV of every applicant record with its applicant details and
+   * reviews, one row per applicant record, for admins to keep as a backup.
+   */
+  getReviewDashboardCSV(): Promise<string>;
+
+  /**
    * Assigns each user to an applicant record to review, and
    * returns the newly created ReviewedApplicantRecords
    * @Param positions the list of positions the algorithm should run on

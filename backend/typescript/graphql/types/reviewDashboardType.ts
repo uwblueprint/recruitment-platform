@@ -105,6 +105,8 @@ const reviewDashboardType = gql`
       filters: ReviewDashboardFilters
     ): [ID!]!
 
+    reviewDashboardCSV: String!
+
     reviewDashboardSidePanel(
       applicantRecordId: ID!
     ): ReviewDashboardSidePanelDTO!
