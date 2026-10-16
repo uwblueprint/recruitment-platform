@@ -17,6 +17,8 @@ export type CollapsibleTitle = CollapsibleHeaderItem & {
 export type CollapsibleRowProps = {
   title: CollapsibleTitle;
   subtitles?: CollapsibleHeaderItem[];
+  /** Interactive header actions, shown only while expanded and outside the toggle button. */
+  expandedActions?: ReactNode;
   selection?: {
     checked: boolean;
     onChange: (checked: boolean) => void;
@@ -34,6 +36,7 @@ export type CollapsibleRowProps = {
 export const CollapsibleRow = ({
   title,
   subtitles = [],
+  expandedActions,
   selection,
   children,
   toggleLabel,
@@ -46,6 +49,7 @@ export const CollapsibleRow = ({
   const triggerId = `${id}-trigger`;
   const panelId = `${id}-panel`;
   const isOpen = open ?? internalOpen;
+  const showActions = isOpen && expandedActions != null;
 
   const toggle = () => {
     const nextOpen = !isOpen;
@@ -103,10 +107,31 @@ export const CollapsibleRow = ({
               </span>
             ))}
           </span>
-          <span aria-hidden="true" className="shrink-0">
-            {isOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
-          </span>
+          {!showActions && (
+            <span aria-hidden="true" className="shrink-0">
+              {isOpen ? <ArrowUpIcon /> : <ArrowDownIcon />}
+            </span>
+          )}
         </button>
+        {showActions && (
+          <div className="flex shrink-0 items-center gap-6 pr-6">
+            <div className="flex flex-wrap items-center justify-end gap-3">
+              {expandedActions}
+            </div>
+            <button
+              type="button"
+              aria-label={toggleLabel}
+              aria-expanded={isOpen}
+              aria-controls={panelId}
+              onClick={toggle}
+              className="flex min-h-[64px] items-center text-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-600"
+            >
+              <span aria-hidden="true">
+                <ArrowUpIcon />
+              </span>
+            </button>
+          </div>
+        )}
       </div>
       <Collapse in={isOpen}>
         <div
