@@ -84,7 +84,7 @@ export const TeamsDashboard = ({
             <p role="status">Loading teams…</p>
           ) : teams.length === 0 ? (
             <p className="py-8 text-center font-source text-sm text-neutral-500">
-              No {status === "Active" ? "active teams" : "archived projects"}{" "}
+              No {status === "Active" ? "active teams" : "archived teams"}{" "}
               found.
             </p>
           ) : (

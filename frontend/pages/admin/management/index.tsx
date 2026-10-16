@@ -10,7 +10,7 @@ import { MembersDashboard } from "./_components/MembersDashboard";
 enum ManagementView {
   MEMBERS = "Members",
   ACTIVE_TEAMS = "Active Teams",
-  ARCHIVED_PROJECTS = "Archived Projects",
+  ARCHIVED_TEAMS = "Archived Teams",
 }
 
 const ManagementPage: NextPageWithLayout = () => {
@@ -44,10 +44,10 @@ const ManagementPage: NextPageWithLayout = () => {
       unit: { singular: "Team", plural: "Teams" },
     },
     {
-      view: ManagementView.ARCHIVED_PROJECTS,
-      label: "Archived Projects",
+      view: ManagementView.ARCHIVED_TEAMS,
+      label: "Archived Teams",
       count: archivedTeamCount,
-      unit: { singular: "Project", plural: "Projects" },
+      unit: { singular: "Team", plural: "Teams" },
     },
   ];
   return (
@@ -70,7 +70,7 @@ const ManagementPage: NextPageWithLayout = () => {
         {activeView === ManagementView.ACTIVE_TEAMS && (
           <TeamsDashboard key="active" status="Active" />
         )}
-        {activeView === ManagementView.ARCHIVED_PROJECTS && (
+        {activeView === ManagementView.ARCHIVED_TEAMS && (
           <TeamsDashboard key="archived" status="Archived" />
         )}
       </main>
