@@ -1,15 +1,4 @@
-type Interviewee = {
-  name: string;
-  role: string;
-};
+import type { InterviewInviteResult } from "@/graphql/typeUtils";
 
-type InterviewInvite = {
-  id: string;
-  interviewers: string[];
-  interviewees: Interviewee[];
-  interviewType: string
-  calendlyLink: string;
-  status: string;
-};
-
-export type { Interviewee, InterviewInvite };
+export type InterviewInvite = InterviewInviteResult;
+export type Interviewee = InterviewInvite["interviewees"][number];

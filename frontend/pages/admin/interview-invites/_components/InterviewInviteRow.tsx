@@ -20,10 +20,13 @@ export const InterviewInviteRow = ({
   isSelected,
   onSelect,
 }: InterviewInviteRowProps) => {
-  const { interviewers, interviewees, interviewType, calendlyLink, status } =
+  const { interviewers, interviewees, position, schedulingLink, status } =
     invite;
 
-  const interviewerLabel = interviewers.join(" + ") || "No interviewers";
+  const interviewerLabel =
+    interviewers
+      .map(({ firstName, lastName }) => `${firstName} ${lastName}`)
+      .join(" + ") || "No interviewers";
 
   const statusLabel = STATUS_LABELS[status] ?? status;
 
@@ -31,7 +34,7 @@ export const InterviewInviteRow = ({
     <CollapsibleRow
       title={{
         text: interviewerLabel,
-        supportingText: `${interviewType} interviewers`,
+        supportingText: `${position} interviewers`,
         leftSlot: <InterviewerAvatars interviewers={interviewers} />,
       }}
       subtitles={[
@@ -60,7 +63,7 @@ export const InterviewInviteRow = ({
       toggleLabel={`Interview details for ${interviewerLabel}`}
     >
       <CollapsibleContent
-        calendlyLink={calendlyLink}
+        schedulingLink={schedulingLink}
         interviewees={interviewees}
       />
     </CollapsibleRow>
@@ -68,30 +71,30 @@ export const InterviewInviteRow = ({
 };
 
 const CollapsibleContent = ({
-  calendlyLink,
+  schedulingLink,
   interviewees,
-}: Pick<InterviewInvite, "calendlyLink" | "interviewees">) => (
+}: Pick<InterviewInvite, "schedulingLink" | "interviewees">) => (
   <div className="grid grid-cols-[0.8fr_1.6fr_1.6fr]">
-    <InterviewAvailability calendlyLink={calendlyLink} />
+    <InterviewAvailability schedulingLink={schedulingLink} />
     <InterviewDetails interviewees={interviewees} />
   </div>
 );
 
 const InterviewAvailability = ({
-  calendlyLink,
-}: Pick<InterviewInvite, "calendlyLink">) => (
+  schedulingLink,
+}: Pick<InterviewInvite, "schedulingLink">) => (
   <div className="flex flex-col items-start gap-3 self-stretch px-6 py-4 border-r border-neutral-200">
     <p className="font-source font-semibold text-base text-neutral-800">
       Interviewer availability:
     </p>
-    {calendlyLink ? (
+    {schedulingLink ? (
       <a
-        href={calendlyLink}
+        href={schedulingLink}
         target="_blank"
         rel="noopener noreferrer"
         className="font-source text-sm text-link underline break-all"
       >
-        {calendlyLink}
+        {schedulingLink}
       </a>
     ) : (
       <span className="font-source text-sm text-neutral-500 italic">
@@ -109,11 +112,13 @@ const InterviewDetails = ({
   <>
     <InterviewDetailColumn
       heading="Interviewees:"
-      values={interviewees.map(({ name }) => name)}
+      values={interviewees.map(
+        ({ firstName, lastName }) => `${firstName} ${lastName}`
+      )}
     />
     <InterviewDetailColumn
       heading="Role interviewing for:"
-      values={interviewees.map(({ role }) => role)}
+      values={interviewees.map(({ position }) => position)}
     />
   </>
 );
@@ -151,14 +156,14 @@ const InterviewerAvatars = ({
     <span className="flex shrink-0 items-center">
       {interviewers.map((interviewer, index) => (
         <Avatar
-          key={`${interviewer}-${index}`}
+          key={interviewer.id}
           className="!h-[42px] !w-[42px] !text-base [&:not(:last-child)]:-mr-2.5"
           sx={{
             zIndex: interviewers.length - index,
             bgcolor: index % 2 === 0 ? "#C4C4C4" : "#9f9f9f",
           }}
         >
-          {interviewer[0]?.toUpperCase()}
+          {interviewer.firstName[0]?.toUpperCase()}
         </Avatar>
       ))}
     </span>
