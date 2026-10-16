@@ -1,4 +1,4 @@
-import { Button } from "@/components/common/Button";
+import type { ReactNode } from "react";
 import {
   FilterChips,
   FilterMenu,
@@ -6,10 +6,10 @@ import {
   type FilterCategory,
   type SelectedFilters,
 } from "@/components/dashboard/filters";
-import PersonAddAltOutlined from "@mui/icons-material/PersonAddAltOutlined";
 
-type MembersDashboardToolbarProps = {
+type ManagementDashboardToolbarProps = {
   search: {
+    placeholder: string;
     value: string;
     onChange: (value: string) => void;
   };
@@ -19,20 +19,20 @@ type MembersDashboardToolbarProps = {
     onChange: (categoryKey: string, values: string[]) => void;
     onRemove: (categoryKey: string, value: string) => void;
   };
-  onAddMember?: () => void;
+  action?: ReactNode;
 };
 
-export const MembersDashboardToolbar = ({
+export const ManagementDashboardToolbar = ({
   search,
   filters,
-  onAddMember,
-}: MembersDashboardToolbarProps) => (
+  action,
+}: ManagementDashboardToolbarProps) => (
   <div className="flex shrink-0 flex-wrap items-center justify-between gap-4">
     <div className="flex shrink-0 items-center gap-3">
       <SearchBar
         value={search.value}
         onChange={search.onChange}
-        placeholder="Search members"
+        placeholder={search.placeholder}
       />
       <FilterMenu
         categories={filters.categories}
@@ -47,17 +47,8 @@ export const MembersDashboardToolbar = ({
         onRemove={filters.onRemove}
       />
     </div>
-    <div className="ml-auto flex shrink-0 items-center gap-3">
-      <Button
-        type="button"
-        size="sm"
-        variant="secondary"
-        onClick={onAddMember}
-        className="flex items-center gap-2 !px-5"
-      >
-        <PersonAddAltOutlined fontSize="small" />
-        Add new member
-      </Button>
-    </div>
+    {action && (
+      <div className="ml-auto flex shrink-0 items-center gap-3">{action}</div>
+    )}
   </div>
 );

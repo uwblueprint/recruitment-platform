@@ -7,7 +7,9 @@ import type { MembersDashboardFilters } from "@/types/membersDashboard";
 import { createMembersDashboardColumns } from "./columns";
 import useMembersDashboardFilterOptions from "@/APIClients/queries/useMembersDashboardFilterOptions";
 import useDebouncedValue from "../../review/_components/hooks/useDebouncedValue";
-import { MembersDashboardToolbar } from "./MembersDashboardToolbar";
+import { ManagementDashboardToolbar } from "./ManagementDashboardToolbar";
+import { Button } from "@/components/common/Button";
+import PersonAddAltOutlined from "@mui/icons-material/PersonAddAltOutlined";
 import useMembersDashboard from "./hooks/useMembersDashboard";
 import type { MemberActionCallbacks } from "./columns/MemberActionsCell";
 
@@ -93,8 +95,23 @@ export const MembersDashboard = ({ onDelete }: MemberActionCallbacks) => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-5">
-      <MembersDashboardToolbar
-        search={{ value: search, onChange: handleSearchChange }}
+      <ManagementDashboardToolbar
+        action={
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            className="flex items-center gap-2 !px-5"
+          >
+            <PersonAddAltOutlined fontSize="small" />
+            Add new member
+          </Button>
+        }
+        search={{
+          value: search,
+          onChange: handleSearchChange,
+          placeholder: "Search members",
+        }}
         filters={{
           categories: filterCategories,
           selected: selectedFilters,
