@@ -1,4 +1,4 @@
-import { InterviewInvite, Interviewee } from "./types";
+import type { InterviewInviteResult } from "@/graphql/typeUtils";
 import { theme } from "@/styles/Theme";
 import { CollapsibleRow } from "@/components/common/CollapsibleRow";
 import { Chip, Avatar } from "@mui/material";
@@ -10,7 +10,7 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 type InterviewInviteRowProps = {
-  invite: InterviewInvite;
+  invite: InterviewInviteResult;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
 };
@@ -73,7 +73,7 @@ export const InterviewInviteRow = ({
 const CollapsibleContent = ({
   schedulingLink,
   interviewees,
-}: Pick<InterviewInvite, "schedulingLink" | "interviewees">) => (
+}: Pick<InterviewInviteResult, "schedulingLink" | "interviewees">) => (
   <div className="grid grid-cols-[0.8fr_1.6fr_1.6fr]">
     <InterviewAvailability schedulingLink={schedulingLink} />
     <InterviewDetails interviewees={interviewees} />
@@ -82,7 +82,7 @@ const CollapsibleContent = ({
 
 const InterviewAvailability = ({
   schedulingLink,
-}: Pick<InterviewInvite, "schedulingLink">) => (
+}: Pick<InterviewInviteResult, "schedulingLink">) => (
   <div className="flex flex-col items-start gap-3 self-stretch px-6 py-4 border-r border-neutral-200">
     <p className="font-source font-semibold text-base text-neutral-800">
       Interviewer availability:
@@ -107,7 +107,7 @@ const InterviewAvailability = ({
 const InterviewDetails = ({
   interviewees,
 }: {
-  interviewees: Interviewee[];
+  interviewees: InterviewInviteResult["interviewees"];
 }) => (
   <>
     <InterviewDetailColumn
@@ -149,7 +149,7 @@ const InterviewDetailColumn = ({
 
 const InterviewerAvatars = ({
   interviewers,
-}: Pick<InterviewInvite, "interviewers">) => {
+}: Pick<InterviewInviteResult, "interviewers">) => {
   if (interviewers.length === 0) return null;
 
   return (

@@ -3,11 +3,13 @@ import type {
   FilterCategory,
   SelectedFilters,
 } from "@/components/dashboard/filters";
-import type { InterviewInvite } from "../types";
+import type { InterviewInviteResult } from "@/graphql/typeUtils";
 
 const READY_STATUSES = new Set(["AVAILABILITY_PENDING", "READY_TO_INTERVIEW"]);
 
-export default function useInterviewInviteList(invites: InterviewInvite[]) {
+export default function useInterviewInviteList(
+  invites: InterviewInviteResult[]
+) {
   const [activeTab, setActiveTab] = useState<string>("ready");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
