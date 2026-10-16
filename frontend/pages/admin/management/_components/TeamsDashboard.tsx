@@ -5,14 +5,16 @@ import { Button } from "@/components/common/Button";
 import { TeamRow } from "./TeamRow";
 import type { SelectedFilters } from "@/components/dashboard/filters";
 import { ManagementDashboardToolbar } from "./ManagementDashboardToolbar";
-import type { TeamStatus } from "@/types/teamsDashboard";
+import type { ManagementTeam, TeamStatus } from "@/types/teamsDashboard";
 
 export const TeamsDashboard = ({
   status,
   onNewProject,
+  onAddMembers,
 }: {
   status: TeamStatus;
   onNewProject?: () => void;
+  onAddMembers?: (team: ManagementTeam) => void;
 }) => {
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<SelectedFilters>({});
@@ -88,7 +90,9 @@ export const TeamsDashboard = ({
               found.
             </p>
           ) : (
-            teams.map((team) => <TeamRow key={team.id} team={team} />)
+            teams.map((team) => (
+              <TeamRow key={team.id} team={team} onAddMembers={onAddMembers} />
+            ))
           )}
         </div>
       )}

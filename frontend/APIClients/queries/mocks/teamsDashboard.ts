@@ -31,7 +31,11 @@ export const MOCK_TEAMS: ManagementTeam[] = [
   id: `mock-team-${index + 1}`,
   name,
   status,
-  members: MOCK_MEMBERS.map((member, memberIndex) => ({
+  // Include an empty roster in each tab for previewing the add-members state.
+  members: (name === "Better Angels" || name === "Community Care"
+    ? []
+    : MOCK_MEMBERS
+  ).map((member, memberIndex) => ({
     ...member,
     id: `mock-team-${index + 1}-${member.id}`,
     team: name,
