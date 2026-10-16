@@ -1,7 +1,7 @@
 import { v4 } from "uuid";
 import type { Seeder } from "../umzug-seed";
 
-const PROJECT_TEST_NAMES = [
+export const PROJECT_TEST_NAMES = [
   "Internal Tools",
   "Forward Deployed",
   "Feeding Canadian Kids",
