@@ -91,8 +91,12 @@ export const CollapsibleRow = ({
             {subtitles.map((subtitle, index) => (
               <span
                 key={index}
-                className="flex items-center gap-3 border-l-2 border-neutral-200 pl-6 font-source text-sm leading-[1.4]"
+                className="flex items-center gap-3 font-source text-sm leading-[1.4]"
               >
+                <span
+                  aria-hidden="true"
+                  className="mr-3 h-8 shrink-0 border-l-2 border-neutral-200"
+                />
                 {subtitle.leftSlot}
                 <span>{subtitle.text}</span>
                 {subtitle.rightSlot}
