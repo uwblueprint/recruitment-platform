@@ -1,3 +1,5 @@
+import type { FilterOption } from "@/components/dashboard/filters";
+
 /** Display-ready row; map the generated query result to this shape in the API hook. */
 export type Member = {
   id: string;
@@ -25,3 +27,15 @@ export type MembersDashboardVariables = {
   resultsPerPage: number;
   filters?: MembersDashboardFilters;
 };
+
+/** Fields supported by member updates and their dropdown options. */
+export type MemberEditableField = keyof Pick<
+  Member,
+  "role" | "team" | "status"
+>;
+export type MemberUpdates = Partial<Pick<Member, MemberEditableField>>;
+
+export type MembersDashboardFilterOptions = Record<
+  "roles" | "teams" | "statuses",
+  FilterOption[]
+>;

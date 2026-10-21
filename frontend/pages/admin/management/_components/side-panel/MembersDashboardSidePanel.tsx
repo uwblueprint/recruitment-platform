@@ -2,9 +2,24 @@ import { DashboardStatusChip } from "@/components/dashboard/common";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel/DashboardSidePanel";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
 import { Button } from "@/components/common/Button";
-import type { Member } from "@/types/membersDashboard";
+import type {
+  Member,
+  MemberEditableField,
+  MemberUpdates,
+  MembersDashboardFilterOptions,
+} from "@/types/membersDashboard";
 import useMembersDashboardFilterOptions from "@/APIClients/queries/useMembersDashboardFilterOptions";
 import useMembersDashboardSidePanel from "../hooks/useMembersDashboardSidePanel";
+
+const MEMBER_FIELDS = [
+  { field: "role", label: "Role", optionsKey: "roles" },
+  { field: "team", label: "Team", optionsKey: "teams" },
+  { field: "status", label: "Status", optionsKey: "statuses" },
+] as const satisfies readonly {
+  field: MemberEditableField;
+  label: string;
+  optionsKey: keyof MembersDashboardFilterOptions;
+}[];
 
 type DeleteMemberButtonProps = {
   onClick: () => void;
@@ -28,10 +43,7 @@ type Props = {
   onClose: () => void;
   onDelete: (member: Member) => void;
   // Connect the member update mutation through this callback.
-  onUpdate?: (
-    id: string,
-    changes: Partial<Pick<Member, "role" | "team" | "status">>
-  ) => void;
+  onUpdate?: (id: string, changes: MemberUpdates) => void;
 };
 
 export const MembersDashboardSidePanel = ({
@@ -66,39 +78,28 @@ export const MembersDashboardSidePanel = ({
         ) : details ? (
           <>
             <div className="flex flex-wrap gap-4 border-b border-neutral-200 pb-6">
-              {(["role", "team", "status"] as const).map((field) => {
-                const choices =
-                  field === "role"
-                    ? options.roles
-                    : field === "team"
-                    ? options.teams
-                    : options.statuses;
-                const values = [
-                  ...new Set([
-                    details[field],
-                    ...choices.map(({ value }) => value),
-                  ]),
-                ];
+              {MEMBER_FIELDS.map(({ field, label, optionsKey }) => {
+                const currentValue = details[field];
+                const choices = options?.[optionsKey] ?? [];
+                // Keep the current value visible while options load or omit it.
+                const fieldOptions = choices.some(
+                  ({ value }) => value === currentValue
+                )
+                  ? choices
+                  : [{ value: currentValue, label: currentValue }, ...choices];
                 return (
                   <label
                     key={field}
                     className="flex flex-col gap-1 text-neutral-500"
                   >
-                    <span>
-                      {field === "role"
-                        ? "Role"
-                        : field === "team"
-                        ? "Team"
-                        : "Status"}
-                    </span>
+                    <span>{label}</span>
                     <DashboardStatusChip
                       outlined
                       value={details[field]}
-                      options={values.map((value) => ({
-                        value,
-                        label: value,
+                      options={fieldOptions.map((option) => ({
+                        ...option,
                         className:
-                          field === "status" && value === "Active"
+                          field === "status" && option.value === "Active"
                             ? "border-green-900 bg-green-50 text-green-900"
                             : "border-neutral-700 bg-neutral-100 text-neutral-700",
                       }))}
