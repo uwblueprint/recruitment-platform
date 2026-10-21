@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DashboardStatusChip } from "@/components/dashboard/common";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel/DashboardSidePanel";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
@@ -52,8 +53,16 @@ export const MembersDashboardSidePanel = ({
   onDelete,
   onUpdate,
 }: Props) => {
+  const [selection, setSelection] = useState<{
+    memberId?: string;
+    role?: string;
+  }>({ memberId });
+  if (selection.memberId !== memberId) {
+    setSelection({ memberId });
+  }
   const { details, isLoading, error } = useMembersDashboardSidePanel(memberId);
-  const { data: options } = useMembersDashboardFilterOptions();
+  const { data: options, error: optionsError } =
+    useMembersDashboardFilterOptions();
 
   return (
     <DashboardSidePanel
@@ -77,9 +86,15 @@ export const MembersDashboardSidePanel = ({
           </p>
         ) : details ? (
           <>
+            {optionsError ? (
+              <p role="alert" className="text-alert-errorText">
+                Failed to load member position options.
+              </p>
+            ) : null}
             <div className="flex flex-wrap gap-4 border-b border-neutral-200 pb-6">
               {MEMBER_FIELDS.map(({ field, label, optionsKey }) => {
-                const currentValue = details[field];
+                const currentValue =
+                  field === "role" ? selection.role ?? details.role : details[field];
                 const choices = options?.[optionsKey] ?? [];
                 // Keep the current value visible while options load or omit it.
                 const fieldOptions = choices.some(
@@ -95,7 +110,8 @@ export const MembersDashboardSidePanel = ({
                     <span>{label}</span>
                     <DashboardStatusChip
                       outlined
-                      value={details[field]}
+                      fitSelectedContent={field === "role"}
+                      value={currentValue}
                       options={fieldOptions.map((option) => ({
                         ...option,
                         className:
@@ -103,9 +119,13 @@ export const MembersDashboardSidePanel = ({
                             ? "border-green-900 bg-green-50 text-green-900"
                             : "border-neutral-700 bg-neutral-100 text-neutral-700",
                       }))}
-                      onChange={(value) =>
-                        onUpdate?.(details.id, { [field]: value })
-                      }
+                      onChange={(value) => {
+                        if (field === "role") {
+                          setSelection({ memberId, role: value });
+                        } else {
+                          onUpdate?.(details.id, { [field]: value });
+                        }
+                      }}
                     />
                   </label>
                 );
