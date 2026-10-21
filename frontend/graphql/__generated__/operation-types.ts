@@ -145,6 +145,13 @@ export type PositionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type PositionsQuery = { positions: Array<{ title: string, isArchived: boolean }> };
 
+export type ProjectsQueryVariables = Exact<{
+  isArchived?: boolean | null | undefined;
+}>;
+
+
+export type ProjectsQuery = { projects: Array<{ id: string, projectName: string, isArchived: boolean }> };
+
 export type ReassignReviewerMutationVariables = Exact<{
   applicantRecordId: string | number;
   oldReviewerId: string | number;

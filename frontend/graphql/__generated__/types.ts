@@ -639,6 +639,13 @@ export type PositionDto = {
   title: Scalars['String']['output'];
 };
 
+export type ProjectDto = {
+  __typename?: 'ProjectDTO';
+  id: Scalars['ID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  projectName: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   _empty?: Maybe<Scalars['String']['output']>;
@@ -664,6 +671,7 @@ export type Query = {
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
   positions: Array<PositionDto>;
+  projects: Array<ProjectDto>;
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
   reviewDashboardCSV: Scalars['String']['output'];
@@ -773,6 +781,11 @@ export type QueryIsAuthorizedByRoleArgs = {
 export type QueryIsAuthorizedToReviewArgs = {
   applicationId: Scalars['Int']['input'];
   reviewerUserId: Scalars['String']['input'];
+};
+
+
+export type QueryProjectsArgs = {
+  isArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
