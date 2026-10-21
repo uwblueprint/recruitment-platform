@@ -28,7 +28,7 @@ const LoginPage: NextPage = () => {
       if (!result) throw new Error("Login Error");
       localStorage.setItem("accessToken", result.accessToken);
       localStorage.setItem("refreshToken", result.refreshToken);
-      setAuthenticatedUser({
+      await setAuthenticatedUser({
         id: result.id,
         firstName: result.firstName,
         lastName: result.lastName,

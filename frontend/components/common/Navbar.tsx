@@ -66,7 +66,7 @@ export const Navbar = () => {
     } catch (error) {
       console.error(error);
     } finally {
-      logout();
+      await logout();
       router.push("/login");
     }
   };

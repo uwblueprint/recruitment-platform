@@ -13,7 +13,7 @@ export default function useReviewDashboardFilterOptions(
     ReviewDashboardFilterOptionsQueryVariables
   >(ReviewDashboardFilterOptionsDocument, {
     variables,
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-first",
     context: { refreshAuth: true },
   });
   const result = data?.reviewDashboardFilterOptions;
