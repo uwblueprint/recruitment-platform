@@ -48,7 +48,6 @@ export const MembersDashboardSidePanel = ({
       open={memberId !== undefined}
       onClose={onClose}
       width={446}
-      ariaLabel="Member details"
       title={details?.name}
       description={details ? `Joined ${details.joined}` : undefined}
       action={

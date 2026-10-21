@@ -62,7 +62,6 @@ type DashboardSidePanelProps = {
   children?: ReactNode;
   title?: string;
   description?: string;
-  ariaLabel?: string;
   isLoading?: boolean;
   hasError?: boolean;
   navigation?: SidePanelNavigation;
