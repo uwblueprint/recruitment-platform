@@ -77,7 +77,9 @@ interface IInterviewCompositeService {
     status?: InterviewGroupStatus[],
     filters?: InterviewInvitesFilters,
   ): Promise<InterviewInviteDTO[]>;
-  getInterviewInvitesCounts(): Promise<InterviewInvitesCountsDTO>;
+  getInterviewInvitesCounts(
+    filters?: InterviewInvitesFilters,
+  ): Promise<InterviewInvitesCountsDTO>;
 
   /**
    * Upload (or replace) the PDF interview notes for an interviewed applicant

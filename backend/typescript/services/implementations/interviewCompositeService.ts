@@ -740,16 +740,19 @@ class InterviewCompositeService implements IInterviewCompositeService {
     }
   }
 
-  async getInterviewInvitesCounts(): Promise<InterviewInvitesCountsDTO> {
+  async getInterviewInvitesCounts(
+    filters?: InterviewInvitesFilters,
+  ): Promise<InterviewInvitesCountsDTO> {
+    const countStatus = (status: InterviewGroupStatus[]) =>
+      InterviewGroup.count({
+        where: buildInterviewInvitesWhere(status, filters),
+        include: buildInterviewInvitePositionInclude(filters),
+        distinct: true,
+        col: "id",
+      });
     const [ready, sent] = await Promise.all([
-      InterviewGroup.count({
-        where: buildInterviewInvitesWhere(READY_INVITE_STATUSES),
-      }),
-      InterviewGroup.count({
-        where: buildInterviewInvitesWhere([
-          InterviewGroupStatusEnum.INVITES_SENT,
-        ]),
-      }),
+      countStatus(READY_INVITE_STATUSES),
+      countStatus([InterviewGroupStatusEnum.INVITES_SENT]),
     ]);
     return { ready, sent };
   }

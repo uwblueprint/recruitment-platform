@@ -387,3 +387,5 @@ export type {
 } from "./__generated__/operation-types";
 
 export { InterviewInvitesCountsDocument } from "./__generated__/graphql";
+
+export type { InterviewInvitesCountsQueryVariables } from "./__generated__/operation-types";

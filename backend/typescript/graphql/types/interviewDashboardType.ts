@@ -91,7 +91,9 @@ const interviewDashboardTypes = gql`
       status: [InterviewGroupStatus!]
       filters: InterviewInvitesFilters
     ): [InterviewInviteDTO!]!
-    interviewInvitesCounts: InterviewInvitesCountsDTO!
+    interviewInvitesCounts(
+      filters: InterviewInvitesFilters
+    ): InterviewInvitesCountsDTO!
   }
 
   extend type Mutation {

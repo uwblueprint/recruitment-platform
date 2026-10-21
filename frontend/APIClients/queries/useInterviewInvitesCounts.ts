@@ -1,8 +1,9 @@
 import { useQuery } from "@apollo/client/react";
-import { InterviewInvitesCountsDocument } from "@/graphql/typeUtils";
+import { InterviewInvitesCountsDocument, type InterviewInvitesCountsQueryVariables } from "@/graphql/typeUtils";
 
-export default function useInterviewInvitesCounts() {
+export default function useInterviewInvitesCounts(variables: InterviewInvitesCountsQueryVariables = {}) {
   const { data, loading, error } = useQuery(InterviewInvitesCountsDocument, {
+    variables,
     fetchPolicy: "network-only",
     context: { refreshAuth: true },
   });

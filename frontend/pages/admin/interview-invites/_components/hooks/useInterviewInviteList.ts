@@ -42,15 +42,16 @@ export default function useInterviewInviteList() {
   };
 
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const filters = { search: searchQuery, positions: selectedFilters.interviewType ?? [] };
   const { data, previousData, loading, error } = useInterviewInvites({
     pageNumber: requestedPage,
     resultsPerPage,
     status: activeTab === "ready"
       ? [InterviewGroupStatus.AvailabilityPending, InterviewGroupStatus.ReadyToInterview]
       : [InterviewGroupStatus.InvitesSent],
-    filters: { search: searchQuery, positions: selectedFilters.interviewType ?? [] },
+    filters,
   });
-  const { counts, error: countsError } = useInterviewInvitesCounts();
+  const { counts, error: countsError } = useInterviewInvitesCounts({ filters });
   const { data: positions, error: positionsError } = usePositions({ isArchived: false });
   const visibleInvites = error ? [] : data ?? (loading ? previousData : undefined) ?? [];
   const filterCategories: FilterCategory[] = [

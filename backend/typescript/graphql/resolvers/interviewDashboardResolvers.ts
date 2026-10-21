@@ -73,8 +73,11 @@ const interviewDashboardResolvers = {
         filters,
       );
     },
-    interviewInvitesCounts: async (): Promise<InterviewInvitesCountsDTO> =>
-      interviewCompositeService.getInterviewInvitesCounts(),
+    interviewInvitesCounts: async (
+      _parent: undefined,
+      { filters }: { filters?: InterviewInvitesFilters },
+    ): Promise<InterviewInvitesCountsDTO> =>
+      interviewCompositeService.getInterviewInvitesCounts(filters),
   },
   Mutation: {
     delegateInterviewers: async (

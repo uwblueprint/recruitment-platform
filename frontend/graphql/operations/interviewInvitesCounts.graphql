@@ -1,5 +1,5 @@
-query InterviewInvitesCounts {
-  interviewInvitesCounts {
+query InterviewInvitesCounts($filters: InterviewInvitesFilters) {
+  interviewInvitesCounts(filters: $filters) {
     ready
     sent
   }
