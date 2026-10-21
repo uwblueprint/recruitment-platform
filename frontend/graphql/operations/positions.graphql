@@ -1,0 +1,6 @@
+query Positions {
+  positions {
+    title
+    isArchived
+  }
+}

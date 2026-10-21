@@ -633,6 +633,12 @@ export type MutationUploadInterviewNotesArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
+export type PositionDto = {
+  __typename?: 'PositionDTO';
+  isArchived: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   _empty?: Maybe<Scalars['String']['output']>;
@@ -657,6 +663,7 @@ export type Query = {
   interviewersByGroupId: Array<UserDto>;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
+  positions: Array<PositionDto>;
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
   reviewDashboardCSV: Scalars['String']['output'];

@@ -140,6 +140,11 @@ export type LogoutMutationVariables = Exact<{
 
 export type LogoutMutation = { logout: string | null };
 
+export type PositionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PositionsQuery = { positions: Array<{ title: string, isArchived: boolean }> };
+
 export type ReassignReviewerMutationVariables = Exact<{
   applicantRecordId: string | number;
   oldReviewerId: string | number;
