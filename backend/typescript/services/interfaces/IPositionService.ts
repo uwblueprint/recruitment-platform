@@ -6,7 +6,7 @@ interface IPositionService {
    * @returns the array of PositionDTOs
    * @throws Error if positions retrieval fails
    */
-  getPositions(): Promise<PositionDTO[]>;
+  getAllPositions(): Promise<PositionDTO[]>;
 }
 
 export default IPositionService;

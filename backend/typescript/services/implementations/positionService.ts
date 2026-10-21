@@ -10,7 +10,7 @@ const Logger = logger(__filename);
 class PositionService implements IPositionService {
   /* eslint-disable class-methods-use-this */
 
-  async getPositions(): Promise<PositionDTO[]> {
+  async getAllPositions(): Promise<PositionDTO[]> {
     try {
       const positions = await Position.findAll({ order: [["title", "ASC"]] });
       return positions.map(toPositionDTO);

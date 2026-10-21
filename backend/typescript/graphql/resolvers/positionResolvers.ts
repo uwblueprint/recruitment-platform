@@ -7,7 +7,7 @@ const positionService: IPositionService = new PositionService();
 const positionResolvers = {
   Query: {
     positions: async (): Promise<PositionDTO[]> => {
-      return positionService.getPositions();
+      return positionService.getAllPositions();
     },
   },
 };
