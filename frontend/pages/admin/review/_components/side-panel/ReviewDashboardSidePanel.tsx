@@ -85,7 +85,7 @@ export const ReviewDashboardSidePanel = ({
       isLoading={isLoading}
       hasError={!!error}
       navigation={navigation}
-      applicantAction={
+      action={
         details ? (
           <ShortlistApplicantButton
             isShortlisted={details.shortlistedForInterview}
