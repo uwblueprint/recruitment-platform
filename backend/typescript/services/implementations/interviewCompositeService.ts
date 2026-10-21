@@ -21,7 +21,7 @@ import {
   DashboardView,
   DashboardViewEnum,
   InterviewDashboardCountsDTO,
-  InterviewDashboardFilters,
+  DashboardFilters,
   InterviewDashboardRowDTO,
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
@@ -67,7 +67,7 @@ import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedAppli
 
 const buildInterviewDashboardWhere = async (
   view?: DashboardView,
-  filters?: InterviewDashboardFilters,
+  filters?: DashboardFilters,
 ): Promise<WhereOptions> => {
   // Resolve matching IDs separately so the hasMany join cannot duplicate rows
   // or interfere with pagination and interviewer sorting in the main query.
@@ -120,7 +120,7 @@ const buildInterviewDashboardWhere = async (
 };
 
 function buildInterviewScoreWhere(
-  filters?: InterviewDashboardFilters,
+  filters?: DashboardFilters,
 ): WhereOptions | undefined {
   if (!filters?.scoreRanges?.length) {
     return undefined;
@@ -274,7 +274,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
     view?: DashboardView,
-    filters?: InterviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<InterviewDashboardRowDTO[]> {
     try {
       if (
@@ -361,7 +361,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
   }
 
   async getInterviewDashboardCounts(
-    filters?: InterviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<InterviewDashboardCountsDTO> {
     const interviewScoreWhere = buildInterviewScoreWhere(filters);
     const countView = async (view: DashboardView) =>

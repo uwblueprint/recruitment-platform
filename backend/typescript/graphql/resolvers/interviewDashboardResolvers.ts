@@ -3,7 +3,7 @@ import IInterviewCompositeService from "../../services/interfaces/IInterviewComp
 import {
   InterviewDashboardRowDTO,
   InterviewDashboardCountsDTO,
-  InterviewDashboardFilters,
+  DashboardFilters,
   DashboardView,
   InterviewDashboardSortBy,
   InterviewDashboardSidePanelDTO,
@@ -17,7 +17,7 @@ const interviewDashboardResolvers = {
   Query: {
     interviewDashboardCounts: async (
       _parent: undefined,
-      { filters }: { filters?: InterviewDashboardFilters },
+      { filters }: { filters?: DashboardFilters },
     ): Promise<InterviewDashboardCountsDTO> => {
       return interviewCompositeService.getInterviewDashboardCounts(filters);
     },
@@ -36,7 +36,7 @@ const interviewDashboardResolvers = {
         sortBy?: InterviewDashboardSortBy;
         sortAscending?: boolean;
         view?: DashboardView;
-        filters?: InterviewDashboardFilters;
+        filters?: DashboardFilters;
       },
     ): Promise<InterviewDashboardRowDTO[]> => {
       return interviewCompositeService.getInterviewDashboard(

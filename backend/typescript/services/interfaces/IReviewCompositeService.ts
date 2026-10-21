@@ -2,7 +2,7 @@ import {
   ApplicantRecordWithReviewersDTO,
   DashboardView,
   DashboardFilterOptionsDTO,
-  ReviewDashboardFilters,
+  DashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
@@ -13,7 +13,7 @@ import {
 
 interface IReviewCompositeService {
   getReviewDashboardCounts(
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<ReviewDashboardCountsDTO>;
 
   /**
@@ -46,7 +46,7 @@ interface IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
     view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]>;
 
@@ -69,7 +69,7 @@ interface IReviewCompositeService {
   getReviewDashboardApplicantRecordIds(
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<string[]>;
 
   /**

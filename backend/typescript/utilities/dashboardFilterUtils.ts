@@ -1,11 +1,10 @@
 import { Op, WhereOptions, col, fn, where as whereFn } from "sequelize";
-import { ReviewDashboardFilters } from "../types";
+import { DashboardFilters } from "../types";
 
-// Where clauses shared by the review and interview dashboards. Interview
-// dashboard filters are a subset of the review ones, so both accept this type.
+// Where clauses shared by the review and interview dashboards.
 
 export function buildApplicantRecordWhere(
-  filters?: ReviewDashboardFilters,
+  filters?: DashboardFilters,
 ): WhereOptions {
   const where: WhereOptions = {};
 
@@ -52,7 +51,7 @@ function escapeLikeWildcards(term: string): string {
 }
 
 export function buildApplicantWhere(
-  filters?: ReviewDashboardFilters,
+  filters?: DashboardFilters,
 ): WhereOptions {
   const where: WhereOptions = {};
   if (filters?.years?.length) {

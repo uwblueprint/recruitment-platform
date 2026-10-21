@@ -2,7 +2,7 @@ import {
   InterviewDelegationDTO,
   DashboardView,
   InterviewDashboardCountsDTO,
-  InterviewDashboardFilters,
+  DashboardFilters,
   InterviewDashboardRowDTO,
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
@@ -16,7 +16,7 @@ import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 
 interface IInterviewCompositeService {
   getInterviewDashboardCounts(
-    filters?: InterviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<InterviewDashboardCountsDTO>;
 
   /**
@@ -34,7 +34,7 @@ interface IInterviewCompositeService {
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
     view?: DashboardView,
-    filters?: InterviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<InterviewDashboardRowDTO[]>;
 
   /**

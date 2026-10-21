@@ -10,7 +10,7 @@ import {
   DashboardView,
   DashboardViewEnum,
   DashboardFilterOptionsDTO,
-  ReviewDashboardFilters,
+  DashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
@@ -198,7 +198,7 @@ class ReviewCompositeService implements IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
     view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]> {
     try {
@@ -261,7 +261,7 @@ class ReviewCompositeService implements IReviewCompositeService {
   }
 
   async getReviewDashboardCounts(
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<ReviewDashboardCountsDTO> {
     const countView = async (view: DashboardView) =>
       ApplicantRecord.count({
@@ -289,7 +289,7 @@ class ReviewCompositeService implements IReviewCompositeService {
   async getReviewDashboardApplicantRecordIds(
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<string[]> {
     try {
       // NOTE: the where clauses must stay identical to getReviewDashboard so

@@ -76,7 +76,7 @@ export type DashboardFilterOptionsDTO = {
   bookmarked: FilterOption[];
 };
 
-export type ReviewDashboardFilters = {
+export type DashboardFilters = {
   /** Free text matched case-insensitively against the applicant's full name. */
   search?: string;
   positions?: string[];

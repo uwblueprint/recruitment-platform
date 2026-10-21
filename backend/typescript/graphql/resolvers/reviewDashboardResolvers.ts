@@ -2,7 +2,7 @@ import ReviewCompositeService from "../../services/implementations/reviewComposi
 import {
   DashboardView,
   DashboardFilterOptionsDTO,
-  ReviewDashboardFilters,
+  DashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
@@ -15,7 +15,7 @@ const reviewDashboardResolvers = {
   Query: {
     reviewDashboardCounts: (
       _parent: undefined,
-      { filters }: { filters?: ReviewDashboardFilters },
+      { filters }: { filters?: DashboardFilters },
     ): Promise<ReviewDashboardCountsDTO> =>
       reviewCompositeService.getReviewDashboardCounts(filters),
     reviewDashboard: async (
@@ -32,7 +32,7 @@ const reviewDashboardResolvers = {
         resultsPerPage: number;
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
-        filters?: ReviewDashboardFilters;
+        filters?: DashboardFilters;
         view?: DashboardView;
       },
     ): Promise<ReviewDashboardRowDTO[]> => {
@@ -54,7 +54,7 @@ const reviewDashboardResolvers = {
       }: {
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
-        filters?: ReviewDashboardFilters;
+        filters?: DashboardFilters;
       },
     ): Promise<string[]> => {
       return reviewCompositeService.getReviewDashboardApplicantRecordIds(
