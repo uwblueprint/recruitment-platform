@@ -50,9 +50,7 @@ function escapeLikeWildcards(term: string): string {
   return term.replace(/[\\%_]/g, (character) => `\\${character}`);
 }
 
-export function buildApplicantWhere(
-  filters?: DashboardFilters,
-): WhereOptions {
+export function buildApplicantWhere(filters?: DashboardFilters): WhereOptions {
   const where: WhereOptions = {};
   if (filters?.years?.length) {
     where.academic_year = { [Op.in]: filters.years };
