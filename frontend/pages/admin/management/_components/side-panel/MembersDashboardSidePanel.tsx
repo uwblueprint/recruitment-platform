@@ -53,7 +53,8 @@ export const MembersDashboardSidePanel = ({
   onUpdate,
 }: Props) => {
   const { details, isLoading, error } = useMembersDashboardSidePanel(memberId);
-  const { data: options } = useMembersDashboardFilterOptions();
+  const { data: options, error: optionsError } =
+    useMembersDashboardFilterOptions();
 
   return (
     <DashboardSidePanel
@@ -77,6 +78,11 @@ export const MembersDashboardSidePanel = ({
           </p>
         ) : details ? (
           <>
+            {optionsError ? (
+              <p role="alert" className="text-alert-errorText">
+                Failed to load member position options.
+              </p>
+            ) : null}
             <div className="flex flex-wrap gap-4 border-b border-neutral-200 pb-6">
               {MEMBER_FIELDS.map(({ field, label, optionsKey }) => {
                 const currentValue = details[field];
