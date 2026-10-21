@@ -187,7 +187,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8">
             {title ? (
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <h2 className="font-source text-lg font-bold text-blue-900">
+                <h2 className="font-poppins text-2xl font-medium not-italic leading-[1.4] text-black [font-feature-settings:'liga'_off,'clig'_off]">
                   {title}
                 </h2>
                 {description ? <p className="italic">{description}</p> : null}

@@ -93,6 +93,7 @@ export const MembersDashboardSidePanel = ({
                         : "Status"}
                     </span>
                     <DashboardStatusChip
+                      outlined
                       value={details[field]}
                       options={values.map((value) => ({
                         value,
