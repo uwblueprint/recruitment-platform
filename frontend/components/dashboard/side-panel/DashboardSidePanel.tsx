@@ -7,8 +7,9 @@ import KeyboardDoubleArrowLeft from "@mui/icons-material/KeyboardDoubleArrowLeft
 import OpenInNew from "@mui/icons-material/OpenInNew";
 import Drawer from "@mui/material/Drawer";
 import Link from "next/link";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 
+import useUpdateApplicantRecordIsApplicantFlagged from "@/APIClients/mutations/useUpdateApplicantRecordIsApplicantFlagged";
 import { ReviewStatusCell } from "@/pages/admin/review/_components/columns/ReviewStatusCell";
 
 import type {
@@ -110,9 +111,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
       onClose={onClose}
       PaperProps={{ sx: { width, maxWidth: "100%" } }}
     >
-      <aside
-        className="flex h-full flex-col bg-white font-source text-neutral-800"
-      >
+      <aside className="flex h-full flex-col bg-white font-source text-neutral-800">
         <header className="flex shrink-0 items-center justify-between px-8 pb-2 pt-6">
           <button
             aria-label="Close side panel"
@@ -259,6 +258,7 @@ const SidePanelApplicantBar = ({
       </div>
       <BookmarkButton
         key={row.applicantRecordId}
+        applicantRecordId={row.applicantRecordId}
         isApplicantFlagged={row.isApplicantFlagged}
       />
     </div>
@@ -315,30 +315,39 @@ const InfoField = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-/**
- * Visual-only bookmark toggle. Persisting the bookmark is handled in a future
- * ticket.
- */
 const BookmarkButton = ({
+  applicantRecordId,
   isApplicantFlagged,
 }: {
+  applicantRecordId: string;
   isApplicantFlagged: boolean;
 }) => {
-  const [isBookmarked, setIsBookmarked] = useState(isApplicantFlagged);
+  const { updateFlag, data, loading, error } =
+    useUpdateApplicantRecordIsApplicantFlagged();
+  const isBookmarked = data?.isApplicantFlagged ?? isApplicantFlagged;
 
   return (
-    <button
-      className="ml-auto flex items-center gap-2 rounded-[20px] px-4 py-2 text-[#936A00] hover:bg-orange-50"
-      onClick={() => setIsBookmarked((prev) => !prev)}
-      aria-pressed={isBookmarked}
-      type="button"
-    >
-      {isBookmarked ? (
-        <BookmarkOutlined sx={{ fontSize: 19 }} />
-      ) : (
-        <BookmarkBorderOutlined sx={{ fontSize: 19 }} />
-      )}
-      Bookmark Applicant
-    </button>
+    <div className="ml-auto flex flex-col items-end gap-1">
+      <button
+        className="flex items-center gap-2 rounded-[20px] px-4 py-2 text-[#936A00] hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-50"
+        onClick={() => updateFlag(applicantRecordId, !isBookmarked)}
+        disabled={loading}
+        aria-busy={loading}
+        aria-pressed={isBookmarked}
+        type="button"
+      >
+        {isBookmarked ? (
+          <BookmarkOutlined sx={{ fontSize: 19 }} />
+        ) : (
+          <BookmarkBorderOutlined sx={{ fontSize: 19 }} />
+        )}
+        Bookmark Applicant
+      </button>
+      {error ? (
+        <p role="alert" className="text-sm text-alert-errorText">
+          Failed to update bookmark. Please try again.
+        </p>
+      ) : null}
+    </div>
   );
 };
