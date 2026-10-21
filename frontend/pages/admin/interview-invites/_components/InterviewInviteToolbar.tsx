@@ -63,7 +63,7 @@ export const InterviewInviteToolbar = ({
         onClick={bulkActions.onSelectAll}
         className="flex items-center gap-2 !px-5"
       >
-        {bulkActions.allSelected ? "Deselect All" : "Select All"}
+        {bulkActions.allSelected ? "Deselect page" : "Select page"}
       </Button>
       <Button
         type="button"

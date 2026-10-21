@@ -10,9 +10,37 @@ const READY_STATUSES = new Set(["AVAILABILITY_PENDING", "READY_TO_INTERVIEW"]);
 export default function useInterviewInviteList(
   invites: InterviewInviteResult[]
 ) {
-  const [activeTab, setActiveTab] = useState<string>("ready");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, updateActiveTab] = useState<string>("ready");
+  const [searchQuery, updateSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  const [requestedPage, setRequestedPage] = useState(1);
+  const [resultsPerPage, setResultsPerPage] = useState(10);
+
+  const resetPagination = () => {
+    setRequestedPage(1);
+    setSelectedIds(new Set());
+  };
+
+  const setActiveTab = (tab: string) => {
+    updateActiveTab(tab);
+    resetPagination();
+  };
+
+  const setSearchQuery = (query: string) => {
+    updateSearchQuery(query);
+    resetPagination();
+  };
+
+  const handlePageChange = (page: number) => {
+    setRequestedPage(page);
+    setSelectedIds(new Set());
+  };
+
+  const handleResultsPerPageChange = (size: number) => {
+    setResultsPerPage(size);
+    resetPagination();
+  };
 
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const filterCategories: FilterCategory[] = [
@@ -26,10 +54,12 @@ export default function useInterviewInviteList(
   ];
 
   const handleFilterChange = (categoryKey: string, values: string[]) => {
+    resetPagination();
     setSelectedFilters((previous) => ({ ...previous, [categoryKey]: values }));
   };
 
   const handleFilterRemove = (categoryKey: string, value: string) => {
+    resetPagination();
     setSelectedFilters((previous) => ({
       ...previous,
       [categoryKey]: (previous[categoryKey] ?? []).filter(
@@ -55,17 +85,27 @@ export default function useInterviewInviteList(
     );
   });
 
+  // Keep pagination local until the API supports fetching individual pages.
+  const pageCount = Math.max(1, Math.ceil(filteredInvites.length / resultsPerPage));
+  const pageNumber = Math.min(requestedPage, pageCount);
+  const visibleInvites = filteredInvites.slice(
+    (pageNumber - 1) * resultsPerPage,
+    pageNumber * resultsPerPage
+  );
+  const visibleSelectedIds = new Set(
+    visibleInvites.filter((invite) => selectedIds.has(invite.id)).map((invite) => invite.id)
+  );
   const allSelected =
-    filteredInvites.length > 0 &&
-    filteredInvites.every((i) => selectedIds.has(i.id));
+    visibleInvites.length > 0 &&
+    visibleInvites.every((i) => visibleSelectedIds.has(i.id));
 
   const handleSelectAll = () => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (allSelected) {
-        filteredInvites.forEach((i) => next.delete(i.id));
+        visibleInvites.forEach((i) => next.delete(i.id));
       } else {
-        filteredInvites.forEach((i) => next.add(i.id));
+        visibleInvites.forEach((i) => next.add(i.id));
       }
       return next;
     });
@@ -88,10 +128,17 @@ export default function useInterviewInviteList(
     setActiveTab,
     searchQuery,
     setSearchQuery,
-    selectedIds,
+    selectedIds: visibleSelectedIds,
     readyInvites,
     sentInvites,
-    filteredInvites,
+    visibleInvites,
+    pagination: {
+      pageNumber,
+      resultsPerPage,
+      canGoNext: pageNumber < pageCount,
+      onPageChange: handlePageChange,
+      onResultsPerPageChange: handleResultsPerPageChange,
+    },
     allSelected,
     handleSelectAll,
     toggleSelect,

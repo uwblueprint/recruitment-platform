@@ -1,3 +1,4 @@
+import { DashboardTablePagination } from "@/components/dashboard/table/DashboardTablePagination";
 import { Tabs } from "@/components/dashboard/common/Tabs";
 import type { InterviewInviteResult } from "@/graphql/typeUtils";
 import { InterviewInviteRow } from "./InterviewInviteRow";
@@ -24,7 +25,8 @@ export const InterviewInviteList = ({
     selectedIds,
     readyInvites,
     sentInvites,
-    filteredInvites,
+    visibleInvites,
+    pagination,
     allSelected,
     handleSelectAll,
     toggleSelect,
@@ -67,7 +69,7 @@ export const InterviewInviteList = ({
         bulkActions={{
           selectedCount: selectedIds.size,
           allSelected,
-          selectAllDisabled: filteredInvites.length === 0,
+          selectAllDisabled: visibleInvites.length === 0,
           disabled: bulkActionsDisabled,
           onSelectAll: handleSelectAll,
           onSendInterviewEmails: onSendInterviewEmails
@@ -78,7 +80,7 @@ export const InterviewInviteList = ({
 
       {/* List */}
       <div className="flex flex-col gap-3">
-        {filteredInvites.map((invite) => (
+        {visibleInvites.map((invite) => (
           <InterviewInviteRow
             key={invite.id}
             invite={invite}
@@ -86,12 +88,14 @@ export const InterviewInviteList = ({
             onSelect={(checked) => toggleSelect(invite.id, checked)}
           />
         ))}
-        {filteredInvites.length === 0 && (
+        {visibleInvites.length === 0 && (
           <p className="font-source text-sm text-neutral-500 py-4">
             No interview groups found.
           </p>
         )}
       </div>
+
+      <DashboardTablePagination pagination={pagination} />
     </div>
   );
 };
