@@ -3,6 +3,9 @@ import { useMutation } from "@apollo/client/react";
 import {
   UpdateApplicantRecordIsApplicantFlaggedDocument,
   InterviewDashboardSidePanelDocument,
+  InterviewDashboardDocument,
+  ReviewDashboardDocument,
+  ReviewDashboardSidePanelDocument,
   type UpdateApplicantRecordIsApplicantFlaggedMutation,
   type UpdateApplicantRecordIsApplicantFlaggedMutationVariables,
 } from "@/graphql/typeUtils";
@@ -27,6 +30,13 @@ export default function useUpdateApplicantRecordIsApplicantFlagged() {
             variables: { applicantRecordId: id },
             context: { refreshAuth: true },
           },
+          {
+            query: ReviewDashboardSidePanelDocument,
+            variables: { applicantRecordId: id },
+            context: { refreshAuth: true },
+          },
+          InterviewDashboardDocument,
+          ReviewDashboardDocument,
         ],
       });
     },
