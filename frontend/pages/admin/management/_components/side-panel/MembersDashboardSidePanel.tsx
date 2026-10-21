@@ -101,6 +101,7 @@ export const MembersDashboardSidePanel = ({
                     <span>{label}</span>
                     <DashboardStatusChip
                       outlined
+                      fitSelectedContent={field === "role"}
                       value={details[field]}
                       options={fieldOptions.map((option) => ({
                         ...option,
