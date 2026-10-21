@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { DashboardTable } from "@/components/dashboard/table";
-import { DashboardSidePanel } from "@/components/dashboard/side-panel";
+import { MembersDashboardSidePanel } from "./side-panel/MembersDashboardSidePanel";
+import type { Member } from "@/types/membersDashboard";
 import type { RowSelectionState } from "@tanstack/react-table";
 import type { SelectedFilters } from "@/components/dashboard/filters";
 import type { MembersDashboardFilters } from "@/types/membersDashboard";
@@ -17,16 +18,26 @@ const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
 
 export const MembersDashboard = ({ onDelete }: MemberActionCallbacks) => {
-  const columns = useMemo(
-    () => createMembersDashboardColumns({ onDelete }),
+  const [selectedMemberId, setSelectedMemberId] = useState<string>();
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const handleDelete = useCallback(
+    (member: Member) => {
+      // Connect the member deletion mutation through this callback.
+      if (!onDelete) return;
+      onDelete(member);
+      setRowSelection({});
+      setSelectedMemberId(undefined);
+    },
     [onDelete]
   );
-  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
+  const columns = useMemo(
+    () => createMembersDashboardColumns({ onDelete: handleDelete }),
+    [handleDelete]
+  );
   const [pageNumber, setPageNumber] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(
     DEFAULT_RESULTS_PER_PAGE
   );
-  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [search, setSearch] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
@@ -146,7 +157,7 @@ export const MembersDashboard = ({ onDelete }: MemberActionCallbacks) => {
           getRowId={(row) => row.id}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
-          onRowClick={() => setIsSidePanelOpen(true)}
+          onRowClick={(member) => setSelectedMemberId(member.id)}
           isLoading={isLoading}
           emptyMessage="No members found."
           pagination={{
@@ -158,9 +169,10 @@ export const MembersDashboard = ({ onDelete }: MemberActionCallbacks) => {
           }}
         />
       </div>
-      <DashboardSidePanel
-        open={isSidePanelOpen}
-        onClose={() => setIsSidePanelOpen(false)}
+      <MembersDashboardSidePanel
+        memberId={selectedMemberId}
+        onClose={() => setSelectedMemberId(undefined)}
+        onDelete={handleDelete}
       />
     </div>
   );

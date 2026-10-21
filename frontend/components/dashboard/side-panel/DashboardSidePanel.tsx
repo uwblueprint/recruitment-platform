@@ -60,6 +60,8 @@ type DashboardSidePanelProps = {
   row?: ApplicantRow;
   details?: ApplicantDetails;
   children?: ReactNode;
+  title?: string;
+  description?: string;
   isLoading?: boolean;
   hasError?: boolean;
   navigation?: SidePanelNavigation;
@@ -72,7 +74,7 @@ type DashboardSidePanelProps = {
     nextStatus: ApplicationStatus,
     previousStatus: ApplicationStatus
   ) => Promise<ApplicationStatus>;
-  applicantAction?: ReactNode;
+  action?: ReactNode;
 };
 
 /** Props for sections that only render once an active row exists. */
@@ -88,6 +90,8 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
     row,
     details,
     children,
+    title,
+    description,
     isLoading = false,
     hasError = false,
     navigation,
@@ -96,7 +100,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
     width = 913,
     showDetailsDivider = true,
     showScoreOnHeader = true,
-    applicantAction,
+    action,
   } = props;
 
   return (
@@ -106,7 +110,9 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
       onClose={onClose}
       PaperProps={{ sx: { width, maxWidth: "100%" } }}
     >
-      <aside className="flex h-full flex-col bg-white font-source text-neutral-800">
+      <aside
+        className="flex h-full flex-col bg-white font-source text-neutral-800"
+      >
         <header className="flex shrink-0 items-center justify-between px-8 pb-2 pt-6">
           <button
             aria-label="Close side panel"
@@ -176,11 +182,23 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
 
             <AdminCommentsSection applicantRecordId={row.applicantRecordId} />
           </div>
-        ) : null}
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8">
+            {title ? (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-poppins text-2xl font-medium not-italic leading-[1.4] text-black [font-feature-settings:'liga'_off,'clig'_off]">
+                  {title}
+                </h2>
+                {description ? <p className="italic">{description}</p> : null}
+              </div>
+            ) : null}
+            {children}
+          </div>
+        )}
 
-        {row && applicantAction ? (
+        {action ? (
           <footer className="flex shrink-0 justify-end px-8 py-5">
-            {applicantAction}
+            {action}
           </footer>
         ) : null}
       </aside>
@@ -239,7 +257,10 @@ const SidePanelApplicantBar = ({
           />
         )}
       </div>
-      <BookmarkButton key={row.applicantRecordId} isApplicantFlagged={row.isApplicantFlagged} />
+      <BookmarkButton
+        key={row.applicantRecordId}
+        isApplicantFlagged={row.isApplicantFlagged}
+      />
     </div>
   );
 };
@@ -298,7 +319,11 @@ const InfoField = ({ label, value }: { label: string; value: string }) => (
  * Visual-only bookmark toggle. Persisting the bookmark is handled in a future
  * ticket.
  */
-const BookmarkButton = ({ isApplicantFlagged }: { isApplicantFlagged: boolean }) => {
+const BookmarkButton = ({
+  isApplicantFlagged,
+}: {
+  isApplicantFlagged: boolean;
+}) => {
   const [isBookmarked, setIsBookmarked] = useState(isApplicantFlagged);
 
   return (
