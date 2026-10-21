@@ -49,7 +49,7 @@ export type InterviewDashboardQueryVariables = Exact<{
 }>;
 
 
-export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
+export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, isApplicantFlagged: boolean, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
 
 export type InterviewDashboardCountsQueryVariables = Exact<{ [key: string]: never; }>;
 

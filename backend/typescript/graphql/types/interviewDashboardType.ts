@@ -7,6 +7,7 @@ const interviewDashboardTypes = gql`
     lastName: String!
     position: String!
     applicationStatus: ApplicationStatus!
+    isApplicantFlagged: Boolean!
     interviewers: [UserDTO!]!
     interviewScore: Int
   }
