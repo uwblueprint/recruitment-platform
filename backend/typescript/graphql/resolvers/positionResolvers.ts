@@ -6,8 +6,11 @@ const positionService: IPositionService = new PositionService();
 
 const positionResolvers = {
   Query: {
-    positions: async (): Promise<PositionDTO[]> => {
-      return positionService.getAllPositions();
+    positions: async (
+      _parent: unknown,
+      { isArchived }: { isArchived?: boolean },
+    ): Promise<PositionDTO[]> => {
+      return positionService.getAllPositions(isArchived ?? undefined);
     },
   },
 };

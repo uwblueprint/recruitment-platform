@@ -43,7 +43,7 @@ export const MembersDashboard = ({ onDelete }: MemberActionCallbacks) => {
   const [search, setSearch] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
-  const { data: positions, error: positionsError } = usePositions();
+  const { data: positions, error: positionsError } = usePositions({ isArchived: false });
   const { data: projects, error: projectsError } = useProjects({ isArchived: false });
   const filterCategories = useMemo(
     () => [

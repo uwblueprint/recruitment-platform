@@ -5,12 +5,15 @@ import {
   type PositionsQueryVariables,
 } from "@/graphql/typeUtils";
 
-export default function usePositions() {
+export default function usePositions(
+  { isArchived }: PositionsQueryVariables = {},
+) {
   const { data, loading, error, refetch } = useQuery<
     PositionsQuery,
     PositionsQueryVariables
   >(PositionsDocument, {
-    fetchPolicy: "network-only",
+    variables: { isArchived },
+    fetchPolicy: "cache-first",
     context: { refreshAuth: true },
   });
 
