@@ -7,7 +7,7 @@ const positionType = gql`
   }
 
   extend type Query {
-    positions: [PositionDTO!]!
+    positions(isArchived: Boolean): [PositionDTO!]!
   }
 `;
 

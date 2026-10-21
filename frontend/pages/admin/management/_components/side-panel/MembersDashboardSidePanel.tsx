@@ -55,7 +55,7 @@ export const MembersDashboardSidePanel = ({
   onUpdate,
 }: Props) => {
   const { details, isLoading, error } = useMembersDashboardSidePanel(memberId);
-  const { data: positions, error: positionsError } = usePositions();
+  const { data: positions, error: positionsError } = usePositions({ isArchived: false });
   const { data: projects, error: projectsError } = useProjects({ isArchived: false });
   const options: MembersDashboardFilterOptions = {
     roles: (positions ?? []).map(({ title }) => ({ value: title, label: title })),

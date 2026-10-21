@@ -784,6 +784,11 @@ export type QueryIsAuthorizedToReviewArgs = {
 };
 
 
+export type QueryPositionsArgs = {
+  isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
 export type QueryProjectsArgs = {
   isArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };

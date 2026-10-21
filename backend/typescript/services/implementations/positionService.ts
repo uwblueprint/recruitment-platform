@@ -10,9 +10,12 @@ const Logger = logger(__filename);
 class PositionService implements IPositionService {
   /* eslint-disable class-methods-use-this */
 
-  async getAllPositions(): Promise<PositionDTO[]> {
+  async getAllPositions(isArchived?: boolean): Promise<PositionDTO[]> {
     try {
-      const positions = await Position.findAll({ order: [["title", "ASC"]] });
+      const positions = await Position.findAll({
+        where: isArchived !== undefined ? { is_archived: isArchived } : {},
+        order: [["title", "ASC"]],
+      });
       return positions.map(toPositionDTO);
     } catch (error: unknown) {
       Logger.error(
