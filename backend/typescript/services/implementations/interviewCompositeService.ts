@@ -1,4 +1,12 @@
-import { Op, Order, OrderItem, col, literal, Transaction } from "sequelize";
+import {
+  Op,
+  Order,
+  OrderItem,
+  WhereOptions,
+  col,
+  literal,
+  Transaction,
+} from "sequelize";
 import { sequelize } from "../../models";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
@@ -13,6 +21,7 @@ import {
   DashboardView,
   DashboardViewEnum,
   InterviewDashboardCountsDTO,
+  DashboardFilters,
   InterviewDashboardRowDTO,
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
@@ -35,6 +44,10 @@ import {
   toInterviewNotesDTO,
   toUserDTO,
 } from "../../utilities/dtoUtils";
+import {
+  buildApplicantRecordWhere,
+  buildApplicantWhere,
+} from "../../utilities/dashboardFilterUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";
@@ -52,7 +65,10 @@ import {
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
 import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedApplicantRecordService";
 
-const buildInterviewDashboardWhere = async (view?: DashboardView) => {
+const buildInterviewDashboardWhere = async (
+  view?: DashboardView,
+  filters?: DashboardFilters,
+): Promise<WhereOptions> => {
   // Resolve matching IDs separately so the hasMany join cannot duplicate rows
   // or interfere with pagination and interviewer sorting in the main query.
   const conflictingRecords =
@@ -72,11 +88,12 @@ const buildInterviewDashboardWhere = async (view?: DashboardView) => {
         })
       : undefined;
 
-  return {
+  const dashboardWhere: WhereOptions = {
     status: {
       [Op.in]: [
         ApplicationStatusEnum.INTERVIEWED,
         ApplicationStatusEnum.SELECTED,
+        ApplicationStatusEnum.OFFERED,
       ],
     },
     ...(view === DashboardViewEnum.SHORTLISTED
@@ -94,7 +111,38 @@ const buildInterviewDashboardWhere = async (view?: DashboardView) => {
         }
       : {}),
   };
+
+  // AND-ed rather than spread so an application status filter narrows the
+  // interviewed/selected set instead of replacing it.
+  return {
+    [Op.and]: [dashboardWhere, buildApplicantRecordWhere(filters)],
+  };
 };
+
+function buildInterviewScoreWhere(
+  filters?: DashboardFilters,
+): WhereOptions | undefined {
+  if (!filters?.scoreRanges?.length) {
+    return undefined;
+  }
+
+  const scoreConditions: WhereOptions[] = [];
+  filters.scoreRanges.forEach((range) => {
+    if (range === "gt_15") {
+      scoreConditions.push({ score: { [Op.gt]: 15 } });
+    } else if (range === "10_15") {
+      scoreConditions.push({ score: { [Op.between]: [10, 15] } });
+    } else if (range === "5_10") {
+      scoreConditions.push({ score: { [Op.between]: [5, 10] } });
+    } else if (range === "lt_5") {
+      scoreConditions.push({ score: { [Op.lt]: 5 } });
+    }
+  });
+
+  return scoreConditions.length
+    ? { ...(({ [Op.or]: scoreConditions } as unknown) as WhereOptions) }
+    : undefined;
+}
 
 const Logger = logger(__filename);
 
@@ -226,6 +274,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
     view?: DashboardView,
+    filters?: DashboardFilters,
   ): Promise<InterviewDashboardRowDTO[]> {
     try {
       if (
@@ -239,19 +288,24 @@ class InterviewCompositeService implements IInterviewCompositeService {
         );
       }
 
+      const interviewScoreWhere = buildInterviewScoreWhere(filters);
+
       const applicantRecords = await ApplicantRecord.findAll({
         attributes: ["id", "position", "status", "is_applicant_flagged"],
-        where: await buildInterviewDashboardWhere(view),
+        where: await buildInterviewDashboardWhere(view, filters),
         include: [
           {
             attributes: ["first_name", "last_name"],
             model: Applicant,
             required: true,
+            where: buildApplicantWhere(filters),
           },
           {
             attributes: ["id", "applicant_record_id", "score"],
             model: InterviewedApplicantRecord,
             as: "interviewed_applicant_record",
+            required: interviewScoreWhere !== undefined,
+            where: interviewScoreWhere,
             include: [
               {
                 attributes: [
@@ -306,11 +360,28 @@ class InterviewCompositeService implements IInterviewCompositeService {
     }
   }
 
-  async getInterviewDashboardCounts(): Promise<InterviewDashboardCountsDTO> {
+  async getInterviewDashboardCounts(
+    filters?: DashboardFilters,
+  ): Promise<InterviewDashboardCountsDTO> {
+    const interviewScoreWhere = buildInterviewScoreWhere(filters);
     const countView = async (view: DashboardView) =>
       ApplicantRecord.count({
-        where: await buildInterviewDashboardWhere(view),
-        include: [{ model: Applicant, required: true, attributes: [] }],
+        where: await buildInterviewDashboardWhere(view, filters),
+        include: [
+          {
+            model: Applicant,
+            required: true,
+            attributes: [],
+            where: buildApplicantWhere(filters),
+          },
+          {
+            model: InterviewedApplicantRecord,
+            as: "interviewed_applicant_record",
+            attributes: [],
+            required: interviewScoreWhere !== undefined,
+            where: interviewScoreWhere,
+          },
+        ],
       });
     const [all, shortlisted, conflicts] = await Promise.all([
       countView(DashboardViewEnum.ALL),

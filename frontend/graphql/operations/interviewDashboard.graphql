@@ -4,6 +4,7 @@ query InterviewDashboard(
   $sortBy: InterviewDashboardSortBy
   $view: DashboardView
   $sortAscending: Boolean
+  $filters: InterviewDashboardFilters
 ) {
   interviewDashboard(
     pageNumber: $pageNumber
@@ -11,6 +12,7 @@ query InterviewDashboard(
     sortBy: $sortBy
     view: $view
     sortAscending: $sortAscending
+    filters: $filters
   ) {
     applicantRecordId
     firstName
