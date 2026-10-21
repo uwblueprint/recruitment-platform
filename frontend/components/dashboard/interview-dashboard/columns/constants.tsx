@@ -2,7 +2,7 @@ import { InterviewDashboardSortBy } from "@/graphql/typeUtils";
 import type { InterviewDashboardResult } from "@/graphql/typeUtils";
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { ApplicationCell } from "@/components/dashboard/common/dashboardCells/ApplicationCell";
+import { ApplicationCell } from "@/components/dashboard/table/cell/ApplicationCell";
 
 import { InterviewStatusCell } from "./InterviewStatusCell";
 import { SelectAllHeader, SelectRowCell } from "./SelectionCell";

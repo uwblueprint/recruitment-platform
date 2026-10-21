@@ -4,7 +4,7 @@ import type {
 } from "@/graphql/typeUtils";
 import type { ColumnDef } from "@tanstack/react-table";
 
-import { ApplicationCell } from "@/components/dashboard/common/dashboardCells/ApplicationCell";
+import { ApplicationCell } from "@/components/dashboard/table/cell/ApplicationCell";
 import { ReviewerCell } from "./ReviewerCell";
 import { ReviewScoreCell } from "./ReviewScoreCell";
 import { ReviewStatusCell } from "./ReviewStatusCell";
