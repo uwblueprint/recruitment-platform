@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { DashboardStatusChip } from "@/components/dashboard/common";
 import { DashboardSidePanel } from "@/components/dashboard/side-panel/DashboardSidePanel";
 import DeleteOutline from "@mui/icons-material/DeleteOutline";
@@ -9,7 +8,9 @@ import type {
   MemberUpdates,
   MembersDashboardFilterOptions,
 } from "@/types/membersDashboard";
-import useMembersDashboardFilterOptions from "@/APIClients/queries/useMembersDashboardFilterOptions";
+import usePositions from "@/APIClients/queries/usePositions";
+import useProjects from "@/APIClients/queries/useProjects";
+import { MEMBER_STATUS_OPTIONS } from "../constants";
 import useMembersDashboardSidePanel from "../hooks/useMembersDashboardSidePanel";
 
 const MEMBER_FIELDS = [
@@ -53,16 +54,17 @@ export const MembersDashboardSidePanel = ({
   onDelete,
   onUpdate,
 }: Props) => {
-  const [selection, setSelection] = useState<{
-    memberId?: string;
-    role?: string;
-  }>({ memberId });
-  if (selection.memberId !== memberId) {
-    setSelection({ memberId });
-  }
   const { details, isLoading, error } = useMembersDashboardSidePanel(memberId);
-  const { data: options, error: optionsError } =
-    useMembersDashboardFilterOptions();
+  const { data: positions, error: positionsError } = usePositions();
+  const { data: projects, error: projectsError } = useProjects({ isArchived: false });
+  const options: MembersDashboardFilterOptions = {
+    roles: (positions ?? []).map(({ title }) => ({ value: title, label: title })),
+    teams: (projects ?? []).map(({ projectName }) => ({
+      value: projectName,
+      label: projectName,
+    })),
+    statuses: MEMBER_STATUS_OPTIONS,
+  };
 
   return (
     <DashboardSidePanel
@@ -86,16 +88,20 @@ export const MembersDashboardSidePanel = ({
           </p>
         ) : details ? (
           <>
-            {optionsError ? (
+            {positionsError ? (
               <p role="alert" className="text-alert-errorText">
-                Failed to load member position options.
+                Failed to load role options.
+              </p>
+            ) : null}
+            {projectsError ? (
+              <p role="alert" className="text-alert-errorText">
+                Failed to load team options.
               </p>
             ) : null}
             <div className="flex flex-wrap gap-4 border-b border-neutral-200 pb-6">
               {MEMBER_FIELDS.map(({ field, label, optionsKey }) => {
-                const currentValue =
-                  field === "role" ? selection.role ?? details.role : details[field];
-                const choices = options?.[optionsKey] ?? [];
+                const currentValue = details[field];
+                const choices = options[optionsKey];
                 // Keep the current value visible while options load or omit it.
                 const fieldOptions = choices.some(
                   ({ value }) => value === currentValue
@@ -119,13 +125,7 @@ export const MembersDashboardSidePanel = ({
                             ? "border-green-900 bg-green-50 text-green-900"
                             : "border-neutral-700 bg-neutral-100 text-neutral-700",
                       }))}
-                      onChange={(value) => {
-                        if (field === "role") {
-                          setSelection({ memberId, role: value });
-                        } else {
-                          onUpdate?.(details.id, { [field]: value });
-                        }
-                      }}
+                      onChange={(value) => onUpdate?.(details.id, { [field]: value })}
                     />
                   </label>
                 );

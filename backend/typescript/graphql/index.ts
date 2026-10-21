@@ -19,6 +19,8 @@ import reviewDashboardResolvers from "./resolvers/reviewDashboardResolvers";
 import reviewPageResolvers from "./resolvers/reviewPageResolvers";
 import userResolvers from "./resolvers/userResolvers";
 import positionResolvers from "./resolvers/positionResolvers";
+import projectResolvers from "./resolvers/projectResolvers";
+import projectType from "./types/projectType";
 import positionType from "./types/positionType";
 import adminCommentType from "./types/adminCommentType";
 import applicantRecordType from "./types/applicantRecordType";
@@ -71,6 +73,7 @@ const executableSchema = makeExecutableSchema({
     simpleEntityType,
     userType,
     positionType,
+    projectType,
   ],
   resolvers: merge(
     { Upload: GraphQLUpload },
@@ -85,6 +88,7 @@ const executableSchema = makeExecutableSchema({
     reviewPageResolvers,
     userResolvers,
     positionResolvers,
+    projectResolvers,
     interviewDelegationResolvers,
     interviewGroupResolvers,
     interviewPageResolvers,
@@ -110,6 +114,7 @@ const graphQLMiddlewares = {
     usersByPosition: authorizedByAdmin(),
     users: authorizedByAdmin(),
     positions: authorizedByAdmin(),
+    projects: authorizedByAdmin(),
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
     reviewedApplicantRecord: authorizedByAdmin(),
