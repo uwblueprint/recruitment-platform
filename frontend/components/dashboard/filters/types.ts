@@ -12,6 +12,8 @@ export type FilterCategory = {
   key: string;
   label: string;
   options: FilterOption[];
+  /** Shown in place of options when this category fails to load. */
+  error?: string;
   /**
    * "accordion" (default) expands the options inside the filter panel.
    * "toggle" renders a single checkbox row for one-option categories such as

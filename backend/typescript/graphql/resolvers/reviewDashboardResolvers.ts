@@ -63,6 +63,8 @@ const reviewDashboardResolvers = {
         filters,
       );
     },
+    reviewDashboardCSV: (): Promise<string> =>
+      reviewCompositeService.getReviewDashboardCSV(),
     reviewDashboardSidePanel: async (
       _parent: undefined,
       { applicantRecordId }: { applicantRecordId: string },

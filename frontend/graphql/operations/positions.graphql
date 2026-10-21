@@ -1,0 +1,6 @@
+query Positions($isArchived: Boolean) {
+  positions(isArchived: $isArchived) {
+    title
+    isArchived
+  }
+}

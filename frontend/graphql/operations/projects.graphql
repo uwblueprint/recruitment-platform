@@ -1,0 +1,7 @@
+query Projects($isArchived: Boolean) {
+  projects(isArchived: $isArchived) {
+    id
+    projectName
+    isArchived
+  }
+}

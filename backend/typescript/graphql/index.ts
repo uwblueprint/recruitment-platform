@@ -18,6 +18,10 @@ import reviewedApplicantRecordResolvers from "./resolvers/reviewedApplicantRecor
 import reviewDashboardResolvers from "./resolvers/reviewDashboardResolvers";
 import reviewPageResolvers from "./resolvers/reviewPageResolvers";
 import userResolvers from "./resolvers/userResolvers";
+import positionResolvers from "./resolvers/positionResolvers";
+import projectResolvers from "./resolvers/projectResolvers";
+import projectType from "./types/projectType";
+import positionType from "./types/positionType";
 import adminCommentType from "./types/adminCommentType";
 import applicantRecordType from "./types/applicantRecordType";
 import authType from "./types/authType";
@@ -68,6 +72,8 @@ const executableSchema = makeExecutableSchema({
     reviewPageType,
     simpleEntityType,
     userType,
+    positionType,
+    projectType,
   ],
   resolvers: merge(
     { Upload: GraphQLUpload },
@@ -81,6 +87,8 @@ const executableSchema = makeExecutableSchema({
     reviewDashboardResolvers,
     reviewPageResolvers,
     userResolvers,
+    positionResolvers,
+    projectResolvers,
     interviewDelegationResolvers,
     interviewGroupResolvers,
     interviewPageResolvers,
@@ -105,6 +113,8 @@ const graphQLMiddlewares = {
     userByEmail: authorizedByAdmin(),
     usersByPosition: authorizedByAdmin(),
     users: authorizedByAdmin(),
+    positions: authorizedByAdmin(),
+    projects: authorizedByAdmin(),
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
     reviewedApplicantRecord: authorizedByAdmin(),
@@ -122,6 +132,7 @@ const graphQLMiddlewares = {
     reviewDashboardCounts: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
     dashboardFilterOptions: authorizedByAdmin(),
+    reviewDashboardCSV: authorizedByAdmin(),
     interviewDashboard: authorizedByAdmin(),
     interviewDashboardCounts: authorizedByAdmin(),
     interviewDashboardSidePanel: authorizedByAdmin(),

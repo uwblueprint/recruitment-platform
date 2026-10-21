@@ -20,6 +20,7 @@ module.exports = {
           50: "#F5F5F5",
           100: "#EEEEEE",
           200: "#C4C4C4",
+          400: "#9F9F9F",
           500: "#737373",
           600: "#2D3748",
           700: "#444444",
@@ -164,4 +165,3 @@ module.exports = {
       require("@tailwindcss/forms"), // Form styling
     ],
   };
-  

@@ -654,6 +654,19 @@ export type MutationUploadInterviewNotesArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
+export type PositionDto = {
+  __typename?: 'PositionDTO';
+  isArchived: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type ProjectDto = {
+  __typename?: 'ProjectDTO';
+  id: Scalars['ID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  projectName: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   _empty?: Maybe<Scalars['String']['output']>;
@@ -679,8 +692,11 @@ export type Query = {
   interviewersByGroupId: Array<UserDto>;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
+  positions: Array<PositionDto>;
+  projects: Array<ProjectDto>;
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
+  reviewDashboardCSV: Scalars['String']['output'];
   reviewDashboardCounts: ReviewDashboardCountsDto;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
@@ -797,6 +813,16 @@ export type QueryIsAuthorizedByRoleArgs = {
 export type QueryIsAuthorizedToReviewArgs = {
   applicationId: Scalars['Int']['input'];
   reviewerUserId: Scalars['String']['input'];
+};
+
+
+export type QueryPositionsArgs = {
+  isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryProjectsArgs = {
+  isArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 

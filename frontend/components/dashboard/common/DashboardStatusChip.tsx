@@ -10,6 +10,10 @@ export type DashboardStatusChipProps<TStatus extends string> = {
   onChange?: (status: TStatus) => void;
   readOnly?: boolean;
   disabled?: boolean;
+  /** Show a border using the selected option’s border color. */
+  outlined?: boolean;
+  /** Size the chip to its selected label instead of the widest option. */
+  fitSelectedContent?: boolean;
 };
 
 export const DashboardStatusChip = <TStatus extends string>({
@@ -18,23 +22,25 @@ export const DashboardStatusChip = <TStatus extends string>({
   onChange,
   readOnly = false,
   disabled = false,
+  outlined = readOnly,
+  fitSelectedContent = false,
 }: DashboardStatusChipProps<TStatus>) => {
   const selectedOption = options.find((option) => option.value === value);
-  const chipClassName = `h-7 min-w-[112px] rounded py-0 text-center font-source text-xs ${selectedOption?.className ?? ""}`;
+  const chipClassName = `h-7 ${fitSelectedContent ? "" : "min-w-[112px]"} rounded py-0 text-center font-source text-xs ${outlined ? "border" : "border-0"} ${selectedOption?.className ?? ""}`;
 
   if (readOnly) {
     return (
       <span
-        className={`${chipClassName} inline-flex items-center justify-center border`}
+        className={`${chipClassName} inline-flex items-center justify-center ${fitSelectedContent ? "px-4" : ""}`}
       >
         {selectedOption?.label ?? value}
       </span>
     );
   }
 
-  return (
+  const select = (
     <select
-      className={`${chipClassName} border-0 pl-4 pr-8 focus:ring-2 focus:ring-blue`}
+      className={`${chipClassName} pl-4 pr-8 focus:ring-2 focus:ring-blue ${fitSelectedContent ? "absolute inset-0 w-full min-w-0" : ""}`}
       value={value}
       disabled={disabled}
       onChange={(event) =>
@@ -52,4 +58,20 @@ export const DashboardStatusChip = <TStatus extends string>({
       ))}
     </select>
   );
+
+  if (fitSelectedContent) {
+    return (
+      <span className="relative inline-grid w-fit align-middle">
+        <span
+          aria-hidden="true"
+          className={`${chipClassName} invisible whitespace-pre pl-4 pr-8`}
+        >
+          {selectedOption?.label ?? value}
+        </span>
+        {select}
+      </span>
+    );
+  }
+
+  return select;
 };
