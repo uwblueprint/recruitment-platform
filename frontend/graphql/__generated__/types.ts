@@ -192,6 +192,7 @@ export type InterviewDashboardRowDto = {
   firstName: Scalars['String']['output'];
   interviewScore?: Maybe<Scalars['Int']['output']>;
   interviewers: Array<UserDto>;
+  isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
 };

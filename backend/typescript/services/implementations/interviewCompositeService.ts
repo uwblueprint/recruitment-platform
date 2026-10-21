@@ -240,7 +240,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
       }
 
       const applicantRecords = await ApplicantRecord.findAll({
-        attributes: ["id", "position", "status"],
+        attributes: ["id", "position", "status", "is_applicant_flagged"],
         where: await buildInterviewDashboardWhere(view),
         include: [
           {

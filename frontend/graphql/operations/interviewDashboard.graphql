@@ -17,6 +17,7 @@ query InterviewDashboard(
     lastName
     position
     applicationStatus
+    isApplicantFlagged
     interviewers {
       firstName
       lastName

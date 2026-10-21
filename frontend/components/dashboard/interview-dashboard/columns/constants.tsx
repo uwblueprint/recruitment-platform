@@ -2,6 +2,8 @@ import { InterviewDashboardSortBy } from "@/graphql/typeUtils";
 import type { InterviewDashboardResult } from "@/graphql/typeUtils";
 import type { ColumnDef } from "@tanstack/react-table";
 
+import { ApplicationCell } from "@/components/dashboard/common/dashboardCells/ApplicationCell";
+
 import { InterviewStatusCell } from "./InterviewStatusCell";
 import { SelectAllHeader, SelectRowCell } from "./SelectionCell";
 
@@ -56,9 +58,10 @@ export const INTERVIEW_DASHBOARD_COLUMNS: ColumnDef<
     header: "Application",
     enableSorting: true,
     cell: ({ row }) => (
-      <span className="border-b border-neutral-800 text-neutral-800">
-        {fullName(row.original.firstName, row.original.lastName)}
-      </span>
+      <ApplicationCell
+        applicantName={fullName(row.original.firstName, row.original.lastName)}
+        isBookmarked={row.original.isApplicantFlagged}
+      />
     ),
   },
   {
