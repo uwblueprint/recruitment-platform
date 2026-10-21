@@ -9,7 +9,9 @@ import type {
   MemberUpdates,
   MembersDashboardFilterOptions,
 } from "@/types/membersDashboard";
-import useMembersDashboardFilterOptions from "@/APIClients/queries/useMembersDashboardFilterOptions";
+import usePositions from "@/APIClients/queries/usePositions";
+import useProjects from "@/APIClients/queries/useProjects";
+import { MEMBER_STATUS_OPTIONS } from "../constants";
 import useMembersDashboardSidePanel from "../hooks/useMembersDashboardSidePanel";
 
 const MEMBER_FIELDS = [
@@ -61,8 +63,16 @@ export const MembersDashboardSidePanel = ({
     setSelection({ memberId });
   }
   const { details, isLoading, error } = useMembersDashboardSidePanel(memberId);
-  const { data: options, error: optionsError } =
-    useMembersDashboardFilterOptions();
+  const { data: positions, error: positionsError } = usePositions();
+  const { data: projects, error: projectsError } = useProjects({ isArchived: false });
+  const options: MembersDashboardFilterOptions = {
+    roles: (positions ?? []).map(({ title }) => ({ value: title, label: title })),
+    teams: (projects ?? []).map(({ projectName }) => ({
+      value: projectName,
+      label: projectName,
+    })),
+    statuses: MEMBER_STATUS_OPTIONS,
+  };
 
   return (
     <DashboardSidePanel
@@ -86,16 +96,21 @@ export const MembersDashboardSidePanel = ({
           </p>
         ) : details ? (
           <>
-            {optionsError ? (
+            {positionsError ? (
               <p role="alert" className="text-alert-errorText">
-                Failed to load member position options.
+                Failed to load role options.
+              </p>
+            ) : null}
+            {projectsError ? (
+              <p role="alert" className="text-alert-errorText">
+                Failed to load team options.
               </p>
             ) : null}
             <div className="flex flex-wrap gap-4 border-b border-neutral-200 pb-6">
               {MEMBER_FIELDS.map(({ field, label, optionsKey }) => {
                 const currentValue =
                   field === "role" ? selection.role ?? details.role : details[field];
-                const choices = options?.[optionsKey] ?? [];
+                const choices = options[optionsKey];
                 // Keep the current value visible while options load or omit it.
                 const fieldOptions = choices.some(
                   ({ value }) => value === currentValue

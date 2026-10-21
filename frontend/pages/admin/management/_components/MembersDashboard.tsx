@@ -6,7 +6,9 @@ import type { RowSelectionState } from "@tanstack/react-table";
 import type { SelectedFilters } from "@/components/dashboard/filters";
 import type { MembersDashboardFilters } from "@/types/membersDashboard";
 import { createMembersDashboardColumns } from "./columns";
-import useMembersDashboardFilterOptions from "@/APIClients/queries/useMembersDashboardFilterOptions";
+import usePositions from "@/APIClients/queries/usePositions";
+import useProjects from "@/APIClients/queries/useProjects";
+import { MEMBER_STATUS_OPTIONS } from "./constants";
 import useDebouncedValue from "../../review/_components/hooks/useDebouncedValue";
 import { ManagementDashboardToolbar } from "./ManagementDashboardToolbar";
 import { Button } from "@/components/common/Button";
@@ -41,18 +43,28 @@ export const MembersDashboard = ({ onDelete }: MemberActionCallbacks) => {
   const [search, setSearch] = useState("");
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
-  const { data: filterOptions, error: filterOptionsError } =
-    useMembersDashboardFilterOptions();
+  const { data: positions, error: positionsError } = usePositions();
+  const { data: projects, error: projectsError } = useProjects({ isArchived: false });
   const filterCategories = useMemo(
-    () =>
-      filterOptions
-        ? [
-            { key: "role", label: "Role", options: filterOptions.roles },
-            { key: "team", label: "Team", options: filterOptions.teams },
-            { key: "status", label: "Status", options: filterOptions.statuses },
-          ]
-        : [],
-    [filterOptions]
+    () => [
+      {
+        key: "role",
+        label: "Role",
+        error: positionsError ? "Failed to load role filters." : undefined,
+        options: (positions ?? []).map(({ title }) => ({ value: title, label: title })),
+      },
+      {
+        key: "team",
+        label: "Team",
+        error: projectsError ? "Failed to load team filters." : undefined,
+        options: (projects ?? []).map(({ projectName }) => ({
+          value: projectName,
+          label: projectName,
+        })),
+      },
+      { key: "status", label: "Status", options: MEMBER_STATUS_OPTIONS },
+    ],
+    [positions, projects, positionsError, projectsError]
   );
   const backendFilters = useMemo(
     (): MembersDashboardFilters => ({
@@ -130,11 +142,6 @@ export const MembersDashboard = ({ onDelete }: MemberActionCallbacks) => {
           onRemove: handleRemoveFilter,
         }}
       />
-      {filterOptionsError ? (
-        <p role="alert" className="text-sm text-alert-errorText">
-          Failed to load member filters.
-        </p>
-      ) : null}
       {error ? (
         <div
           role="alert"
