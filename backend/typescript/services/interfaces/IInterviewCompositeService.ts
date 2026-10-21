@@ -6,6 +6,9 @@ import {
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
   InterviewInviteDTO,
+  InterviewGroupStatus,
+  InterviewInvitesFilters,
+  InterviewInvitesCountsDTO,
   InterviewedApplicantsDTO,
   InterviewNotesDTO,
   InterviewPairingsDTO,
@@ -68,7 +71,13 @@ interface IInterviewCompositeService {
   /**
    * Fetches all interview groups with their interviewers and interviewees for the admin interview invites page.
    */
-  getInterviewInvites(): Promise<InterviewInviteDTO[]>;
+  getInterviewInvites(
+    pageNumber: number,
+    resultsPerPage: number,
+    status?: InterviewGroupStatus[],
+    filters?: InterviewInvitesFilters,
+  ): Promise<InterviewInviteDTO[]>;
+  getInterviewInvitesCounts(): Promise<InterviewInvitesCountsDTO>;
 
   /**
    * Upload (or replace) the PDF interview notes for an interviewed applicant

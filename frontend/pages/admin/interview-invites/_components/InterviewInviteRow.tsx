@@ -1,12 +1,12 @@
-import type { InterviewInviteResult } from "@/graphql/typeUtils";
+import { InterviewGroupStatus, type InterviewInviteResult } from "@/graphql/typeUtils";
 import { theme } from "@/styles/Theme";
 import { CollapsibleRow } from "@/components/common/CollapsibleRow";
 import { Chip, Avatar } from "@mui/material";
 
-const STATUS_LABELS: Record<string, string> = {
-  AVAILABILITY_PENDING: "Availability pending",
-  READY_TO_INTERVIEW: "Ready for invite",
-  INVITES_SENT: "Invites sent",
+const STATUS_LABELS: Record<InterviewGroupStatus, string> = {
+  [InterviewGroupStatus.AvailabilityPending]: "Availability pending",
+  [InterviewGroupStatus.ReadyToInterview]: "Ready for invite",
+  [InterviewGroupStatus.InvitesSent]: "Invites sent",
 };
 
 type InterviewInviteRowProps = {

@@ -385,3 +385,5 @@ export type {
   UpdateReviewedApplicantRecordMutation,
   UpdateReviewedApplicantRecordMutationVariables,
 } from "./__generated__/operation-types";
+
+export { InterviewInvitesCountsDocument } from "./__generated__/graphql";

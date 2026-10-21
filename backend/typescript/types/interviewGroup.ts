@@ -32,3 +32,13 @@ export type InterviewInviteDTO = {
   schedulingLink?: string;
   status: InterviewGroupStatus;
 };
+
+export type InterviewInvitesFilters = {
+  search?: string;
+  positions?: string[];
+};
+
+export type InterviewInvitesCountsDTO = {
+  ready: number;
+  sent: number;
+};

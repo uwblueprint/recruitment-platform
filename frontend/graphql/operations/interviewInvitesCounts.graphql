@@ -1,0 +1,6 @@
+query InterviewInvitesCounts {
+  interviewInvitesCounts {
+    ready
+    sent
+  }
+}

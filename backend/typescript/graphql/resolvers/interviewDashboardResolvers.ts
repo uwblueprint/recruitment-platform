@@ -8,6 +8,9 @@ import {
   InterviewDashboardSidePanelDTO,
   InterviewDelegationDTO,
   InterviewInviteDTO,
+  InterviewGroupStatus,
+  InterviewInvitesFilters,
+  InterviewInvitesCountsDTO,
 } from "../../types";
 
 const interviewCompositeService: IInterviewCompositeService = new InterviewCompositeService();
@@ -49,9 +52,29 @@ const interviewDashboardResolvers = {
         applicantRecordId,
       );
     },
-    interviewInvites: async (): Promise<InterviewInviteDTO[]> => {
-      return interviewCompositeService.getInterviewInvites();
+    interviewInvites: async (
+      _parent: undefined,
+      {
+        pageNumber,
+        resultsPerPage,
+        status,
+        filters,
+      }: {
+        pageNumber: number;
+        resultsPerPage: number;
+        status?: InterviewGroupStatus[];
+        filters?: InterviewInvitesFilters;
+      },
+    ): Promise<InterviewInviteDTO[]> => {
+      return interviewCompositeService.getInterviewInvites(
+        pageNumber,
+        resultsPerPage,
+        status,
+        filters,
+      );
     },
+    interviewInvitesCounts: async (): Promise<InterviewInvitesCountsDTO> =>
+      interviewCompositeService.getInterviewInvitesCounts(),
   },
   Mutation: {
     delegateInterviewers: async (

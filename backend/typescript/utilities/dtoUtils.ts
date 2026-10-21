@@ -7,6 +7,7 @@ import {
   FirebaseFileDTO,
   InterviewDelegationDTO,
   InterviewGroupDTO,
+  InterviewInviteDTO,
   InterviewNotesDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -347,3 +348,39 @@ export const toPositionDTO = (position: Position): PositionDTO => {
     isArchived: position.is_archived,
   };
 };
+
+export function toInterviewInviteDTO(
+  group: InterviewGroup,
+): InterviewInviteDTO {
+  const interviewers = new Map<string, UserDTO>();
+  const interviewees = new Map<
+    string,
+    InterviewInviteDTO["interviewees"][number]
+  >();
+
+  (group.team ?? []).forEach((delegation) => {
+    if (delegation.interviewer) {
+      const interviewer = toUserDTO(delegation.interviewer);
+      interviewers.set(interviewer.id, interviewer);
+    }
+    const record = delegation.record?.applicant_record;
+    if (record?.applicant) {
+      interviewees.set(record.id, {
+        firstName: record.applicant.first_name,
+        lastName: record.applicant.last_name,
+        position: record.position,
+      });
+    }
+  });
+
+  return {
+    id: group.id,
+    status: group.status,
+    schedulingLink: group.scheduling_link,
+    position:
+      [...interviewees.values()].map((person) => person.position).sort()[0] ??
+      "",
+    interviewers: [...interviewers.values()],
+    interviewees: [...interviewees.values()],
+  };
+}

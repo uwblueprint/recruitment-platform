@@ -70,10 +70,20 @@ export type InterviewGroupQueryVariables = Exact<{
 
 export type InterviewGroupQuery = { interviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
 
-export type InterviewInvitesQueryVariables = Exact<{ [key: string]: never; }>;
+export type InterviewInvitesQueryVariables = Exact<{
+  pageNumber: number;
+  resultsPerPage: number;
+  status?: Array<Types.InterviewGroupStatus> | Types.InterviewGroupStatus | null | undefined;
+  filters?: Types.InterviewInvitesFilters | null | undefined;
+}>;
 
 
 export type InterviewInvitesQuery = { interviewInvites: Array<{ id: string, position: string, schedulingLink: string | null, status: Types.InterviewGroupStatus, interviewers: Array<{ id: string, firstName: string, lastName: string }>, interviewees: Array<{ firstName: string, lastName: string, position: string }> }> };
+
+export type InterviewInvitesCountsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InterviewInvitesCountsQuery = { interviewInvitesCounts: { ready: number, sent: number } };
 
 export type InterviewNotesQueryVariables = Exact<{
   interviewedApplicantRecordId: string | number;

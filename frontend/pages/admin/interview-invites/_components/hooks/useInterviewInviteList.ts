@@ -3,13 +3,12 @@ import type {
   FilterCategory,
   SelectedFilters,
 } from "@/components/dashboard/filters";
-import type { InterviewInviteResult } from "@/graphql/typeUtils";
+import { InterviewGroupStatus } from "@/graphql/typeUtils";
+import useInterviewInvites from "@/APIClients/queries/useInterviewInvites";
+import useInterviewInvitesCounts from "@/APIClients/queries/useInterviewInvitesCounts";
+import usePositions from "@/APIClients/queries/usePositions";
 
-const READY_STATUSES = new Set(["AVAILABILITY_PENDING", "READY_TO_INTERVIEW"]);
-
-export default function useInterviewInviteList(
-  invites: InterviewInviteResult[]
-) {
+export default function useInterviewInviteList() {
   const [activeTab, updateActiveTab] = useState<string>("ready");
   const [searchQuery, updateSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -43,13 +42,22 @@ export default function useInterviewInviteList(
   };
 
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const { data, previousData, loading, error } = useInterviewInvites({
+    pageNumber: requestedPage,
+    resultsPerPage,
+    status: activeTab === "ready"
+      ? [InterviewGroupStatus.AvailabilityPending, InterviewGroupStatus.ReadyToInterview]
+      : [InterviewGroupStatus.InvitesSent],
+    filters: { search: searchQuery, positions: selectedFilters.interviewType ?? [] },
+  });
+  const { counts, error: countsError } = useInterviewInvitesCounts();
+  const { data: positions, error: positionsError } = usePositions({ isArchived: false });
+  const visibleInvites = error ? [] : data ?? (loading ? previousData : undefined) ?? [];
   const filterCategories: FilterCategory[] = [
     {
       key: "interviewType",
       label: "Interview Type",
-      options: Array.from(new Set(invites.map((invite) => invite.position)))
-        .sort()
-        .map((value) => ({ value, label: value })),
+      options: (positions ?? []).map(({ title }) => ({ value: title, label: title })),
     },
   ];
 
@@ -68,30 +76,6 @@ export default function useInterviewInviteList(
     }));
   };
 
-  const readyInvites = invites.filter((i) => READY_STATUSES.has(i.status));
-  const sentInvites = invites.filter((i) => !READY_STATUSES.has(i.status));
-
-  const activeInvites = activeTab === "ready" ? readyInvites : sentInvites;
-  const filteredInvites = activeInvites.filter((invite) => {
-    const matchesSearch = invite.interviewers.some(({ firstName, lastName }) =>
-      `${firstName} ${lastName}`
-        .toLowerCase()
-        .includes(searchQuery.trim().toLowerCase())
-    );
-    const types = selectedFilters.interviewType ?? [];
-    return (
-      (!searchQuery.trim() || matchesSearch) &&
-      (types.length === 0 || types.includes(invite.position))
-    );
-  });
-
-  // Keep pagination local until the API supports fetching individual pages.
-  const pageCount = Math.max(1, Math.ceil(filteredInvites.length / resultsPerPage));
-  const pageNumber = Math.min(requestedPage, pageCount);
-  const visibleInvites = filteredInvites.slice(
-    (pageNumber - 1) * resultsPerPage,
-    pageNumber * resultsPerPage
-  );
   const visibleSelectedIds = new Set(
     visibleInvites.filter((invite) => selectedIds.has(invite.id)).map((invite) => invite.id)
   );
@@ -129,13 +113,15 @@ export default function useInterviewInviteList(
     searchQuery,
     setSearchQuery,
     selectedIds: visibleSelectedIds,
-    readyInvites,
-    sentInvites,
+    readyCount: counts?.ready,
+    sentCount: counts?.sent,
+    loading,
+    error: error ?? countsError ?? positionsError,
     visibleInvites,
     pagination: {
-      pageNumber,
+      pageNumber: requestedPage,
       resultsPerPage,
-      canGoNext: pageNumber < pageCount,
+      canGoNext: !loading && !error && visibleInvites.length === resultsPerPage,
       onPageChange: handlePageChange,
       onResultsPerPageChange: handleResultsPerPageChange,
     },

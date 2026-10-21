@@ -274,6 +274,17 @@ export type InterviewInviteeDto = {
   position: Scalars['String']['output'];
 };
 
+export type InterviewInvitesCountsDto = {
+  __typename?: 'InterviewInvitesCountsDTO';
+  ready: Scalars['Int']['output'];
+  sent: Scalars['Int']['output'];
+};
+
+export type InterviewInvitesFilters = {
+  positions?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type InterviewNotes = {
   __typename?: 'InterviewNotes';
   fileId: Scalars['ID']['output'];
@@ -663,6 +674,7 @@ export type Query = {
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
   interviewInvites: Array<InterviewInviteDto>;
+  interviewInvitesCounts: InterviewInvitesCountsDto;
   interviewNotes?: Maybe<InterviewNotes>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
@@ -740,6 +752,14 @@ export type QueryInterviewDelegationArgs = {
 
 export type QueryInterviewGroupArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewInvitesArgs = {
+  filters?: InputMaybe<InterviewInvitesFilters>;
+  pageNumber: Scalars['Int']['input'];
+  resultsPerPage: Scalars['Int']['input'];
+  status?: InputMaybe<Array<InterviewGroupStatus>>;
 };
 
 
