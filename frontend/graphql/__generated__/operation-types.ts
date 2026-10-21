@@ -80,7 +80,9 @@ export type InterviewInvitesQueryVariables = Exact<{
 
 export type InterviewInvitesQuery = { interviewInvites: Array<{ id: string, position: string, schedulingLink: string | null, status: Types.InterviewGroupStatus, interviewers: Array<{ id: string, firstName: string, lastName: string }>, interviewees: Array<{ firstName: string, lastName: string, position: string }> }> };
 
-export type InterviewInvitesCountsQueryVariables = Exact<{ [key: string]: never; }>;
+export type InterviewInvitesCountsQueryVariables = Exact<{
+  filters?: Types.InterviewInvitesFilters | null | undefined;
+}>;
 
 
 export type InterviewInvitesCountsQuery = { interviewInvitesCounts: { ready: number, sent: number } };

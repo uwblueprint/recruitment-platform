@@ -763,6 +763,11 @@ export type QueryInterviewInvitesArgs = {
 };
 
 
+export type QueryInterviewInvitesCountsArgs = {
+  filters?: InputMaybe<InterviewInvitesFilters>;
+};
+
+
 export type QueryInterviewNotesArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
 };
