@@ -14,11 +14,23 @@ export const up: Migration = async ({ context: sequelize }) => {
     project_id: {
       type: DataType.UUID,
       allowNull: false,
+      references: {
+        model: "projects",
+        key: "id",
+      },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     },
 
     position_id: {
       type: DataType.STRING,
       allowNull: false,
+      references: {
+        model: "positions",
+        key: "title",
+      },
+      onDelete: "CASCADE",
+      onUpdate: "CASCADE",
     },
 
     term: {
