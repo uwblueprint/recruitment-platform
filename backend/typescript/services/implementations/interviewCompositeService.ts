@@ -16,6 +16,7 @@ import InterviewDelegation from "../../models/interviewDelegation.model";
 import InterviewGroup from "../../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.model";
 import User from "../../models/user.model";
+import Position from "../../models/position.model";
 import {
   CreateInterviewDelegationDTO,
   ApplicationStatusEnum,
@@ -809,19 +810,17 @@ class InterviewCompositeService implements IInterviewCompositeService {
     InterviewUnmatchedApplicantsByPositionDTO[]
   > {
     try {
-      const records = await InterviewedApplicantRecord.findAll({
-        attributes: ["id", "applicant_record_id"],
-        where: { "$interview_delegations.interviewer_id$": { [Op.is]: null } },
+      const positions = await Position.findAll({
+        attributes: ["title"],
+        where: {
+          "$applicant_records.interviewed_applicant_record.interview_delegations.interviewer_id$": {
+            [Op.is]: null,
+          },
+        },
         include: [
           {
-            model: InterviewDelegation,
-            as: "interview_delegations",
-            attributes: [],
-            required: false,
-          },
-          {
             model: ApplicantRecord,
-            as: "applicant_record",
+            as: "applicant_records",
             attributes: ["id", "position"],
             required: true,
             include: [
@@ -831,18 +830,32 @@ class InterviewCompositeService implements IInterviewCompositeService {
                 attributes: ["id", "first_name", "last_name"],
                 required: true,
               },
+              {
+                model: InterviewedApplicantRecord,
+                as: "interviewed_applicant_record",
+                attributes: ["id", "applicant_record_id"],
+                required: true,
+                include: [
+                  {
+                    model: InterviewDelegation,
+                    as: "interview_delegations",
+                    attributes: [],
+                    required: false,
+                  },
+                ],
+              },
             ],
           },
         ],
         order: [
-          ["applicant_record", "position", "ASC"],
-          ["applicant_record", "applicant", "last_name", "ASC"],
-          ["applicant_record", "applicant", "first_name", "ASC"],
+          ["title", "ASC"],
+          ["applicant_records", "applicant", "last_name", "ASC"],
+          ["applicant_records", "applicant", "first_name", "ASC"],
+          ["applicant_records", "id", "ASC"],
         ],
-        group: ["position"],
       });
 
-      return records.map(toInterviewUnmatchedApplicantsByPositionDTO);
+      return positions.map(toInterviewUnmatchedApplicantsByPositionDTO);
     } catch (error: unknown) {
       Logger.error(
         `Failed to fetch unmatched applicants. Reason = ${getErrorMessage(

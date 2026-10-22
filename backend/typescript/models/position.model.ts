@@ -1,4 +1,5 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+import ApplicantRecord from "./applicantRecord.model";
 
 @Table({ tableName: "positions" })
 export default class Position extends Model {
@@ -7,4 +8,10 @@ export default class Position extends Model {
 
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
   is_archived!: boolean;
+
+  @HasMany(() => ApplicantRecord, {
+    foreignKey: "position",
+    sourceKey: "title",
+  })
+  applicant_records!: ApplicantRecord[];
 }

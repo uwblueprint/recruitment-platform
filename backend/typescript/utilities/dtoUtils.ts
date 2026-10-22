@@ -387,17 +387,17 @@ export function toInterviewInviteDTO(
 }
 
 export function toInterviewUnmatchedApplicantsByPositionDTO(
-  record: InterviewedApplicantRecord,
+  position: Position,
 ): InterviewUnmatchedApplicantsByPositionDTO {
   return {
-    position: record.applicant_record.position,
-    applicants: [
-      {
-        applicantRecordId: record.applicant_record_id,
-        interviewedApplicantRecordId: record.id,
-        firstName: record.applicant_record.applicant.first_name,
-        lastName: record.applicant_record.applicant.last_name,
-      },
-    ],
+    position: position.title,
+    applicants: position.applicant_records.map((record) => ({
+      applicantRecordId: record.id,
+      // Required by the unmatched-applicant query's inner join.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      interviewedApplicantRecordId: record.interviewed_applicant_record!.id,
+      firstName: record.applicant.first_name,
+      lastName: record.applicant.last_name,
+    })),
   };
 }
