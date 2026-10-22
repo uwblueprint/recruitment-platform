@@ -3,8 +3,6 @@ import {
   DataType,
   Model,
   Table,
-  HasMany,
-  HasOne,
   BelongsTo,
 } from "sequelize-typescript";
 import User from "./user.model";
