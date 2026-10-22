@@ -27,6 +27,7 @@ import applicantRecordType from "./types/applicantRecordType";
 import authType from "./types/authType";
 import entityType from "./types/entityType";
 import interviewDashboardTypes from "./types/interviewDashboardType";
+import interviewInvitesTypes from "./types/interviewInvitesTypes";
 import interviewDelegationsTypes from "./types/interviewDelegationType";
 import interviewedApplicantRecordsTypes from "./types/interviewedApplicantRecordsType";
 import interviewGroupTypes from "./types/interviewGroupType";
@@ -41,6 +42,7 @@ import interviewDelegationResolvers from "./resolvers/interviewDelegationResolve
 import interviewGroupResolvers from "./resolvers/interviewGroupResolvers";
 import interviewPageResolvers from "./resolvers/interviewPageResolvers";
 import interviewDashboardResolvers from "./resolvers/interviewDashboardResolvers";
+import interviewInvitesDashboardResolvers from "./resolvers/interviewInvitesDashboardResolvers";
 
 const query = gql`
   type Query {
@@ -63,6 +65,7 @@ const executableSchema = makeExecutableSchema({
     authType,
     entityType,
     interviewDashboardTypes,
+    interviewInvitesTypes,
     interviewDelegationsTypes,
     interviewGroupTypes,
     interviewPageType,
@@ -93,6 +96,7 @@ const executableSchema = makeExecutableSchema({
     interviewGroupResolvers,
     interviewPageResolvers,
     interviewDashboardResolvers,
+    interviewInvitesDashboardResolvers,
   ),
 });
 
