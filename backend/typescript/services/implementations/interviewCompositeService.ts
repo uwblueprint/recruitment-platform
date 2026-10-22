@@ -32,6 +32,7 @@ import {
   InterviewGroupStatus,
   InterviewInvitesFilters,
   InterviewInvitesCountsDTO,
+  InterviewUnmatchedApplicantsByPositionDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
   InterviewNotesDTO,
@@ -47,6 +48,7 @@ import {
   toInterviewNotesDTO,
   toUserDTO,
   toInterviewInviteDTO,
+  toInterviewUnmatchedApplicantsByPositionDTO,
 } from "../../utilities/dtoUtils";
 import {
   buildApplicantRecordWhere,
@@ -798,6 +800,54 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to delegate interviewers. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getUnmatchedApplicants(): Promise<
+    InterviewUnmatchedApplicantsByPositionDTO[]
+  > {
+    try {
+      const records = await InterviewedApplicantRecord.findAll({
+        attributes: ["id", "applicant_record_id"],
+        where: { "$interview_delegations.interviewer_id$": { [Op.is]: null } },
+        include: [
+          {
+            model: InterviewDelegation,
+            as: "interview_delegations",
+            attributes: [],
+            required: false,
+          },
+          {
+            model: ApplicantRecord,
+            as: "applicant_record",
+            attributes: ["id", "position"],
+            required: true,
+            include: [
+              {
+                model: Applicant,
+                as: "applicant",
+                attributes: ["id", "first_name", "last_name"],
+                required: true,
+              },
+            ],
+          },
+        ],
+        order: [
+          ["applicant_record", "position", "ASC"],
+          ["applicant_record", "applicant", "last_name", "ASC"],
+          ["applicant_record", "applicant", "first_name", "ASC"],
+        ],
+        group: ["position"],
+      });
+
+      return records.map(toInterviewUnmatchedApplicantsByPositionDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to fetch unmatched applicants. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }

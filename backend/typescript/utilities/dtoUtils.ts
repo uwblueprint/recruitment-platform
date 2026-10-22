@@ -8,6 +8,7 @@ import {
   InterviewDelegationDTO,
   InterviewGroupDTO,
   InterviewInviteDTO,
+  InterviewUnmatchedApplicantsByPositionDTO,
   InterviewNotesDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -382,5 +383,21 @@ export function toInterviewInviteDTO(
       "",
     interviewers: [...interviewers.values()],
     interviewees: [...interviewees.values()],
+  };
+}
+
+export function toInterviewUnmatchedApplicantsByPositionDTO(
+  record: InterviewedApplicantRecord,
+): InterviewUnmatchedApplicantsByPositionDTO {
+  return {
+    position: record.applicant_record.position,
+    applicants: [
+      {
+        applicantRecordId: record.applicant_record_id,
+        interviewedApplicantRecordId: record.id,
+        firstName: record.applicant_record.applicant.first_name,
+        lastName: record.applicant_record.applicant.last_name,
+      },
+    ],
   };
 }

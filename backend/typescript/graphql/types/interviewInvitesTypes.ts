@@ -26,7 +26,20 @@ const interviewInvitesTypes = gql`
     status: InterviewGroupStatus!
   }
 
+  type UnmatchedApplicantDTO {
+    applicantRecordId: ID!
+    interviewedApplicantRecordId: ID!
+    firstName: String!
+    lastName: String!
+  }
+
+  type InterviewUnmatchedApplicantsByPositionDTO {
+    position: String!
+    applicants: [UnmatchedApplicantDTO!]!
+  }
+
   extend type Query {
+    interviewUnmatchedApplicants: [InterviewUnmatchedApplicantsByPositionDTO!]!
     interviewInvites(
       pageNumber: Int!
       resultsPerPage: Int!
