@@ -104,6 +104,11 @@ export type InterviewNotesQueryVariables = Exact<{
 
 export type InterviewNotesQuery = { interviewNotes: { fileId: string, fileName: string, signedUrl: string } | null };
 
+export type InterviewUnmatchedApplicantsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type InterviewUnmatchedApplicantsQuery = { interviewUnmatchedApplicants: Array<{ position: string, applicants: Array<{ applicantRecordId: string, interviewedApplicantRecordId: string, firstName: string, lastName: string }> }> };
+
 export type InterviewedApplicantRecordByApplicantRecordIdQueryVariables = Exact<{
   applicantRecordId: string | number;
 }>;

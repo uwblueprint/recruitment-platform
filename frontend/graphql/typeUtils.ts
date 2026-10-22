@@ -1,6 +1,18 @@
 import type * as Operations from "./__generated__/operation-types";
 import type * as Schema from "./__generated__/types";
 
+export { InterviewUnmatchedApplicantsDocument } from "./__generated__/graphql";
+export type {
+  InterviewUnmatchedApplicantsQuery,
+  InterviewUnmatchedApplicantsQueryVariables,
+} from "./__generated__/operation-types";
+export type InterviewUnmatchedApplicantsResult = ArrayElement<
+  OperationField<
+    Operations.InterviewUnmatchedApplicantsQuery,
+    "interviewUnmatchedApplicants"
+  >
+>;
+
 /**
  * Re-export schema enums from the generated GraphQL type artifact.
  *
