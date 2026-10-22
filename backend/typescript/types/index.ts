@@ -15,4 +15,5 @@ export * from "./interviewPage";
 export * from "./interviewDashboard";
 export * from "./firebaseFile";
 export * from "./project";
+export * from "./userTermRecord";
 export * from "./position";

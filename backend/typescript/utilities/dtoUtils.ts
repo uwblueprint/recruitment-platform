@@ -23,6 +23,7 @@ import {
   SkillCategory,
   UserDTO,
   ProjectDTO,
+  UserTermRecordDTO,
   PositionDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
@@ -35,6 +36,7 @@ import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.mod
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 import User from "../models/user.model";
 import Project from "../models/project.model";
+import UserTermRecord from "../models/userTermRecord.model";
 import Position from "../models/position.model";
 
 export function toUserDTO(model: User): UserDTO {
@@ -342,6 +344,16 @@ export const toProjectDTO = (project: Project): ProjectDTO => {
   };
 };
 
+export const toUserTermRecordDTO = (
+  user_term_record: UserTermRecord,
+): UserTermRecordDTO => {
+  return {
+    userId: user_term_record.user_id,
+    projectId: user_term_record.project_id,
+    positionId: user_term_record.position_id,
+    term: user_term_record.term,
+  };
+};
 export const toPositionDTO = (position: Position): PositionDTO => {
   return {
     title: position.title,
