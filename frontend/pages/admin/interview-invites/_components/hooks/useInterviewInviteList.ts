@@ -77,12 +77,16 @@ export default function useInterviewInviteList() {
     }));
   };
 
-  const visibleSelectedIds = new Set(
-    visibleInvites.filter((invite) => selectedIds.has(invite.id)).map((invite) => invite.id)
-  );
+  // Fresh results reset selection, including after a background refetch.
+  const [previousInvites, setPreviousInvites] = useState(data);
+  if (data !== previousInvites) {
+    setPreviousInvites(data);
+    setSelectedIds(new Set());
+  }
+
   const allSelected =
     visibleInvites.length > 0 &&
-    visibleInvites.every((i) => visibleSelectedIds.has(i.id));
+    visibleInvites.every((i) => selectedIds.has(i.id));
 
   const handleSelectAll = () => {
     setSelectedIds((prev) => {
@@ -113,7 +117,7 @@ export default function useInterviewInviteList() {
     setActiveTab,
     searchQuery,
     setSearchQuery,
-    selectedIds: visibleSelectedIds,
+    selectedIds,
     readyCount: counts?.ready,
     sentCount: counts?.sent,
     loading,
