@@ -44,7 +44,7 @@ const reviewDashboardType = gql`
     label: String!
   }
 
-  type ReviewDashboardFilterOptionsDTO {
+  type DashboardFilterOptionsDTO {
     positions: [FilterOption!]!
     applicationStatuses: [FilterOption!]!
     skillCategories: [FilterOption!]!
@@ -111,9 +111,7 @@ const reviewDashboardType = gql`
       applicantRecordId: ID!
     ): ReviewDashboardSidePanelDTO!
 
-    reviewDashboardFilterOptions(
-      department: String
-    ): ReviewDashboardFilterOptionsDTO!
+    dashboardFilterOptions(department: String): DashboardFilterOptionsDTO!
   }
 
   extend type Mutation {

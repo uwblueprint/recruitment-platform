@@ -121,6 +121,16 @@ export type CreateUserDto = {
   role: Role;
 };
 
+export type DashboardFilterOptionsDto = {
+  __typename?: 'DashboardFilterOptionsDTO';
+  applicationStatuses: Array<FilterOption>;
+  bookmarked: Array<FilterOption>;
+  positions: Array<FilterOption>;
+  scoreRanges: Array<FilterOption>;
+  skillCategories: Array<FilterOption>;
+  years: Array<FilterOption>;
+};
+
 export enum DashboardView {
   All = 'ALL',
   Conflicts = 'CONFLICTS',
@@ -183,6 +193,16 @@ export type InterviewDashboardCountsDto = {
   all: Scalars['Int']['output'];
   conflicts: Scalars['Int']['output'];
   shortlisted: Scalars['Int']['output'];
+};
+
+export type InterviewDashboardFilters = {
+  applicationStatuses?: InputMaybe<Array<ApplicationStatus>>;
+  bookmarked?: InputMaybe<Scalars['Boolean']['input']>;
+  positions?: InputMaybe<Array<Scalars['String']['input']>>;
+  scoreRanges?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  skillCategories?: InputMaybe<Array<SkillCategory>>;
+  years?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type InterviewDashboardRowDto = {
@@ -664,6 +684,7 @@ export type Query = {
   adminCommentById: AdminCommentDto;
   adminCommentsByApplicantRecordId: Array<AdminCommentDto>;
   application: ApplicationDto;
+  dashboardFilterOptions: DashboardFilterOptionsDto;
   entities: Array<EntityResponseDto>;
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
@@ -689,7 +710,6 @@ export type Query = {
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
   reviewDashboardCSV: Scalars['String']['output'];
   reviewDashboardCounts: ReviewDashboardCountsDto;
-  reviewDashboardFilterOptions: ReviewDashboardFilterOptionsDto;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
   reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
@@ -720,6 +740,11 @@ export type QueryApplicationArgs = {
 };
 
 
+export type QueryDashboardFilterOptionsArgs = {
+  department?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryEntityArgs = {
   id: Scalars['ID']['input'];
 };
@@ -731,11 +756,17 @@ export type QueryFileArgs = {
 
 
 export type QueryInterviewDashboardArgs = {
+  filters?: InputMaybe<InterviewDashboardFilters>;
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<InterviewDashboardSortBy>;
   view?: InputMaybe<DashboardView>;
+};
+
+
+export type QueryInterviewDashboardCountsArgs = {
+  filters?: InputMaybe<InterviewDashboardFilters>;
 };
 
 
@@ -842,11 +873,6 @@ export type QueryReviewDashboardCountsArgs = {
 };
 
 
-export type QueryReviewDashboardFilterOptionsArgs = {
-  department?: InputMaybe<Scalars['String']['input']>;
-};
-
-
 export type QueryReviewDashboardSidePanelArgs = {
   applicantRecordId: Scalars['ID']['input'];
 };
@@ -921,16 +947,6 @@ export type ReviewDashboardCountsDto = {
   all: Scalars['Int']['output'];
   conflicts: Scalars['Int']['output'];
   shortlisted: Scalars['Int']['output'];
-};
-
-export type ReviewDashboardFilterOptionsDto = {
-  __typename?: 'ReviewDashboardFilterOptionsDTO';
-  applicationStatuses: Array<FilterOption>;
-  bookmarked: Array<FilterOption>;
-  positions: Array<FilterOption>;
-  scoreRanges: Array<FilterOption>;
-  skillCategories: Array<FilterOption>;
-  years: Array<FilterOption>;
 };
 
 export type ReviewDashboardFilters = {

@@ -41,6 +41,31 @@ const interviewDashboardTypes = gql`
     APPLICATION_STATUS
   }
 
+  type InterviewInviteeDTO {
+    firstName: String!
+    lastName: String!
+    position: String!
+  }
+
+  type InterviewInviteDTO {
+    id: ID!
+    interviewers: [UserDTO!]!
+    interviewees: [InterviewInviteeDTO!]!
+    position: String!
+    schedulingLink: String
+    status: InterviewGroupStatus!
+  }
+
+  input InterviewDashboardFilters {
+    search: String
+    positions: [String!]
+    applicationStatuses: [ApplicationStatus!]
+    skillCategories: [SkillCategory!]
+    scoreRanges: [String!]
+    years: [String!]
+    bookmarked: Boolean
+  }
+
   type InterviewDashboardCountsDTO {
     all: Int!
     shortlisted: Int!
@@ -48,13 +73,16 @@ const interviewDashboardTypes = gql`
   }
 
   extend type Query {
-    interviewDashboardCounts: InterviewDashboardCountsDTO!
+    interviewDashboardCounts(
+      filters: InterviewDashboardFilters
+    ): InterviewDashboardCountsDTO!
     interviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
       sortBy: InterviewDashboardSortBy
       view: DashboardView
       sortAscending: Boolean
+      filters: InterviewDashboardFilters
     ): [InterviewDashboardRowDTO!]!
 
     interviewDashboardSidePanel(

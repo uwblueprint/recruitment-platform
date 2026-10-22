@@ -9,7 +9,7 @@ import { createMembersDashboardColumns } from "./columns";
 import usePositions from "@/APIClients/queries/usePositions";
 import useProjects from "@/APIClients/queries/useProjects";
 import { MEMBER_STATUS_OPTIONS } from "./constants";
-import useDebouncedValue from "../../review/_components/hooks/useDebouncedValue";
+import useDebouncedValue from "@/hooks/useDebouncedValue";
 import { ManagementDashboardToolbar } from "./ManagementDashboardToolbar";
 import { Button } from "@/components/common/Button";
 import PersonAddAltOutlined from "@mui/icons-material/PersonAddAltOutlined";

@@ -77,6 +77,7 @@ export type UserDTO = WithoutTypename<Schema.UserDto>;
 export type ReviewDashboardReviewDetails =
   WithoutTypename<Schema.ReviewDashboardReviewDetails>;
 export type ReviewDashboardFilters = Schema.ReviewDashboardFilters;
+export type InterviewDashboardFilters = Schema.InterviewDashboardFilters;
 
 /**
  * Clean aliases for generated GraphQL input types.
@@ -136,7 +137,7 @@ export {
   ReviewDashboardCountsDocument,
   ReviewDashboardCsvDocument,
   ReviewDashboardSidePanelDocument,
-  ReviewDashboardFilterOptionsDocument,
+  DashboardFilterOptionsDocument,
   UpdateApplicantRecordStatusDocument,
   SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
@@ -214,8 +215,8 @@ export type {
   ReviewDashboardQueryVariables,
   ReviewDashboardSidePanelQuery,
   ReviewDashboardSidePanelQueryVariables,
-  ReviewDashboardFilterOptionsQuery,
-  ReviewDashboardFilterOptionsQueryVariables,
+  DashboardFilterOptionsQuery,
+  DashboardFilterOptionsQueryVariables,
   UpdateApplicantRecordStatusMutation,
   UpdateApplicantRecordStatusMutationVariables,
   SubmitInterviewScoresMutation,
@@ -343,9 +344,9 @@ export type ReviewDashboardSidePanelReviewDetail = ArrayElement<
   ReviewDashboardSidePanelResult["reviewDetails"]
 >;
 
-export type ReviewDashboardFilterOptionsResult = OperationField<
-  Operations.ReviewDashboardFilterOptionsQuery,
-  "reviewDashboardFilterOptions"
+export type DashboardFilterOptionsResult = OperationField<
+  Operations.DashboardFilterOptionsQuery,
+  "dashboardFilterOptions"
 >;
 
 export type ReviewedApplicantResult = ArrayElement<

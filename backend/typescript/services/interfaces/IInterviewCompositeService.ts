@@ -2,6 +2,7 @@ import {
   InterviewDelegationDTO,
   DashboardView,
   InterviewDashboardCountsDTO,
+  DashboardFilters,
   InterviewDashboardRowDTO,
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
@@ -17,7 +18,9 @@ import {
 import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 
 interface IInterviewCompositeService {
-  getInterviewDashboardCounts(): Promise<InterviewDashboardCountsDTO>;
+  getInterviewDashboardCounts(
+    filters?: DashboardFilters,
+  ): Promise<InterviewDashboardCountsDTO>;
 
   /**
    * Fetches paginated applicants for the admin interview dashboard.
@@ -25,6 +28,8 @@ interface IInterviewCompositeService {
    * @Param resultsPerPage the number of results per page
    * @Param sortBy the dashboard column to sort results by
    * @Param sortAscending whether to sort ascending; defaults to true
+   * @Param view the dashboard tab to restrict results to
+   * @Param filters search text and filter menu selections to narrow results by
    */
   getInterviewDashboard(
     pageNumber: number,
@@ -32,6 +37,7 @@ interface IInterviewCompositeService {
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
     view?: DashboardView,
+    filters?: DashboardFilters,
   ): Promise<InterviewDashboardRowDTO[]>;
 
   /**
