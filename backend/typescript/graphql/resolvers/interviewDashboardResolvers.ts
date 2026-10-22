@@ -8,7 +8,6 @@ import {
   InterviewDashboardSortBy,
   InterviewDashboardSidePanelDTO,
   InterviewDelegationDTO,
-  InterviewInviteDTO,
 } from "../../types";
 
 const interviewCompositeService: IInterviewCompositeService = new InterviewCompositeService();
@@ -55,9 +54,6 @@ const interviewDashboardResolvers = {
       return interviewCompositeService.getInterviewDashboardSidePanel(
         applicantRecordId,
       );
-    },
-    interviewInvites: async (): Promise<InterviewInviteDTO[]> => {
-      return interviewCompositeService.getInterviewInvites();
     },
   },
   Mutation: {

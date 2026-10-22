@@ -68,6 +68,14 @@ export default class InterviewDelegation extends Model {
   })
   interviewed_applicant_record!: InterviewedApplicantRecord;
 
+  // Short aliases keep deeply nested eager-loading column names below
+  // PostgreSQL's 63-byte identifier limit.
+  @BelongsTo(() => InterviewedApplicantRecord, {
+    foreignKey: "interviewed_applicant_record_id",
+    targetKey: "id",
+  })
+  record?: InterviewedApplicantRecord;
+
   @BelongsTo(() => User, {
     foreignKey: "interviewer_id",
     targetKey: "id",
