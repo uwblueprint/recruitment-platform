@@ -1,4 +1,13 @@
-import { Op, Order, OrderItem, col, literal, Transaction } from "sequelize";
+import {
+  Op,
+  Order,
+  OrderItem,
+  WhereOptions,
+  IncludeOptions,
+  col,
+  literal,
+  Transaction,
+} from "sequelize";
 import { sequelize } from "../../models";
 import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
@@ -13,13 +22,16 @@ import {
   DashboardView,
   DashboardViewEnum,
   InterviewDashboardCountsDTO,
+  DashboardFilters,
   InterviewDashboardRowDTO,
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
   InterviewDashboardSortByEnum,
   InterviewDelegationDTO,
   InterviewInviteDTO,
-  InterviewInviteeDTO,
+  InterviewGroupStatus,
+  InterviewInvitesFilters,
+  InterviewInvitesCountsDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
   InterviewNotesDTO,
@@ -34,7 +46,12 @@ import {
   toInterviewedApplicantDTO,
   toInterviewNotesDTO,
   toUserDTO,
+  toInterviewInviteDTO,
 } from "../../utilities/dtoUtils";
+import {
+  buildApplicantRecordWhere,
+  buildApplicantWhere,
+} from "../../utilities/dashboardFilterUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IInterviewCompositeService from "../interfaces/IInterviewCompositeService";
@@ -52,7 +69,10 @@ import {
 import IInterviewGroupService from "../interfaces/IInterviewGroupService";
 import IInterviewedApplicantRecordsService from "../interfaces/IInterviewedApplicantRecordService";
 
-const buildInterviewDashboardWhere = async (view?: DashboardView) => {
+const buildInterviewDashboardWhere = async (
+  view?: DashboardView,
+  filters?: DashboardFilters,
+): Promise<WhereOptions> => {
   // Resolve matching IDs separately so the hasMany join cannot duplicate rows
   // or interfere with pagination and interviewer sorting in the main query.
   const conflictingRecords =
@@ -72,11 +92,12 @@ const buildInterviewDashboardWhere = async (view?: DashboardView) => {
         })
       : undefined;
 
-  return {
+  const dashboardWhere: WhereOptions = {
     status: {
       [Op.in]: [
         ApplicationStatusEnum.INTERVIEWED,
         ApplicationStatusEnum.SELECTED,
+        ApplicationStatusEnum.OFFERED,
       ],
     },
     ...(view === DashboardViewEnum.SHORTLISTED
@@ -94,6 +115,116 @@ const buildInterviewDashboardWhere = async (view?: DashboardView) => {
         }
       : {}),
   };
+
+  // AND-ed rather than spread so an application status filter narrows the
+  // interviewed/selected set instead of replacing it.
+  return {
+    [Op.and]: [dashboardWhere, buildApplicantRecordWhere(filters)],
+  };
+};
+
+function buildInterviewScoreWhere(
+  filters?: DashboardFilters,
+): WhereOptions | undefined {
+  if (!filters?.scoreRanges?.length) {
+    return undefined;
+  }
+
+  const scoreConditions: WhereOptions[] = [];
+  filters.scoreRanges.forEach((range) => {
+    if (range === "gt_15") {
+      scoreConditions.push({ score: { [Op.gt]: 15 } });
+    } else if (range === "10_15") {
+      scoreConditions.push({ score: { [Op.between]: [10, 15] } });
+    } else if (range === "5_10") {
+      scoreConditions.push({ score: { [Op.between]: [5, 10] } });
+    } else if (range === "lt_5") {
+      scoreConditions.push({ score: { [Op.lt]: 5 } });
+    }
+  });
+
+  return scoreConditions.length
+    ? { ...(({ [Op.or]: scoreConditions } as unknown) as WhereOptions) }
+    : undefined;
+}
+
+const READY_INVITE_STATUSES = [
+  InterviewGroupStatusEnum.AVAILABILITY_PENDING,
+  InterviewGroupStatusEnum.READY_TO_INTERVIEW,
+];
+
+const buildInterviewInvitesWhere = (
+  status?: InterviewGroupStatus[],
+  filters?: InterviewInvitesFilters,
+): WhereOptions => {
+  const result: WhereOptions = {
+    ...(status?.length ? { status: { [Op.in]: status } } : {}),
+  };
+  const search = filters?.search?.trim();
+  if (search) {
+    const pattern = `%${search.replace(/[\\%_]/g, "\\$&")}%`;
+    return {
+      ...result,
+      [Op.and]: [
+        literal(`EXISTS (
+      SELECT 1 FROM interview_delegations d
+      JOIN users u ON u.id = d.interviewer_id
+      WHERE d.group_id = "InterviewGroup".id
+        AND (u.first_name || ' ' || u.last_name) ILIKE ${sequelize.escape(
+          pattern,
+        )}
+    )`),
+      ],
+    };
+  }
+  return result;
+};
+
+const buildInterviewInviteApplicantRecordWhere = (
+  filters?: InterviewInvitesFilters,
+): WhereOptions => {
+  const result: WhereOptions = {};
+  if (filters?.positions?.length) {
+    result.position = { [Op.in]: filters.positions };
+  }
+  return result;
+};
+
+const buildInterviewInvitePositionInclude = (
+  filters?: InterviewInvitesFilters,
+): IncludeOptions[] => {
+  if (!filters?.positions?.length) return [];
+
+  // Match groups without restricting the members loaded by the team association.
+  return [
+    {
+      model: InterviewDelegation,
+      as: "interview_delegations",
+      attributes: [],
+      required: true,
+      include: [
+        {
+          model: InterviewedApplicantRecord,
+          as: "interviewed_applicant_record",
+          attributes: [],
+          required: true,
+          // Keep these joins in Sequelize's group-existence subquery so LIMIT
+          // applies to groups rather than matching delegation rows.
+          duplicating: true,
+          include: [
+            {
+              model: ApplicantRecord,
+              as: "applicant_record",
+              attributes: [],
+              required: true,
+              duplicating: true,
+              where: buildInterviewInviteApplicantRecordWhere(filters),
+            },
+          ],
+        },
+      ],
+    },
+  ];
 };
 
 const Logger = logger(__filename);
@@ -226,6 +357,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
     view?: DashboardView,
+    filters?: DashboardFilters,
   ): Promise<InterviewDashboardRowDTO[]> {
     try {
       if (
@@ -239,19 +371,24 @@ class InterviewCompositeService implements IInterviewCompositeService {
         );
       }
 
+      const interviewScoreWhere = buildInterviewScoreWhere(filters);
+
       const applicantRecords = await ApplicantRecord.findAll({
-        attributes: ["id", "position", "status"],
-        where: await buildInterviewDashboardWhere(view),
+        attributes: ["id", "position", "status", "is_applicant_flagged"],
+        where: await buildInterviewDashboardWhere(view, filters),
         include: [
           {
             attributes: ["first_name", "last_name"],
             model: Applicant,
             required: true,
+            where: buildApplicantWhere(filters),
           },
           {
             attributes: ["id", "applicant_record_id", "score"],
             model: InterviewedApplicantRecord,
             as: "interviewed_applicant_record",
+            required: interviewScoreWhere !== undefined,
+            where: interviewScoreWhere,
             include: [
               {
                 attributes: [
@@ -306,11 +443,28 @@ class InterviewCompositeService implements IInterviewCompositeService {
     }
   }
 
-  async getInterviewDashboardCounts(): Promise<InterviewDashboardCountsDTO> {
+  async getInterviewDashboardCounts(
+    filters?: DashboardFilters,
+  ): Promise<InterviewDashboardCountsDTO> {
+    const interviewScoreWhere = buildInterviewScoreWhere(filters);
     const countView = async (view: DashboardView) =>
       ApplicantRecord.count({
-        where: await buildInterviewDashboardWhere(view),
-        include: [{ model: Applicant, required: true, attributes: [] }],
+        where: await buildInterviewDashboardWhere(view, filters),
+        include: [
+          {
+            model: Applicant,
+            required: true,
+            attributes: [],
+            where: buildApplicantWhere(filters),
+          },
+          {
+            model: InterviewedApplicantRecord,
+            as: "interviewed_applicant_record",
+            attributes: [],
+            required: interviewScoreWhere !== undefined,
+            where: interviewScoreWhere,
+          },
+        ],
       });
     const [all, shortlisted, conflicts] = await Promise.all([
       countView(DashboardViewEnum.ALL),
@@ -649,84 +803,99 @@ class InterviewCompositeService implements IInterviewCompositeService {
     }
   }
 
-  async getInterviewInvites(): Promise<InterviewInviteDTO[]> {
+  async getInterviewInvitesCounts(
+    filters?: InterviewInvitesFilters,
+  ): Promise<InterviewInvitesCountsDTO> {
+    const countStatus = (status: InterviewGroupStatus[]) =>
+      InterviewGroup.count({
+        where: buildInterviewInvitesWhere(status, filters),
+        include: buildInterviewInvitePositionInclude(filters),
+        distinct: true,
+        col: "id",
+      });
+    const [ready, sent] = await Promise.all([
+      countStatus(READY_INVITE_STATUSES),
+      countStatus([InterviewGroupStatusEnum.INVITES_SENT]),
+    ]);
+    return { ready, sent };
+  }
+
+  async getInterviewInvites(
+    pageNumber: number,
+    resultsPerPage: number,
+    status?: InterviewGroupStatus[],
+    filters?: InterviewInvitesFilters,
+  ): Promise<InterviewInviteDTO[]> {
     try {
-      // Query 1: groups with interviewers only (avoids deep join collision)
+      if (
+        !Number.isInteger(pageNumber) ||
+        pageNumber < 1 ||
+        !Number.isInteger(resultsPerPage) ||
+        resultsPerPage < 1 ||
+        resultsPerPage > 100
+      ) {
+        throw new Error(
+          "pageNumber must be a positive integer and resultsPerPage must be between 1 and 100",
+        );
+      }
       const groups = await InterviewGroup.findAll({
+        attributes: ["id", "status", "scheduling_link", "createdAt"],
+        where: buildInterviewInvitesWhere(status, filters),
         include: [
+          ...buildInterviewInvitePositionInclude(filters),
           {
             model: InterviewDelegation,
-            as: "interview_delegations",
+            as: "team",
+            attributes: [
+              "interviewed_applicant_record_id",
+              "interviewer_id",
+              "group_id",
+            ],
             required: false,
-            separate: true,
-            include: [{ model: User, as: "interviewer" }],
+            include: [
+              {
+                model: User,
+                as: "interviewer",
+                attributes: [
+                  "id",
+                  "first_name",
+                  "last_name",
+                  "email",
+                  "position",
+                  "role",
+                  "is_archived",
+                ],
+              },
+              {
+                model: InterviewedApplicantRecord,
+                as: "record",
+                attributes: ["id", "applicant_record_id"],
+                include: [
+                  {
+                    model: ApplicantRecord,
+                    as: "applicant_record",
+                    attributes: ["id", "position"],
+                    include: [
+                      {
+                        model: Applicant,
+                        as: "applicant",
+                        attributes: ["id", "first_name", "last_name"],
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
           },
         ],
+        order: [
+          ["createdAt", "ASC"],
+          ["id", "ASC"],
+        ],
+        limit: resultsPerPage,
+        offset: (pageNumber - 1) * resultsPerPage,
       });
-
-      // Collect all interviewed_applicant_record_ids across all delegations
-      const allIarIds = [
-        ...new Set(
-          groups.flatMap((g) =>
-            (g.interview_delegations ?? []).map(
-              (d) => d.interviewed_applicant_record_id,
-            ),
-          ),
-        ),
-      ];
-
-      // Query 2: load interviewee data for those records
-      const iarByRecordId = new Map<string, InterviewedApplicantRecord>();
-      if (allIarIds.length > 0) {
-        const iars = await InterviewedApplicantRecord.findAll({
-          where: { id: { [Op.in]: allIarIds } },
-          include: [
-            {
-              model: ApplicantRecord,
-              include: [{ model: Applicant }],
-            },
-          ],
-        });
-        iars.forEach((iar) => iarByRecordId.set(iar.id, iar));
-      }
-
-      return groups.map((group) => {
-        const delegations = group.interview_delegations ?? [];
-
-        const interviewers = dedupeUsersById(
-          delegations.map((d) => d.interviewer).filter((u): u is User => !!u),
-        ).map((user) => toUserDTO(user));
-
-        const seenApplicantRecordIds = new Set<string>();
-        const interviewees: InterviewInviteeDTO[] = delegations
-          .map((d) => iarByRecordId.get(d.interviewed_applicant_record_id))
-          .filter(
-            (iar): iar is InterviewedApplicantRecord =>
-              !!iar?.applicant_record?.applicant,
-          )
-          .filter((iar) => {
-            if (seenApplicantRecordIds.has(iar.applicant_record_id))
-              return false;
-            seenApplicantRecordIds.add(iar.applicant_record_id);
-            return true;
-          })
-          .map((iar) => ({
-            firstName: iar.applicant_record.applicant.first_name,
-            lastName: iar.applicant_record.applicant.last_name,
-            position: iar.applicant_record.position,
-          }));
-
-        const position = interviewees[0]?.position ?? "";
-
-        return {
-          id: group.id,
-          interviewers,
-          interviewees,
-          position,
-          schedulingLink: group.scheduling_link,
-          status: group.status,
-        };
-      });
+      return groups.map(toInterviewInviteDTO);
     } catch (error: unknown) {
       Logger.error(
         `Failed to fetch interview invites. Reason = ${getErrorMessage(error)}`,

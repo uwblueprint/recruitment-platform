@@ -1,8 +1,8 @@
 import ReviewCompositeService from "../../services/implementations/reviewCompositeService";
 import {
   DashboardView,
-  ReviewDashboardFilterOptionsDTO,
-  ReviewDashboardFilters,
+  DashboardFilterOptionsDTO,
+  DashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
@@ -15,7 +15,7 @@ const reviewDashboardResolvers = {
   Query: {
     reviewDashboardCounts: (
       _parent: undefined,
-      { filters }: { filters?: ReviewDashboardFilters },
+      { filters }: { filters?: DashboardFilters },
     ): Promise<ReviewDashboardCountsDTO> =>
       reviewCompositeService.getReviewDashboardCounts(filters),
     reviewDashboard: async (
@@ -32,7 +32,7 @@ const reviewDashboardResolvers = {
         resultsPerPage: number;
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
-        filters?: ReviewDashboardFilters;
+        filters?: DashboardFilters;
         view?: DashboardView;
       },
     ): Promise<ReviewDashboardRowDTO[]> => {
@@ -54,7 +54,7 @@ const reviewDashboardResolvers = {
       }: {
         sortBy?: ReviewDashboardSortBy;
         sortAscending?: boolean;
-        filters?: ReviewDashboardFilters;
+        filters?: DashboardFilters;
       },
     ): Promise<string[]> => {
       return reviewCompositeService.getReviewDashboardApplicantRecordIds(
@@ -63,6 +63,8 @@ const reviewDashboardResolvers = {
         filters,
       );
     },
+    reviewDashboardCSV: (): Promise<string> =>
+      reviewCompositeService.getReviewDashboardCSV(),
     reviewDashboardSidePanel: async (
       _parent: undefined,
       { applicantRecordId }: { applicantRecordId: string },
@@ -71,11 +73,11 @@ const reviewDashboardResolvers = {
         applicantRecordId,
       );
     },
-    reviewDashboardFilterOptions: async (
+    dashboardFilterOptions: async (
       _parent: undefined,
       { department }: { department?: string },
-    ): Promise<ReviewDashboardFilterOptionsDTO> => {
-      return reviewCompositeService.getReviewDashboardFilterOptions(department);
+    ): Promise<DashboardFilterOptionsDTO> => {
+      return reviewCompositeService.getDashboardFilterOptions(department);
     },
   },
   Mutation: {

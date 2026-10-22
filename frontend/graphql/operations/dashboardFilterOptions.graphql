@@ -1,5 +1,5 @@
-query ReviewDashboardFilterOptions($department: String) {
-  reviewDashboardFilterOptions(department: $department) {
+query DashboardFilterOptions($department: String) {
+  dashboardFilterOptions(department: $department) {
     positions {
       value
       label

@@ -5,11 +5,12 @@ import {
   type InterviewInvitesQueryVariables,
 } from "@/graphql/typeUtils";
 
-export default function useInterviewInvites() {
-  const { data, loading, error, refetch } = useQuery<
+export default function useInterviewInvites(variables: InterviewInvitesQueryVariables) {
+  const { data, previousData, loading, error, refetch } = useQuery<
     InterviewInvitesQuery,
     InterviewInvitesQueryVariables
   >(InterviewInvitesDocument, {
+    variables,
     fetchPolicy: "network-only",
     context: { refreshAuth: true },
   });
@@ -21,7 +22,8 @@ export default function useInterviewInvites() {
       : undefined);
 
   return {
-    data: !loading && !queryError ? invites : undefined,
+    data: queryError ? undefined : invites,
+    previousData: previousData?.interviewInvites,
     loading,
     error: queryError,
     refetch,

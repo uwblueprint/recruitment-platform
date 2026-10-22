@@ -7,8 +7,9 @@ import KeyboardDoubleArrowLeft from "@mui/icons-material/KeyboardDoubleArrowLeft
 import OpenInNew from "@mui/icons-material/OpenInNew";
 import Drawer from "@mui/material/Drawer";
 import Link from "next/link";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 
+import useUpdateApplicantRecordIsApplicantFlagged from "@/APIClients/mutations/useUpdateApplicantRecordIsApplicantFlagged";
 import { ReviewStatusCell } from "@/pages/admin/review/_components/columns/ReviewStatusCell";
 
 import type {
@@ -60,6 +61,8 @@ type DashboardSidePanelProps = {
   row?: ApplicantRow;
   details?: ApplicantDetails;
   children?: ReactNode;
+  title?: string;
+  description?: string;
   isLoading?: boolean;
   hasError?: boolean;
   navigation?: SidePanelNavigation;
@@ -72,7 +75,7 @@ type DashboardSidePanelProps = {
     nextStatus: ApplicationStatus,
     previousStatus: ApplicationStatus
   ) => Promise<ApplicationStatus>;
-  applicantAction?: ReactNode;
+  action?: ReactNode;
 };
 
 /** Props for sections that only render once an active row exists. */
@@ -88,6 +91,8 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
     row,
     details,
     children,
+    title,
+    description,
     isLoading = false,
     hasError = false,
     navigation,
@@ -96,7 +101,7 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
     width = 913,
     showDetailsDivider = true,
     showScoreOnHeader = true,
-    applicantAction,
+    action,
   } = props;
 
   return (
@@ -145,9 +150,12 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
         </header>
 
         {row ? (
+          // Reserve the scrollbar's width even when the content fits, so
+          // switching to a shorter tab doesn't widen the content and shift
+          // right-aligned items like the bookmark button.
           <div
             key={row.applicantRecordId}
-            className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8"
+            className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8 [scrollbar-gutter:stable]"
           >
             <SidePanelApplicantBar
               row={row}
@@ -176,11 +184,23 @@ export const DashboardSidePanel = (props: DashboardSidePanelProps) => {
 
             <AdminCommentsSection applicantRecordId={row.applicantRecordId} />
           </div>
-        ) : null}
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-8 pb-8">
+            {title ? (
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-poppins text-2xl font-medium not-italic leading-[1.4] text-black [font-feature-settings:'liga'_off,'clig'_off]">
+                  {title}
+                </h2>
+                {description ? <p className="italic">{description}</p> : null}
+              </div>
+            ) : null}
+            {children}
+          </div>
+        )}
 
-        {row && applicantAction ? (
+        {action ? (
           <footer className="flex shrink-0 justify-end px-8 py-5">
-            {applicantAction}
+            {action}
           </footer>
         ) : null}
       </aside>
@@ -239,7 +259,11 @@ const SidePanelApplicantBar = ({
           />
         )}
       </div>
-      <BookmarkButton key={row.applicantRecordId} isApplicantFlagged={row.isApplicantFlagged} />
+      <BookmarkButton
+        key={row.applicantRecordId}
+        applicantRecordId={row.applicantRecordId}
+        isApplicantFlagged={row.isApplicantFlagged}
+      />
     </div>
   );
 };
@@ -294,26 +318,39 @@ const InfoField = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-/**
- * Visual-only bookmark toggle. Persisting the bookmark is handled in a future
- * ticket.
- */
-const BookmarkButton = ({ isApplicantFlagged }: { isApplicantFlagged: boolean }) => {
-  const [isBookmarked, setIsBookmarked] = useState(isApplicantFlagged);
+const BookmarkButton = ({
+  applicantRecordId,
+  isApplicantFlagged,
+}: {
+  applicantRecordId: string;
+  isApplicantFlagged: boolean;
+}) => {
+  const { updateFlag, data, loading, error } =
+    useUpdateApplicantRecordIsApplicantFlagged();
+  const isBookmarked = data?.isApplicantFlagged ?? isApplicantFlagged;
 
   return (
-    <button
-      className="ml-auto flex items-center gap-2 rounded-[20px] px-4 py-2 text-[#936A00] hover:bg-orange-50"
-      onClick={() => setIsBookmarked((prev) => !prev)}
-      aria-pressed={isBookmarked}
-      type="button"
-    >
-      {isBookmarked ? (
-        <BookmarkOutlined sx={{ fontSize: 19 }} />
-      ) : (
-        <BookmarkBorderOutlined sx={{ fontSize: 19 }} />
-      )}
-      Bookmark Applicant
-    </button>
+    <div className="ml-auto flex flex-col items-end gap-1">
+      <button
+        className="flex items-center gap-2 rounded-[20px] px-4 py-2 text-[#936A00] hover:bg-orange-50 disabled:cursor-not-allowed disabled:opacity-50"
+        onClick={() => updateFlag(applicantRecordId, !isBookmarked)}
+        disabled={loading}
+        aria-busy={loading}
+        aria-pressed={isBookmarked}
+        type="button"
+      >
+        {isBookmarked ? (
+          <BookmarkOutlined sx={{ fontSize: 19 }} />
+        ) : (
+          <BookmarkBorderOutlined sx={{ fontSize: 19 }} />
+        )}
+        Bookmark Applicant
+      </button>
+      {error ? (
+        <p role="alert" className="text-sm text-alert-errorText">
+          Failed to update bookmark. Please try again.
+        </p>
+      ) : null}
+    </div>
   );
 };

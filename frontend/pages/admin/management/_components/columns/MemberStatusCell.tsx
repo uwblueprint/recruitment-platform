@@ -14,5 +14,5 @@ const MEMBER_STATUS_OPTIONS = [
 ] as const;
 
 export const MemberStatusCell = ({ status }: { status: string }) => (
-  <DashboardStatusChip value={status} options={MEMBER_STATUS_OPTIONS} readOnly />
+  <DashboardStatusChip value={status} options={MEMBER_STATUS_OPTIONS} readOnly outlined />
 );

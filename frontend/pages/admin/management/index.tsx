@@ -3,16 +3,20 @@ import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { NextPageWithLayout } from "../../_app";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useMembersDashboardCount from "@/APIClients/queries/useMembersDashboardCount";
+import useTeamsDashboard from "@/APIClients/queries/useTeamsDashboard";
+import { TeamsDashboard } from "./_components/TeamsDashboard";
 import { MembersDashboard } from "./_components/MembersDashboard";
 
 enum ManagementView {
   MEMBERS = "Members",
   ACTIVE_TEAMS = "Active Teams",
-  ARCHIVED_PROJECTS = "Archived Projects",
+  ARCHIVED_TEAMS = "Archived Teams",
 }
 
 const ManagementPage: NextPageWithLayout = () => {
   const { count: memberCount, error: countsError } = useMembersDashboardCount();
+  const { count: activeTeamCount } = useTeamsDashboard("Active");
+  const { count: archivedTeamCount } = useTeamsDashboard("Archived");
   const [activeView, setActiveView] = useState<ManagementView>(
     ManagementView.MEMBERS
   );
@@ -36,14 +40,14 @@ const ManagementPage: NextPageWithLayout = () => {
     {
       view: ManagementView.ACTIVE_TEAMS,
       label: "Active Teams",
-      count: 0,
+      count: activeTeamCount,
       unit: { singular: "Team", plural: "Teams" },
     },
     {
-      view: ManagementView.ARCHIVED_PROJECTS,
-      label: "Archived Projects",
-      count: 0,
-      unit: { singular: "Project", plural: "Projects" },
+      view: ManagementView.ARCHIVED_TEAMS,
+      label: "Archived Teams",
+      count: archivedTeamCount,
+      unit: { singular: "Team", plural: "Teams" },
     },
   ];
   return (
@@ -62,8 +66,12 @@ const ManagementPage: NextPageWithLayout = () => {
           onViewChange={handleViewChange}
           tabs={tabs}
         />
-        {activeView === ManagementView.MEMBERS && (
-          <MembersDashboard />
+        {activeView === ManagementView.MEMBERS && <MembersDashboard />}
+        {activeView === ManagementView.ACTIVE_TEAMS && (
+          <TeamsDashboard key="active" status="Active" />
+        )}
+        {activeView === ManagementView.ARCHIVED_TEAMS && (
+          <TeamsDashboard key="archived" status="Archived" />
         )}
       </main>
     </div>

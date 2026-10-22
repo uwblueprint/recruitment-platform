@@ -5,6 +5,7 @@ import {
   import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
   import { InterviewHeader } from "@/pages/interview/_components/layout";
   import { ReactElement } from "react";
+  import { Role } from "@/graphql/typeUtils";
   import { NextPageWithLayout } from "../_app";
   import InterviewGroupIllustrationPanel from "./_components/InterviewGroupIllustrationPanel";
   
@@ -25,7 +26,7 @@ import {
   };
   
   InterviewGroupsHomePage.getLayout = (page: ReactElement) => (
-      <ProtectedRoute allowedRoles={["Admin", "User"]}>
+      <ProtectedRoute allowedRoles={[Role.Admin, Role.User]}>
         <SplitPanelLayout header={<InterviewHeader steps={[]} />}>
           <InterviewGroupIllustrationPanel />
           {page}

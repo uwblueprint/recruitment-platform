@@ -1,8 +1,8 @@
 import {
   ApplicantRecordWithReviewersDTO,
   DashboardView,
-  ReviewDashboardFilterOptionsDTO,
-  ReviewDashboardFilters,
+  DashboardFilterOptionsDTO,
+  DashboardFilters,
   ReviewDashboardCountsDTO,
   ReviewDashboardRowDTO,
   ReviewDashboardSidePanelDTO,
@@ -13,7 +13,7 @@ import {
 
 interface IReviewCompositeService {
   getReviewDashboardCounts(
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<ReviewDashboardCountsDTO>;
 
   /**
@@ -46,9 +46,15 @@ interface IReviewCompositeService {
     resultsPerPage: number,
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
     view?: DashboardView,
   ): Promise<ReviewDashboardRowDTO[]>;
+
+  /**
+   * Builds a CSV of every applicant record with its applicant details and
+   * reviews, one row per applicant record, for admins to keep as a backup.
+   */
+  getReviewDashboardCSV(): Promise<string>;
 
   /**
    * Assigns each user to an applicant record to review, and
@@ -69,7 +75,7 @@ interface IReviewCompositeService {
   getReviewDashboardApplicantRecordIds(
     sortBy?: ReviewDashboardSortBy,
     sortAscending?: boolean,
-    filters?: ReviewDashboardFilters,
+    filters?: DashboardFilters,
   ): Promise<string[]>;
 
   /**
@@ -81,13 +87,13 @@ interface IReviewCompositeService {
   ): Promise<ReviewDashboardSidePanelDTO>;
 
   /**
-   * Fetches all filter options for the review dashboard
+   * Fetches the shared filter options used by applicant dashboards.
    * @param department optional department to scope position options
-   * @returns ReviewDashboardFilterOptionsDTO with all filter options
+   * @returns DashboardFilterOptionsDTO with all filter options
    */
-  getReviewDashboardFilterOptions(
+  getDashboardFilterOptions(
     department?: string,
-  ): Promise<ReviewDashboardFilterOptionsDTO>;
+  ): Promise<DashboardFilterOptionsDTO>;
 }
 
 export default IReviewCompositeService;

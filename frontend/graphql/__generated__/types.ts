@@ -121,6 +121,16 @@ export type CreateUserDto = {
   role: Role;
 };
 
+export type DashboardFilterOptionsDto = {
+  __typename?: 'DashboardFilterOptionsDTO';
+  applicationStatuses: Array<FilterOption>;
+  bookmarked: Array<FilterOption>;
+  positions: Array<FilterOption>;
+  scoreRanges: Array<FilterOption>;
+  skillCategories: Array<FilterOption>;
+  years: Array<FilterOption>;
+};
+
 export enum DashboardView {
   All = 'ALL',
   Conflicts = 'CONFLICTS',
@@ -185,6 +195,16 @@ export type InterviewDashboardCountsDto = {
   shortlisted: Scalars['Int']['output'];
 };
 
+export type InterviewDashboardFilters = {
+  applicationStatuses?: InputMaybe<Array<ApplicationStatus>>;
+  bookmarked?: InputMaybe<Scalars['Boolean']['input']>;
+  positions?: InputMaybe<Array<Scalars['String']['input']>>;
+  scoreRanges?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  skillCategories?: InputMaybe<Array<SkillCategory>>;
+  years?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type InterviewDashboardRowDto = {
   __typename?: 'InterviewDashboardRowDTO';
   applicantRecordId: Scalars['ID']['output'];
@@ -192,6 +212,7 @@ export type InterviewDashboardRowDto = {
   firstName: Scalars['String']['output'];
   interviewScore?: Maybe<Scalars['Int']['output']>;
   interviewers: Array<UserDto>;
+  isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
 };
@@ -271,6 +292,17 @@ export type InterviewInviteeDto = {
   firstName: Scalars['String']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
+};
+
+export type InterviewInvitesCountsDto = {
+  __typename?: 'InterviewInvitesCountsDTO';
+  ready: Scalars['Int']['output'];
+  sent: Scalars['Int']['output'];
+};
+
+export type InterviewInvitesFilters = {
+  positions?: InputMaybe<Array<Scalars['String']['input']>>;
+  search?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type InterviewNotes = {
@@ -633,12 +665,26 @@ export type MutationUploadInterviewNotesArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
+export type PositionDto = {
+  __typename?: 'PositionDTO';
+  isArchived: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+};
+
+export type ProjectDto = {
+  __typename?: 'ProjectDTO';
+  id: Scalars['ID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  projectName: Scalars['String']['output'];
+};
+
 export type Query = {
   __typename?: 'Query';
   _empty?: Maybe<Scalars['String']['output']>;
   adminCommentById: AdminCommentDto;
   adminCommentsByApplicantRecordId: Array<AdminCommentDto>;
   application: ApplicationDto;
+  dashboardFilterOptions: DashboardFilterOptionsDto;
   entities: Array<EntityResponseDto>;
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
@@ -649,6 +695,7 @@ export type Query = {
   interviewDelegation: InterviewDelegationDto;
   interviewGroup: InterviewGroupDto;
   interviewInvites: Array<InterviewInviteDto>;
+  interviewInvitesCounts: InterviewInvitesCountsDto;
   interviewNotes?: Maybe<InterviewNotes>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
@@ -657,10 +704,12 @@ export type Query = {
   interviewersByGroupId: Array<UserDto>;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
+  positions: Array<PositionDto>;
+  projects: Array<ProjectDto>;
   reviewDashboard: Array<ReviewDashboardRowDto>;
   reviewDashboardApplicantRecordIds: Array<Scalars['ID']['output']>;
+  reviewDashboardCSV: Scalars['String']['output'];
   reviewDashboardCounts: ReviewDashboardCountsDto;
-  reviewDashboardFilterOptions: ReviewDashboardFilterOptionsDto;
   reviewDashboardSidePanel: ReviewDashboardSidePanelDto;
   reviewedApplicantRecord: ReviewedApplicantRecordDto;
   reviewedApplicantRecordsByApplicantRecordId: ApplicantRecordWithReviewersDto;
@@ -691,6 +740,11 @@ export type QueryApplicationArgs = {
 };
 
 
+export type QueryDashboardFilterOptionsArgs = {
+  department?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryEntityArgs = {
   id: Scalars['ID']['input'];
 };
@@ -702,11 +756,17 @@ export type QueryFileArgs = {
 
 
 export type QueryInterviewDashboardArgs = {
+  filters?: InputMaybe<InterviewDashboardFilters>;
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
   sortAscending?: InputMaybe<Scalars['Boolean']['input']>;
   sortBy?: InputMaybe<InterviewDashboardSortBy>;
   view?: InputMaybe<DashboardView>;
+};
+
+
+export type QueryInterviewDashboardCountsArgs = {
+  filters?: InputMaybe<InterviewDashboardFilters>;
 };
 
 
@@ -723,6 +783,19 @@ export type QueryInterviewDelegationArgs = {
 
 export type QueryInterviewGroupArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewInvitesArgs = {
+  filters?: InputMaybe<InterviewInvitesFilters>;
+  pageNumber: Scalars['Int']['input'];
+  resultsPerPage: Scalars['Int']['input'];
+  status?: InputMaybe<Array<InterviewGroupStatus>>;
+};
+
+
+export type QueryInterviewInvitesCountsArgs = {
+  filters?: InputMaybe<InterviewInvitesFilters>;
 };
 
 
@@ -768,6 +841,16 @@ export type QueryIsAuthorizedToReviewArgs = {
 };
 
 
+export type QueryPositionsArgs = {
+  isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type QueryProjectsArgs = {
+  isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
 export type QueryReviewDashboardArgs = {
   filters?: InputMaybe<ReviewDashboardFilters>;
   pageNumber: Scalars['Int']['input'];
@@ -787,11 +870,6 @@ export type QueryReviewDashboardApplicantRecordIdsArgs = {
 
 export type QueryReviewDashboardCountsArgs = {
   filters?: InputMaybe<ReviewDashboardFilters>;
-};
-
-
-export type QueryReviewDashboardFilterOptionsArgs = {
-  department?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -869,16 +947,6 @@ export type ReviewDashboardCountsDto = {
   all: Scalars['Int']['output'];
   conflicts: Scalars['Int']['output'];
   shortlisted: Scalars['Int']['output'];
-};
-
-export type ReviewDashboardFilterOptionsDto = {
-  __typename?: 'ReviewDashboardFilterOptionsDTO';
-  applicationStatuses: Array<FilterOption>;
-  bookmarked: Array<FilterOption>;
-  positions: Array<FilterOption>;
-  scoreRanges: Array<FilterOption>;
-  skillCategories: Array<FilterOption>;
-  years: Array<FilterOption>;
 };
 
 export type ReviewDashboardFilters = {

@@ -23,6 +23,7 @@ export type InterviewDashboardRowDTO = {
   lastName: string;
   position: string;
   applicationStatus: ApplicationStatus;
+  isApplicantFlagged: boolean;
   interviewers: UserDTO[];
   interviewScore: number | null;
 };

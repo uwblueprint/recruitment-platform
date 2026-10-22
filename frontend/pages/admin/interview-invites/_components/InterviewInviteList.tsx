@@ -1,18 +1,16 @@
+import { DashboardTablePagination } from "@/components/dashboard/table/DashboardTablePagination";
 import { Tabs } from "@/components/dashboard/common/Tabs";
-import { InterviewInvite } from "./types";
 import { InterviewInviteRow } from "./InterviewInviteRow";
 import { InterviewInviteToolbar } from "./InterviewInviteToolbar";
 
 import useInterviewInviteList from "./hooks/useInterviewInviteList";
 
 type InterviewInviteListProps = {
-  invites: InterviewInvite[];
   onSendInterviewEmails?: (selectedIds: string[]) => void;
   bulkActionsDisabled?: boolean;
 };
 
 export const InterviewInviteList = ({
-  invites,
   onSendInterviewEmails,
   bulkActionsDisabled,
 }: InterviewInviteListProps) => {
@@ -22,9 +20,12 @@ export const InterviewInviteList = ({
     searchQuery,
     setSearchQuery,
     selectedIds,
-    readyInvites,
-    sentInvites,
-    filteredInvites,
+    readyCount,
+    sentCount,
+    loading,
+    error,
+    visibleInvites,
+    pagination,
     allSelected,
     handleSelectAll,
     toggleSelect,
@@ -32,7 +33,7 @@ export const InterviewInviteList = ({
     selectedFilters,
     handleFilterChange,
     handleFilterRemove,
-  } = useInterviewInviteList(invites);
+  } = useInterviewInviteList();
 
   return (
     <div className="w-full flex flex-col gap-4">
@@ -43,13 +44,13 @@ export const InterviewInviteList = ({
           {
             view: "ready",
             label: "Ready for Invite",
-            count: readyInvites.length,
+            count: readyCount,
             unit: { singular: "Entry", plural: "Entries" },
           },
           {
             view: "sent",
             label: "Invites Sent",
-            count: sentInvites.length,
+            count: sentCount,
             unit: { singular: "Entry", plural: "Entries" },
           },
         ]}
@@ -67,8 +68,8 @@ export const InterviewInviteList = ({
         bulkActions={{
           selectedCount: selectedIds.size,
           allSelected,
-          selectAllDisabled: filteredInvites.length === 0,
-          disabled: bulkActionsDisabled,
+          selectAllDisabled: visibleInvites.length === 0,
+          disabled: bulkActionsDisabled || loading || !!error,
           onSelectAll: handleSelectAll,
           onSendInterviewEmails: onSendInterviewEmails
             ? () => onSendInterviewEmails(Array.from(selectedIds))
@@ -78,7 +79,15 @@ export const InterviewInviteList = ({
 
       {/* List */}
       <div className="flex flex-col gap-3">
-        {filteredInvites.map((invite) => (
+        {error ? (
+          <p role="alert" className="text-sm text-alert-errorText py-4">
+            Failed to load interview invites. Please try again.
+          </p>
+        ) : loading ? (
+          <p role="status" className="font-source text-sm text-neutral-500 py-4">
+            Loading...
+          </p>
+        ) : visibleInvites.map((invite) => (
           <InterviewInviteRow
             key={invite.id}
             invite={invite}
@@ -86,12 +95,14 @@ export const InterviewInviteList = ({
             onSelect={(checked) => toggleSelect(invite.id, checked)}
           />
         ))}
-        {filteredInvites.length === 0 && (
+        {!loading && !error && visibleInvites.length === 0 && (
           <p className="font-source text-sm text-neutral-500 py-4">
             No interview groups found.
           </p>
         )}
       </div>
+
+      <DashboardTablePagination pagination={pagination} />
     </div>
   );
 };
