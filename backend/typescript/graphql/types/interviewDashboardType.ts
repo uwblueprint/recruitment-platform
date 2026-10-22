@@ -41,21 +41,6 @@ const interviewDashboardTypes = gql`
     APPLICATION_STATUS
   }
 
-  type InterviewInviteeDTO {
-    firstName: String!
-    lastName: String!
-    position: String!
-  }
-
-  type InterviewInviteDTO {
-    id: ID!
-    interviewers: [UserDTO!]!
-    interviewees: [InterviewInviteeDTO!]!
-    position: String!
-    schedulingLink: String
-    status: InterviewGroupStatus!
-  }
-
   input InterviewDashboardFilters {
     search: String
     positions: [String!]
