@@ -41,4 +41,9 @@ export default class InterviewGroup extends Model {
 
   @HasMany(() => InterviewDelegation, { foreignKey: "group_id" })
   interview_delegations?: InterviewDelegation[];
+
+  // Short aliases keep deeply nested eager-loading column names below
+  // PostgreSQL's 63-byte identifier limit.
+  @HasMany(() => InterviewDelegation, { foreignKey: "group_id" })
+  team?: InterviewDelegation[];
 }

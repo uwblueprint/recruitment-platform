@@ -1,11 +1,8 @@
 import { NextPageWithLayout } from "../../_app";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { InterviewInviteList } from "./_components/InterviewInviteList";
-import useInterviewInvites from "./_components/hooks/useInterviewInvites";
 
 const InterviewInvites: NextPageWithLayout = () => {
-  const { invites, isLoading, error } = useInterviewInvites();
-
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
@@ -14,15 +11,7 @@ const InterviewInvites: NextPageWithLayout = () => {
           Interview invite Dashboard
         </h1>
 
-        {error ? (
-          <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
-            Failed to load interview invites
-          </div>
-        ) : null}
-
-        {!isLoading && !error ? (
-          <InterviewInviteList invites={invites} />
-        ) : null}
+        <InterviewInviteList />
       </main>
     </div>
   );

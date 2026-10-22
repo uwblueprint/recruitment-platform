@@ -18,11 +18,16 @@ import reviewedApplicantRecordResolvers from "./resolvers/reviewedApplicantRecor
 import reviewDashboardResolvers from "./resolvers/reviewDashboardResolvers";
 import reviewPageResolvers from "./resolvers/reviewPageResolvers";
 import userResolvers from "./resolvers/userResolvers";
+import positionResolvers from "./resolvers/positionResolvers";
+import projectResolvers from "./resolvers/projectResolvers";
+import projectType from "./types/projectType";
+import positionType from "./types/positionType";
 import adminCommentType from "./types/adminCommentType";
 import applicantRecordType from "./types/applicantRecordType";
 import authType from "./types/authType";
 import entityType from "./types/entityType";
 import interviewDashboardTypes from "./types/interviewDashboardType";
+import interviewInvitesTypes from "./types/interviewInvitesTypes";
 import interviewDelegationsTypes from "./types/interviewDelegationType";
 import interviewedApplicantRecordsTypes from "./types/interviewedApplicantRecordsType";
 import interviewGroupTypes from "./types/interviewGroupType";
@@ -37,6 +42,7 @@ import interviewDelegationResolvers from "./resolvers/interviewDelegationResolve
 import interviewGroupResolvers from "./resolvers/interviewGroupResolvers";
 import interviewPageResolvers from "./resolvers/interviewPageResolvers";
 import interviewDashboardResolvers from "./resolvers/interviewDashboardResolvers";
+import interviewInvitesDashboardResolvers from "./resolvers/interviewInvitesDashboardResolvers";
 
 const query = gql`
   type Query {
@@ -59,6 +65,7 @@ const executableSchema = makeExecutableSchema({
     authType,
     entityType,
     interviewDashboardTypes,
+    interviewInvitesTypes,
     interviewDelegationsTypes,
     interviewGroupTypes,
     interviewPageType,
@@ -68,6 +75,8 @@ const executableSchema = makeExecutableSchema({
     reviewPageType,
     simpleEntityType,
     userType,
+    positionType,
+    projectType,
   ],
   resolvers: merge(
     { Upload: GraphQLUpload },
@@ -81,10 +90,13 @@ const executableSchema = makeExecutableSchema({
     reviewDashboardResolvers,
     reviewPageResolvers,
     userResolvers,
+    positionResolvers,
+    projectResolvers,
     interviewDelegationResolvers,
     interviewGroupResolvers,
     interviewPageResolvers,
     interviewDashboardResolvers,
+    interviewInvitesDashboardResolvers,
   ),
 });
 
@@ -105,6 +117,8 @@ const graphQLMiddlewares = {
     userByEmail: authorizedByAdmin(),
     usersByPosition: authorizedByAdmin(),
     users: authorizedByAdmin(),
+    positions: authorizedByAdmin(),
+    projects: authorizedByAdmin(),
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
     reviewedApplicantRecord: authorizedByAdmin(),
@@ -121,11 +135,13 @@ const graphQLMiddlewares = {
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardCounts: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
-    reviewDashboardFilterOptions: authorizedByAdmin(),
+    dashboardFilterOptions: authorizedByAdmin(),
+    reviewDashboardCSV: authorizedByAdmin(),
     interviewDashboard: authorizedByAdmin(),
     interviewDashboardCounts: authorizedByAdmin(),
     interviewDashboardSidePanel: authorizedByAdmin(),
     interviewInvites: authorizedByAdmin(),
+    interviewInvitesCounts: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),

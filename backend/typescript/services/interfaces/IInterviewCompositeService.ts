@@ -2,10 +2,14 @@ import {
   InterviewDelegationDTO,
   DashboardView,
   InterviewDashboardCountsDTO,
+  DashboardFilters,
   InterviewDashboardRowDTO,
   InterviewDashboardSidePanelDTO,
   InterviewDashboardSortBy,
   InterviewInviteDTO,
+  InterviewGroupStatus,
+  InterviewInvitesFilters,
+  InterviewInvitesCountsDTO,
   InterviewedApplicantsDTO,
   InterviewNotesDTO,
   InterviewPairingsDTO,
@@ -14,7 +18,9 @@ import {
 import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 
 interface IInterviewCompositeService {
-  getInterviewDashboardCounts(): Promise<InterviewDashboardCountsDTO>;
+  getInterviewDashboardCounts(
+    filters?: DashboardFilters,
+  ): Promise<InterviewDashboardCountsDTO>;
 
   /**
    * Fetches paginated applicants for the admin interview dashboard.
@@ -22,6 +28,8 @@ interface IInterviewCompositeService {
    * @Param resultsPerPage the number of results per page
    * @Param sortBy the dashboard column to sort results by
    * @Param sortAscending whether to sort ascending; defaults to true
+   * @Param view the dashboard tab to restrict results to
+   * @Param filters search text and filter menu selections to narrow results by
    */
   getInterviewDashboard(
     pageNumber: number,
@@ -29,6 +37,7 @@ interface IInterviewCompositeService {
     sortBy?: InterviewDashboardSortBy,
     sortAscending?: boolean,
     view?: DashboardView,
+    filters?: DashboardFilters,
   ): Promise<InterviewDashboardRowDTO[]>;
 
   /**
@@ -68,7 +77,15 @@ interface IInterviewCompositeService {
   /**
    * Fetches all interview groups with their interviewers and interviewees for the admin interview invites page.
    */
-  getInterviewInvites(): Promise<InterviewInviteDTO[]>;
+  getInterviewInvites(
+    pageNumber: number,
+    resultsPerPage: number,
+    status?: InterviewGroupStatus[],
+    filters?: InterviewInvitesFilters,
+  ): Promise<InterviewInviteDTO[]>;
+  getInterviewInvitesCounts(
+    filters?: InterviewInvitesFilters,
+  ): Promise<InterviewInvitesCountsDTO>;
 
   /**
    * Upload (or replace) the PDF interview notes for an interviewed applicant

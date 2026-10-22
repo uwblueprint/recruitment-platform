@@ -7,6 +7,7 @@ const interviewDashboardTypes = gql`
     lastName: String!
     position: String!
     applicationStatus: ApplicationStatus!
+    isApplicantFlagged: Boolean!
     interviewers: [UserDTO!]!
     interviewScore: Int
   }
@@ -40,19 +41,14 @@ const interviewDashboardTypes = gql`
     APPLICATION_STATUS
   }
 
-  type InterviewInviteeDTO {
-    firstName: String!
-    lastName: String!
-    position: String!
-  }
-
-  type InterviewInviteDTO {
-    id: ID!
-    interviewers: [UserDTO!]!
-    interviewees: [InterviewInviteeDTO!]!
-    position: String!
-    schedulingLink: String
-    status: InterviewGroupStatus!
+  input InterviewDashboardFilters {
+    search: String
+    positions: [String!]
+    applicationStatuses: [ApplicationStatus!]
+    skillCategories: [SkillCategory!]
+    scoreRanges: [String!]
+    years: [String!]
+    bookmarked: Boolean
   }
 
   type InterviewDashboardCountsDTO {
@@ -62,19 +58,21 @@ const interviewDashboardTypes = gql`
   }
 
   extend type Query {
-    interviewDashboardCounts: InterviewDashboardCountsDTO!
+    interviewDashboardCounts(
+      filters: InterviewDashboardFilters
+    ): InterviewDashboardCountsDTO!
     interviewDashboard(
       pageNumber: Int!
       resultsPerPage: Int!
       sortBy: InterviewDashboardSortBy
       view: DashboardView
       sortAscending: Boolean
+      filters: InterviewDashboardFilters
     ): [InterviewDashboardRowDTO!]!
 
     interviewDashboardSidePanel(
       applicantRecordId: ID!
     ): InterviewDashboardSidePanelDTO!
-    interviewInvites: [InterviewInviteDTO!]!
   }
 
   extend type Mutation {

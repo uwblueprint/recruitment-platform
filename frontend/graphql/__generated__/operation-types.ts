@@ -33,6 +33,13 @@ export type CreateAdminCommentMutationVariables = Exact<{
 
 export type CreateAdminCommentMutation = { createAdminComment: { id: string, userId: string, applicantRecordId: string, comment: string, createdAt: string, updatedAt: string } };
 
+export type DashboardFilterOptionsQueryVariables = Exact<{
+  department?: string | null | undefined;
+}>;
+
+
+export type DashboardFilterOptionsQuery = { dashboardFilterOptions: { positions: Array<{ value: string, label: string }>, applicationStatuses: Array<{ value: string, label: string }>, skillCategories: Array<{ value: string, label: string }>, scoreRanges: Array<{ value: string, label: string }>, years: Array<{ value: string, label: string }>, bookmarked: Array<{ value: string, label: string }> } };
+
 export type DeleteAdminCommentByIdMutationVariables = Exact<{
   id: string | number;
 }>;
@@ -46,12 +53,15 @@ export type InterviewDashboardQueryVariables = Exact<{
   sortBy?: Types.InterviewDashboardSortBy | null | undefined;
   view?: Types.DashboardView | null | undefined;
   sortAscending?: boolean | null | undefined;
+  filters?: Types.InterviewDashboardFilters | null | undefined;
 }>;
 
 
-export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
+export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, isApplicantFlagged: boolean, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
 
-export type InterviewDashboardCountsQueryVariables = Exact<{ [key: string]: never; }>;
+export type InterviewDashboardCountsQueryVariables = Exact<{
+  filters?: Types.InterviewDashboardFilters | null | undefined;
+}>;
 
 
 export type InterviewDashboardCountsQuery = { interviewDashboardCounts: { all: number, shortlisted: number, conflicts: number } };
@@ -70,10 +80,22 @@ export type InterviewGroupQueryVariables = Exact<{
 
 export type InterviewGroupQuery = { interviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
 
-export type InterviewInvitesQueryVariables = Exact<{ [key: string]: never; }>;
+export type InterviewInvitesQueryVariables = Exact<{
+  pageNumber: number;
+  resultsPerPage: number;
+  status?: Array<Types.InterviewGroupStatus> | Types.InterviewGroupStatus | null | undefined;
+  filters?: Types.InterviewInvitesFilters | null | undefined;
+}>;
 
 
 export type InterviewInvitesQuery = { interviewInvites: Array<{ id: string, position: string, schedulingLink: string | null, status: Types.InterviewGroupStatus, interviewers: Array<{ id: string, firstName: string, lastName: string }>, interviewees: Array<{ firstName: string, lastName: string, position: string }> }> };
+
+export type InterviewInvitesCountsQueryVariables = Exact<{
+  filters?: Types.InterviewInvitesFilters | null | undefined;
+}>;
+
+
+export type InterviewInvitesCountsQuery = { interviewInvitesCounts: { ready: number, sent: number } };
 
 export type InterviewNotesQueryVariables = Exact<{
   interviewedApplicantRecordId: string | number;
@@ -140,6 +162,20 @@ export type LogoutMutationVariables = Exact<{
 
 export type LogoutMutation = { logout: string | null };
 
+export type PositionsQueryVariables = Exact<{
+  isArchived?: boolean | null | undefined;
+}>;
+
+
+export type PositionsQuery = { positions: Array<{ title: string, isArchived: boolean }> };
+
+export type ProjectsQueryVariables = Exact<{
+  isArchived?: boolean | null | undefined;
+}>;
+
+
+export type ProjectsQuery = { projects: Array<{ id: string, projectName: string, isArchived: boolean }> };
+
 export type ReassignReviewerMutationVariables = Exact<{
   applicantRecordId: string | number;
   oldReviewerId: string | number;
@@ -194,19 +230,17 @@ export type ReviewDashboardApplicantRecordIdsQueryVariables = Exact<{
 
 export type ReviewDashboardApplicantRecordIdsQuery = { reviewDashboardApplicantRecordIds: Array<string> };
 
+export type ReviewDashboardCsvQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type ReviewDashboardCsvQuery = { reviewDashboardCSV: string };
+
 export type ReviewDashboardCountsQueryVariables = Exact<{
   filters?: Types.ReviewDashboardFilters | null | undefined;
 }>;
 
 
 export type ReviewDashboardCountsQuery = { reviewDashboardCounts: { all: number, shortlisted: number, conflicts: number } };
-
-export type ReviewDashboardFilterOptionsQueryVariables = Exact<{
-  department?: string | null | undefined;
-}>;
-
-
-export type ReviewDashboardFilterOptionsQuery = { reviewDashboardFilterOptions: { positions: Array<{ value: string, label: string }>, applicationStatuses: Array<{ value: string, label: string }>, skillCategories: Array<{ value: string, label: string }>, scoreRanges: Array<{ value: string, label: string }>, years: Array<{ value: string, label: string }>, bookmarked: Array<{ value: string, label: string }> } };
 
 export type ReviewDashboardSidePanelQueryVariables = Exact<{
   applicantRecordId: string | number;

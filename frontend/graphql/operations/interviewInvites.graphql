@@ -1,5 +1,15 @@
-query InterviewInvites {
-  interviewInvites {
+query InterviewInvites(
+  $pageNumber: Int!
+  $resultsPerPage: Int!
+  $status: [InterviewGroupStatus!]
+  $filters: InterviewInvitesFilters
+) {
+  interviewInvites(
+    pageNumber: $pageNumber
+    resultsPerPage: $resultsPerPage
+    status: $status
+    filters: $filters
+  ) {
     id
     interviewers {
       id

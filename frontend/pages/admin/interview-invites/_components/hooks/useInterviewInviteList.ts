@@ -3,33 +3,72 @@ import type {
   FilterCategory,
   SelectedFilters,
 } from "@/components/dashboard/filters";
-import type { InterviewInvite } from "../types";
+import { InterviewGroupStatus } from "@/graphql/typeUtils";
+import useInterviewInvites from "@/APIClients/queries/useInterviewInvites";
+import useInterviewInvitesCounts from "@/APIClients/queries/useInterviewInvitesCounts";
+import usePositions from "@/APIClients/queries/usePositions";
 
-const READY_STATUSES = new Set(["AVAILABILITY_PENDING", "READY_TO_INTERVIEW"]);
-
-export default function useInterviewInviteList(invites: InterviewInvite[]) {
-  const [activeTab, setActiveTab] = useState<string>("ready");
-  const [searchQuery, setSearchQuery] = useState("");
+export default function useInterviewInviteList() {
+  const [activeTab, updateActiveTab] = useState<string>("ready");
+  const [searchQuery, updateSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
+  const [requestedPage, setRequestedPage] = useState(1);
+  const [resultsPerPage, setResultsPerPage] = useState(10);
+
+  const resetPagination = () => {
+    setRequestedPage(1);
+    setSelectedIds(new Set());
+  };
+
+  const setActiveTab = (tab: string) => {
+    updateActiveTab(tab);
+    resetPagination();
+  };
+
+  const setSearchQuery = (query: string) => {
+    updateSearchQuery(query);
+    resetPagination();
+  };
+
+  const handlePageChange = (page: number) => {
+    setRequestedPage(page);
+    setSelectedIds(new Set());
+  };
+
+  const handleResultsPerPageChange = (size: number) => {
+    setResultsPerPage(size);
+    resetPagination();
+  };
+
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
+  const filters = { search: searchQuery, positions: selectedFilters.interviewType ?? [] };
+  const { data, previousData, loading, error } = useInterviewInvites({
+    pageNumber: requestedPage,
+    resultsPerPage,
+    status: activeTab === "ready"
+      ? [InterviewGroupStatus.AvailabilityPending, InterviewGroupStatus.ReadyToInterview]
+      : [InterviewGroupStatus.InvitesSent],
+    filters,
+  });
+  const { counts, error: countsError } = useInterviewInvitesCounts({ filters });
+  const { data: positions, error: positionsError } = usePositions({ isArchived: false });
+  const visibleInvites = error ? [] : data ?? (loading ? previousData : undefined) ?? [];
   const filterCategories: FilterCategory[] = [
     {
       key: "interviewType",
       label: "Interview Type",
-      options: Array.from(
-        new Set(invites.map((invite) => invite.interviewType))
-      )
-        .sort()
-        .map((value) => ({ value, label: value })),
+      options: (positions ?? []).map(({ title }) => ({ value: title, label: title })),
     },
   ];
 
   const handleFilterChange = (categoryKey: string, values: string[]) => {
+    resetPagination();
     setSelectedFilters((previous) => ({ ...previous, [categoryKey]: values }));
   };
 
   const handleFilterRemove = (categoryKey: string, value: string) => {
+    resetPagination();
     setSelectedFilters((previous) => ({
       ...previous,
       [categoryKey]: (previous[categoryKey] ?? []).filter(
@@ -38,32 +77,24 @@ export default function useInterviewInviteList(invites: InterviewInvite[]) {
     }));
   };
 
-  const readyInvites = invites.filter((i) => READY_STATUSES.has(i.status));
-  const sentInvites = invites.filter((i) => !READY_STATUSES.has(i.status));
-
-  const activeInvites = activeTab === "ready" ? readyInvites : sentInvites;
-  const filteredInvites = activeInvites.filter((invite) => {
-    const matchesSearch = invite.interviewers.some((name) =>
-      name.toLowerCase().includes(searchQuery.trim().toLowerCase())
-    );
-    const types = selectedFilters.interviewType ?? [];
-    return (
-      (!searchQuery.trim() || matchesSearch) &&
-      (types.length === 0 || types.includes(invite.interviewType))
-    );
-  });
+  // Fresh results reset selection, including after a background refetch.
+  const [previousInvites, setPreviousInvites] = useState(data);
+  if (data !== previousInvites) {
+    setPreviousInvites(data);
+    setSelectedIds(new Set());
+  }
 
   const allSelected =
-    filteredInvites.length > 0 &&
-    filteredInvites.every((i) => selectedIds.has(i.id));
+    visibleInvites.length > 0 &&
+    visibleInvites.every((i) => selectedIds.has(i.id));
 
   const handleSelectAll = () => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
       if (allSelected) {
-        filteredInvites.forEach((i) => next.delete(i.id));
+        visibleInvites.forEach((i) => next.delete(i.id));
       } else {
-        filteredInvites.forEach((i) => next.add(i.id));
+        visibleInvites.forEach((i) => next.add(i.id));
       }
       return next;
     });
@@ -87,9 +118,18 @@ export default function useInterviewInviteList(invites: InterviewInvite[]) {
     searchQuery,
     setSearchQuery,
     selectedIds,
-    readyInvites,
-    sentInvites,
-    filteredInvites,
+    readyCount: counts?.ready,
+    sentCount: counts?.sent,
+    loading,
+    error: error ?? countsError ?? positionsError,
+    visibleInvites,
+    pagination: {
+      pageNumber: requestedPage,
+      resultsPerPage,
+      canGoNext: !loading && !error && visibleInvites.length === resultsPerPage,
+      onPageChange: handlePageChange,
+      onResultsPerPageChange: handleResultsPerPageChange,
+    },
     allSelected,
     handleSelectAll,
     toggleSelect,

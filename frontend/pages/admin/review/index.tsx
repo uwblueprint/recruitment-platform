@@ -25,15 +25,17 @@ import {
   createReviewDashboardColumns,
 } from "./_components/columns";
 import { Tab, Tabs } from "../../../components/dashboard/common/Tabs";
-import useDebouncedValue from "./_components/hooks/useDebouncedValue";
+import useDebouncedValue from "@/hooks/useDebouncedValue";
 import { ReassignReviewerDialogue } from "./_components/dialogues/ReassignReviewerDialogue";
+import { ExportCSVButton } from "./_components/ExportCSVButton";
 import { ReviewDashboardToolbar } from "./_components/ReviewDashboardToolbar";
 import { BulkAction } from "./_components/bulkStatusActions";
 import useReviewDashboard from "./_components/hooks/useReviewDashboard";
 import useReviewDashboardApplicantRecordIds from "@/APIClients/queries/useReviewDashboardApplicantRecordIds";
-import useReviewDashboardFilterOptions from "@/APIClients/queries/useReviewDashboardFilterOptions";
+import useDashboardFilterOptions from "@/APIClients/queries/useDashboardFilterOptions";
 import useReviewDashboardCount from "@/APIClients/queries/useReviewDashboardCount";
 import useBulkStatusAction from "./_components/hooks/useBulkStatusAction";
+import useExportReviewDashboardCSV from "./_components/hooks/useExportReviewDashboardCSV";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -76,7 +78,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
   const [statusError, setStatusError] = useState(false);
 
-  const { data: filterOptions } = useReviewDashboardFilterOptions({});
+  const { data: filterOptions } = useDashboardFilterOptions({});
   const { updateApplicantRecordStatus } = useUpdateApplicantRecordStatus();
 
   // build filter categories from backend options
@@ -247,6 +249,9 @@ const AdminReviewPage: NextPageWithLayout = () => {
     },
   });
 
+  const { exportCSV, isExporting, exportFailed, dismissExportError } =
+    useExportReviewDashboardCSV();
+
   const handleResultsPerPageChange = (value: number) => {
     setResultsPerPage(value);
     setPageNumber(1);
@@ -315,7 +320,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
-        <DashboardSwitcher currentDashboard={DASHBOARD_ENUM.REVIEW} />
+        <div className="flex shrink-0 items-center justify-between gap-4">
+          <DashboardSwitcher currentDashboard={DASHBOARD_ENUM.REVIEW} />
+          <ExportCSVButton isExporting={isExporting} onExport={exportCSV} />
+        </div>
         {countsError ? (
           <p role="alert" className="text-sm text-alert-errorText">
             Failed to load dashboard counts.
@@ -416,6 +424,13 @@ const AdminReviewPage: NextPageWithLayout = () => {
         <BulkStatusConfirmationDialogue {...bulkActionDialogue} />
       ) : null}
       <Toast {...bulkActionToast} onClose={dismissBulkActionToast} />
+      <Toast
+        open={exportFailed}
+        severity="error"
+        title="Export failed"
+        description="The CSV could not be generated. Please try again."
+        onClose={dismissExportError}
+      />
     </div>
   );
 };

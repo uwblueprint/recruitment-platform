@@ -7,6 +7,7 @@ import {
   FirebaseFileDTO,
   InterviewDelegationDTO,
   InterviewGroupDTO,
+  InterviewInviteDTO,
   InterviewNotesDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -23,6 +24,7 @@ import {
   UserDTO,
   ProjectDTO,
   UserTermRecordDTO,
+  PositionDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
@@ -35,6 +37,7 @@ import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 import User from "../models/user.model";
 import Project from "../models/project.model";
 import UserTermRecord from "../models/userTermRecord.model";
+import Position from "../models/position.model";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -265,6 +268,7 @@ export function toInterviewDashboardRowDTO(
     lastName: applicantRecord.applicant.last_name,
     position: applicantRecord.position,
     applicationStatus: applicantRecord.status,
+    isApplicantFlagged: applicantRecord.is_applicant_flagged,
     interviewers: (
       interviewedApplicantRecord?.interview_delegations ?? []
     ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),
@@ -350,3 +354,45 @@ export const toUserTermRecordDTO = (
     term: user_term_record.term,
   };
 };
+export const toPositionDTO = (position: Position): PositionDTO => {
+  return {
+    title: position.title,
+    isArchived: position.is_archived,
+  };
+};
+
+export function toInterviewInviteDTO(
+  group: InterviewGroup,
+): InterviewInviteDTO {
+  const interviewers = new Map<string, UserDTO>();
+  const interviewees = new Map<
+    string,
+    InterviewInviteDTO["interviewees"][number]
+  >();
+
+  (group.team ?? []).forEach((delegation) => {
+    if (delegation.interviewer) {
+      const interviewer = toUserDTO(delegation.interviewer);
+      interviewers.set(interviewer.id, interviewer);
+    }
+    const record = delegation.record?.applicant_record;
+    if (record?.applicant) {
+      interviewees.set(record.id, {
+        firstName: record.applicant.first_name,
+        lastName: record.applicant.last_name,
+        position: record.position,
+      });
+    }
+  });
+
+  return {
+    id: group.id,
+    status: group.status,
+    schedulingLink: group.scheduling_link,
+    position:
+      [...interviewees.values()].map((person) => person.position).sort()[0] ??
+      "",
+    interviewers: [...interviewers.values()],
+    interviewees: [...interviewees.values()],
+  };
+}
