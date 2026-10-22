@@ -1,5 +1,5 @@
-import type { Seeder } from "../umzug-seed";
 import { v4 } from "uuid";
+import type { Seeder } from "../umzug-seed";
 
 // user_id is the table's primary key, so each one must be unique.
 const TEST_USER_TERM_RECORDS = [
