@@ -1,13 +1,28 @@
 import { InterviewGroupStatus, type InterviewInviteResult } from "@/graphql/typeUtils";
-import { theme } from "@/styles/Theme";
 import { CollapsibleRow } from "@/components/common/CollapsibleRow";
-import { Chip, Avatar } from "@mui/material";
+import {
+  DashboardStatusChip,
+  type DashboardStatusChipOption,
+} from "@/components/dashboard/common";
+import { Avatar } from "@mui/material";
 
-const STATUS_LABELS: Record<InterviewGroupStatus, string> = {
-  [InterviewGroupStatus.AvailabilityPending]: "Availability pending",
-  [InterviewGroupStatus.ReadyToInterview]: "Ready for invite",
-  [InterviewGroupStatus.InvitesSent]: "Invites sent",
-};
+const STATUS_OPTIONS: readonly DashboardStatusChipOption<InterviewGroupStatus>[] = [
+  {
+    value: InterviewGroupStatus.AvailabilityPending,
+    label: "Availability pending",
+    className: "bg-purple-150 text-black",
+  },
+  {
+    value: InterviewGroupStatus.ReadyToInterview,
+    label: "Ready for invite",
+    className: "bg-purple-150 text-black",
+  },
+  {
+    value: InterviewGroupStatus.InvitesSent,
+    label: "Invites sent",
+    className: "bg-purple-150 text-black",
+  },
+];
 
 type InterviewInviteRowProps = {
   invite: InterviewInviteResult;
@@ -28,8 +43,6 @@ export const InterviewInviteRow = ({
       .map(({ firstName, lastName }) => `${firstName} ${lastName}`)
       .join(" + ") || "No interviewers";
 
-  const statusLabel = STATUS_LABELS[status] ?? status;
-
   return (
     <CollapsibleRow
       title={{
@@ -46,11 +59,12 @@ export const InterviewInviteRow = ({
         {
           text: "Status:",
           rightSlot: (
-            <Chip
-              label={statusLabel}
-              size="small"
-              className="font-source !rounded-[4px] !py-4"
-              sx={{ backgroundColor: theme.colors.V05 }}
+            <DashboardStatusChip
+              value={status}
+              options={STATUS_OPTIONS}
+              readOnly
+              outlined={false}
+              fitSelectedContent
             />
           ),
         },

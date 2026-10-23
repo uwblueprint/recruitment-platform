@@ -1,5 +1,7 @@
 import { DashboardTablePagination } from "@/components/dashboard/table/DashboardTablePagination";
 import { Tabs } from "@/components/dashboard/common/Tabs";
+import useInterviewUnmatchedApplicants from "@/APIClients/queries/useInterviewUnmatchedApplicants";
+import { UnmatchedApplicantsList } from "./UnmatchedApplicantsList";
 import { InterviewInviteRow } from "./InterviewInviteRow";
 import { InterviewInviteToolbar } from "./InterviewInviteToolbar";
 
@@ -14,6 +16,11 @@ export const InterviewInviteList = ({
   onSendInterviewEmails,
   bulkActionsDisabled,
 }: InterviewInviteListProps) => {
+  const unmatched = useInterviewUnmatchedApplicants();
+  const unmatchedCount = unmatched.data?.reduce(
+    (count, group) => count + group.applicants.length,
+    0
+  );
   const {
     activeTab,
     setActiveTab,
@@ -42,6 +49,12 @@ export const InterviewInviteList = ({
         onViewChange={setActiveTab}
         tabs={[
           {
+            view: "unmatched",
+            label: "Unmatched Applicants",
+            count: unmatchedCount,
+            unit: { singular: "Applicant", plural: "Applicants" },
+          },
+          {
             view: "ready",
             label: "Ready for Invite",
             count: readyCount,
@@ -54,55 +67,70 @@ export const InterviewInviteList = ({
             unit: { singular: "Entry", plural: "Entries" },
           },
         ]}
-        selectedCount={selectedIds.size}
+        selectedCount={activeTab === "unmatched" ? undefined : selectedIds.size}
       />
 
-      <InterviewInviteToolbar
-        search={{ value: searchQuery, onChange: setSearchQuery }}
-        filters={{
-          categories: filterCategories,
-          selected: selectedFilters,
-          onChange: handleFilterChange,
-          onRemove: handleFilterRemove,
-        }}
-        bulkActions={{
-          selectedCount: selectedIds.size,
-          allSelected,
-          selectAllDisabled: visibleInvites.length === 0,
-          disabled: bulkActionsDisabled || loading || !!error,
-          onSelectAll: handleSelectAll,
-          onSendInterviewEmails: onSendInterviewEmails
-            ? () => onSendInterviewEmails(Array.from(selectedIds))
-            : undefined,
-        }}
-      />
-
-      {/* List */}
-      <div className="flex flex-col gap-3">
-        {error ? (
-          <p role="alert" className="text-sm text-alert-errorText py-4">
-            Failed to load interview invites. Please try again.
-          </p>
-        ) : loading ? (
-          <p role="status" className="font-source text-sm text-neutral-500 py-4">
-            Loading...
-          </p>
-        ) : visibleInvites.map((invite) => (
-          <InterviewInviteRow
-            key={invite.id}
-            invite={invite}
-            isSelected={selectedIds.has(invite.id)}
-            onSelect={(checked) => toggleSelect(invite.id, checked)}
+      {activeTab === "unmatched" ? (
+        <UnmatchedApplicantsList
+          groups={unmatched.data ?? []}
+          loading={unmatched.loading}
+          error={unmatched.error}
+        />
+      ) : (
+        <>
+          <InterviewInviteToolbar
+            search={{ value: searchQuery, onChange: setSearchQuery }}
+            filters={{
+              categories: filterCategories,
+              selected: selectedFilters,
+              onChange: handleFilterChange,
+              onRemove: handleFilterRemove,
+            }}
+            bulkActions={{
+              selectedCount: selectedIds.size,
+              allSelected,
+              selectAllDisabled: visibleInvites.length === 0,
+              disabled: bulkActionsDisabled || loading || !!error,
+              onSelectAll: handleSelectAll,
+              onSendInterviewEmails: onSendInterviewEmails
+                ? () => onSendInterviewEmails(Array.from(selectedIds))
+                : undefined,
+            }}
           />
-        ))}
-        {!loading && !error && visibleInvites.length === 0 && (
-          <p className="font-source text-sm text-neutral-500 py-4">
-            No interview groups found.
-          </p>
-        )}
-      </div>
 
-      <DashboardTablePagination pagination={pagination} />
+          {/* List */}
+          <div className="flex flex-col gap-3">
+            {error ? (
+              <p role="alert" className="text-sm text-alert-errorText py-4">
+                Failed to load interview invites. Please try again.
+              </p>
+            ) : loading ? (
+              <p
+                role="status"
+                className="font-source text-sm text-neutral-500 py-4"
+              >
+                Loading...
+              </p>
+            ) : (
+              visibleInvites.map((invite) => (
+                <InterviewInviteRow
+                  key={invite.id}
+                  invite={invite}
+                  isSelected={selectedIds.has(invite.id)}
+                  onSelect={(checked) => toggleSelect(invite.id, checked)}
+                />
+              ))
+            )}
+            {!loading && !error && visibleInvites.length === 0 && (
+              <p className="font-source text-sm text-neutral-500 py-4">
+                No interview groups found.
+              </p>
+            )}
+          </div>
+
+          <DashboardTablePagination pagination={pagination} />
+        </>
+      )}
     </div>
   );
 };

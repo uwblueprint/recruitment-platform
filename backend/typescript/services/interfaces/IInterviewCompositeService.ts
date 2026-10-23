@@ -10,6 +10,7 @@ import {
   InterviewGroupStatus,
   InterviewInvitesFilters,
   InterviewInvitesCountsDTO,
+  InterviewUnmatchedApplicantsByPositionDTO,
   InterviewedApplicantsDTO,
   InterviewNotesDTO,
   InterviewPairingsDTO,
@@ -18,6 +19,11 @@ import {
 import { CreateFirebaseFileDTO } from "../../types/firebaseFile";
 
 interface IInterviewCompositeService {
+  /** Fetches applicants with an interviewed record but no delegation, grouped by position. */
+  getUnmatchedApplicants(): Promise<
+    InterviewUnmatchedApplicantsByPositionDTO[]
+  >;
+
   getInterviewDashboardCounts(
     filters?: DashboardFilters,
   ): Promise<InterviewDashboardCountsDTO>;

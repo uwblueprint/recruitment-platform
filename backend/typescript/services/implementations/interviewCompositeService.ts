@@ -16,6 +16,7 @@ import InterviewDelegation from "../../models/interviewDelegation.model";
 import InterviewGroup from "../../models/interviewGroup.model";
 import InterviewedApplicantRecord from "../../models/interviewedApplicantRecord.model";
 import User from "../../models/user.model";
+import Position from "../../models/position.model";
 import {
   CreateInterviewDelegationDTO,
   ApplicationStatusEnum,
@@ -32,6 +33,7 @@ import {
   InterviewGroupStatus,
   InterviewInvitesFilters,
   InterviewInvitesCountsDTO,
+  InterviewUnmatchedApplicantsByPositionDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
   InterviewNotesDTO,
@@ -47,6 +49,7 @@ import {
   toInterviewNotesDTO,
   toUserDTO,
   toInterviewInviteDTO,
+  toInterviewUnmatchedApplicantsByPositionDTO,
 } from "../../utilities/dtoUtils";
 import {
   buildApplicantRecordWhere,
@@ -798,6 +801,66 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to delegate interviewers. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getUnmatchedApplicants(): Promise<
+    InterviewUnmatchedApplicantsByPositionDTO[]
+  > {
+    try {
+      const positions = await Position.findAll({
+        attributes: ["title"],
+        where: {
+          "$applicant_records.interviewed_applicant_record.interview_delegations.interviewer_id$": {
+            [Op.is]: null,
+          },
+        },
+        include: [
+          {
+            model: ApplicantRecord,
+            as: "applicant_records",
+            attributes: ["id", "position"],
+            required: true,
+            include: [
+              {
+                model: Applicant,
+                as: "applicant",
+                attributes: ["id", "first_name", "last_name"],
+                required: true,
+              },
+              {
+                model: InterviewedApplicantRecord,
+                as: "interviewed_applicant_record",
+                attributes: ["id", "applicant_record_id"],
+                required: true,
+                include: [
+                  {
+                    model: InterviewDelegation,
+                    as: "interview_delegations",
+                    attributes: [],
+                    required: false,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        order: [
+          ["title", "ASC"],
+          ["applicant_records", "applicant", "last_name", "ASC"],
+          ["applicant_records", "applicant", "first_name", "ASC"],
+          ["applicant_records", "id", "ASC"],
+        ],
+      });
+
+      return positions.map(toInterviewUnmatchedApplicantsByPositionDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to fetch unmatched applicants. Reason = ${getErrorMessage(
+          error,
+        )}`,
       );
       throw error;
     }

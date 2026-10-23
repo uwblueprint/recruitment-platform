@@ -8,6 +8,7 @@ import {
   InterviewDelegationDTO,
   InterviewGroupDTO,
   InterviewInviteDTO,
+  InterviewUnmatchedApplicantsByPositionDTO,
   InterviewNotesDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -382,5 +383,21 @@ export function toInterviewInviteDTO(
       "",
     interviewers: [...interviewers.values()],
     interviewees: [...interviewees.values()],
+  };
+}
+
+export function toInterviewUnmatchedApplicantsByPositionDTO(
+  position: Position,
+): InterviewUnmatchedApplicantsByPositionDTO {
+  return {
+    position: position.title,
+    applicants: position.applicant_records.map((record) => ({
+      applicantRecordId: record.id,
+      // Required by the unmatched-applicant query's inner join.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      interviewedApplicantRecordId: record.interviewed_applicant_record!.id,
+      firstName: record.applicant.first_name,
+      lastName: record.applicant.last_name,
+    })),
   };
 }

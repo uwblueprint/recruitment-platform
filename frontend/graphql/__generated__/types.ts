@@ -326,6 +326,12 @@ export enum InterviewStatus {
   NeedsReview = 'NEEDS_REVIEW'
 }
 
+export type InterviewUnmatchedApplicantsByPositionDto = {
+  __typename?: 'InterviewUnmatchedApplicantsByPositionDTO';
+  applicants: Array<UnmatchedApplicantDto>;
+  position: Scalars['String']['output'];
+};
+
 export type InterviewedApplicantRecord = {
   __typename?: 'InterviewedApplicantRecord';
   applicantRecordId: Scalars['ID']['output'];
@@ -697,6 +703,7 @@ export type Query = {
   interviewInvites: Array<InterviewInviteDto>;
   interviewInvitesCounts: InterviewInvitesCountsDto;
   interviewNotes?: Maybe<InterviewNotes>;
+  interviewUnmatchedApplicants: Array<InterviewUnmatchedApplicantsByPositionDto>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
   interviewedApplicantsByUserId: Array<InterviewedApplicantsDto>;
@@ -1094,6 +1101,14 @@ export enum SkillCategory {
   Junior = 'JUNIOR',
   Senior = 'SENIOR'
 }
+
+export type UnmatchedApplicantDto = {
+  __typename?: 'UnmatchedApplicantDTO';
+  applicantRecordId: Scalars['ID']['output'];
+  firstName: Scalars['String']['output'];
+  interviewedApplicantRecordId: Scalars['ID']['output'];
+  lastName: Scalars['String']['output'];
+};
 
 export type UpdateAdminCommentDto = {
   comment: Scalars['String']['input'];
