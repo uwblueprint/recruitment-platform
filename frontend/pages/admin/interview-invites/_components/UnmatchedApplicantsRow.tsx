@@ -1,14 +1,9 @@
+import Link from "next/link";
 import { CollapsibleRow } from "@/components/common/CollapsibleRow";
+import type { InterviewUnmatchedApplicantsResult } from "@/graphql/typeUtils";
 
 type UnmatchedApplicantsRowProps = {
-  group: {
-    position: string;
-    applicants: {
-      applicantRecordId: string;
-      firstName: string;
-      lastName: string;
-    }[];
-  };
+  group: InterviewUnmatchedApplicantsResult;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
 };
@@ -59,7 +54,12 @@ const Interviewees = ({
           index % 2 === 0 ? "bg-charcoal-100" : "bg-white"
         }`}
       >
-        {firstName} {lastName}
+        <Link
+          href={`/review/${applicantRecordId}/view`}
+          className="text-link underline"
+        >
+          {firstName} {lastName}
+        </Link>
       </p>
     ))}
   </div>

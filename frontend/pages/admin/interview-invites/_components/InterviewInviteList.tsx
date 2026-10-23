@@ -1,5 +1,7 @@
 import { DashboardTablePagination } from "@/components/dashboard/table/DashboardTablePagination";
 import { Tabs } from "@/components/dashboard/common/Tabs";
+import useInterviewUnmatchedApplicants from "@/APIClients/queries/useInterviewUnmatchedApplicants";
+import { UnmatchedApplicantsList } from "./UnmatchedApplicantsList";
 import { InterviewInviteRow } from "./InterviewInviteRow";
 import { InterviewInviteToolbar } from "./InterviewInviteToolbar";
 
@@ -14,6 +16,11 @@ export const InterviewInviteList = ({
   onSendInterviewEmails,
   bulkActionsDisabled,
 }: InterviewInviteListProps) => {
+  const unmatched = useInterviewUnmatchedApplicants();
+  const unmatchedCount = unmatched.data?.reduce(
+    (count, group) => count + group.applicants.length,
+    0
+  );
   const {
     activeTab,
     setActiveTab,
@@ -44,7 +51,7 @@ export const InterviewInviteList = ({
           {
             view: "unmatched",
             label: "Unmatched Applicants",
-            count: undefined,
+            count: unmatchedCount,
             unit: { singular: "Applicant", plural: "Applicants" },
           },
           {
@@ -63,7 +70,13 @@ export const InterviewInviteList = ({
         selectedCount={activeTab === "unmatched" ? undefined : selectedIds.size}
       />
 
-      {activeTab !== "unmatched" && (
+      {activeTab === "unmatched" ? (
+        <UnmatchedApplicantsList
+          groups={unmatched.data ?? []}
+          loading={unmatched.loading}
+          error={unmatched.error}
+        />
+      ) : (
         <>
           <InterviewInviteToolbar
             search={{ value: searchQuery, onChange: setSearchQuery }}
