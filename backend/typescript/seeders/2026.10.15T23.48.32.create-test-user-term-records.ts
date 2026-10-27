@@ -104,7 +104,7 @@ export const down: Seeder = async ({ context: sequelize }) => {
 
   const t = await sequelize.transaction();
   try {
-    const PROJECT_NAMES = Array.from(
+    const PROJECTS = Array.from(
       { length: 12 },
       (_, i) => `Term Records Seed Project ${i + 1}`,
     );
@@ -124,7 +124,7 @@ export const down: Seeder = async ({ context: sequelize }) => {
 
     await queryInterface.bulkDelete(
       "projects",
-      { project_name: PROJECT_NAMES },
+      { project_name: PROJECTS },
       { transaction: t },
     );
 
