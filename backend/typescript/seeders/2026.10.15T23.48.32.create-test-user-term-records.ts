@@ -1,3 +1,4 @@
+import { v4 } from "uuid";
 import type { Seeder } from "../umzug-seed";
 
 const USER_ID_OFFSET = 31000000;
@@ -6,19 +7,19 @@ const userId = (targetId: number) => USER_ID_OFFSET + targetId;
 const SEED_EMAIL_PREFIX = "seed-term-record-user-";
 
 // fixed projects
-const TEST_PROJECTS = [
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a01", project_name: "Project 1" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a02", project_name: "Project 2" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a03", project_name: "Project 3" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a04", project_name: "Project 4" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a05", project_name: "Project 5" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a06", project_name: "Project 6" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a07", project_name: "Project 7" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a08", project_name: "Project 8" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a09", project_name: "Project 9" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a0a", project_name: "Project 10" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a0b", project_name: "Project 11" },
-  { id: "6f1c2a3e-8b4d-4e5f-9a1b-0c2d3e4f5a0c", project_name: "Project 12" },
+const PROJECT_NAMES = [
+  "Project 1",
+  "Project 2",
+  "Project 3",
+  "Project 4",
+  "Project 5",
+  "Project 6",
+  "Project 7",
+  "Project 8",
+  "Project 9",
+  "Project 10",
+  "Project 11",
+  "Project 12",
 ];
 
 const TEST_USER_TERM_RECORDS = [
@@ -42,11 +43,12 @@ const TEST_USER_TERM_RECORDS = [
 ];
 
 const USER_IDS = TEST_USER_TERM_RECORDS.map((r) => userId(r.targetId));
-const PROJECT_IDS = TEST_PROJECTS.map((p) => p.id);
 
 export const up: Seeder = async ({ context: sequelize }) => {
   const queryInterface = sequelize.getQueryInterface();
   const now = new Date();
+
+  const projectIds = PROJECT_NAMES.map(() => v4());
 
   const t = await sequelize.transaction();
   try {
@@ -67,8 +69,9 @@ export const up: Seeder = async ({ context: sequelize }) => {
 
     await queryInterface.bulkInsert(
       "projects",
-      TEST_PROJECTS.map((project) => ({
-        ...project,
+      PROJECT_NAMES.map((project_name, i) => ({
+        id: projectIds[i],
+        project_name,
         is_archived: false,
       })),
       { transaction: t },
@@ -79,7 +82,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
       TEST_USER_TERM_RECORDS.map(
         ({ targetId, projectIndex, position_id, term }) => ({
           user_id: userId(targetId),
-          project_id: TEST_PROJECTS[projectIndex].id,
+          project_id: projectIds[projectIndex],
           position_id,
           term,
           createdAt: now,
@@ -101,6 +104,11 @@ export const down: Seeder = async ({ context: sequelize }) => {
 
   const t = await sequelize.transaction();
   try {
+    const PROJECT_NAMES = Array.from(
+      { length: 12 },
+      (_, i) => `Term Records Seed Project ${i + 1}`,
+    );
+
     // Reverse order of `up`: rows holding foreign keys go first.
     await queryInterface.bulkDelete(
       "user_term_records",
@@ -116,7 +124,7 @@ export const down: Seeder = async ({ context: sequelize }) => {
 
     await queryInterface.bulkDelete(
       "projects",
-      { id: PROJECT_IDS },
+      { project_name: PROJECT_NAMES },
       { transaction: t },
     );
 
