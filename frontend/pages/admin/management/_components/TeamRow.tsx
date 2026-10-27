@@ -2,7 +2,7 @@ import ArchiveOutlined from "@mui/icons-material/ArchiveOutlined";
 import UnarchiveOutlined from "@mui/icons-material/UnarchiveOutlined";
 import PersonAddAltOutlined from "@mui/icons-material/PersonAddAltOutlined";
 import { Button } from "@/components/common/Button";
-import { Avatar } from "@mui/material";
+import { UserAvatar } from "@/components/common/UserAvatar";
 import { CollapsibleRow } from "@/components/common/CollapsibleRow";
 import type { ManagementTeam, TeamMember } from "@/types/teamsDashboard";
 
@@ -142,16 +142,12 @@ const TeamMemberRow = ({ member }: { member: TeamMember }) => (
   <tr className="h-14 odd:bg-neutral-50 even:bg-white">
     <td className="px-6 py-2">
       <span className="flex items-center gap-3">
-        <Avatar
-          src={member.avatarUrl}
-          alt={member.name}
-          sx={{ width: 40, height: 40, fontSize: 14 }}
-        >
-          {member.name
-            .split(" ")
-            .map((part) => part[0])
-            .join("")}
-        </Avatar>
+        <UserAvatar
+          firstName={member.firstName}
+          lastName={member.lastName}
+          photoUrl={member.avatarUrl}
+          size={40}
+        />
         <span className="underline underline-offset-4">{member.name}</span>
       </span>
     </td>

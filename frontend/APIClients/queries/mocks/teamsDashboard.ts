@@ -37,6 +37,8 @@ export const MOCK_TEAMS: ManagementTeam[] = [
     : MOCK_MEMBERS
   ).map((member, memberIndex) => ({
     ...member,
+    firstName: member.name.trim().split(/\s+/)[0],
+    lastName: member.name.trim().split(/\s+/).slice(1).join(" ") || undefined,
     id: `mock-team-${index + 1}-${member.id}`,
     team: name,
     termsOnProject: ["3+", "2", "1"][memberIndex % 3],

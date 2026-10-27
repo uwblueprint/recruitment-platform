@@ -1,6 +1,8 @@
 import type { Member } from "./membersDashboard";
 
 export type TeamMember = Member & {
+  firstName?: string;
+  lastName?: string;
   termsOnProject: string;
   avatarUrl?: string;
 };
