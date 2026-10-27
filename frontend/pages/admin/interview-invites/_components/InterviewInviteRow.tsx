@@ -4,7 +4,7 @@ import {
   DashboardStatusChip,
   type DashboardStatusChipOption,
 } from "@/components/dashboard/common";
-import { Avatar } from "@mui/material";
+import { UserAvatar } from "@/components/common/UserAvatar";
 
 const STATUS_OPTIONS: readonly DashboardStatusChipOption<InterviewGroupStatus>[] = [
   {
@@ -169,17 +169,16 @@ const InterviewerAvatars = ({
   return (
     <span className="flex shrink-0 items-center">
       {interviewers.map((interviewer, index) => (
-        <Avatar
+        <span
           key={interviewer.id}
-          className={`!h-[42px] !w-[42px] !text-base [&:not(:last-child)]:-mr-2.5 ${
-            index % 2 === 0 ? "!bg-neutral-200" : "!bg-neutral-400"
-          }`}
-          sx={{
-            zIndex: interviewers.length - index,
-          }}
+          className="relative shrink-0 [&:not(:last-child)]:-mr-2.5"
+          style={{ zIndex: interviewers.length - index }}
         >
-          {interviewer.firstName[0]?.toUpperCase()}
-        </Avatar>
+          <UserAvatar
+            firstName={interviewer.firstName}
+            lastName={interviewer.lastName}
+          />
+        </span>
       ))}
     </span>
   );
