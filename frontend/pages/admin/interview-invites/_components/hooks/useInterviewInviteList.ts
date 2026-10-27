@@ -3,13 +3,11 @@ import type {
   FilterCategory,
   SelectedFilters,
 } from "@/components/dashboard/filters";
-import { InterviewGroupStatus } from "@/graphql/typeUtils";
+import type { InterviewGroupStatus } from "@/graphql/typeUtils";
 import useInterviewInvites from "@/APIClients/queries/useInterviewInvites";
-import useInterviewInvitesCounts from "@/APIClients/queries/useInterviewInvitesCounts";
 import usePositions from "@/APIClients/queries/usePositions";
 
-export default function useInterviewInviteList() {
-  const [activeTab, updateActiveTab] = useState<string>("ready");
+export default function useInterviewInviteList(status: InterviewGroupStatus[]) {
   const [searchQuery, updateSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
@@ -19,11 +17,6 @@ export default function useInterviewInviteList() {
   const resetPagination = () => {
     setRequestedPage(1);
     setSelectedIds(new Set());
-  };
-
-  const setActiveTab = (tab: string) => {
-    updateActiveTab(tab);
-    resetPagination();
   };
 
   const setSearchQuery = (query: string) => {
@@ -46,12 +39,9 @@ export default function useInterviewInviteList() {
   const { data, previousData, loading, error } = useInterviewInvites({
     pageNumber: requestedPage,
     resultsPerPage,
-    status: activeTab === "ready"
-      ? [InterviewGroupStatus.AvailabilityPending, InterviewGroupStatus.ReadyToInterview]
-      : [InterviewGroupStatus.InvitesSent],
+    status,
     filters,
   });
-  const { counts, error: countsError } = useInterviewInvitesCounts({ filters });
   const { data: positions, error: positionsError } = usePositions({ isArchived: false });
   const visibleInvites = error ? [] : data ?? (loading ? previousData : undefined) ?? [];
   const filterCategories: FilterCategory[] = [
@@ -113,15 +103,13 @@ export default function useInterviewInviteList() {
   };
 
   return {
-    activeTab,
-    setActiveTab,
+    resetPagination,
+    filters,
     searchQuery,
     setSearchQuery,
     selectedIds,
-    readyCount: counts?.ready,
-    sentCount: counts?.sent,
     loading,
-    error: error ?? countsError ?? positionsError,
+    error: error ?? positionsError,
     visibleInvites,
     pagination: {
       pageNumber: requestedPage,
