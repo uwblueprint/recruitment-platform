@@ -412,13 +412,13 @@ class ReviewCompositeService implements IReviewCompositeService {
   }
 
   async getDashboardFilterOptions(
-    // department filtering not yet supported — reserved for future use
-    _department?: string,
+    department?: string,
   ): Promise<DashboardFilterOptionsDTO> {
     try {
       const positionRecords = await Position.findAll({
         where: {
           is_archived: false,
+          ...(department ? { department } : {}),
         },
       });
 

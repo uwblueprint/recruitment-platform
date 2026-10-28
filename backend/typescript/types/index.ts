@@ -17,3 +17,4 @@ export * from "./firebaseFile";
 export * from "./project";
 export * from "./userTermRecord";
 export * from "./position";
+export * from "./department";
