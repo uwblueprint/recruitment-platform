@@ -48,6 +48,7 @@ const interviewDashboardTypes = gql`
 
   input InterviewDashboardFilters {
     search: String
+    department: String
     positions: [String!]
     applicationStatuses: [ApplicationStatus!]
     skillCategories: [SkillCategory!]
