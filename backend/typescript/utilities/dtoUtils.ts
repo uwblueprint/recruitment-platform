@@ -26,6 +26,7 @@ import {
   ProjectDTO,
   UserTermRecordDTO,
   PositionDTO,
+  DepartmentDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
 import Applicant from "../models/applicant.model";
@@ -39,6 +40,7 @@ import User from "../models/user.model";
 import Project from "../models/project.model";
 import UserTermRecord from "../models/userTermRecord.model";
 import Position from "../models/position.model";
+import Department from "../models/department.model";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -359,6 +361,13 @@ export const toPositionDTO = (position: Position): PositionDTO => {
   return {
     title: position.title,
     isArchived: position.is_archived,
+  };
+};
+
+export const toDepartmentDTO = (department: Department): DepartmentDTO => {
+  return {
+    slug: department.slug,
+    name: department.name,
   };
 };
 
