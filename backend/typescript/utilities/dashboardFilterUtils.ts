@@ -1,15 +1,32 @@
 import {
   Op,
   WhereOptions,
+  IncludeOptions,
   col,
   fn,
-  literal,
   where as whereFn,
 } from "sequelize";
-import { sequelize } from "../models";
+import Position from "../models/position.model";
 import { DashboardFilters } from "../types";
 
 // Where clauses shared by the review and interview dashboards.
+
+/** Required belongs-to join narrows rows without duplicating applicant records. */
+export function buildDepartmentPositionInclude(
+  filters?: DashboardFilters,
+): IncludeOptions[] {
+  if (!filters?.department) return [];
+
+  return [
+    {
+      model: Position,
+      as: "positionRecord",
+      attributes: [],
+      required: true,
+      where: { department: filters.department },
+    },
+  ];
+}
 
 export function buildApplicantRecordWhere(
   filters?: DashboardFilters,
@@ -18,24 +35,6 @@ export function buildApplicantRecordWhere(
 
   if (filters?.positions?.length) {
     where.position = { [Op.in]: filters.positions };
-  }
-  // AND-ed with the positions filter above, so picking a role outside the
-  // department matches nothing rather than falling back to every role. A
-  // subquery keeps this helper synchronous; an unknown slug matches no rows.
-  if (filters?.department) {
-    Object.assign(where, {
-      [Op.and]: [
-        {
-          position: {
-            [Op.in]: literal(
-              `(SELECT title FROM positions WHERE department = ${sequelize.escape(
-                filters.department,
-              )})`,
-            ),
-          },
-        },
-      ],
-    });
   }
   if (filters?.applicationStatuses?.length) {
     where.status = { [Op.in]: filters.applicationStatuses };
