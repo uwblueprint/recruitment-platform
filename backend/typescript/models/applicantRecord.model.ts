@@ -16,6 +16,8 @@ import {
 } from "../types";
 import Applicant from "./applicant.model";
 // eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
+import Position from "./position.model";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import ReviewedApplicantRecord from "./reviewedApplicantRecord.model";
 // eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import InterviewedApplicantRecord from "./interviewedApplicantRecord.model";
@@ -82,6 +84,9 @@ export default class ApplicantRecord extends Model {
 
   @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
   is_shortlisted_for_offer!: boolean;
+
+  @BelongsTo(() => Position, { foreignKey: "position", targetKey: "title" })
+  positionRecord!: Position;
 
   @BelongsTo(() => Applicant, { foreignKey: "applicant_id", targetKey: "id" })
   applicant!: Applicant;
