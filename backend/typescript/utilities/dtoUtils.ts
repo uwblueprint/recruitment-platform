@@ -270,9 +270,13 @@ export function toInterviewDashboardRowDTO(
     position: applicantRecord.position,
     applicationStatus: applicantRecord.status,
     isApplicantFlagged: applicantRecord.is_applicant_flagged,
-    interviewers: (
-      interviewedApplicantRecord?.interview_delegations ?? []
-    ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),
+    interviewers: (interviewedApplicantRecord?.interview_delegations ?? []).map(
+      (interviewDelegation) => ({
+        userInfo: toUserDTO(interviewDelegation.interviewer),
+        interviewHasConflict:
+          interviewDelegation.interview_has_conflict ?? null,
+      }),
+    ),
     interviewScore: interviewedApplicantRecord?.score ?? null,
   };
 }

@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import {
   CreateInterviewDelegationDTO,
   InterviewDelegationDTO,
@@ -13,6 +14,7 @@ interface IInterviewDelegationService {
    */
   createInterviewDelegation(
     interviewDelegation: CreateInterviewDelegationDTO,
+    transaction?: Transaction,
   ): Promise<InterviewDelegationDTO>;
 
   /**
@@ -45,6 +47,7 @@ interface IInterviewDelegationService {
   deleteInterviewDelegation(
     interviewedApplicantRecordId: string,
     interviewerId: string,
+    transaction?: Transaction,
   ): Promise<InterviewDelegationDTO>;
 
   /**

@@ -1,5 +1,6 @@
 import { InterviewDashboardSortBy } from "@/graphql/typeUtils";
 import type { InterviewDashboardResult } from "@/graphql/typeUtils";
+import { ReviewerCell } from "@/pages/admin/review/_components/columns/ReviewerCell";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { ApplicationCell } from "@/components/dashboard/table/cell/ApplicationCell";
@@ -19,33 +20,53 @@ export const COLUMN_ID_TO_SORT_BY: Record<string, InterviewDashboardSortBy> = {
 const fullName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
 
+type DashboardInterviewer = InterviewDashboardResult["interviewers"][number];
+
 const interviewerName = (row: InterviewDashboardResult, index: number) => {
-  const interviewer = row.interviewers[index];
+  const interviewer = row.interviewers[index]?.userInfo;
   return interviewer
     ? fullName(interviewer.firstName, interviewer.lastName)
     : null;
 };
 
-const InterviewerCell = ({
+type InterviewDashboardColumnOptions = {
+  onInterviewerClick: (
+    row: InterviewDashboardResult,
+    interviewer: DashboardInterviewer,
+  ) => void;
+};
+
+const InterviewerNameCell = ({
   row,
   index,
+  onInterviewerClick,
 }: {
   row: InterviewDashboardResult;
   index: number;
+  onInterviewerClick: InterviewDashboardColumnOptions["onInterviewerClick"];
 }) => {
+  const interviewer = row.interviewers[index];
   const name = interviewerName(row, index);
 
-  return name ? (
-    <span className="border-b border-neutral-800">{name}</span>
-  ) : (
-    "-"
+  return (
+    <ReviewerCell
+      reviewerName={name ?? "-"}
+      reviewerHasConflict={interviewer?.interviewHasConflict != null}
+      onClick={
+        interviewer
+          ? () => onInterviewerClick(row, interviewer)
+          : undefined
+      }
+    />
   );
 };
 
-export const INTERVIEW_DASHBOARD_COLUMNS: ColumnDef<
+export const createInterviewDashboardColumns = ({
+  onInterviewerClick,
+}: InterviewDashboardColumnOptions): ColumnDef<
   InterviewDashboardResult,
   unknown
->[] = [
+>[] => [
   {
     id: "select",
     size: 40,
@@ -88,14 +109,26 @@ export const INTERVIEW_DASHBOARD_COLUMNS: ColumnDef<
     accessorFn: (row) => interviewerName(row, 0) ?? "-",
     header: "Interviewer 1",
     enableSorting: true,
-    cell: ({ row }) => <InterviewerCell row={row.original} index={0} />,
+    cell: ({ row }) => (
+      <InterviewerNameCell
+        row={row.original}
+        index={0}
+        onInterviewerClick={onInterviewerClick}
+      />
+    ),
   },
   {
     id: "interviewer2",
     accessorFn: (row) => interviewerName(row, 1) ?? "-",
     header: "Interviewer 2",
     enableSorting: true,
-    cell: ({ row }) => <InterviewerCell row={row.original} index={1} />,
+    cell: ({ row }) => (
+      <InterviewerNameCell
+        row={row.original}
+        index={1}
+        onInterviewerClick={onInterviewerClick}
+      />
+    ),
   },
   {
     id: "interviewScore",

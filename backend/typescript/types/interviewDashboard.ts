@@ -1,5 +1,6 @@
 import { ValueOf } from "../utilities/typingUtils";
 import { ApplicationStatus, SkillCategory } from "./applicantRecord";
+import { InterviewConflict } from "./interviewDelegation";
 import { Interview, InterviewStatus } from "./interviewedApplicantRecord";
 import { UserDTO } from "./user";
 
@@ -17,6 +18,11 @@ export type InterviewDashboardSortBy = ValueOf<
   typeof InterviewDashboardSortByEnum
 >;
 
+export type InterviewDashboardInterviewerDTO = {
+  userInfo: UserDTO;
+  interviewHasConflict: InterviewConflict | null;
+};
+
 export type InterviewDashboardRowDTO = {
   applicantRecordId: string;
   firstName: string;
@@ -24,7 +30,7 @@ export type InterviewDashboardRowDTO = {
   position: string;
   applicationStatus: ApplicationStatus;
   isApplicantFlagged: boolean;
-  interviewers: UserDTO[];
+  interviewers: InterviewDashboardInterviewerDTO[];
   interviewScore: number | null;
 };
 
