@@ -2,6 +2,7 @@ import {
   Op,
   Order,
   OrderItem,
+  QueryTypes,
   WhereOptions,
   IncludeOptions,
   col,
@@ -278,6 +279,54 @@ function interviewerTeamKey(a: InterviewerAssignment): string {
   return `pair:${x}|${y}`;
 }
 
+/** Stable lock identity for an interviewer set. Order of ids does not matter. */
+function interviewerSetLockKey(interviewerIds: number[]): string {
+  return [...interviewerIds].sort((a, b) => a - b).join("|");
+}
+
+/**
+ * One group per interviewer set. Lock that set for this transaction so two
+ * reassignments cannot both create a group for the same interviewers.
+ */
+async function lockInterviewerSet(
+  interviewerIds: number[],
+  transaction: Transaction,
+): Promise<void> {
+  await sequelize.query(`SELECT pg_advisory_xact_lock(hashtext(:teamKey))`, {
+    replacements: { teamKey: interviewerSetLockKey(interviewerIds) },
+    transaction,
+  });
+}
+
+/** Oldest group whose distinct interviewers are exactly `interviewerIds`. */
+async function findInterviewGroupIdByInterviewerSet(
+  interviewerIds: number[],
+  transaction: Transaction,
+): Promise<string | null> {
+  const rows = await sequelize.query<{ group_id: string }>(
+    `
+      SELECT group_id
+      FROM interview_delegations
+      GROUP BY group_id
+      HAVING COUNT(DISTINCT interviewer_id) = :interviewerCount
+        AND COUNT(DISTINCT interviewer_id) FILTER (
+          WHERE interviewer_id IN (:interviewerIds)
+        ) = :interviewerCount
+      ORDER BY MIN("createdAt") ASC
+      LIMIT 1
+    `,
+    {
+      replacements: {
+        interviewerIds,
+        interviewerCount: interviewerIds.length,
+      },
+      transaction,
+      type: QueryTypes.SELECT,
+    },
+  );
+  return rows[0]?.group_id ?? null;
+}
+
 function dedupeUsersById(users: User[]): User[] {
   const seen = new Set<number>();
   return users.filter((user) => {
@@ -397,6 +446,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
                 attributes: [
                   "interviewed_applicant_record_id",
                   "interviewer_id",
+                  "interview_has_conflict",
                   "createdAt",
                 ],
                 model: InterviewDelegation,
@@ -801,6 +851,163 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to delegate interviewers. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async reassignInterviewer(
+    applicantRecordId: string,
+    oldInterviewerId: string,
+    newInterviewerId: string,
+  ): Promise<InterviewDelegationDTO> {
+    const transaction = await sequelize.transaction();
+    try {
+      const interviewedApplicantRecord = await InterviewedApplicantRecord.findOne(
+        {
+          where: { applicant_record_id: applicantRecordId },
+          transaction,
+          lock: transaction.LOCK.UPDATE,
+        },
+      );
+      if (!interviewedApplicantRecord) {
+        throw new Error(
+          `No interviewed applicant record found for applicantRecordId: ${applicantRecordId}`,
+        );
+      }
+
+      const delegations = await InterviewDelegation.findAll({
+        where: {
+          interviewed_applicant_record_id: interviewedApplicantRecord.id,
+        },
+        transaction,
+      });
+      const oldDelegation = delegations.find(
+        (delegation) => delegation.interviewer_id === Number(oldInterviewerId),
+      );
+      if (!oldDelegation) {
+        throw new Error(
+          `No interview delegation found for interviewedApplicantRecordId: ${interviewedApplicantRecord.id} and interviewerId: ${oldInterviewerId}`,
+        );
+      }
+      if (
+        delegations.some(
+          (delegation) =>
+            delegation.interviewer_id === Number(newInterviewerId),
+        )
+      ) {
+        throw new Error(
+          `Interviewer ${newInterviewerId} is already assigned to applicantRecordId: ${applicantRecordId}`,
+        );
+      }
+
+      const previousInterviewerIds = delegations.map(
+        (delegation) => delegation.interviewer_id,
+      );
+      const nextInterviewerIds = [
+        ...delegations
+          .filter(
+            (delegation) =>
+              delegation.interviewer_id !== Number(oldInterviewerId),
+          )
+          .map((delegation) => delegation.interviewer_id),
+        Number(newInterviewerId),
+      ];
+      const previousGroupIds = [
+        ...new Set(delegations.map((delegation) => delegation.group_id)),
+      ];
+      // Interviewer 1 and 2 are ordered by createdAt. Keep the original
+      // timestamp so the replacement stays in the column that was edited.
+      const { createdAt } = oldDelegation;
+
+      // Lock the set being left and the set being joined, in one order, so
+      // two reassignments cannot deadlock, and so deleting an emptied group
+      // cannot remove rows another reassignment has just attached to it.
+      const setsToLock = [previousInterviewerIds, nextInterviewerIds]
+        .map((ids) => ({ ids, key: interviewerSetLockKey(ids) }))
+        .filter(
+          (set, index, all) =>
+            all.findIndex((other) => other.key === set.key) === index,
+        )
+        .sort((left, right) => left.key.localeCompare(right.key));
+      // One connection per transaction, so these locks cannot run in parallel.
+      // eslint-disable-next-line no-restricted-syntax
+      for (const { ids } of setsToLock) {
+        // eslint-disable-next-line no-await-in-loop
+        await lockInterviewerSet(ids, transaction);
+      }
+      const existingGroupId = await findInterviewGroupIdByInterviewerSet(
+        nextInterviewerIds,
+        transaction,
+      );
+      const groupId =
+        existingGroupId ??
+        (
+          await interviewGroupService.createInterviewGroup(
+            { status: InterviewGroupStatusEnum.AVAILABILITY_PENDING },
+            transaction,
+          )
+        ).id;
+
+      await interviewDelegationsService.deleteInterviewDelegation(
+        interviewedApplicantRecord.id,
+        oldInterviewerId,
+        transaction,
+      );
+      await InterviewDelegation.update(
+        { group_id: groupId },
+        {
+          where: {
+            interviewed_applicant_record_id: interviewedApplicantRecord.id,
+          },
+          transaction,
+        },
+      );
+      const newDelegation = await interviewDelegationsService.createInterviewDelegation(
+        {
+          interviewedApplicantRecordId: interviewedApplicantRecord.id,
+          interviewerId: newInterviewerId,
+          groupId,
+        },
+        transaction,
+      );
+      await InterviewDelegation.update(
+        { createdAt },
+        {
+          where: {
+            interviewed_applicant_record_id: interviewedApplicantRecord.id,
+            interviewer_id: Number(newInterviewerId),
+          },
+          transaction,
+        },
+      );
+
+      const emptiedGroupIds = previousGroupIds.filter(
+        (previousGroupId) => previousGroupId !== groupId,
+      );
+      // One connection per transaction, so these counts cannot run in parallel.
+      // eslint-disable-next-line no-restricted-syntax
+      for (const previousGroupId of emptiedGroupIds) {
+        // eslint-disable-next-line no-await-in-loop
+        const remaining = await InterviewDelegation.count({
+          where: { group_id: previousGroupId },
+          transaction,
+        });
+        if (remaining === 0) {
+          // eslint-disable-next-line no-await-in-loop
+          await interviewGroupService.deleteInterviewGroupById(
+            previousGroupId,
+            transaction,
+          );
+        }
+      }
+
+      await transaction.commit();
+      return newDelegation;
+    } catch (error: unknown) {
+      await transaction.rollback();
+      Logger.error(
+        `Failed to reassign interviewer. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     }

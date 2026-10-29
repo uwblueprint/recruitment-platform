@@ -1,6 +1,11 @@
 import { gql } from "apollo-server-express";
 
 const interviewDashboardTypes = gql`
+  type InterviewDashboardInterviewerDTO {
+    userInfo: UserDTO!
+    interviewHasConflict: InterviewConflict
+  }
+
   type InterviewDashboardRowDTO {
     applicantRecordId: ID!
     firstName: String!
@@ -8,7 +13,7 @@ const interviewDashboardTypes = gql`
     position: String!
     applicationStatus: ApplicationStatus!
     isApplicantFlagged: Boolean!
-    interviewers: [UserDTO!]!
+    interviewers: [InterviewDashboardInterviewerDTO!]!
     interviewScore: Int
   }
 

@@ -205,13 +205,19 @@ export type InterviewDashboardFilters = {
   years?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+export type InterviewDashboardInterviewerDto = {
+  __typename?: 'InterviewDashboardInterviewerDTO';
+  interviewHasConflict?: Maybe<InterviewConflict>;
+  userInfo: UserDto;
+};
+
 export type InterviewDashboardRowDto = {
   __typename?: 'InterviewDashboardRowDTO';
   applicantRecordId: Scalars['ID']['output'];
   applicationStatus: ApplicationStatus;
   firstName: Scalars['String']['output'];
   interviewScore?: Maybe<Scalars['Int']['output']>;
-  interviewers: Array<UserDto>;
+  interviewers: Array<InterviewDashboardInterviewerDto>;
   isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
@@ -381,6 +387,7 @@ export type Mutation = {
   login: AuthDto;
   loginWithGoogle: AuthDto;
   logout?: Maybe<Scalars['ID']['output']>;
+  reassignInterviewer: InterviewDelegationDto;
   reassignReviewer: ReviewedApplicantRecordDto;
   refresh: Scalars['String']['output'];
   register: AuthDto;
@@ -542,6 +549,13 @@ export type MutationLoginWithGoogleArgs = {
 
 export type MutationLogoutArgs = {
   userId: Scalars['ID']['input'];
+};
+
+
+export type MutationReassignInterviewerArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+  newInterviewerId: Scalars['ID']['input'];
+  oldInterviewerId: Scalars['ID']['input'];
 };
 
 

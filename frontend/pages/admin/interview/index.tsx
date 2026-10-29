@@ -1,10 +1,11 @@
 import { InterviewDashboardSidePanel } from "./_components/side-panel/InterviewDashboardSidePanel";
 import { InterviewDashboardToolbar } from "./_components/InterviewDashboardToolbar";
+import { ReassignInterviewerDialogue } from "./_components/dialogues/ReassignInterviewerDialogue";
 import { DashboardTable } from "@/components/dashboard/table";
 import { DASHBOARD_ENUM, DashboardSwitcher } from "@/components/dashboard/common/DashboardSwitcher";
 import {
   COLUMN_ID_TO_SORT_BY,
-  INTERVIEW_DASHBOARD_COLUMNS,
+  createInterviewDashboardColumns,
 } from "@/components/dashboard/interview-dashboard/columns";
 import {
   FilterCategoryVariant,
@@ -29,6 +30,14 @@ import { NextPageWithLayout } from "../../_app";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useInterviewDashboardCounts from "@/APIClients/queries/useInterviewDashboardCounts";
+
+type InterviewerReassignmentTarget = {
+  applicantRecordId: string;
+  position: string;
+  interviewerId: string;
+  interviewerName: string;
+  assignedInterviewerIds: string[];
+};
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -60,6 +69,8 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const [search, setSearch] = useState("");
+  const [interviewerReassignmentTarget, setInterviewerReassignmentTarget] =
+    useState<InterviewerReassignmentTarget | null>(null);
 
   // The query fires on the settled text; the input keeps the raw value.
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
@@ -154,6 +165,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     previousData,
     loading: isLoading,
     error,
+    refetch,
   } = useInterviewDashboard({
     pageNumber,
     resultsPerPage,
@@ -225,8 +237,34 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     resetForNewResults();
   };
 
-  const { counts: tabCounts, error: countsError } =
-    useInterviewDashboardCounts(backendFilters);
+  const {
+    counts: tabCounts,
+    error: countsError,
+    refetch: refetchCounts,
+  } = useInterviewDashboardCounts(backendFilters);
+
+  const columns = useMemo(
+    () =>
+      createInterviewDashboardColumns({
+        onInterviewerClick: (row, interviewer) => {
+          setInterviewerReassignmentTarget({
+            applicantRecordId: row.applicantRecordId,
+            position: row.position,
+            interviewerId: interviewer.userInfo.id,
+            interviewerName: `${interviewer.userInfo.firstName} ${interviewer.userInfo.lastName}`,
+            assignedInterviewerIds: row.interviewers.map(
+              (item) => item.userInfo.id,
+            ),
+          });
+        },
+      }),
+    [],
+  );
+
+  const refreshDashboard = () => {
+    void refetch().catch(() => {});
+    void refetchCounts().catch(() => {});
+  };
 
   const INTERVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
   const tabs: Tab[] = [
@@ -272,7 +310,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
 
         <DashboardTable
           data={rows}
-          columns={INTERVIEW_DASHBOARD_COLUMNS}
+          columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
@@ -313,6 +351,24 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             : undefined
         }
       />
+
+      {interviewerReassignmentTarget ? (
+        <ReassignInterviewerDialogue
+          open={!!interviewerReassignmentTarget}
+          applicantRecordId={interviewerReassignmentTarget.applicantRecordId}
+          position={interviewerReassignmentTarget.position}
+          currentInterviewerId={interviewerReassignmentTarget.interviewerId}
+          currentInterviewerName={interviewerReassignmentTarget.interviewerName}
+          assignedInterviewerIds={
+            interviewerReassignmentTarget.assignedInterviewerIds
+          }
+          onClose={() => setInterviewerReassignmentTarget(null)}
+          onUpdated={() => {
+            setInterviewerReassignmentTarget(null);
+            refreshDashboard();
+          }}
+        />
+      ) : null}
     </div>
   );
 };

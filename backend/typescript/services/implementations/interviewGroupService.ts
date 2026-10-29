@@ -1,4 +1,4 @@
-import { Op } from "sequelize";
+import { Op, Transaction } from "sequelize";
 import { sequelize } from "../../models";
 import InterviewGroup from "../../models/interviewGroup.model";
 import {
@@ -32,12 +32,16 @@ class InterviewGroupService implements IInterviewGroupService {
 
   async createInterviewGroup(
     interviewGroup: CreateInterviewGroupDTO,
+    transaction?: Transaction,
   ): Promise<InterviewGroupDTO> {
     try {
-      const newInterviewGroup = await InterviewGroup.create({
-        scheduling_link: interviewGroup.schedulingLink,
-        status: interviewGroup.status,
-      });
+      const newInterviewGroup = await InterviewGroup.create(
+        {
+          scheduling_link: interviewGroup.schedulingLink,
+          status: interviewGroup.status,
+        },
+        { transaction },
+      );
       return toInterviewGroupDTO(newInterviewGroup);
     } catch (error: unknown) {
       Logger.error(
@@ -70,13 +74,16 @@ class InterviewGroupService implements IInterviewGroupService {
     }
   }
 
-  async deleteInterviewGroupById(id: string): Promise<InterviewGroupDTO> {
+  async deleteInterviewGroupById(
+    id: string,
+    transaction?: Transaction,
+  ): Promise<InterviewGroupDTO> {
     try {
-      const interviewGroup = await InterviewGroup.findByPk(id);
+      const interviewGroup = await InterviewGroup.findByPk(id, { transaction });
       if (!interviewGroup) {
         throw new Error(`No interview group found for id: ${id}`);
       }
-      await interviewGroup.destroy();
+      await interviewGroup.destroy({ transaction });
       return toInterviewGroupDTO(interviewGroup);
     } catch (error: unknown) {
       Logger.error(
