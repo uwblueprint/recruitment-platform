@@ -2,7 +2,6 @@ import {
   Op,
   Order,
   OrderItem,
-  QueryTypes,
   WhereOptions,
   IncludeOptions,
   col,
@@ -277,54 +276,6 @@ function interviewerTeamKey(a: InterviewerAssignment): string {
   // Order the interviewers so that the smaller ID is first.
   const [x, y] = ids[0] <= ids[1] ? [ids[0], ids[1]] : [ids[1], ids[0]];
   return `pair:${x}|${y}`;
-}
-
-/** Stable lock identity for an interviewer set. Order of ids does not matter. */
-function interviewerSetLockKey(interviewerIds: number[]): string {
-  return [...interviewerIds].sort((a, b) => a - b).join("|");
-}
-
-/**
- * One group per interviewer set. Lock that set for this transaction so two
- * reassignments cannot both create a group for the same interviewers.
- */
-async function lockInterviewerSet(
-  interviewerIds: number[],
-  transaction: Transaction,
-): Promise<void> {
-  await sequelize.query(`SELECT pg_advisory_xact_lock(hashtext(:teamKey))`, {
-    replacements: { teamKey: interviewerSetLockKey(interviewerIds) },
-    transaction,
-  });
-}
-
-/** Oldest group whose distinct interviewers are exactly `interviewerIds`. */
-async function findInterviewGroupIdByInterviewerSet(
-  interviewerIds: number[],
-  transaction: Transaction,
-): Promise<string | null> {
-  const rows = await sequelize.query<{ group_id: string }>(
-    `
-      SELECT group_id
-      FROM interview_delegations
-      GROUP BY group_id
-      HAVING COUNT(DISTINCT interviewer_id) = :interviewerCount
-        AND COUNT(DISTINCT interviewer_id) FILTER (
-          WHERE interviewer_id IN (:interviewerIds)
-        ) = :interviewerCount
-      ORDER BY MIN("createdAt") ASC
-      LIMIT 1
-    `,
-    {
-      replacements: {
-        interviewerIds,
-        interviewerCount: interviewerIds.length,
-      },
-      transaction,
-      type: QueryTypes.SELECT,
-    },
-  );
-  return rows[0]?.group_id ?? null;
 }
 
 function dedupeUsersById(users: User[]): User[] {
@@ -863,11 +814,11 @@ class InterviewCompositeService implements IInterviewCompositeService {
   ): Promise<InterviewDelegationDTO> {
     const transaction = await sequelize.transaction();
     try {
+      // 1. Find the interview record for the selected applicant.
       const interviewedApplicantRecord = await InterviewedApplicantRecord.findOne(
         {
           where: { applicant_record_id: applicantRecordId },
           transaction,
-          lock: transaction.LOCK.UPDATE,
         },
       );
       if (!interviewedApplicantRecord) {
@@ -876,20 +827,29 @@ class InterviewCompositeService implements IInterviewCompositeService {
         );
       }
 
-      const delegations = await InterviewDelegation.findAll({
+      // 2. Find the old interviewer's delegation and its group.
+      // We assume that there exists only one delegation for this applicant and interviewer - this is not enforced by the database schema, but is a business rule.
+      const oldDelegation = await InterviewDelegation.findOne({
         where: {
           interviewed_applicant_record_id: interviewedApplicantRecord.id,
+          interviewer_id: Number(oldInterviewerId),
         },
         transaction,
       });
-      const oldDelegation = delegations.find(
-        (delegation) => delegation.interviewer_id === Number(oldInterviewerId),
-      );
       if (!oldDelegation) {
         throw new Error(
           `No interview delegation found for interviewedApplicantRecordId: ${interviewedApplicantRecord.id} and interviewerId: ${oldInterviewerId}`,
         );
       }
+      // 3. Load this applicant's delegations in that group and reject a duplicate assignment.
+      // A group may serve multiple applicants; only this applicant's partners will move.
+      const delegations = await InterviewDelegation.findAll({
+        where: {
+          interviewed_applicant_record_id: interviewedApplicantRecord.id,
+          group_id: oldDelegation.group_id,
+        },
+        transaction,
+      });
       if (
         delegations.some(
           (delegation) =>
@@ -901,47 +861,48 @@ class InterviewCompositeService implements IInterviewCompositeService {
         );
       }
 
-      const previousInterviewerIds = delegations.map(
-        (delegation) => delegation.interviewer_id,
-      );
-      const nextInterviewerIds = [
-        ...delegations
-          .filter(
-            (delegation) =>
-              delegation.interviewer_id !== Number(oldInterviewerId),
-          )
-          .map((delegation) => delegation.interviewer_id),
-        Number(newInterviewerId),
-      ];
-      const previousGroupIds = [
-        ...new Set(delegations.map((delegation) => delegation.group_id)),
-      ];
-      // Interviewer 1 and 2 are ordered by createdAt. Keep the original
-      // timestamp so the replacement stays in the column that was edited.
-      const { createdAt } = oldDelegation;
+      // 4. Build the desired team: the existing partners plus the new interviewer.
+      const getNextInterviewerIds = (): number[] => {
+        const partnerDelegations = delegations.filter(
+          (delegation) =>
+            delegation.interviewer_id !== Number(oldInterviewerId),
+        );
+        const partnerIds = partnerDelegations.map(
+          (partner) => partner.interviewer_id,
+        );
+        return [...partnerIds, Number(newInterviewerId)];
+      };
+      const nextInterviewerIds = getNextInterviewerIds();
 
-      // Lock the set being left and the set being joined, in one order, so
-      // two reassignments cannot deadlock, and so deleting an emptied group
-      // cannot remove rows another reassignment has just attached to it.
-      const setsToLock = [previousInterviewerIds, nextInterviewerIds]
-        .map((ids) => ({ ids, key: interviewerSetLockKey(ids) }))
-        .filter(
-          (set, index, all) =>
-            all.findIndex((other) => other.key === set.key) === index,
-        )
-        .sort((left, right) => left.key.localeCompare(right.key));
-      // One connection per transaction, so these locks cannot run in parallel.
-      // eslint-disable-next-line no-restricted-syntax
-      for (const { ids } of setsToLock) {
-        // eslint-disable-next-line no-await-in-loop
-        await lockInterviewerSet(ids, transaction);
-      }
-      const existingGroupId = await findInterviewGroupIdByInterviewerSet(
-        nextInterviewerIds,
+      // 5. Find groups containing the new interviewer and load their full membership.
+      const newInterviewerDelegations = await InterviewDelegation.findAll({
+        attributes: ["group_id"],
+        where: { interviewer_id: Number(newInterviewerId) },
         transaction,
-      );
+      });
+      const candidateGroups = await InterviewGroup.findAll({
+        where: {
+          id: { [Op.in]: newInterviewerDelegations.map((d) => d.group_id) },
+        },
+        include: [{ model: InterviewDelegation, as: "interview_delegations" }],
+        order: [
+          ["createdAt", "ASC"],
+          ["id", "ASC"],
+        ],
+        transaction,
+      });
+      // 6. Reuse a group with exactly the desired team, or create one if none matches.
+      const existingGroup = candidateGroups.find((group) => {
+        const memberIds = new Set(
+          group.interview_delegations?.map((d) => d.interviewer_id),
+        );
+        return (
+          memberIds.size === nextInterviewerIds.length &&
+          nextInterviewerIds.every((id) => memberIds.has(id))
+        );
+      });
       const groupId =
-        existingGroupId ??
+        existingGroup?.id ??
         (
           await interviewGroupService.createInterviewGroup(
             { status: InterviewGroupStatusEnum.AVAILABILITY_PENDING },
@@ -949,6 +910,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
           )
         ).id;
 
+      // 7. Remove the old interviewer and move this applicant's partners to the destination group.
       await interviewDelegationsService.deleteInterviewDelegation(
         interviewedApplicantRecord.id,
         oldInterviewerId,
@@ -959,10 +921,12 @@ class InterviewCompositeService implements IInterviewCompositeService {
         {
           where: {
             interviewed_applicant_record_id: interviewedApplicantRecord.id,
+            group_id: oldDelegation.group_id,
           },
           transaction,
         },
       );
+      // 8. Assign the new interviewer, preserving the original dashboard column.
       const newDelegation = await interviewDelegationsService.createInterviewDelegation(
         {
           interviewedApplicantRecordId: interviewedApplicantRecord.id,
@@ -972,7 +936,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
         transaction,
       );
       await InterviewDelegation.update(
-        { createdAt },
+        { createdAt: oldDelegation.createdAt },
         {
           where: {
             interviewed_applicant_record_id: interviewedApplicantRecord.id,
@@ -982,26 +946,19 @@ class InterviewCompositeService implements IInterviewCompositeService {
         },
       );
 
-      const emptiedGroupIds = previousGroupIds.filter(
-        (previousGroupId) => previousGroupId !== groupId,
-      );
-      // One connection per transaction, so these counts cannot run in parallel.
-      // eslint-disable-next-line no-restricted-syntax
-      for (const previousGroupId of emptiedGroupIds) {
-        // eslint-disable-next-line no-await-in-loop
-        const remaining = await InterviewDelegation.count({
-          where: { group_id: previousGroupId },
+      // 9. Delete the original group only if no applicants still have delegations in it.
+      const remaining = await InterviewDelegation.count({
+        where: { group_id: oldDelegation.group_id },
+        transaction,
+      });
+      if (remaining === 0) {
+        await interviewGroupService.deleteInterviewGroupById(
+          oldDelegation.group_id,
           transaction,
-        });
-        if (remaining === 0) {
-          // eslint-disable-next-line no-await-in-loop
-          await interviewGroupService.deleteInterviewGroupById(
-            previousGroupId,
-            transaction,
-          );
-        }
+        );
       }
 
+      // 10. Commit all changes together and return the new delegation.
       await transaction.commit();
       return newDelegation;
     } catch (error: unknown) {
