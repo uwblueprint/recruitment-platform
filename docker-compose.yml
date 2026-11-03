@@ -37,11 +37,11 @@ services:
   db:
     # TODO: rename container for your project
     container_name: recruitment_platform_db
-    image: postgres:12-alpine
+    image: postgres:18-alpine
     ports:
       - 5432:5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql
       - ./db-init:/docker-entrypoint-initdb.d
     env_file:
       - ./.env
