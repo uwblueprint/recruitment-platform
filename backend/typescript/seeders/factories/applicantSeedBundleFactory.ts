@@ -3,24 +3,10 @@ import * as path from "path";
 
 import { v4 } from "uuid";
 
-const TIMES_APPLIED_MAP = {
-  "This is my first time!": 1,
-  Once: 2,
-  Twice: 3,
-  "3 or more": 4,
-} as const;
-
-/** Export labels in applications.json - `positions.title` from create-bp-positions seeder (FK target). */
-const POSITION_TITLE_BY_EXPORT_ROLE: Record<string, string> = {
-  "Product Designer": "Designer",
-  "Project Developer": "Developer",
-  "VP Finance & Operations": "VP Finance",
-  "VP Project Scoping": "VP Scoping",
-};
-
-function positionTitleForApplicantRecord(exportRoleTitle: string): string {
-  return POSITION_TITLE_BY_EXPORT_ROLE[exportRoleTitle] ?? exportRoleTitle;
-}
+import {
+  positionTitleForExportRole,
+  TIMES_APPLIED_MAP,
+} from "../../constants/applicantIngestion";
 
 export type ShortAnswerQuestion = {
   question: string;
@@ -160,7 +146,7 @@ const getApplicantRecordDTO = (
   choiceRoleFromExport: string,
   choice: number,
 ): CreateApplicantRecordDTO => {
-  const position = positionTitleForApplicantRecord(choiceRoleFromExport);
+  const position = positionTitleForExportRole(choiceRoleFromExport);
   return {
     id: v4(),
     applicant_id: applicantId,
