@@ -9,5 +9,10 @@ const DATABASE_URL =
 
 /* eslint-disable-next-line import/prefer-default-export */
 export const sequelize = new Sequelize(DATABASE_URL, {
-  models: [path.join(__dirname, "/*.model.ts")],
+  models: [
+    path.join(
+      __dirname,
+      process.env.NODE_ENV === "production" ? "*.model.js" : "*.model.ts",
+    ),
+  ],
 });

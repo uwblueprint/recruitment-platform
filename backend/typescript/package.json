@@ -18,7 +18,9 @@
     "seed:down:all": "node seed.js down --to 0",
     "db:up": "node migrate.js up && node seed.js up",
     "db:down:all": "node seed.js down --to 0 && node migrate.js down --to 0",
-    "postinstall": "tsc"
+    "postinstall": "tsc",
+    "build": "tsc",
+    "start": "node build/server.js"
   },
   "keywords": [],
   "author": "",

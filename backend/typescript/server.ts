@@ -9,12 +9,10 @@ import { sequelize } from "./models";
 import schema from "./graphql";
 import { INTERVIEW_NOTES_MAX_BYTES } from "./constants/interviewNotes";
 
-const CORS_ALLOW_LIST = [
-  "http://localhost:3000",
-  "https://uw-blueprint-starter-code.firebaseapp.com",
-  "https://uw-blueprint-starter-code.web.app",
-  /^https:\/\/uw-blueprint-starter-code--pr.*\.web\.app$/,
-];
+const CORS_ALLOW_LIST = (process.env.CORS_ORIGINS || "http://localhost:3000")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 const CORS_OPTIONS: cors.CorsOptions = {
   origin: CORS_ALLOW_LIST,
@@ -49,8 +47,6 @@ server.applyMiddleware({
   cors: { origin: CORS_ALLOW_LIST, credentials: true },
 });
 
-sequelize.authenticate();
-
 firebaseAdmin.initializeApp({
   credential: firebaseAdmin.credential.cert({
     projectId: process.env.FIREBASE_PROJECT_ID,
@@ -62,7 +58,24 @@ firebaseAdmin.initializeApp({
   }),
 });
 
-app.listen({ port: process.env.PORT || 8080 }, () => {
+app.get("/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+const startServer = async (): Promise<void> => {
+  await sequelize.authenticate();
+
+  app.listen({ port: process.env.PORT || 8080 }, () => {
+    /* eslint-disable-next-line no-console */
+    console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
+  });
+};
+
+startServer().catch((error: unknown) => {
   /* eslint-disable-next-line no-console */
-  console.info(`Server is listening on port ${process.env.PORT || 8080}!`);
+  console.error(
+    "Failed to start server: database authentication failed.",
+    error,
+  );
+  process.exit(1);
 });
