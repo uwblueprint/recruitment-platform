@@ -142,6 +142,7 @@ const graphQLMiddlewares = {
     interviewDashboardSidePanel: authorizedByAdmin(),
     interviewInvites: authorizedByAdmin(),
     interviewInvitesCounts: authorizedByAdmin(),
+    interviewUnmatchedApplicants: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),

@@ -42,3 +42,15 @@ export type InterviewInvitesCountsDTO = {
   ready: number;
   sent: number;
 };
+
+export type InterviewUnmatchedApplicantDTO = {
+  applicantRecordId: string;
+  interviewedApplicantRecordId: string;
+  firstName: string;
+  lastName: string;
+};
+
+export type InterviewUnmatchedApplicantsByPositionDTO = {
+  position: string;
+  applicants: InterviewUnmatchedApplicantDTO[];
+};

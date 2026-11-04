@@ -8,6 +8,7 @@ import {
   InterviewDelegationDTO,
   InterviewGroupDTO,
   InterviewInviteDTO,
+  InterviewUnmatchedApplicantsByPositionDTO,
   InterviewNotesDTO,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -23,6 +24,7 @@ import {
   SkillCategory,
   UserDTO,
   ProjectDTO,
+  UserTermRecordDTO,
   PositionDTO,
 } from "../types";
 import AdminComment from "../models/adminComment.model";
@@ -35,6 +37,7 @@ import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.mod
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 import User from "../models/user.model";
 import Project from "../models/project.model";
+import UserTermRecord from "../models/userTermRecord.model";
 import Position from "../models/position.model";
 
 export function toUserDTO(model: User): UserDTO {
@@ -342,6 +345,16 @@ export const toProjectDTO = (project: Project): ProjectDTO => {
   };
 };
 
+export const toUserTermRecordDTO = (
+  user_term_record: UserTermRecord,
+): UserTermRecordDTO => {
+  return {
+    userId: user_term_record.user_id,
+    projectId: user_term_record.project_id,
+    positionId: user_term_record.position_id,
+    term: user_term_record.term,
+  };
+};
 export const toPositionDTO = (position: Position): PositionDTO => {
   return {
     title: position.title,
@@ -382,5 +395,21 @@ export function toInterviewInviteDTO(
       "",
     interviewers: [...interviewers.values()],
     interviewees: [...interviewees.values()],
+  };
+}
+
+export function toInterviewUnmatchedApplicantsByPositionDTO(
+  position: Position,
+): InterviewUnmatchedApplicantsByPositionDTO {
+  return {
+    position: position.title,
+    applicants: position.applicant_records.map((record) => ({
+      applicantRecordId: record.id,
+      // Required by the unmatched-applicant query's inner join.
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      interviewedApplicantRecordId: record.interviewed_applicant_record!.id,
+      firstName: record.applicant.first_name,
+      lastName: record.applicant.last_name,
+    })),
   };
 }

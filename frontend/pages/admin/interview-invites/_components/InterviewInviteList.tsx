@@ -1,108 +1,55 @@
-import { DashboardTablePagination } from "@/components/dashboard/table/DashboardTablePagination";
-import { Tabs } from "@/components/dashboard/common/Tabs";
+import type { InterviewInviteResult } from "@/graphql/typeUtils";
 import { InterviewInviteRow } from "./InterviewInviteRow";
-import { InterviewInviteToolbar } from "./InterviewInviteToolbar";
-
-import useInterviewInviteList from "./hooks/useInterviewInviteList";
 
 type InterviewInviteListProps = {
-  onSendInterviewEmails?: (selectedIds: string[]) => void;
-  bulkActionsDisabled?: boolean;
+  invites: InterviewInviteResult[];
+  loading: boolean;
+  error?: Error;
+  selectedIds: Set<string>;
+  onSelect: (id: string, checked: boolean) => void;
 };
 
 export const InterviewInviteList = ({
-  onSendInterviewEmails,
-  bulkActionsDisabled,
+  invites,
+  loading,
+  error,
+  selectedIds,
+  onSelect,
 }: InterviewInviteListProps) => {
-  const {
-    activeTab,
-    setActiveTab,
-    searchQuery,
-    setSearchQuery,
-    selectedIds,
-    readyCount,
-    sentCount,
-    loading,
-    error,
-    visibleInvites,
-    pagination,
-    allSelected,
-    handleSelectAll,
-    toggleSelect,
-    filterCategories,
-    selectedFilters,
-    handleFilterChange,
-    handleFilterRemove,
-  } = useInterviewInviteList();
+  if (error) {
+    return (
+      <p role="alert" className="font-source text-sm text-alert-errorText py-4">
+        Failed to load interview invites. Please try again.
+      </p>
+    );
+  }
+
+  if (loading) {
+    return (
+      <p role="status" className="font-source text-sm text-neutral-500 py-4">
+        Loading...
+      </p>
+    );
+  }
+
+  if (invites.length === 0) {
+    return (
+      <p className="font-source text-sm text-neutral-500 py-4">
+        No interview groups found.
+      </p>
+    );
+  }
 
   return (
-    <div className="w-full flex flex-col gap-4">
-      <Tabs
-        activeView={activeTab}
-        onViewChange={setActiveTab}
-        tabs={[
-          {
-            view: "ready",
-            label: "Ready for Invite",
-            count: readyCount,
-            unit: { singular: "Entry", plural: "Entries" },
-          },
-          {
-            view: "sent",
-            label: "Invites Sent",
-            count: sentCount,
-            unit: { singular: "Entry", plural: "Entries" },
-          },
-        ]}
-        selectedCount={selectedIds.size}
-      />
-
-      <InterviewInviteToolbar
-        search={{ value: searchQuery, onChange: setSearchQuery }}
-        filters={{
-          categories: filterCategories,
-          selected: selectedFilters,
-          onChange: handleFilterChange,
-          onRemove: handleFilterRemove,
-        }}
-        bulkActions={{
-          selectedCount: selectedIds.size,
-          allSelected,
-          selectAllDisabled: visibleInvites.length === 0,
-          disabled: bulkActionsDisabled || loading || !!error,
-          onSelectAll: handleSelectAll,
-          onSendInterviewEmails: onSendInterviewEmails
-            ? () => onSendInterviewEmails(Array.from(selectedIds))
-            : undefined,
-        }}
-      />
-
-      {/* List */}
-      <div className="flex flex-col gap-3">
-        {error ? (
-          <p role="alert" className="text-sm text-alert-errorText py-4">
-            Failed to load interview invites. Please try again.
-          </p>
-        ) : loading ? (
-          <p role="status" className="font-source text-sm text-neutral-500 py-4">
-            Loading...
-          </p>
-        ) : visibleInvites.map((invite) => (
-          <InterviewInviteRow
-            key={invite.id}
-            invite={invite}
-            isSelected={selectedIds.has(invite.id)}
-            onSelect={(checked) => toggleSelect(invite.id, checked)}
-          />
-        ))}
-        {!loading && !error && visibleInvites.length === 0 && (
-          <p className="font-source text-sm text-neutral-500 py-4">
-            No interview groups found.
-          </p>
-        )}
-      </div>
-
-      <DashboardTablePagination pagination={pagination} />
+    <div className="flex flex-col gap-3">
+      {invites.map((invite) => (
+        <InterviewInviteRow
+          key={invite.id}
+          invite={invite}
+          isSelected={selectedIds.has(invite.id)}
+          onSelect={(checked) => onSelect(invite.id, checked)}
+        />
+      ))}
     </div>
   );
 };

@@ -5,12 +5,16 @@ import {
   InterviewGroupStatus,
   InterviewInvitesFilters,
   InterviewInvitesCountsDTO,
+  InterviewUnmatchedApplicantsByPositionDTO,
 } from "../../types";
 
 const interviewCompositeService: IInterviewCompositeService = new InterviewCompositeService();
 
 const interviewInvitesDashboardResolvers = {
   Query: {
+    interviewUnmatchedApplicants: (): Promise<
+      InterviewUnmatchedApplicantsByPositionDTO[]
+    > => interviewCompositeService.getUnmatchedApplicants(),
     interviewInvites: async (
       _parent: undefined,
       {

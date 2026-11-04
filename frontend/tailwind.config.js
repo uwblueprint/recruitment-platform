@@ -85,6 +85,7 @@ module.exports = {
           DEFAULT: "#7C3AED",
           50: "#F5F3FF",
           100: "#EDE9FE",
+          150: "#E5DCFF",
           200: "#DDD6FE",
           500: "#7C3AED",
           700: "#6D28D9",

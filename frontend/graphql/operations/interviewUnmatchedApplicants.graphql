@@ -1,0 +1,11 @@
+query InterviewUnmatchedApplicants {
+  interviewUnmatchedApplicants {
+    position
+    applicants {
+      applicantRecordId
+      interviewedApplicantRecordId
+      firstName
+      lastName
+    }
+  }
+}
