@@ -1,4 +1,4 @@
-import { DataTypes, Op } from "sequelize";
+import { DataTypes, Op, QueryTypes } from "sequelize";
 import { v4 } from "uuid";
 import type { Seeder } from "../umzug-seed";
 import { generateApplicantSeedBundles } from "./factories/applicantSeedBundleFactory";
@@ -24,9 +24,9 @@ const APPLICANT_RECORD_BULK_INSERT_FIELD_TYPES = {
 const SEED_EMAIL_PREFIX = "real-data-test-home-page";
 const SEED_SCHEDULING_LINK_PREFIX = `${SEED_EMAIL_PREFIX}-scheduling-`;
 
-/** First user created via Google OAuth in a fresh dev environment. Lets the
- * /home page show data for whichever Blueprint member logs in locally. */
+/** Prefer the first local OAuth user, but allow seeding before anyone logs in. */
 const HOME_USER_ID = 1;
+const FALLBACK_HOME_USER_ID = 9999991; // John Doe, created by create-test-users.
 
 /** Existing "Reviewer 1" test user (seeded by create-test-reviewed-applicant-records),
  * reused here as the second interviewer in a paired interview group. */
@@ -77,6 +77,19 @@ const getReviewDTO = (): ReviewDTO => {
 };
 
 export const up: Seeder = async ({ context: sequelize }) => {
+  const [homeUser] = await sequelize.query<{ id: number }>(
+    "SELECT id FROM users WHERE id IN (:userIds) ORDER BY id ASC LIMIT 1",
+    {
+      replacements: { userIds: [HOME_USER_ID, FALLBACK_HOME_USER_ID] },
+      type: QueryTypes.SELECT,
+    },
+  );
+  if (!homeUser) {
+    throw new Error(
+      "Home-page seed data requires the create-test-users seeder first.",
+    );
+  }
+
   const seedData = generateApplicantSeedBundles(SEED_EMAIL_PREFIX, 3);
 
   const applicants = seedData.map((s) => s.applicant);
@@ -87,11 +100,11 @@ export const up: Seeder = async ({ context: sequelize }) => {
     s.secondChoiceApplicantRecord ? [s.secondChoiceApplicantRecord] : [],
   );
 
-  // "Application Review" tab: HOME_USER_ID is the reviewer for each first-choice record.
+  // "Application Review" tab: the selected home user is the reviewer for each first-choice record.
   const reviewedApplicantRecords = firstChoiceApplicantRecords.map(
     (record, index) => ({
       applicant_record_id: record.id,
-      reviewer_id: HOME_USER_ID,
+      reviewer_id: homeUser.id,
       review: JSON.stringify(getReviewDTO()),
       status: REVIEW_STATUSES[index % REVIEW_STATUSES.length],
       createdAt: new Date(),
@@ -113,7 +126,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
     }),
   );
 
-  // "Interview Pairing" tab: one paired group, one solo group, both including HOME_USER_ID.
+  // "Interview Pairing" tab: one paired group, one solo group, both including the selected home user.
   const interviewGroups = GROUP_STATUSES.map((status, index) => ({
     id: v4(),
     scheduling_link: `${SEED_SCHEDULING_LINK_PREFIX}${index + 1}`,
@@ -125,7 +138,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
   const interviewDelegations = [
     {
       interviewed_applicant_record_id: interviewedApplicantRecords[0].id,
-      interviewer_id: HOME_USER_ID,
+      interviewer_id: homeUser.id,
       group_id: interviewGroups[0].id,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -139,7 +152,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
     },
     {
       interviewed_applicant_record_id: interviewedApplicantRecords[1].id,
-      interviewer_id: HOME_USER_ID,
+      interviewer_id: homeUser.id,
       group_id: interviewGroups[0].id,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -153,7 +166,7 @@ export const up: Seeder = async ({ context: sequelize }) => {
     },
     {
       interviewed_applicant_record_id: interviewedApplicantRecords[2].id,
-      interviewer_id: HOME_USER_ID,
+      interviewer_id: homeUser.id,
       group_id: interviewGroups[1].id,
       createdAt: new Date(),
       updatedAt: new Date(),
