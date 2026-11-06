@@ -1,5 +1,3 @@
-import { CookieOptions, Request, Response } from "express";
-
 import nodemailerConfig from "../../nodemailer.config";
 import AuthService from "../../services/implementations/authService";
 import EmailService from "../../services/implementations/emailService";
@@ -12,11 +10,6 @@ import { AuthDTO, RegisterUserDTO, Role } from "../../types";
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
-const cookieOptions: CookieOptions = {
-  httpOnly: true,
-  sameSite: process.env.PREVIEW_DEPLOY ? "none" : "strict",
-  secure: process.env.NODE_ENV === "production",
-};
 
 const authResolvers = {
   Query: {
@@ -35,25 +28,20 @@ const authResolvers = {
     login: async (
       _parent: undefined,
       { email, password }: { email: string; password: string },
-      { res }: { res: Response },
     ): Promise<AuthDTO> => {
       const authDTO = await authService.generateToken(email, password);
-      res.cookie("refreshToken", authDTO.refreshToken, cookieOptions);
       return authDTO;
     },
     loginWithGoogle: async (
       _parent: undefined,
       { idToken }: { idToken: string },
-      { res }: { res: Response },
     ): Promise<AuthDTO> => {
       const authDTO = await authService.generateTokenOAuth(idToken);
-      res.cookie("refreshToken", authDTO.refreshToken, cookieOptions);
       return authDTO;
     },
     register: async (
       _parent: undefined,
       { user }: { user: RegisterUserDTO },
-      { res }: { res: Response },
     ): Promise<AuthDTO> => {
       await userService.createUser({
         ...user,
@@ -65,16 +53,13 @@ const authResolvers = {
         user.password,
       );
       await authService.sendEmailVerificationLink(user.email);
-      res.cookie("refreshToken", authDTO.refreshToken, cookieOptions);
       return authDTO;
     },
     refresh: async (
       _parent: undefined,
-      _args: Record<string, undefined>,
-      { req, res }: { req: Request; res: Response },
+      { refreshToken }: { refreshToken: string },
     ): Promise<string> => {
-      const token = await authService.renewToken(req.cookies.refreshToken);
-      res.cookie("refreshToken", token.refreshToken, cookieOptions);
+      const token = await authService.renewToken(refreshToken);
       return token.accessToken;
     },
     logout: async (
