@@ -1,4 +1,4 @@
-import { InterviewDashboardSortBy } from "@/graphql/typeUtils";
+import { InterviewConflict, InterviewDashboardSortBy } from "@/graphql/typeUtils";
 import type { InterviewDashboardResult } from "@/graphql/typeUtils";
 import { ReviewerCell } from "@/pages/admin/review/_components/columns/ReviewerCell";
 import type { ColumnDef } from "@tanstack/react-table";
@@ -29,7 +29,34 @@ const interviewerName = (row: InterviewDashboardResult, index: number) => {
     : null;
 };
 
+const applicantDidNotRespond = (row: InterviewDashboardResult) =>
+  row.interviewers.some(
+    (interviewer) =>
+      interviewer.interviewHasConflict === InterviewConflict.ApplicantNoResponse,
+  );
+
+const interviewerHasOwnConflictIcon = (
+  interviewer: DashboardInterviewer | undefined,
+) => {
+  const conflict = interviewer?.interviewHasConflict;
+  return (
+    conflict === InterviewConflict.ApplicantConflict ||
+    conflict === InterviewConflict.CannotAttend
+  );
+};
+
+const wasReportedAsUnresponsivePartner = (
+  row: InterviewDashboardResult,
+  interviewer: DashboardInterviewer,
+) =>
+  row.interviewers.some(
+    (other) =>
+      other.userInfo.id !== interviewer.userInfo.id &&
+      other.interviewHasConflict === InterviewConflict.PartnerNoResponse,
+  );
+
 type InterviewDashboardColumnOptions = {
+  onApplicantClick: (row: InterviewDashboardResult) => void;
   onInterviewerClick: (
     row: InterviewDashboardResult,
     interviewer: DashboardInterviewer,
@@ -51,7 +78,11 @@ const InterviewerNameCell = ({
   return (
     <ReviewerCell
       reviewerName={name ?? "-"}
-      reviewerHasConflict={interviewer?.interviewHasConflict != null}
+      reviewerHasConflict={
+        interviewerHasOwnConflictIcon(interviewer) ||
+        (interviewer != null &&
+          wasReportedAsUnresponsivePartner(row, interviewer))
+      }
       onClick={
         interviewer
           ? () => onInterviewerClick(row, interviewer)
@@ -62,6 +93,7 @@ const InterviewerNameCell = ({
 };
 
 export const createInterviewDashboardColumns = ({
+  onApplicantClick,
   onInterviewerClick,
 }: InterviewDashboardColumnOptions): ColumnDef<
   InterviewDashboardResult,
@@ -82,6 +114,12 @@ export const createInterviewDashboardColumns = ({
       <ApplicationCell
         applicantName={fullName(row.original.firstName, row.original.lastName)}
         isBookmarked={row.original.isApplicantFlagged}
+        hasConflict={applicantDidNotRespond(row.original)}
+        onClick={
+          applicantDidNotRespond(row.original)
+            ? () => onApplicantClick(row.original)
+            : undefined
+        }
       />
     ),
   },

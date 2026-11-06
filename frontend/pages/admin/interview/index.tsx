@@ -1,5 +1,6 @@
 import { InterviewDashboardSidePanel } from "./_components/side-panel/InterviewDashboardSidePanel";
 import { InterviewDashboardToolbar } from "./_components/InterviewDashboardToolbar";
+import { InterviewConflictInfoDialogue } from "./_components/dialogues/InterviewConflictInfoDialogue";
 import { ReassignInterviewerDialogue } from "./_components/dialogues/ReassignInterviewerDialogue";
 import { DashboardTable } from "@/components/dashboard/table";
 import { DASHBOARD_ENUM, DashboardSwitcher } from "@/components/dashboard/common/DashboardSwitcher";
@@ -16,6 +17,7 @@ import useDashboardFilterOptions from "@/APIClients/queries/useDashboardFilterOp
 import {
   ApplicationStatus,
   DashboardView,
+  InterviewConflict,
   type InterviewDashboardFilters,
   type InterviewDashboardResult,
 } from "@/graphql/typeUtils";
@@ -37,7 +39,29 @@ type InterviewerReassignmentTarget = {
   interviewerId: string;
   interviewerName: string;
   assignedInterviewerIds: string[];
+  acknowledgesNoResponse: boolean;
 };
+
+type DashboardInterviewer = InterviewDashboardResult["interviewers"][number];
+
+const personName = (firstName: string, lastName: string) =>
+  `${firstName} ${lastName}`;
+
+const applicantNoResponseText = (row: InterviewDashboardResult) =>
+  `The interviewee, ${personName(
+    row.firstName,
+    row.lastName,
+  )}, has not responded to interview invite.`;
+
+const partnerDidNotRespond = (
+  row: InterviewDashboardResult,
+  interviewer: DashboardInterviewer,
+) =>
+  row.interviewers.some(
+    (other) =>
+      other.userInfo.id !== interviewer.userInfo.id &&
+      other.interviewHasConflict === InterviewConflict.PartnerNoResponse,
+  );
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -71,6 +95,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const [search, setSearch] = useState("");
   const [interviewerReassignmentTarget, setInterviewerReassignmentTarget] =
     useState<InterviewerReassignmentTarget | null>(null);
+  const [conflictInfoText, setConflictInfoText] = useState<string | null>(null);
 
   // The query fires on the settled text; the input keeps the raw value.
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
@@ -246,6 +271,9 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const columns = useMemo(
     () =>
       createInterviewDashboardColumns({
+        onApplicantClick: (row) => {
+          setConflictInfoText(applicantNoResponseText(row));
+        },
         onInterviewerClick: (row, interviewer) => {
           setInterviewerReassignmentTarget({
             applicantRecordId: row.applicantRecordId,
@@ -255,6 +283,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             assignedInterviewerIds: row.interviewers.map(
               (item) => item.userInfo.id,
             ),
+            acknowledgesNoResponse: partnerDidNotRespond(row, interviewer),
           });
         },
       }),
@@ -352,6 +381,14 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
         }
       />
 
+      {conflictInfoText != null ? (
+        <InterviewConflictInfoDialogue
+          open
+          text={conflictInfoText}
+          onClose={() => setConflictInfoText(null)}
+        />
+      ) : null}
+
       {interviewerReassignmentTarget ? (
         <ReassignInterviewerDialogue
           open={!!interviewerReassignmentTarget}
@@ -361,6 +398,9 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           currentInterviewerName={interviewerReassignmentTarget.interviewerName}
           assignedInterviewerIds={
             interviewerReassignmentTarget.assignedInterviewerIds
+          }
+          acknowledgesNoResponse={
+            interviewerReassignmentTarget.acknowledgesNoResponse
           }
           onClose={() => setInterviewerReassignmentTarget(null)}
           onUpdated={() => {

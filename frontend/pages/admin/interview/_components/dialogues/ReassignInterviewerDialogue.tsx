@@ -14,6 +14,7 @@ type ReassignInterviewerDialogueProps = {
   currentInterviewerId: string;
   currentInterviewerName: string;
   assignedInterviewerIds: string[];
+  acknowledgesNoResponse?: boolean;
   onClose: () => void;
   onUpdated: () => void;
 };
@@ -30,6 +31,7 @@ export const ReassignInterviewerDialogue = ({
   currentInterviewerId,
   currentInterviewerName,
   assignedInterviewerIds,
+  acknowledgesNoResponse = false,
   onClose,
   onUpdated,
 }: ReassignInterviewerDialogueProps) => {
@@ -63,7 +65,11 @@ export const ReassignInterviewerDialogue = ({
       open={open}
       onClose={onClose}
       header="Edit the interviewer below"
-      text={`Search a new interviewer to replace ${currentInterviewerName}.`}
+      text={
+        acknowledgesNoResponse
+          ? `${currentInterviewerName} has not responded to any messages. Search a new interviewer to replace ${currentInterviewerName}.`
+          : `Search a new interviewer to replace ${currentInterviewerName}.`
+      }
       errorText={
         updateError
           ? "Failed to update interviewer. Please try again."
