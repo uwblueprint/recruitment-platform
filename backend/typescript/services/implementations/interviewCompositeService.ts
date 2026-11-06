@@ -812,6 +812,12 @@ class InterviewCompositeService implements IInterviewCompositeService {
     oldInterviewerId: string,
     newInterviewerId: string,
   ): Promise<InterviewDelegationDTO> {
+    if (oldInterviewerId === newInterviewerId) {
+      throw new Error(
+        `Cannot reassign interviewer ${oldInterviewerId} to the same interviewer`,
+      );
+    }
+
     const transaction = await sequelize.transaction();
     try {
       // 1. Find the interview record for the selected applicant.
@@ -962,7 +968,10 @@ class InterviewCompositeService implements IInterviewCompositeService {
       await transaction.commit();
       return newDelegation;
     } catch (error: unknown) {
-      await transaction.rollback();
+      // Sequelize rolls back at runtime via `finished`, which its types omit.
+      if (!(transaction as Transaction & { finished?: string }).finished) {
+        await transaction.rollback();
+      }
       Logger.error(
         `Failed to reassign interviewer. Reason = ${getErrorMessage(error)}`,
       );

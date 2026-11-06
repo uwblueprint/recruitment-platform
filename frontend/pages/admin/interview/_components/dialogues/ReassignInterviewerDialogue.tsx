@@ -1,11 +1,15 @@
+import useReassignInterviewerMutation from "@/APIClients/mutations/useReassignInterviewer";
+import useUsersByPosition from "@/APIClients/queries/useUsersByPosition";
 import { Button } from "@/components/common/Button";
 import { Dialogue } from "@/components/common/Dialogue";
-import type { UsersByPositionResult } from "@/graphql/typeUtils";
+import {
+  InterviewDashboardSidePanelDocument,
+  type UsersByPositionResult,
+} from "@/graphql/typeUtils";
 import { theme } from "@/styles/Theme";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import Autocomplete from "@mui/material/Autocomplete";
 import { useState } from "react";
-import useReassignInterviewer from "../hooks/useReassignInterviewer";
 
 type ReassignInterviewerDialogueProps = {
   open: boolean;
@@ -35,14 +39,26 @@ export const ReassignInterviewerDialogue = ({
   onClose,
   onUpdated,
 }: ReassignInterviewerDialogueProps) => {
+  const usersQuery = useUsersByPosition(position);
   const {
-    users,
-    isLoadingUsers,
-    usersError,
-    reassignInterviewer,
-    isSubmitting,
-    updateError,
-  } = useReassignInterviewer(position, assignedInterviewerIds);
+    mutate,
+    loading: isSubmitting,
+    error: updateError,
+  } = useReassignInterviewerMutation();
+  const users =
+    !usersQuery.loading && !usersQuery.error && usersQuery.data
+      ? usersQuery.data
+          .filter((user): user is InterviewerUser => user !== null)
+          .filter(
+            (user) =>
+              !user.isArchived && !assignedInterviewerIds.includes(user.id),
+          )
+          .sort((left, right) =>
+            getUserLabel(left)
+              .toLowerCase()
+              .localeCompare(getUserLabel(right).toLowerCase()),
+          )
+      : [];
   const [selectedUser, setSelectedUser] = useState<InterviewerUser | null>(
     null,
   );
@@ -51,13 +67,30 @@ export const ReassignInterviewerDialogue = ({
     if (!selectedUser || isSubmitting) {
       return;
     }
+    if (
+      !usersQuery.data?.some(
+        (user) =>
+          user &&
+          !user.isArchived &&
+          user.id === selectedUser.id &&
+          !assignedInterviewerIds.includes(user.id),
+      )
+    ) {
+      return;
+    }
 
-    reassignInterviewer(
-      applicantRecordId,
-      currentInterviewerId,
-      selectedUser.id,
-      onUpdated,
-    );
+    void mutate({
+      variables: {
+        applicantRecordId,
+        oldInterviewerId: currentInterviewerId,
+        newInterviewerId: selectedUser.id,
+      },
+      refetchQueries: [InterviewDashboardSidePanelDocument],
+      awaitRefetchQueries: true,
+      onCompleted: (result) => {
+        if (result.reassignInterviewer) onUpdated();
+      },
+    });
   };
 
   return (
@@ -73,7 +106,7 @@ export const ReassignInterviewerDialogue = ({
       errorText={
         updateError
           ? "Failed to update interviewer. Please try again."
-          : usersError
+          : usersQuery.error
             ? "Failed to load interviewers. Please try again."
             : undefined
       }
@@ -86,7 +119,7 @@ export const ReassignInterviewerDialogue = ({
           options={users}
           value={selectedUser}
           inputValue={inputValue}
-          loading={isLoadingUsers}
+          loading={usersQuery.loading}
           ListboxProps={{
             style: {
               maxHeight: 96,
@@ -107,7 +140,7 @@ export const ReassignInterviewerDialogue = ({
           getOptionLabel={(option) => getUserLabel(option)}
           isOptionEqualToValue={(option, value) => option.id === value.id}
           noOptionsText={
-            isLoadingUsers
+            usersQuery.loading
               ? "Loading interviewers..."
               : `No interviewers found for ${position} role`
           }

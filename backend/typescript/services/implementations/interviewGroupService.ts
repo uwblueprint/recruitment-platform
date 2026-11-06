@@ -47,6 +47,9 @@ class InterviewGroupService implements IInterviewGroupService {
       Logger.error(
         `Failed to create interview group. Reason = ${getErrorMessage(error)}`,
       );
+      if (transaction) {
+        await transaction.rollback();
+      }
       throw error;
     }
   }
@@ -89,6 +92,9 @@ class InterviewGroupService implements IInterviewGroupService {
       Logger.error(
         `Failed to delete interview group. Reason = ${getErrorMessage(error)}`,
       );
+      if (transaction) {
+        await transaction.rollback();
+      }
       throw error;
     }
   }
