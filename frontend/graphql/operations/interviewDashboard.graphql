@@ -21,8 +21,12 @@ query InterviewDashboard(
     applicationStatus
     isApplicantFlagged
     interviewers {
-      firstName
-      lastName
+      userInfo {
+        id
+        firstName
+        lastName
+      }
+      interviewHasConflict
     }
     interviewScore
   }

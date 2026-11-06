@@ -1,3 +1,4 @@
+import { Transaction } from "sequelize";
 import {
   CreateInterviewGroupDTO,
   InterviewGroupDTO,
@@ -17,6 +18,7 @@ interface IInterviewGroupService {
    */
   createInterviewGroup(
     interviewGroup: CreateInterviewGroupDTO,
+    transaction?: Transaction,
   ): Promise<InterviewGroupDTO>;
 
   /**
@@ -33,7 +35,10 @@ interface IInterviewGroupService {
    * Deletes an interview group by id.
    * @param id PK of the interview group to delete
    */
-  deleteInterviewGroupById(id: string): Promise<InterviewGroupDTO>;
+  deleteInterviewGroupById(
+    id: string,
+    transaction?: Transaction,
+  ): Promise<InterviewGroupDTO>;
 
   /**
    * Bulk creates interview groups.

@@ -1,4 +1,6 @@
+import InterviewCompositeService from "../../services/implementations/interviewCompositeService";
 import InterviewDelegationService from "../../services/implementations/interviewDelegationService";
+import IInterviewCompositeService from "../../services/interfaces/IInterviewCompositeService";
 import IInterviewDelegationService from "../../services/interfaces/IInterviewDelegationService";
 import {
   CreateInterviewDelegationDTO,
@@ -7,6 +9,7 @@ import {
 } from "../../types";
 
 const interviewDelegationsService: IInterviewDelegationService = new InterviewDelegationService();
+const interviewCompositeService: IInterviewCompositeService = new InterviewCompositeService();
 
 const interviewDelegationsResolvers = {
   Query: {
@@ -73,6 +76,25 @@ const interviewDelegationsResolvers = {
     ): Promise<InterviewDelegationDTO[]> => {
       return interviewDelegationsService.bulkCreateInterviewDelegations(
         delegations,
+      );
+    },
+
+    reassignInterviewer: async (
+      _parent: undefined,
+      {
+        applicantRecordId,
+        oldInterviewerId,
+        newInterviewerId,
+      }: {
+        applicantRecordId: string;
+        oldInterviewerId: string;
+        newInterviewerId: string;
+      },
+    ): Promise<InterviewDelegationDTO> => {
+      return interviewCompositeService.reassignInterviewer(
+        applicantRecordId,
+        oldInterviewerId,
+        newInterviewerId,
       );
     },
   },

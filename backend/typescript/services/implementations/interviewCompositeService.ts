@@ -397,6 +397,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
                 attributes: [
                   "interviewed_applicant_record_id",
                   "interviewer_id",
+                  "interview_has_conflict",
                   "createdAt",
                 ],
                 model: InterviewDelegation,
@@ -801,6 +802,178 @@ class InterviewCompositeService implements IInterviewCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to delegate interviewers. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async reassignInterviewer(
+    applicantRecordId: string,
+    oldInterviewerId: string,
+    newInterviewerId: string,
+  ): Promise<InterviewDelegationDTO> {
+    if (oldInterviewerId === newInterviewerId) {
+      throw new Error(
+        `Cannot reassign interviewer ${oldInterviewerId} to the same interviewer`,
+      );
+    }
+
+    const transaction = await sequelize.transaction();
+    try {
+      // 1. Find the interview record for the selected applicant.
+      const interviewedApplicantRecord = await InterviewedApplicantRecord.findOne(
+        {
+          where: { applicant_record_id: applicantRecordId },
+          transaction,
+        },
+      );
+      if (!interviewedApplicantRecord) {
+        throw new Error(
+          `No interviewed applicant record found for applicantRecordId: ${applicantRecordId}`,
+        );
+      }
+
+      // 2. Find the old interviewer's delegation and its group.
+      // We assume that there exists only one delegation for this applicant and interviewer - this is not enforced by the database schema, but is a business rule.
+      const oldDelegation = await InterviewDelegation.findOne({
+        where: {
+          interviewed_applicant_record_id: interviewedApplicantRecord.id,
+          interviewer_id: Number(oldInterviewerId),
+        },
+        transaction,
+      });
+      if (!oldDelegation) {
+        throw new Error(
+          `No interview delegation found for interviewedApplicantRecordId: ${interviewedApplicantRecord.id} and interviewerId: ${oldInterviewerId}`,
+        );
+      }
+      // 3. Load this applicant's delegations in that group and reject a duplicate assignment.
+      // A group may serve multiple applicants; only this applicant's partners will move.
+      const delegations = await InterviewDelegation.findAll({
+        where: {
+          interviewed_applicant_record_id: interviewedApplicantRecord.id,
+          group_id: oldDelegation.group_id,
+        },
+        transaction,
+      });
+      if (
+        delegations.some(
+          (delegation) =>
+            delegation.interviewer_id === Number(newInterviewerId),
+        )
+      ) {
+        throw new Error(
+          `Interviewer ${newInterviewerId} is already assigned to applicantRecordId: ${applicantRecordId}`,
+        );
+      }
+
+      // 4. Build the desired team: the existing partners plus the new interviewer.
+      const getNextInterviewerIds = (): number[] => {
+        const partnerDelegations = delegations.filter(
+          (delegation) =>
+            delegation.interviewer_id !== Number(oldInterviewerId),
+        );
+        const partnerIds = partnerDelegations.map(
+          (partner) => partner.interviewer_id,
+        );
+        return [...partnerIds, Number(newInterviewerId)];
+      };
+      const nextInterviewerIds = getNextInterviewerIds();
+
+      // 5. Find groups containing the new interviewer and load their full membership.
+      const newInterviewerDelegations = await InterviewDelegation.findAll({
+        attributes: ["group_id"],
+        where: { interviewer_id: Number(newInterviewerId) },
+        transaction,
+      });
+      const candidateGroups = await InterviewGroup.findAll({
+        where: {
+          id: { [Op.in]: newInterviewerDelegations.map((d) => d.group_id) },
+        },
+        include: [{ model: InterviewDelegation, as: "interview_delegations" }],
+        order: [
+          ["createdAt", "ASC"],
+          ["id", "ASC"],
+        ],
+        transaction,
+      });
+      // 6. Reuse a group with exactly the desired team, or create one if none matches.
+      const existingGroup = candidateGroups.find((group) => {
+        const memberIds = new Set(
+          group.interview_delegations?.map((d) => d.interviewer_id),
+        );
+        return (
+          memberIds.size === nextInterviewerIds.length &&
+          nextInterviewerIds.every((id) => memberIds.has(id))
+        );
+      });
+      const groupId =
+        existingGroup?.id ??
+        (
+          await interviewGroupService.createInterviewGroup(
+            { status: InterviewGroupStatusEnum.AVAILABILITY_PENDING },
+            transaction,
+          )
+        ).id;
+
+      // 7. Remove the old interviewer and move this applicant's partners to the destination group.
+      await interviewDelegationsService.deleteInterviewDelegation(
+        interviewedApplicantRecord.id,
+        oldInterviewerId,
+        transaction,
+      );
+      await InterviewDelegation.update(
+        { group_id: groupId },
+        {
+          where: {
+            interviewed_applicant_record_id: interviewedApplicantRecord.id,
+            group_id: oldDelegation.group_id,
+          },
+          transaction,
+        },
+      );
+      // 8. Assign the new interviewer, preserving the original dashboard column.
+      const newDelegation = await interviewDelegationsService.createInterviewDelegation(
+        {
+          interviewedApplicantRecordId: interviewedApplicantRecord.id,
+          interviewerId: newInterviewerId,
+          groupId,
+        },
+        transaction,
+      );
+      await InterviewDelegation.update(
+        { createdAt: oldDelegation.createdAt },
+        {
+          where: {
+            interviewed_applicant_record_id: interviewedApplicantRecord.id,
+            interviewer_id: Number(newInterviewerId),
+          },
+          transaction,
+        },
+      );
+
+      // 9. Delete the original group only if no applicants still have delegations in it.
+      const remaining = await InterviewDelegation.count({
+        where: { group_id: oldDelegation.group_id },
+        transaction,
+      });
+      if (remaining === 0) {
+        await interviewGroupService.deleteInterviewGroupById(
+          oldDelegation.group_id,
+          transaction,
+        );
+      }
+
+      // 10. Commit all changes together and return the new delegation.
+      await transaction.commit();
+      return newDelegation;
+    } catch (error: unknown) {
+      // Sequelize rolls back at runtime via `finished`, which its types omit.
+      if (!(transaction as Transaction & { finished?: string }).finished) {
+        await transaction.rollback();
+      }
+      Logger.error(
+        `Failed to reassign interviewer. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     }

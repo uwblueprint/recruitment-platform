@@ -1,5 +1,6 @@
-import { InterviewDashboardSortBy } from "@/graphql/typeUtils";
+import { InterviewConflict, InterviewDashboardSortBy } from "@/graphql/typeUtils";
 import type { InterviewDashboardResult } from "@/graphql/typeUtils";
+import { ReviewerCell } from "@/pages/admin/review/_components/columns/ReviewerCell";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { ApplicationCell } from "@/components/dashboard/table/cell/ApplicationCell";
@@ -19,33 +20,85 @@ export const COLUMN_ID_TO_SORT_BY: Record<string, InterviewDashboardSortBy> = {
 const fullName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
 
+type DashboardInterviewer = InterviewDashboardResult["interviewers"][number];
+
 const interviewerName = (row: InterviewDashboardResult, index: number) => {
-  const interviewer = row.interviewers[index];
+  const interviewer = row.interviewers[index]?.userInfo;
   return interviewer
     ? fullName(interviewer.firstName, interviewer.lastName)
     : null;
 };
 
-const InterviewerCell = ({
-  row,
-  index,
-}: {
-  row: InterviewDashboardResult;
-  index: number;
-}) => {
-  const name = interviewerName(row, index);
+const applicantDidNotRespond = (row: InterviewDashboardResult) =>
+  row.interviewers.some(
+    (interviewer) =>
+      interviewer.interviewHasConflict === InterviewConflict.ApplicantNoResponse,
+  );
 
-  return name ? (
-    <span className="border-b border-neutral-800">{name}</span>
-  ) : (
-    "-"
+const interviewerHasOwnConflictIcon = (
+  interviewer: DashboardInterviewer | undefined,
+) => {
+  const conflict = interviewer?.interviewHasConflict;
+  return (
+    conflict === InterviewConflict.ApplicantConflict ||
+    conflict === InterviewConflict.CannotAttend
   );
 };
 
-export const INTERVIEW_DASHBOARD_COLUMNS: ColumnDef<
+const wasReportedAsUnresponsivePartner = (
+  row: InterviewDashboardResult,
+  interviewer: DashboardInterviewer,
+) =>
+  row.interviewers.some(
+    (other) =>
+      other.userInfo.id !== interviewer.userInfo.id &&
+      other.interviewHasConflict === InterviewConflict.PartnerNoResponse,
+  );
+
+type InterviewDashboardColumnOptions = {
+  onApplicantClick: (row: InterviewDashboardResult) => void;
+  onInterviewerClick: (
+    row: InterviewDashboardResult,
+    interviewer: DashboardInterviewer,
+  ) => void;
+};
+
+const InterviewerNameCell = ({
+  row,
+  index,
+  onInterviewerClick,
+}: {
+  row: InterviewDashboardResult;
+  index: number;
+  onInterviewerClick: InterviewDashboardColumnOptions["onInterviewerClick"];
+}) => {
+  const interviewer = row.interviewers[index];
+  const name = interviewerName(row, index);
+
+  return (
+    <ReviewerCell
+      reviewerName={name ?? "-"}
+      reviewerHasConflict={
+        interviewerHasOwnConflictIcon(interviewer) ||
+        (interviewer != null &&
+          wasReportedAsUnresponsivePartner(row, interviewer))
+      }
+      onClick={
+        interviewer
+          ? () => onInterviewerClick(row, interviewer)
+          : undefined
+      }
+    />
+  );
+};
+
+export const createInterviewDashboardColumns = ({
+  onApplicantClick,
+  onInterviewerClick,
+}: InterviewDashboardColumnOptions): ColumnDef<
   InterviewDashboardResult,
   unknown
->[] = [
+>[] => [
   {
     id: "select",
     size: 40,
@@ -61,6 +114,12 @@ export const INTERVIEW_DASHBOARD_COLUMNS: ColumnDef<
       <ApplicationCell
         applicantName={fullName(row.original.firstName, row.original.lastName)}
         isBookmarked={row.original.isApplicantFlagged}
+        hasConflict={applicantDidNotRespond(row.original)}
+        onClick={
+          applicantDidNotRespond(row.original)
+            ? () => onApplicantClick(row.original)
+            : undefined
+        }
       />
     ),
   },
@@ -88,14 +147,26 @@ export const INTERVIEW_DASHBOARD_COLUMNS: ColumnDef<
     accessorFn: (row) => interviewerName(row, 0) ?? "-",
     header: "Interviewer 1",
     enableSorting: true,
-    cell: ({ row }) => <InterviewerCell row={row.original} index={0} />,
+    cell: ({ row }) => (
+      <InterviewerNameCell
+        row={row.original}
+        index={0}
+        onInterviewerClick={onInterviewerClick}
+      />
+    ),
   },
   {
     id: "interviewer2",
     accessorFn: (row) => interviewerName(row, 1) ?? "-",
     header: "Interviewer 2",
     enableSorting: true,
-    cell: ({ row }) => <InterviewerCell row={row.original} index={1} />,
+    cell: ({ row }) => (
+      <InterviewerNameCell
+        row={row.original}
+        index={1}
+        onInterviewerClick={onInterviewerClick}
+      />
+    ),
   },
   {
     id: "interviewScore",

@@ -57,7 +57,7 @@ export type InterviewDashboardQueryVariables = Exact<{
 }>;
 
 
-export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, isApplicantFlagged: boolean, interviewScore: number | null, interviewers: Array<{ firstName: string, lastName: string }> }> };
+export type InterviewDashboardQuery = { interviewDashboard: Array<{ applicantRecordId: string, firstName: string, lastName: string, position: string, applicationStatus: Types.ApplicationStatus, isApplicantFlagged: boolean, interviewScore: number | null, interviewers: Array<{ interviewHasConflict: Types.InterviewConflict | null, userInfo: { id: string, firstName: string, lastName: string } }> }> };
 
 export type InterviewDashboardCountsQueryVariables = Exact<{
   filters?: Types.InterviewDashboardFilters | null | undefined;
@@ -180,6 +180,15 @@ export type ProjectsQueryVariables = Exact<{
 
 
 export type ProjectsQuery = { projects: Array<{ id: string, projectName: string, isArchived: boolean }> };
+
+export type ReassignInterviewerMutationVariables = Exact<{
+  applicantRecordId: string | number;
+  oldInterviewerId: string | number;
+  newInterviewerId: string | number;
+}>;
+
+
+export type ReassignInterviewerMutation = { reassignInterviewer: { interviewedApplicantRecordId: string, interviewerId: string, groupId: string } };
 
 export type ReassignReviewerMutationVariables = Exact<{
   applicantRecordId: string | number;
