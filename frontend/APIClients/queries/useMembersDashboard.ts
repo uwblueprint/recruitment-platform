@@ -9,18 +9,21 @@ import type {
   MembersDashboardVariables,
 } from "@/types/membersDashboard";
 
-const formatJoined = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-US", {
-    month: "short",
-    year: "numeric",
-  });
+// school terms
+const formatJoinedTerm = (iso: string) => {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  const month = date.getMonth();
+  const season = month <= 3 ? "Winter" : month <= 7 ? "Spring" : "Fall";
+  return `${season} ${date.getFullYear()}`;
+};
 
 const toMember = (row: MembersDashboardResult): Member => ({
   id: row.id,
   name: `${row.firstName} ${row.lastName}`,
   role: row.role ?? "—",
   team: row.team ?? "Unassigned",
-  joined: row.joined ? formatJoined(row.joined) : "—",
+  joined: row.joined ? formatJoinedTerm(row.joined) : "—",
   status: row.isArchived ? "Not Active" : "Active",
 });
 
