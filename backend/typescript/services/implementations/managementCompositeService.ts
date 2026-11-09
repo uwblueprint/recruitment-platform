@@ -10,6 +10,7 @@ import IManagementCompositeService from "../interfaces/IManagementCompositeServi
 const Logger = logger(__filename);
 
 class ManagementCompositeService implements IManagementCompositeService {
+  /* eslint-disable class-methods-use-this */
   async getMembersDashboard(
     pageNumber: number,
     resultsPerPage: number,

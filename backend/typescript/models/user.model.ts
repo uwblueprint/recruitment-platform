@@ -8,6 +8,7 @@ import {
 } from "sequelize-typescript";
 import FirebaseFile from "./firebaseFile.model";
 import { Role } from "../types";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import UserTermRecord from "./userTermRecord.model";
 
 @Table({ tableName: "users" })

@@ -5,6 +5,7 @@ import {
   Table,
   BelongsTo,
 } from "sequelize-typescript";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import User from "./user.model";
 import Project from "./project.model";
 
