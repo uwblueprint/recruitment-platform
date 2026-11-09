@@ -1,0 +1,11 @@
+query MembersDashboard($pageNumber: Int!, $resultsPerPage: Int!) {
+  membersDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {
+    id
+    firstName
+    lastName
+    role
+    team
+    joined
+    isArchived
+  }
+}

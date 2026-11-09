@@ -351,6 +351,17 @@ export type InterviewedApplicantsDto = {
   interviewStatus: InterviewStatus;
 };
 
+export type MembersDashboardRowDto = {
+  __typename?: 'MembersDashboardRowDTO';
+  firstName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  joined?: Maybe<Scalars['String']['output']>;
+  lastName: Scalars['String']['output'];
+  role?: Maybe<Scalars['String']['output']>;
+  team?: Maybe<Scalars['String']['output']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
@@ -711,6 +722,8 @@ export type Query = {
   interviewersByGroupId: Array<UserDto>;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
+  membersDashboard: Array<MembersDashboardRowDto>;
+  membersDashboardCount: Scalars['Int']['output'];
   positions: Array<PositionDto>;
   projects: Array<ProjectDto>;
   reviewDashboard: Array<ReviewDashboardRowDto>;
@@ -845,6 +858,12 @@ export type QueryIsAuthorizedByRoleArgs = {
 export type QueryIsAuthorizedToReviewArgs = {
   applicationId: Scalars['Int']['input'];
   reviewerUserId: Scalars['String']['input'];
+};
+
+
+export type QueryMembersDashboardArgs = {
+  pageNumber: Scalars['Int']['input'];
+  resultsPerPage: Scalars['Int']['input'];
 };
 
 
