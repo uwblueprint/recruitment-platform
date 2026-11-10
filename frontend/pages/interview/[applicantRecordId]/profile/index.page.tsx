@@ -1,4 +1,4 @@
-import { NextPageWithLayout } from "@/pages/_app";
+import { NextPageWithLayout } from "@/pages/_app.page";
 import {
   getInterviewLayout,
   InterviewHeader,

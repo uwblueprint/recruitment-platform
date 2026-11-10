@@ -6,7 +6,7 @@ import {
   import { InterviewHeader } from "@/pages/interview/_components/layout";
   import { ReactElement } from "react";
   import { Role } from "@/graphql/typeUtils";
-  import { NextPageWithLayout } from "../_app";
+  import { NextPageWithLayout } from "../_app.page";
   import InterviewGroupIllustrationPanel from "./_components/InterviewGroupIllustrationPanel";
   
 
