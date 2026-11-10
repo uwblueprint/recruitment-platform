@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { NextPageWithLayout } from "../../_app";
+import { NextPageWithLayout } from "../../_app.page";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { InterviewInviteList } from "./_components/InterviewInviteList";
 

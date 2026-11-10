@@ -12,7 +12,7 @@ import {
   InterviewHeader,
   InterviewFooter,
 } from "../../_components/layout";
-import { NextPageWithLayout } from "../../../_app";
+import { NextPageWithLayout } from "../../../_app.page";
 import { Dialogue } from "@/components/common/Dialogue";
 import { Button } from "@/components/common/Button";
 import { useInterviewProgress } from "../../_components/InterviewProgressContext";
