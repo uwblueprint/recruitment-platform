@@ -30,6 +30,7 @@ import {
 } from "../../utilities/dtoUtils";
 import {
   buildApplicantRecordWhere,
+  buildDepartmentPositionInclude,
   buildApplicantWhere,
 } from "../../utilities/dashboardFilterUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
@@ -233,6 +234,7 @@ class ReviewCompositeService implements IReviewCompositeService {
         attributes: { exclude: ["createdAt", "updatedAt"] },
         where: { ...buildApplicantRecordWhere(filters), ...viewWhere },
         include: [
+          ...buildDepartmentPositionInclude(filters),
           {
             attributes: { exclude: ["updatedAt"] },
             model: ReviewedApplicantRecord,
@@ -317,6 +319,7 @@ class ReviewCompositeService implements IReviewCompositeService {
           ...(await buildReviewDashboardViewWhere(view)),
         },
         include: [
+          ...buildDepartmentPositionInclude(filters),
           {
             model: Applicant,
             attributes: [],
@@ -345,6 +348,7 @@ class ReviewCompositeService implements IReviewCompositeService {
         attributes: ["id"],
         where: buildApplicantRecordWhere(filters),
         include: [
+          ...buildDepartmentPositionInclude(filters),
           {
             // Joined with no attributes so the ORDER BY can reference
             // applicant columns without fetching them.
