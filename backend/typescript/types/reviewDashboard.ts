@@ -79,6 +79,7 @@ export type DashboardFilterOptionsDTO = {
 export type DashboardFilters = {
   /** Free text matched case-insensitively against the applicant's full name. */
   search?: string;
+  department?: string;
   positions?: string[];
   applicationStatuses?: ApplicationStatus[];
   skillCategories?: SkillCategory[];

@@ -1,7 +1,31 @@
-import { Op, WhereOptions, col, fn, where as whereFn } from "sequelize";
+import {
+  Op,
+  WhereOptions,
+  IncludeOptions,
+  col,
+  fn,
+  where as whereFn,
+} from "sequelize";
+import Position from "../models/position.model";
 import { DashboardFilters } from "../types";
 
 // Where clauses shared by the review and interview dashboards.
+
+export function buildDepartmentPositionInclude(
+  filters?: DashboardFilters,
+): IncludeOptions[] {
+  if (!filters?.department) return [];
+
+  return [
+    {
+      model: Position,
+      as: "positionRecord",
+      attributes: [],
+      required: true,
+      where: { department: filters.department },
+    },
+  ];
+}
 
 export function buildApplicantRecordWhere(
   filters?: DashboardFilters,
