@@ -128,7 +128,7 @@ export type InterviewedPairingsByUserIdQueryVariables = Exact<{
 }>;
 
 
-export type InterviewedPairingsByUserIdQuery = { interviewedPairingsByUserId: Array<{ interviewedGroupId: string, interviewGroupStatus: Types.InterviewGroupStatus, groupMembers: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }> }> };
+export type InterviewedPairingsByUserIdQuery = { interviewedPairingsByUserId: Array<{ interviewedGroupId: string, interviewGroupStatus: Types.InterviewGroupStatus, groupMembers: Array<{ id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean, photoUrl: string | null }> }> };
 
 export type InterviewersByGroupIdQueryVariables = Exact<{
   groupId: string | number;
@@ -267,6 +267,13 @@ export type ReviewedApplicantsByUserIdQueryVariables = Exact<{
 
 
 export type ReviewedApplicantsByUserIdQuery = { reviewedApplicantsByUserId: Array<{ applicantRecordId: string, reviewStatus: Types.ReviewStatus, applicantFirstName: string, applicantLastName: string }> };
+
+export type SendOfferEmailsMutationVariables = Exact<{
+  ids: Array<string | number> | string | number;
+}>;
+
+
+export type SendOfferEmailsMutation = { sendOfferEmails: { sent: Array<string>, failed: Array<{ to: string, error: string }> } };
 
 export type SendRejectionEmailsMutationVariables = Exact<{
   ids: Array<string | number> | string | number;

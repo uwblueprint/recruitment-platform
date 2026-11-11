@@ -381,12 +381,14 @@ export type Mutation = {
   login: AuthDto;
   loginWithGoogle: AuthDto;
   logout?: Maybe<Scalars['ID']['output']>;
+  populateApplicantRecords: PopulateApplicantRecordsResult;
   reassignReviewer: ReviewedApplicantRecordDto;
   refresh: Scalars['String']['output'];
   register: AuthDto;
   reportInterviewConflict: InterviewedApplicantRecord;
   reportReviewConflict: ReviewedApplicantRecordDto;
   resetPassword: Scalars['Boolean']['output'];
+  sendOfferEmails: RejectionEmailResult;
   sendRejectionEmails: RejectionEmailResult;
   submitInterviewScores: InterviewedApplicantRecord;
   updateAdminComment: AdminCommentDto;
@@ -545,6 +547,11 @@ export type MutationLogoutArgs = {
 };
 
 
+export type MutationPopulateApplicantRecordsArgs = {
+  term: Scalars['String']['input'];
+};
+
+
 export type MutationReassignReviewerArgs = {
   applicantRecordId: Scalars['ID']['input'];
   newReviewerId: Scalars['ID']['input'];
@@ -577,6 +584,11 @@ export type MutationReportReviewConflictArgs = {
 
 export type MutationResetPasswordArgs = {
   email: Scalars['String']['input'];
+};
+
+
+export type MutationSendOfferEmailsArgs = {
+  ids: Array<Scalars['ID']['input']>;
 };
 
 
@@ -669,6 +681,14 @@ export type MutationUpdateUserArgs = {
 export type MutationUploadInterviewNotesArgs = {
   file: Scalars['Upload']['input'];
   interviewedApplicantRecordId: Scalars['ID']['input'];
+};
+
+export type PopulateApplicantRecordsResult = {
+  __typename?: 'PopulateApplicantRecordsResult';
+  applicantRecordsCreated: Scalars['Int']['output'];
+  applicantsCreated: Scalars['Int']['output'];
+  skippedExistingEmails: Array<Scalars['String']['output']>;
+  term: Scalars['String']['output'];
 };
 
 export type PositionDto = {
@@ -1153,6 +1173,7 @@ export type UserDto = {
   id: Scalars['ID']['output'];
   isArchived: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
+  photoUrl?: Maybe<Scalars['String']['output']>;
   position?: Maybe<Scalars['String']['output']>;
   role: Role;
 };

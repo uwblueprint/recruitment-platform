@@ -165,6 +165,7 @@ const graphQLMiddlewares = {
     bulkUpdateApplicantRecordsStatus: authorizedByAdmin(),
     populateApplicantRecords: authorizedByAdmin(),
     sendRejectionEmails: authorizedByAdmin(),
+    sendOfferEmails: authorizedByAdmin(),
     updateApplicantRecordIsApplicantFlagged: authorizedByAdmin(),
     updateApplicantRecordShortlistedForInterview: authorizedByAdmin(),
     createReviewedApplicantRecord: authorizedByAdmin(),
