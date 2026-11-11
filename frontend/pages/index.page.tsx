@@ -5,7 +5,7 @@ import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
 import { SplitPanelLayout } from "@/components/layouts/SplitPageLayout";
 import { InterviewHeader } from "@/pages/interview/_components/layout";
-import { NextPageWithLayout } from "./_app";
+import { NextPageWithLayout } from "./_app.page";
 import IllustrationPanel from "./home/_components/IllustrationPanel";
 import { Tabs } from "@/components/dashboard/common/Tabs";
 import {

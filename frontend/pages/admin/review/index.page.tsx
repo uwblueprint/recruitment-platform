@@ -18,7 +18,7 @@ import {
 import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 import { useRouter } from "next/router";
 import { useCallback, useMemo, useState } from "react";
-import { NextPageWithLayout } from "../../_app";
+import { NextPageWithLayout } from "../../_app.page";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import {
   COLUMN_ID_TO_SORT_BY,

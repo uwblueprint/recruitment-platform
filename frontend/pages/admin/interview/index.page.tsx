@@ -28,7 +28,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
-import { NextPageWithLayout } from "../../_app";
+import { NextPageWithLayout } from "../../_app.page";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useInterviewDashboardCounts from "@/APIClients/queries/useInterviewDashboardCounts";
