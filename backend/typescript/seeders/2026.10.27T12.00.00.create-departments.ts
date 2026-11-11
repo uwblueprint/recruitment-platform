@@ -25,7 +25,12 @@ const DEPARTMENTS = [
   {
     slug: "design",
     name: "Design",
-    positions: ["Designer", "Graphic Designer", "VP Design"],
+    positions: [
+      "Designer",
+      "Graphic Designer",
+      "VP Design",
+      "User Experience Researcher",
+    ],
   },
   {
     slug: "engineering",
