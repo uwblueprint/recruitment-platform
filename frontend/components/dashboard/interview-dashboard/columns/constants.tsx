@@ -45,7 +45,7 @@ const interviewerHasOwnConflictIcon = (
   );
 };
 
-const wasReportedAsUnresponsivePartner = (
+export const wasReportedAsUnresponsivePartner = (
   row: InterviewDashboardResult,
   interviewer: DashboardInterviewer,
 ) =>

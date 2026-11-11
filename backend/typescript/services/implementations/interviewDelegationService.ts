@@ -36,6 +36,9 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
           error,
         )}`,
       );
+      if (transaction) {
+        await transaction.rollback();
+      }
       throw error;
     }
   }

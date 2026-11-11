@@ -7,6 +7,7 @@ import { DASHBOARD_ENUM, DashboardSwitcher } from "@/components/dashboard/common
 import {
   COLUMN_ID_TO_SORT_BY,
   createInterviewDashboardColumns,
+  wasReportedAsUnresponsivePartner,
 } from "@/components/dashboard/interview-dashboard/columns";
 import {
   FilterCategoryVariant,
@@ -17,7 +18,6 @@ import useDashboardFilterOptions from "@/APIClients/queries/useDashboardFilterOp
 import {
   ApplicationStatus,
   DashboardView,
-  InterviewConflict,
   type InterviewDashboardFilters,
   type InterviewDashboardResult,
 } from "@/graphql/typeUtils";
@@ -42,8 +42,6 @@ type InterviewerReassignmentTarget = {
   acknowledgesNoResponse: boolean;
 };
 
-type DashboardInterviewer = InterviewDashboardResult["interviewers"][number];
-
 const personName = (firstName: string, lastName: string) =>
   `${firstName} ${lastName}`;
 
@@ -52,16 +50,6 @@ const applicantNoResponseText = (row: InterviewDashboardResult) =>
     row.firstName,
     row.lastName,
   )}, has not responded to interview invite.`;
-
-const partnerDidNotRespond = (
-  row: InterviewDashboardResult,
-  interviewer: DashboardInterviewer,
-) =>
-  row.interviewers.some(
-    (other) =>
-      other.userInfo.id !== interviewer.userInfo.id &&
-      other.interviewHasConflict === InterviewConflict.PartnerNoResponse,
-  );
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -283,7 +271,10 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             assignedInterviewerIds: row.interviewers.map(
               (item) => item.userInfo.id,
             ),
-            acknowledgesNoResponse: partnerDidNotRespond(row, interviewer),
+            acknowledgesNoResponse: wasReportedAsUnresponsivePartner(
+              row,
+              interviewer,
+            ),
           });
         },
       }),

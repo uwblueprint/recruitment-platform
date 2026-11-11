@@ -36,6 +36,7 @@ import {
   InterviewUnmatchedApplicantsByPositionDTO,
   InterviewedApplicantsDTO,
   InterviewGroupStatusEnum,
+  InterviewStatusEnum,
   InterviewNotesDTO,
   InterviewPairingsDTO,
   UserDTO,
@@ -961,6 +962,16 @@ class InterviewCompositeService implements IInterviewCompositeService {
         await interviewGroupService.deleteInterviewGroupById(
           oldDelegation.group_id,
           transaction,
+        );
+      }
+
+      if (
+        interviewedApplicantRecord.status ===
+        InterviewStatusEnum.CONFLICT_REPORTED
+      ) {
+        await interviewedApplicantRecord.update(
+          { status: InterviewStatusEnum.NEEDS_REVIEW },
+          { transaction },
         );
       }
 
