@@ -1,4 +1,5 @@
 import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+// eslint-disable-next-line import/no-cycle
 import ApplicantRecord from "./applicantRecord.model";
 
 @Table({ tableName: "positions" })
