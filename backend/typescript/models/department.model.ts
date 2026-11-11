@@ -9,9 +9,6 @@ export default class Department extends Model {
   @Column({ type: DataType.STRING, allowNull: false })
   name!: string;
 
-  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
-  is_archived!: boolean;
-
   @HasMany(() => Position, { foreignKey: "department", sourceKey: "slug" })
   positions?: Position[];
 }

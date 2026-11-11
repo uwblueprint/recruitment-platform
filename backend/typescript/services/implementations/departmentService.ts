@@ -13,7 +13,6 @@ class DepartmentService implements IDepartmentService {
   async getDepartments(): Promise<DepartmentDTO[]> {
     try {
       const departments = await Department.findAll({
-        where: { is_archived: false },
         order: [["name", "ASC"]],
       });
       return departments.map(toDepartmentDTO);
