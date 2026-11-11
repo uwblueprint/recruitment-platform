@@ -42,7 +42,6 @@ export const up: Seeder = async ({ context: sequelize }) => {
     DEPARTMENTS.map(({ slug, name }) => ({
       slug,
       name,
-      is_archived: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     })),

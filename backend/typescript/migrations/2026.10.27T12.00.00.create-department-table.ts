@@ -14,11 +14,6 @@ export const up: Migration = async ({ context: sequelize }) => {
       type: DataType.STRING,
       allowNull: false,
     },
-    is_archived: {
-      type: DataType.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    },
     createdAt: DataType.DATE,
     updatedAt: DataType.DATE,
   });
