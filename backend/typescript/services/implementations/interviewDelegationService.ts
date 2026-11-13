@@ -17,14 +17,18 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
   /* eslint-disable class-methods-use-this */
   async createInterviewDelegation(
     interviewDelegation: CreateInterviewDelegationDTO,
+    transaction?: Transaction,
   ): Promise<InterviewDelegationDTO> {
     try {
-      const newDelegation = await InterviewDelegation.create({
-        interviewed_applicant_record_id:
-          interviewDelegation.interviewedApplicantRecordId,
-        interviewer_id: Number(interviewDelegation.interviewerId),
-        group_id: interviewDelegation.groupId,
-      });
+      const newDelegation = await InterviewDelegation.create(
+        {
+          interviewed_applicant_record_id:
+            interviewDelegation.interviewedApplicantRecordId,
+          interviewer_id: Number(interviewDelegation.interviewerId),
+          group_id: interviewDelegation.groupId,
+        },
+        { transaction },
+      );
       return toInterviewDelegationDTO(newDelegation);
     } catch (error: unknown) {
       Logger.error(
@@ -32,6 +36,9 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
           error,
         )}`,
       );
+      if (transaction) {
+        await transaction.rollback();
+      }
       throw error;
     }
   }
@@ -103,6 +110,7 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
   async deleteInterviewDelegation(
     interviewedApplicantRecordId: string,
     interviewerId: string,
+    transaction?: Transaction,
   ): Promise<InterviewDelegationDTO> {
     try {
       const delegation = await InterviewDelegation.findOne({
@@ -110,13 +118,14 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
           interviewed_applicant_record_id: interviewedApplicantRecordId,
           interviewer_id: Number(interviewerId),
         },
+        transaction,
       });
       if (!delegation) {
         throw new Error(
           `No interview delegation found for interviewedApplicantRecordId: ${interviewedApplicantRecordId} and interviewerId: ${interviewerId}`,
         );
       }
-      await delegation.destroy();
+      await delegation.destroy({ transaction });
       return toInterviewDelegationDTO(delegation);
     } catch (error: unknown) {
       Logger.error(
@@ -124,6 +133,9 @@ class InterviewDelegationsService implements IInterviewDelegationsService {
           error,
         )}`,
       );
+      if (transaction) {
+        await transaction.rollback();
+      }
       throw error;
     }
   }

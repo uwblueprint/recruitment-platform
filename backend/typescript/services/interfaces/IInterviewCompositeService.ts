@@ -58,6 +58,19 @@ interface IInterviewCompositeService {
    * Delegates interviewers to interview applicants.
    */
   delegateInterviewers(positions: string[]): Promise<InterviewDelegationDTO[]>;
+
+  /**
+   * Replaces one interviewer on an applicant. Both this applicant's delegations
+   * move onto the single interview group for the updated interviewer set.
+   * @param applicantRecordId the applicant whose interviewer is changing
+   * @param oldInterviewerId the interviewer being replaced
+   * @param newInterviewerId the interviewer taking that assignment
+   */
+  reassignInterviewer(
+    applicantRecordId: string,
+    oldInterviewerId: string,
+    newInterviewerId: string,
+  ): Promise<InterviewDelegationDTO>;
   /**
    * Fetches information about all the applicants assigned to a user to interview.
    * @param userId the id of the interviewer

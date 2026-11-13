@@ -1,0 +1,15 @@
+mutation ReassignInterviewer(
+  $applicantRecordId: ID!
+  $oldInterviewerId: ID!
+  $newInterviewerId: ID!
+) {
+  reassignInterviewer(
+    applicantRecordId: $applicantRecordId
+    oldInterviewerId: $oldInterviewerId
+    newInterviewerId: $newInterviewerId
+  ) {
+    interviewedApplicantRecordId
+    interviewerId
+    groupId
+  }
+}

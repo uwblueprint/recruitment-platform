@@ -11,7 +11,6 @@ type ReassignReviewerDialogueProps = {
   open: boolean;
   applicantRecordId: string;
   position: string;
-  conflict?: boolean;
   currentReviewerId: string;
   currentReviewerName: string;
   onClose: () => void;
@@ -27,7 +26,6 @@ export const ReassignReviewerDialogue = ({
   open,
   applicantRecordId,
   position,
-  conflict = false,
   currentReviewerId,
   currentReviewerName,
   onClose,
@@ -61,11 +59,7 @@ export const ReassignReviewerDialogue = ({
       open={open}
       onClose={onClose}
       header="Edit the reviewer below"
-      text={
-        conflict
-          ? `A conflict has been reported. Reassign ${currentReviewerName}.`
-          : `Search a new reviewer below to replace ${currentReviewerName}.`
-      }
+      text={`Search a new reviewer to replace ${currentReviewerName}.`}
       errorText={
         updateError
           ? "Failed to update reviewer. Please try again."
