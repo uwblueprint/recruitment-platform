@@ -1,18 +1,10 @@
-import type { MembersDashboardFilters } from "@/types/membersDashboard";
-import {
-  filterMockMembers,
-  refetchMockMembers,
-} from "./mocks/membersDashboard";
+import { useQuery } from "@apollo/client/react";
+import { MembersDashboardCountDocument } from "@/graphql/typeUtils";
 
-// Like review, counts use the same filters as the rows, without pagination.
-// Replace with useQuery following useReviewDashboardCount once available.
-export default function useMembersDashboardCount(
-  filters?: MembersDashboardFilters
-) {
-  return {
-    count: filterMockMembers(filters).length,
-    loading: false,
-    error: undefined as Error | undefined,
-    refetch: refetchMockMembers,
-  };
+export default function useMembersDashboardCount() {
+  const { data, loading, error, refetch } = useQuery(
+    MembersDashboardCountDocument,
+    { fetchPolicy: "network-only", context: { refreshAuth: true } },
+  );
+  return { count: data?.membersDashboardCount, loading, error, refetch };
 }

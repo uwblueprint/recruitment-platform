@@ -2,11 +2,14 @@ import {
   BelongsTo,
   Column,
   DataType,
+  HasOne,
   Model,
   Table,
 } from "sequelize-typescript";
 import FirebaseFile from "./firebaseFile.model";
 import { Role } from "../types";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
+import UserTermRecord from "./userTermRecord.model";
 
 @Table({ tableName: "users" })
 export default class User extends Model {
@@ -68,4 +71,9 @@ export default class User extends Model {
     targetKey: "id",
   })
   profile_picture_file?: FirebaseFile;
+
+  @HasOne(() => UserTermRecord, {
+    foreignKey: "user_id",
+  })
+  user_term_record?: UserTermRecord;
 }

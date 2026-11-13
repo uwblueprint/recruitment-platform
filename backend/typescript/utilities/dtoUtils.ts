@@ -39,6 +39,7 @@ import User from "../models/user.model";
 import Project from "../models/project.model";
 import UserTermRecord from "../models/userTermRecord.model";
 import Position from "../models/position.model";
+import { MembersDashboardRowDTO } from "../types/membersDashboard";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -415,5 +416,19 @@ export function toInterviewUnmatchedApplicantsByPositionDTO(
       firstName: record.applicant.first_name,
       lastName: record.applicant.last_name,
     })),
+  };
+}
+
+export function toMembersDashboardRowDTO(member: User): MembersDashboardRowDTO {
+  const termRecord = member.user_term_record;
+
+  return {
+    id: member.id,
+    firstName: member.first_name,
+    lastName: member.last_name,
+    role: termRecord?.position_id ?? null,
+    team: termRecord?.project?.project_name ?? null,
+    joined: termRecord ? new Date(termRecord.createdAt).toISOString() : null,
+    isArchived: member.is_archived,
   };
 }

@@ -36,6 +36,8 @@ type Documents = {
     "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": typeof types.LoginDocument,
     "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": typeof types.LoginWithGoogleDocument,
     "mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}": typeof types.LogoutDocument,
+    "query MembersDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  membersDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n  }\n}": typeof types.MembersDashboardDocument,
+    "query MembersDashboardCount {\n  membersDashboardCount\n}": typeof types.MembersDashboardCountDocument,
     "query Positions($isArchived: Boolean) {\n  positions(isArchived: $isArchived) {\n    title\n    isArchived\n  }\n}": typeof types.PositionsDocument,
     "query Projects($isArchived: Boolean) {\n  projects(isArchived: $isArchived) {\n    id\n    projectName\n    isArchived\n  }\n}": typeof types.ProjectsDocument,
     "mutation ReassignInterviewer($applicantRecordId: ID!, $oldInterviewerId: ID!, $newInterviewerId: ID!) {\n  reassignInterviewer(\n    applicantRecordId: $applicantRecordId\n    oldInterviewerId: $oldInterviewerId\n    newInterviewerId: $newInterviewerId\n  ) {\n    interviewedApplicantRecordId\n    interviewerId\n    groupId\n  }\n}": typeof types.ReassignInterviewerDocument,
@@ -85,6 +87,8 @@ const documents: Documents = {
     "mutation Login($email: String!, $password: String!) {\n  login(email: $email, password: $password) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n  }\n}": types.LoginDocument,
     "mutation LoginWithGoogle($idToken: String!) {\n  loginWithGoogle(idToken: $idToken) {\n    id\n    firstName\n    lastName\n    email\n    role\n    position\n    isArchived\n    accessToken\n    refreshToken\n  }\n}": types.LoginWithGoogleDocument,
     "mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}": types.LogoutDocument,
+    "query MembersDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  membersDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n  }\n}": types.MembersDashboardDocument,
+    "query MembersDashboardCount {\n  membersDashboardCount\n}": types.MembersDashboardCountDocument,
     "query Positions($isArchived: Boolean) {\n  positions(isArchived: $isArchived) {\n    title\n    isArchived\n  }\n}": types.PositionsDocument,
     "query Projects($isArchived: Boolean) {\n  projects(isArchived: $isArchived) {\n    id\n    projectName\n    isArchived\n  }\n}": types.ProjectsDocument,
     "mutation ReassignInterviewer($applicantRecordId: ID!, $oldInterviewerId: ID!, $newInterviewerId: ID!) {\n  reassignInterviewer(\n    applicantRecordId: $applicantRecordId\n    oldInterviewerId: $oldInterviewerId\n    newInterviewerId: $newInterviewerId\n  ) {\n    interviewedApplicantRecordId\n    interviewerId\n    groupId\n  }\n}": types.ReassignInterviewerDocument,
@@ -214,6 +218,14 @@ export function gql(source: "mutation LoginWithGoogle($idToken: String!) {\n  lo
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}"): (typeof documents)["mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query MembersDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  membersDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n  }\n}"): (typeof documents)["query MembersDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  membersDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query MembersDashboardCount {\n  membersDashboardCount\n}"): (typeof documents)["query MembersDashboardCount {\n  membersDashboardCount\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

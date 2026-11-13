@@ -405,3 +405,16 @@ export type {
 export { InterviewInvitesCountsDocument } from "./__generated__/graphql";
 
 export type { InterviewInvitesCountsQueryVariables } from "./__generated__/operation-types";
+
+export {
+  MembersDashboardDocument,
+  MembersDashboardCountDocument,
+} from "./__generated__/graphql";
+export type {
+  MembersDashboardQuery,
+  MembersDashboardQueryVariables,
+  MembersDashboardCountQuery,
+} from "./__generated__/operation-types";
+export type MembersDashboardResult = ArrayElement<
+  OperationField<Operations.MembersDashboardQuery, "membersDashboard">
+>;
