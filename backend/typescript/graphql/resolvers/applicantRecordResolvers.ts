@@ -1,5 +1,7 @@
+import ApplicantIngestionService from "../../services/implementations/applicantIngestionService";
 import ApplicantRecordService from "../../services/implementations/applicantRecordService";
 import EmailService from "../../services/implementations/emailService";
+import IApplicantIngestionService from "../../services/interfaces/IApplicantIngestionService";
 import IApplicantRecordService from "../../services/interfaces/IApplicantRecordService";
 import IEmailService from "../../services/interfaces/emailService";
 import nodemailerConfig from "../../nodemailer.config";
@@ -7,6 +9,7 @@ import {
   ApplicantRecordDTO,
   ApplicationStatus,
   BulkEmailResult,
+  PopulateApplicantRecordsResult,
 } from "../../types";
 
 const emailService: IEmailService = new EmailService(
@@ -17,8 +20,16 @@ const applicantRecordService: IApplicantRecordService = new ApplicantRecordServi
   emailService,
 );
 
+const applicantIngestionService: IApplicantIngestionService = new ApplicantIngestionService();
+
 const applicantRecordResolvers = {
   Mutation: {
+    populateApplicantRecords: async (
+      _parent: undefined,
+      { term }: { term: string },
+    ): Promise<PopulateApplicantRecordsResult> => {
+      return applicantIngestionService.populateApplicantRecords(term);
+    },
     sendRejectionEmails: async (
       _parent: undefined,
       { ids }: { ids: string[] },
