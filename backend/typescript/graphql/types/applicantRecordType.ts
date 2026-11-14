@@ -41,6 +41,7 @@ const applicantRecordType = gql`
 
   extend type Mutation {
     sendRejectionEmails(ids: [ID!]!): RejectionEmailResult!
+    sendOfferEmails(ids: [ID!]!): RejectionEmailResult!
     updateApplicantRecordStatus(
       id: ID!
       status: ApplicationStatus!

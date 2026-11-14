@@ -96,6 +96,17 @@ Bulk rejection emails are wired up this way in
 after the status update commits. Email failures are logged and never roll back the
 status change.
 
+### Status emails (rejection and offer)
+
+Rejection and offer emails are sent by the `sendRejectionEmails` and `sendOfferEmails`
+GraphQL mutations, which share `ApplicantRecordService.sendStatusEmails`. The records
+must already be in the matching status (`REJECTED` / `OFFERED`), so the dashboards call
+`bulkUpdateApplicantRecordsStatus` first and then the email mutation. Both bulk flows
+live in `frontend/pages/admin/review/_components/hooks/useBulkStatusAction.ts` and are
+used by the Review dashboard (rejection) and the Interview dashboard (rejection and
+offer). The offer template (`templates/offer.html`) is a placeholder until design
+provides the final copy.
+
 ## Adding a new email type
 
 1. Add `backend/typescript/emails/templates/<name>.html` using `{{placeholders}}`.

@@ -7,6 +7,8 @@ export type BulkStatusApplicant = {
   name: string;
   position: string;
   totalScore: number | null;
+  // Denominator shown next to the score; the review dashboard scores out of 40.
+  maxScore?: number;
 };
 
 export type BulkStatusConfirmationDialogueProps = Pick<
@@ -50,7 +52,7 @@ export const BulkStatusConfirmationDialogue = ({
           <div key={applicant.id} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_4rem] gap-4 bg-neutral-50 px-3 py-4 font-source text-sm">
             <span className="truncate" title={applicant.name}>{applicant.name}</span>
             <span className="truncate" title={applicant.position}>{applicant.position}</span>
-            <span className="truncate text-green-700">{applicant.totalScore === null ? "-" : `${applicant.totalScore}/40`}</span>
+            <span className="truncate text-green-700">{applicant.totalScore === null ? "-" : `${applicant.totalScore}/${applicant.maxScore ?? 40}`}</span>
           </div>
         ))}
       </div>

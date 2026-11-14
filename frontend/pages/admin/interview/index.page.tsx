@@ -32,6 +32,10 @@ import { NextPageWithLayout } from "../../_app.page";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useInterviewDashboardCounts from "@/APIClients/queries/useInterviewDashboardCounts";
+import { Toast } from "@/components/common/Toast";
+import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
+import { BulkAction } from "../review/_components/bulkStatusActions";
+import useBulkStatusAction from "../review/_components/hooks/useBulkStatusAction";
 
 type InterviewerReassignmentTarget = {
   applicantRecordId: string;
@@ -286,6 +290,34 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     void refetchCounts().catch(() => {});
   };
 
+  const selectedRows = rows.filter(
+    (row) => rowSelection[row.applicantRecordId]
+  );
+
+  const {
+    dialogue: bulkActionDialogue,
+    openBulkAction,
+    toast: bulkActionToast,
+    dismissToast: dismissBulkActionToast,
+  } = useBulkStatusAction({
+    onSuccess: () => {
+      setRowSelection({});
+      refreshDashboard();
+    },
+  });
+
+  const handleBulkAction = (action: BulkAction) =>
+    openBulkAction(
+      action,
+      selectedRows.map((row) => ({
+        id: row.applicantRecordId,
+        name: `${row.firstName} ${row.lastName}`,
+        position: row.position,
+        totalScore: row.interviewScore ?? null,
+        maxScore: 20,
+      }))
+    );
+
   const INTERVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
   const tabs: Tab[] = [
     { view: DashboardView.All, label: "All Applicants", count: tabCounts[DashboardView.All], unit: INTERVIEW_DASHBOARD_TABS_UNIT },
@@ -325,6 +357,11 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             selected: selectedFilters,
             onChange: handleFilterCategoryChange,
             onRemove: handleRemoveFilter,
+          }}
+          bulkActions={{
+            selectedCount: selectedRows.length,
+            onReject: () => handleBulkAction(BulkAction.Reject),
+            onOffer: () => handleBulkAction(BulkAction.Offer),
           }}
         />
 
@@ -400,6 +437,11 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           }}
         />
       ) : null}
+
+      {bulkActionDialogue ? (
+        <BulkStatusConfirmationDialogue {...bulkActionDialogue} />
+      ) : null}
+      <Toast {...bulkActionToast} onClose={dismissBulkActionToast} />
     </div>
   );
 };
