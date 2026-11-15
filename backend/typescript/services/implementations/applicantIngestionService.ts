@@ -106,7 +106,7 @@ class ApplicantIngestionService implements IApplicantIngestionService {
         throw new Error(
           `No matching position for role(s): ${missingPositions.join(
             ", ",
-          )}. Add them to the positions table (or the export-role mapping) and retry.`,
+          )}. Add them to the positions table and retry.`,
         );
       }
 

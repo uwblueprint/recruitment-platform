@@ -3,10 +3,7 @@ import * as path from "path";
 
 import { v4 } from "uuid";
 
-import {
-  positionTitleForExportRole,
-  TIMES_APPLIED_MAP,
-} from "../../constants/applicantIngestion";
+import { TIMES_APPLIED_MAP } from "../../constants/applicantIngestion";
 
 export type ShortAnswerQuestion = {
   question: string;
@@ -146,11 +143,10 @@ const getApplicantRecordDTO = (
   choiceRoleFromExport: string,
   choice: number,
 ): CreateApplicantRecordDTO => {
-  const position = positionTitleForExportRole(choiceRoleFromExport);
   return {
     id: v4(),
     applicant_id: applicantId,
-    position,
+    position: choiceRoleFromExport,
     role_specific_questions: getRoleSpecificQuestions(
       app.roleSpecificQuestions,
       choiceRoleFromExport,

@@ -1,7 +1,4 @@
-import {
-  positionTitleForExportRole,
-  TIMES_APPLIED_MAP,
-} from "../constants/applicantIngestion";
+import { TIMES_APPLIED_MAP } from "../constants/applicantIngestion";
 import {
   ApplicationStatusEnum,
   FirebaseApplication,
@@ -63,7 +60,7 @@ const toApplicantRecord = (
     );
   }
   return {
-    position: positionTitleForExportRole(exportRole),
+    position: exportRole,
     role_specific_questions: toStoredQuestions(roleQuestions.questions),
     choice,
     status: ApplicationStatusEnum.APPLIED,

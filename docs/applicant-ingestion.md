@@ -55,6 +55,15 @@ If any required variable is missing, `populateApplicantRecords` fails with
 
 The key file is a secret. Do not commit it; `.env` is gitignored.
 
+## Positions
+
+Each role in an application is stored as-is in `applicant_records.position`, which is a
+foreign key to `positions.title`. Role labels from the Firebase export must therefore match a
+`positions` row exactly (for example `Project Developer`, `Product Designer`,
+`VP Finance & Operations`). The `add-firebase-export-positions` seeder adds the labels the
+export uses; if a new role appears, `populateApplicantRecords` fails and lists the missing
+titles, so add them to `positions` and retry.
+
 ## Reading the data
 
 The client reads the Realtime Database over its REST API with an access token from the

@@ -59,7 +59,7 @@ describe("parseFirebaseApplication", () => {
 
     expect(applicantRecords).toHaveLength(2);
     expect(applicantRecords[0]).toMatchObject({
-      position: "Developer",
+      position: "Project Developer",
       choice: 1,
       status: "APPLIED",
       role_specific_questions: [
@@ -68,7 +68,7 @@ describe("parseFirebaseApplication", () => {
       ],
     });
     expect(applicantRecords[1]).toMatchObject({
-      position: "Designer",
+      position: "Product Designer",
       choice: 2,
     });
   });
