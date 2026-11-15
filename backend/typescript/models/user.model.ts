@@ -2,7 +2,7 @@ import {
   BelongsTo,
   Column,
   DataType,
-  HasOne,
+  HasMany,
   Model,
   Table,
 } from "sequelize-typescript";
@@ -72,8 +72,8 @@ export default class User extends Model {
   })
   profile_picture_file?: FirebaseFile;
 
-  @HasOne(() => UserTermRecord, {
+  @HasMany(() => UserTermRecord, {
     foreignKey: "user_id",
   })
-  user_term_record?: UserTermRecord;
+  user_term_records?: UserTermRecord[];
 }

@@ -416,15 +416,17 @@ export function toInterviewUnmatchedApplicantsByPositionDTO(
 }
 
 export function toMembersDashboardRowDTO(member: User): MembersDashboardRowDTO {
-  const termRecord = member.user_term_record;
+  const termRecords = member.user_term_records ?? [];
+  const currRecord = termRecords[0];
+  const firstRecord = termRecords[termRecords.length - 1];
 
   return {
     id: member.id,
     firstName: member.first_name,
     lastName: member.last_name,
-    role: termRecord?.position_id ?? null,
-    team: termRecord?.project?.project_name ?? null,
-    joined: termRecord ? new Date(termRecord.createdAt).toISOString() : null,
+    role: currRecord?.position_id ?? null,
+    team: currRecord?.project?.project_name ?? null,
+    joined: firstRecord ? new Date(firstRecord.createdAt).toISOString() : null,
     isArchived: member.is_archived,
   };
 }

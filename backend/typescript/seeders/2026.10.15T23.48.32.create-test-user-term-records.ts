@@ -104,12 +104,6 @@ export const down: Seeder = async ({ context: sequelize }) => {
 
   const t = await sequelize.transaction();
   try {
-    const PROJECTS = Array.from(
-      { length: 12 },
-      (_, i) => `Term Records Seed Project ${i + 1}`,
-    );
-
-    // Reverse order of `up`: rows holding foreign keys go first.
     await queryInterface.bulkDelete(
       "user_term_records",
       { user_id: USER_IDS },
@@ -124,7 +118,7 @@ export const down: Seeder = async ({ context: sequelize }) => {
 
     await queryInterface.bulkDelete(
       "projects",
-      { project_name: PROJECTS },
+      { project_name: PROJECT_NAMES },
       { transaction: t },
     );
 

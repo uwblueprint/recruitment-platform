@@ -45,6 +45,7 @@ export default class UserTermRecord extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    primaryKey: true,
   })
   term!: string;
 

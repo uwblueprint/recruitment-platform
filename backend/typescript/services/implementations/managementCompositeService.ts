@@ -29,9 +29,11 @@ class ManagementCompositeService implements IManagementCompositeService {
         include: [
           {
             model: UserTermRecord,
-            as: "user_term_record",
+            as: "user_term_records",
+            separate: true,
             required: false,
-            attributes: ["position_id", "createdAt"],
+            attributes: ["user_id", "position_id", "createdAt"],
+            order: [["createdAt", "DESC"]],
             include: [
               {
                 model: Project,
