@@ -36,12 +36,6 @@ const applicantRecordResolvers = {
     ): Promise<BulkEmailResult> => {
       return applicantRecordService.sendRejectionEmails(ids);
     },
-    sendOfferEmails: async (
-      _parent: undefined,
-      { ids }: { ids: string[] },
-    ): Promise<BulkEmailResult> => {
-      return applicantRecordService.sendOfferEmails(ids);
-    },
     updateApplicantRecordStatus: async (
       _parent: undefined,
       { id, status }: { id: string; status: ApplicationStatus },

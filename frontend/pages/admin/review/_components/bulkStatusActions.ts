@@ -3,7 +3,6 @@ import { ApplicationStatus } from "@/graphql/typeUtils";
 export enum BulkAction {
   Reject = "reject",
   Interview = "interview",
-  Offer = "offer",
 }
 
 const pluralizeCandidates = (count: number) =>
@@ -16,21 +15,8 @@ export const BULK_ACTIONS = {
     description:
       "This action will mark the applicants listed below as rejected and send them rejection emails. Please confirm your selections.",
     confirmLabel: "Confirm rejection",
-    emailType: "rejection",
     toast: (count: number) => ({
       title: `${pluralizeCandidates(count)} marked as rejected`,
-      description: "The selected application statuses have been updated.",
-    }),
-  },
-  [BulkAction.Offer]: {
-    status: ApplicationStatus.Offered,
-    title: "Send offer to candidates",
-    description:
-      "This action will mark the applicants listed below as offered and send them offer emails. Please confirm your selections.",
-    confirmLabel: "Confirm offer",
-    emailType: "offer",
-    toast: (count: number) => ({
-      title: `${pluralizeCandidates(count)} marked as offered`,
       description: "The selected application statuses have been updated.",
     }),
   },

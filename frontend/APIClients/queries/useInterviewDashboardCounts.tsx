@@ -8,7 +8,7 @@ import {
 export default function useInterviewDashboardCounts(
   filters?: InterviewDashboardFilters
 ) {
-  const { data, loading, error, refetch } = useQuery(InterviewDashboardCountsDocument, {
+  const { data, loading, error } = useQuery(InterviewDashboardCountsDocument, {
     variables: { filters },
     fetchPolicy: "network-only",
     context: { refreshAuth: true },
@@ -22,6 +22,5 @@ export default function useInterviewDashboardCounts(
     },
     loading,
     error,
-    refetch,
   };
 }

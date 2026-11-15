@@ -9,8 +9,6 @@ import {
 interface IApplicantRecordService {
   sendRejectionEmails(applicantRecordIds: string[]): Promise<BulkEmailResult>;
 
-  sendOfferEmails(applicantRecordIds: string[]): Promise<BulkEmailResult>;
-
   /**
    * Get applicant record associated with id
    * @param id applicant record id

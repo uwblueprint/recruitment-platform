@@ -1,7 +1,6 @@
 import {
   ApplicantRecordDTO,
   BulkEmailResult,
-  ApplicationStatus,
   ApplicationStatusEnum,
   BulkUpdateApplicantRecordDTO,
   CreateApplicantRecordDTO,
@@ -14,12 +13,7 @@ import Applicant from "../../models/applicant.model";
 import ApplicantRecord from "../../models/applicantRecord.model";
 import IApplicantRecordService from "../interfaces/IApplicantRecordService";
 import IEmailService from "../interfaces/emailService";
-import {
-  buildOfferEmail,
-  buildRejectionEmail,
-  EmailContent,
-  StatusEmailContext,
-} from "../../emails";
+import { buildRejectionEmail } from "../../emails";
 import { sequelize } from "../../models";
 
 const Logger = logger(__filename);
@@ -197,41 +191,8 @@ class ApplicantRecordService implements IApplicantRecordService {
   async sendRejectionEmails(
     applicantRecordIds: string[],
   ): Promise<BulkEmailResult> {
-    return this.sendStatusEmails(
-      applicantRecordIds,
-      ApplicationStatusEnum.REJECTED,
-      "rejection",
-      buildRejectionEmail,
-    );
-  }
-
-  /**
-   * Send a templated offer email to the applicant of each given record.
-   * Called explicitly by the mail mutation, independently of status updates.
-   */
-  async sendOfferEmails(
-    applicantRecordIds: string[],
-  ): Promise<BulkEmailResult> {
-    return this.sendStatusEmails(
-      applicantRecordIds,
-      ApplicationStatusEnum.OFFERED,
-      "offer",
-      buildOfferEmail,
-    );
-  }
-
-  /**
-   * Send one templated email per record, requiring every record to already
-   * have the given status so emails can't go out ahead of a status update.
-   */
-  private async sendStatusEmails(
-    applicantRecordIds: string[],
-    requiredStatus: ApplicationStatus,
-    emailType: string,
-    buildEmail: (context: StatusEmailContext) => EmailContent,
-  ): Promise<BulkEmailResult> {
     if (!this.emailService) {
-      throw new Error(`${emailType} email service is not configured.`);
+      throw new Error("Rejection email service is not configured.");
     }
 
     try {
@@ -243,13 +204,15 @@ class ApplicantRecordService implements IApplicantRecordService {
       if (records.length !== ids.length) {
         throw new Error("One or more applicant records were not found.");
       }
-      if (records.some((record) => record.status !== requiredStatus)) {
-        throw new Error(
-          `${emailType} emails require ${requiredStatus.toLowerCase()} applicant records.`,
-        );
+      if (
+        records.some(
+          (record) => record.status !== ApplicationStatusEnum.REJECTED,
+        )
+      ) {
+        throw new Error("Rejection emails require rejected applicant records.");
       }
       const messages = records.map((record) => {
-        const { subject, html } = buildEmail({
+        const { subject, html } = buildRejectionEmail({
           firstName: record.applicant.first_name,
           position: record.position,
           term: record.applicant.term,
@@ -261,7 +224,7 @@ class ApplicantRecordService implements IApplicantRecordService {
       const { failed } = result;
       if (failed.length > 0) {
         Logger.error(
-          `Failed to send ${emailType} emails to: ${failed
+          `Failed to send rejection emails to: ${failed
             .map((failure) => failure.to)
             .join(", ")}`,
         );
@@ -269,9 +232,7 @@ class ApplicantRecordService implements IApplicantRecordService {
       return result;
     } catch (error: unknown) {
       Logger.error(
-        `Failed to send ${emailType} emails. Reason = ${getErrorMessage(
-          error,
-        )}`,
+        `Failed to send rejection emails. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     }

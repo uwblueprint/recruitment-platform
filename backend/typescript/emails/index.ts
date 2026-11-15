@@ -33,14 +33,11 @@ const getTemplate = (name: string): Handlebars.TemplateDelegate => {
   return template;
 };
 
-export type StatusEmailContext = {
+export type RejectionEmailContext = {
   firstName: string;
   position: string;
   term: string;
 };
-
-export type RejectionEmailContext = StatusEmailContext;
-export type OfferEmailContext = StatusEmailContext;
 
 export const buildRejectionEmail = (
   context: RejectionEmailContext,
@@ -48,12 +45,5 @@ export const buildRejectionEmail = (
   return {
     subject: `Your UW Blueprint ${context.term} Application`,
     html: getTemplate("rejection")(context),
-  };
-};
-
-export const buildOfferEmail = (context: OfferEmailContext): EmailContent => {
-  return {
-    subject: `Your UW Blueprint ${context.term} Offer`,
-    html: getTemplate("offer")(context),
   };
 };

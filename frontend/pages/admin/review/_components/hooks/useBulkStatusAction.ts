@@ -1,7 +1,6 @@
 import { useReducer, useRef, useState } from "react";
 
 import useSendRejectionEmails from "@/APIClients/mutations/useSendRejectionEmails";
-import useSendOfferEmails from "@/APIClients/mutations/useSendOfferEmails";
 import useBulkUpdateApplicantRecordsStatus from "@/APIClients/mutations/useBulkUpdateApplicantRecordsStatus";
 import type {
   BulkStatusApplicant,
@@ -120,7 +119,6 @@ const useBulkStatusAction = ({
   const { bulkUpdateApplicantRecordsStatus } =
     useBulkUpdateApplicantRecordsStatus();
   const { sendRejectionEmails } = useSendRejectionEmails();
-  const { sendOfferEmails } = useSendOfferEmails();
   const [state, dispatch] = useReducer(dialogueReducer, {
     status: DialogueStatus.Closed,
   });
@@ -149,15 +147,11 @@ const useBulkStatusAction = ({
         config.status
       );
       let emailFailed = false;
-      const sendEmails =
-        action === BulkAction.Reject
-          ? sendRejectionEmails
-          : action === BulkAction.Offer
-          ? sendOfferEmails
-          : undefined;
-      if (sendEmails) {
+      if (action === BulkAction.Reject) {
         try {
-          await sendEmails(applicants.map((applicant) => applicant.id));
+          await sendRejectionEmails(
+            applicants.map((applicant) => applicant.id)
+          );
         } catch {
           emailFailed = true;
         }
@@ -170,9 +164,7 @@ const useBulkStatusAction = ({
         ...(emailFailed
           ? {
               description:
-                `Statuses were updated, but some or all ${
-                  "emailType" in config ? config.emailType : ""
-                } emails could not be confirmed. Contact an administrator before resending.`,
+                "Statuses were updated, but some or all rejection emails could not be confirmed. Contact an administrator before resending.",
             }
           : {}),
       });

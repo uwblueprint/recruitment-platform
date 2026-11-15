@@ -29,10 +29,6 @@ import { NextPageWithLayout } from "../../_app";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useInterviewDashboardCounts from "@/APIClients/queries/useInterviewDashboardCounts";
-import { Toast } from "@/components/common/Toast";
-import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
-import { BulkAction } from "../review/_components/bulkStatusActions";
-import useBulkStatusAction from "../review/_components/hooks/useBulkStatusAction";
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -158,7 +154,6 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     previousData,
     loading: isLoading,
     error,
-    refetch,
   } = useInterviewDashboard({
     pageNumber,
     resultsPerPage,
@@ -230,40 +225,8 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     resetForNewResults();
   };
 
-  const {
-    counts: tabCounts,
-    error: countsError,
-    refetch: refetchCounts,
-  } = useInterviewDashboardCounts(backendFilters);
-
-  const selectedRows = rows.filter(
-    (row) => rowSelection[row.applicantRecordId]
-  );
-
-  const {
-    dialogue: bulkActionDialogue,
-    openBulkAction,
-    toast: bulkActionToast,
-    dismissToast: dismissBulkActionToast,
-  } = useBulkStatusAction({
-    onSuccess: () => {
-      setRowSelection({});
-      void refetchCounts().catch(() => {});
-      void refetch().catch(() => {});
-    },
-  });
-
-  const handleBulkAction = (action: BulkAction) =>
-    openBulkAction(
-      action,
-      selectedRows.map((row) => ({
-        id: row.applicantRecordId,
-        name: `${row.firstName} ${row.lastName}`,
-        position: row.position,
-        totalScore: row.interviewScore ?? null,
-        maxScore: 20,
-      }))
-    );
+  const { counts: tabCounts, error: countsError } =
+    useInterviewDashboardCounts(backendFilters);
 
   const INTERVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
   const tabs: Tab[] = [
@@ -304,11 +267,6 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             selected: selectedFilters,
             onChange: handleFilterCategoryChange,
             onRemove: handleRemoveFilter,
-          }}
-          bulkActions={{
-            selectedCount: selectedRows.length,
-            onReject: () => handleBulkAction(BulkAction.Reject),
-            onOffer: () => handleBulkAction(BulkAction.Offer),
           }}
         />
 
@@ -355,10 +313,6 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             : undefined
         }
       />
-      {bulkActionDialogue ? (
-        <BulkStatusConfirmationDialogue {...bulkActionDialogue} />
-      ) : null}
-      <Toast {...bulkActionToast} onClose={dismissBulkActionToast} />
     </div>
   );
 };

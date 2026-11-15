@@ -1,9 +1,0 @@
-mutation SendOfferEmails($ids: [ID!]!) {
-  sendOfferEmails(ids: $ids) {
-    sent
-    failed {
-      to
-      error
-    }
-  }
-}
