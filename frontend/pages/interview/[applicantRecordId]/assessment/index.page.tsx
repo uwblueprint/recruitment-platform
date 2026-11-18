@@ -10,7 +10,7 @@ import {
   InterviewFooter,
 } from "../../_components/layout";
 import { Button } from "@/components/common/Button";
-import { NextPageWithLayout } from "../../../_app";
+import { NextPageWithLayout } from "../../../_app.page";
 import { ScoresPanel } from "../../_components/assessment/ScoresPanel";
 import NotesUploader from "../../_components/assessment/NotesUploader";
 import {
@@ -99,7 +99,7 @@ const InterviewAssessmentPage: NextPageWithLayout = () => {
       return (
         <PanelLayout>
           <NotesUploader
-            interviewedApplicantRecordId={recordId}
+            interviewedApplicantRecordId={recordId ?? null}
             {...interviewNotes}
           />
         </PanelLayout>

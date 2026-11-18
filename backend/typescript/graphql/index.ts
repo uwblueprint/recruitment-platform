@@ -168,6 +168,7 @@ const graphQLMiddlewares = {
     deleteAdminCommentById: authorizedByAdmin(),
     updateApplicantRecordStatus: authorizedByAllRoles(),
     reassignReviewer: authorizedByAdmin(),
+    reassignInterviewer: authorizedByAdmin(),
     bulkUpdateApplicantRecordsStatus: authorizedByAdmin(),
     sendRejectionEmails: authorizedByAdmin(),
     updateApplicantRecordIsApplicantFlagged: authorizedByAdmin(),

@@ -11,7 +11,7 @@ export const InterviewNotesTab = ({
     data: notes,
     loading: isLoading,
     error,
-  } = useInterviewNotes(interviewedApplicantRecordId);
+  } = useInterviewNotes(interviewedApplicantRecordId ?? undefined);
 
   if (isLoading) {
     return (

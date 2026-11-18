@@ -51,6 +51,12 @@ const interviewDelegationsTypes = gql`
     bulkCreateInterviewDelegations(
       delegations: [CreateInterviewDelegationDTO!]!
     ): [InterviewDelegationDTO!]!
+
+    reassignInterviewer(
+      applicantRecordId: ID!
+      oldInterviewerId: ID!
+      newInterviewerId: ID!
+    ): InterviewDelegationDTO!
   }
 `;
 

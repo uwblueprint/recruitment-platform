@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import { ReactElement } from "react";
 import useInterviewGroupDetails from "../_components/hooks/useInterviewGroupDetails";
 import useSchedulingLinkEditor from "../_components/hooks/useSchedulingLinkEditor";
-import { NextPageWithLayout } from "../../_app";
+import { NextPageWithLayout } from "../../_app.page";
 import CalendlyLinkForm from "../_components/CalendlyLinkForm";
 import CalendlyLinkSubmitted from "../_components/CalendlyLinkSubmitted";
 import CalendlySection from "../_components/CalendlySection";
