@@ -4,14 +4,18 @@ on:
   push:
     branches:
       - main
+      - staging
     paths:
+      - ".github/workflows/lint.yml"
       - "frontend/**"
       - "backend/typescript/**"
       - "backend/python/**"
   pull_request:
     branches:
       - main
+      - staging
     paths:
+      - ".github/workflows/lint.yml"
       - "frontend/**"
       - "backend/typescript/**"
       - "backend/python/**"
@@ -29,10 +33,13 @@ jobs:
         with:
           filters: |
             frontend:
+              - ".github/workflows/lint.yml"
               - "frontend/**"
             typescript-backend:
+              - ".github/workflows/lint.yml"
               - "backend/typescript/**"
             python-backend:
+              - ".github/workflows/lint.yml"
               - "backend/python/**"
       
       - name: Set up Node.js
