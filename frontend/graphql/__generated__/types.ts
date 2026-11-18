@@ -1153,6 +1153,7 @@ export type UserDto = {
   id: Scalars['ID']['output'];
   isArchived: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
+  photoUrl?: Maybe<Scalars['String']['output']>;
   position?: Maybe<Scalars['String']['output']>;
   role: Role;
 };

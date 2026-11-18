@@ -1,9 +1,11 @@
 import nodemailerConfig from "../../nodemailer.config";
 import AuthService from "../../services/implementations/authService";
 import EmailService from "../../services/implementations/emailService";
+import ProfilePhotoService from "../../services/implementations/profilePhotoService";
 import UserService from "../../services/implementations/userService";
 import IAuthService from "../../services/interfaces/authService";
 import IEmailService from "../../services/interfaces/emailService";
+import IProfilePhotoService from "../../services/interfaces/IProfilePhotoService";
 import IUserService from "../../services/interfaces/userService";
 import { CreateUserDTO, UpdateUserDTO, UserDTO } from "../../types";
 import { generateCSV } from "../../utilities/CSVUtils";
@@ -11,6 +13,7 @@ import { generateCSV } from "../../utilities/CSVUtils";
 const userService: IUserService = new UserService();
 const emailService: IEmailService = new EmailService(nodemailerConfig);
 const authService: IAuthService = new AuthService(userService, emailService);
+const profilePhotoService: IProfilePhotoService = new ProfilePhotoService();
 
 const userResolvers = {
   Query: {
@@ -67,6 +70,12 @@ const userResolvers = {
       { email }: { email: string },
     ): Promise<void> => {
       return userService.deleteUserByEmail(email);
+    },
+  },
+  UserDTO: {
+    // Only runs for queries that select photoUrl
+    photoUrl: async (parent: UserDTO): Promise<string | null> => {
+      return profilePhotoService.getPhotoUrl(parent.email);
     },
   },
 };
