@@ -4,7 +4,7 @@ export type InterviewPartner = {
   firstName: string;
   lastName: string;
   email: string;
-  photoUrl?: string;
+  photoUrl?: string | null;
 };
 
 type InterviewPartnerCardProps = {
