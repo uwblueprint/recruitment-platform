@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
-import { NextPageWithLayout } from "../../_app";
+import { NextPageWithLayout } from "../../_app.page";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useMembersDashboardCount from "@/APIClients/queries/useMembersDashboardCount";
 import useTeamsDashboard from "@/APIClients/queries/useTeamsDashboard";
