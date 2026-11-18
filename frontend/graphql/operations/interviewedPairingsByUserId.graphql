@@ -10,7 +10,6 @@ query InterviewedPairingsByUserId($userId: ID!) {
       role
       position
       isArchived
-      photoUrl
     }
   }
 }

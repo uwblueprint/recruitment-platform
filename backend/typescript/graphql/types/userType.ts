@@ -15,7 +15,6 @@ const userType = gql`
     role: Role!
     position: String
     isArchived: Boolean!
-    photoUrl: String
   }
 
   input CreateUserDTO {
