@@ -421,8 +421,9 @@ export function toInterviewUnmatchedApplicantsByPositionDTO(
 
 export function toMembersDashboardRowDTO(member: User): MembersDashboardRowDTO {
   const termRecords = member.user_term_records ?? [];
-  const currRecord = termRecords[0];
-  const firstRecord = termRecords[termRecords.length - 1];
+  const currRecord = termRecords.length > 0 ? termRecords[0] : null;
+  const firstRecord =
+    termRecords.length > 0 ? termRecords[termRecords.length - 1] : null;
 
   return {
     id: member.id,
