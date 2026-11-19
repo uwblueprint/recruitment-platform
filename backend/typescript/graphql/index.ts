@@ -43,6 +43,8 @@ import interviewGroupResolvers from "./resolvers/interviewGroupResolvers";
 import interviewPageResolvers from "./resolvers/interviewPageResolvers";
 import interviewDashboardResolvers from "./resolvers/interviewDashboardResolvers";
 import interviewInvitesDashboardResolvers from "./resolvers/interviewInvitesDashboardResolvers";
+import membersDashboardType from "./types/membersDashboardType";
+import managementCompositeResolvers from "./resolvers/managementCompositeResolvers";
 
 const query = gql`
   type Query {
@@ -77,6 +79,7 @@ const executableSchema = makeExecutableSchema({
     userType,
     positionType,
     projectType,
+    membersDashboardType,
   ],
   resolvers: merge(
     { Upload: GraphQLUpload },
@@ -97,6 +100,7 @@ const executableSchema = makeExecutableSchema({
     interviewPageResolvers,
     interviewDashboardResolvers,
     interviewInvitesDashboardResolvers,
+    managementCompositeResolvers,
   ),
 });
 
@@ -143,6 +147,8 @@ const graphQLMiddlewares = {
     interviewInvites: authorizedByAdmin(),
     interviewInvitesCounts: authorizedByAdmin(),
     interviewUnmatchedApplicants: authorizedByAdmin(),
+    membersDashboard: authorizedByAdmin(),
+    membersDashboardCount: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),

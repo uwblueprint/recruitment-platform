@@ -167,6 +167,19 @@ export type LogoutMutationVariables = Exact<{
 
 export type LogoutMutation = { logout: string | null };
 
+export type MembersDashboardQueryVariables = Exact<{
+  pageNumber: number;
+  resultsPerPage: number;
+}>;
+
+
+export type MembersDashboardQuery = { membersDashboard: Array<{ id: string, firstName: string, lastName: string, role: string | null, team: string | null, joined: string | null, isArchived: boolean }> };
+
+export type MembersDashboardCountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type MembersDashboardCountQuery = { membersDashboardCount: number };
+
 export type PositionsQueryVariables = Exact<{
   isArchived?: boolean | null | undefined;
 }>;

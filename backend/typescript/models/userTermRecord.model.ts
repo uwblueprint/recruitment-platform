@@ -5,7 +5,9 @@ import {
   Table,
   BelongsTo,
 } from "sequelize-typescript";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import User from "./user.model";
+import Project from "./project.model";
 
 @Table({ tableName: "user_term_records" })
 export default class UserTermRecord extends Model {
@@ -43,9 +45,13 @@ export default class UserTermRecord extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+    primaryKey: true,
   })
   term!: string;
 
   @BelongsTo(() => User, { foreignKey: "user_id", targetKey: "id" })
   user!: User;
+
+  @BelongsTo(() => Project, { foreignKey: "project_id", targetKey: "id" })
+  project!: Project;
 }
