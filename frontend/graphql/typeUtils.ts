@@ -420,3 +420,5 @@ export type MembersDashboardResult = ArrayElement<
 >;
 
 export { CanReviewApplicantDocument } from "./__generated__/graphql";
+
+export { CanAccessInterviewGroupDocument } from "./__generated__/graphql";

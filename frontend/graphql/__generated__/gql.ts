@@ -17,6 +17,7 @@ type Documents = {
     "query AdminCommentsByApplicantRecordId($applicantRecordId: ID!) {\n  adminCommentsByApplicantRecordId(applicantRecordId: $applicantRecordId) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": typeof types.AdminCommentsByApplicantRecordIdDocument,
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": typeof types.ApplicationDocument,
     "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}": typeof types.BulkUpdateApplicantRecordsStatusDocument,
+    "query CanAccessInterviewGroup($groupId: ID!) {\n  canAccessInterviewGroup(groupId: $groupId)\n}": typeof types.CanAccessInterviewGroupDocument,
     "query CanReviewApplicant($applicantRecordId: ID!) {\n  canReviewApplicant(applicantRecordId: $applicantRecordId)\n}": typeof types.CanReviewApplicantDocument,
     "mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": typeof types.CreateAdminCommentDocument,
     "query DashboardFilterOptions($department: String) {\n  dashboardFilterOptions(department: $department) {\n    positions {\n      value\n      label\n    }\n    applicationStatuses {\n      value\n      label\n    }\n    skillCategories {\n      value\n      label\n    }\n    scoreRanges {\n      value\n      label\n    }\n    years {\n      value\n      label\n    }\n    bookmarked {\n      value\n      label\n    }\n  }\n}": typeof types.DashboardFilterOptionsDocument,
@@ -69,6 +70,7 @@ const documents: Documents = {
     "query AdminCommentsByApplicantRecordId($applicantRecordId: ID!) {\n  adminCommentsByApplicantRecordId(applicantRecordId: $applicantRecordId) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": types.AdminCommentsByApplicantRecordIdDocument,
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": types.ApplicationDocument,
     "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}": types.BulkUpdateApplicantRecordsStatusDocument,
+    "query CanAccessInterviewGroup($groupId: ID!) {\n  canAccessInterviewGroup(groupId: $groupId)\n}": types.CanAccessInterviewGroupDocument,
     "query CanReviewApplicant($applicantRecordId: ID!) {\n  canReviewApplicant(applicantRecordId: $applicantRecordId)\n}": types.CanReviewApplicantDocument,
     "mutation CreateAdminComment($adminComment: CreateAdminCommentDTO!) {\n  createAdminComment(adminComment: $adminComment) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": types.CreateAdminCommentDocument,
     "query DashboardFilterOptions($department: String) {\n  dashboardFilterOptions(department: $department) {\n    positions {\n      value\n      label\n    }\n    applicationStatuses {\n      value\n      label\n    }\n    skillCategories {\n      value\n      label\n    }\n    scoreRanges {\n      value\n      label\n    }\n    years {\n      value\n      label\n    }\n    bookmarked {\n      value\n      label\n    }\n  }\n}": types.DashboardFilterOptionsDocument,
@@ -144,6 +146,10 @@ export function gql(source: "query Application($applicantRecordId: ID!) {\n  app
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}"): (typeof documents)["mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query CanAccessInterviewGroup($groupId: ID!) {\n  canAccessInterviewGroup(groupId: $groupId)\n}"): (typeof documents)["query CanAccessInterviewGroup($groupId: ID!) {\n  canAccessInterviewGroup(groupId: $groupId)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

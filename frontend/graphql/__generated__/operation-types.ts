@@ -26,6 +26,13 @@ export type BulkUpdateApplicantRecordsStatusMutationVariables = Exact<{
 
 export type BulkUpdateApplicantRecordsStatusMutation = { bulkUpdateApplicantRecordsStatus: Array<{ id: string, status: Types.ApplicationStatus }> };
 
+export type CanAccessInterviewGroupQueryVariables = Exact<{
+  groupId: string | number;
+}>;
+
+
+export type CanAccessInterviewGroupQuery = { canAccessInterviewGroup: boolean };
+
 export type CanReviewApplicantQueryVariables = Exact<{
   applicantRecordId: string | number;
 }>;
