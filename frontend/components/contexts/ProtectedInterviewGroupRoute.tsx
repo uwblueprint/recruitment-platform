@@ -1,5 +1,5 @@
 import { StatusPage } from "@/components/layouts/StatusPage";
-import { ReactNode, useEffect } from "react";
+import { ReactNode } from "react";
 import { useRouter } from "next/router";
 import useCanAccessInterviewGroup from "@/APIClients/queries/useCanAccessInterviewGroup";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
@@ -16,11 +16,16 @@ const InterviewGroupMembershipGuard = ({ children }: { children: ReactNode }) =>
   const denied = router.isReady && (!groupId ||
     (!loading && !error && data?.canAccessInterviewGroup === false));
 
-  useEffect(() => {
-    if (denied) void router.replace("/503");
-  }, [denied, router]);
-
-  if (denied) return null;
+  if (denied) {
+    return (
+      <StatusPage
+        code={503}
+        role="alert"
+        title="Interview group access denied"
+        description="You’re not a member of this interview group. If you believe you should be assigned to this group, please contact an administrator."
+      />
+    );
+  }
   if (error) {
     return (
       <StatusPage
