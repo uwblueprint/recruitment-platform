@@ -26,6 +26,13 @@ export type BulkUpdateApplicantRecordsStatusMutationVariables = Exact<{
 
 export type BulkUpdateApplicantRecordsStatusMutation = { bulkUpdateApplicantRecordsStatus: Array<{ id: string, status: Types.ApplicationStatus }> };
 
+export type CanAccessInterviewGroupQueryVariables = Exact<{
+  groupId: string | number;
+}>;
+
+
+export type CanAccessInterviewGroupQuery = { canAccessInterviewGroup: boolean };
+
 export type CanReviewApplicantQueryVariables = Exact<{
   applicantRecordId: string | number;
 }>;
@@ -81,7 +88,7 @@ export type InterviewDashboardSidePanelQueryVariables = Exact<{
 export type InterviewDashboardSidePanelQuery = { interviewDashboardSidePanel: { firstName: string, lastName: string, term: string, program: string, position: string, resumeUrl: string, applicationStatus: Types.ApplicationStatus, skillCategory: Types.SkillCategory | null, isApplicantFlagged: boolean, isShortlistedForOffer: boolean, interviewStatus: Types.InterviewStatus | null, interviewScore: number | null, interviewedApplicantRecordId: string | null, interviewDate: string | null, interviewers: Array<{ firstName: string, lastName: string }>, interview: { skill: number | null, passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, comments: string | null } | null } };
 
 export type InterviewGroupQueryVariables = Exact<{
-  id: string | number;
+  groupId: string | number;
 }>;
 
 
@@ -345,7 +352,7 @@ export type UpdateApplicantRecordStatusMutationVariables = Exact<{
 export type UpdateApplicantRecordStatusMutation = { updateApplicantRecordStatus: { id: string, status: Types.ApplicationStatus } };
 
 export type UpdateInterviewGroupMutationVariables = Exact<{
-  id: string | number;
+  groupId: string | number;
   interviewGroup: Types.UpdateInterviewGroupDto;
 }>;
 
@@ -353,7 +360,7 @@ export type UpdateInterviewGroupMutationVariables = Exact<{
 export type UpdateInterviewGroupMutation = { updateInterviewGroup: { id: string, schedulingLink: string | null, status: Types.InterviewGroupStatus } };
 
 export type UpdateInterviewGroupSchedulingLinkMutationVariables = Exact<{
-  id: string | number;
+  groupId: string | number;
   schedulingLink: string;
 }>;
 

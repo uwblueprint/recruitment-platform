@@ -1,4 +1,5 @@
-import { ReactNode, useEffect } from "react";
+import { StatusPage } from "@/components/layouts/StatusPage";
+import { ReactNode } from "react";
 import { useRouter } from "next/router";
 import useCanReviewApplicant from "@/APIClients/queries/useCanReviewApplicant";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
@@ -15,13 +16,24 @@ const ReviewAssignmentGuard = ({ children }: { children: ReactNode }) => {
   const denied = router.isReady && (!applicantRecordId ||
     (!loading && !error && data?.canReviewApplicant === false));
 
-  useEffect(() => {
-    if (denied) void router.replace("/503");
-  }, [denied, router]);
-
-  if (denied) return null;
+  if (denied) {
+    return (
+      <StatusPage
+        code={503}
+        title="Review access denied"
+        description="You’re not assigned to review this applicant. If you believe you should be assigned, please contact an administrator."
+      />
+    );
+  }
   if (error) {
-    return <p role="alert" className="p-8">Unable to check review access. Please refresh and try again.</p>;
+    return (
+      <StatusPage
+        code={500}
+        title="Unable to check review access"
+        description="Please refresh and try again."
+        action={{ label: "Try again", onClick: () => router.reload() }}
+      />
+    );
   }
   if (!applicantRecordId || loading || data?.canReviewApplicant !== true) {
     return <Loading />;

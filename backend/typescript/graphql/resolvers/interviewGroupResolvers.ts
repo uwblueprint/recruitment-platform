@@ -1,3 +1,8 @@
+import { ExpressContext } from "apollo-server-express";
+import {
+  canUserAccessInterviewGroup,
+  getUserIdFromContext,
+} from "../../middlewares/auth";
 import InterviewGroupService from "../../services/implementations/interviewGroupService";
 import IInterviewGroupService from "../../services/interfaces/IInterviewGroupService";
 import {
@@ -11,11 +16,19 @@ const interviewGroupService: IInterviewGroupService = new InterviewGroupService(
 
 const interviewGroupResolvers = {
   Query: {
+    canAccessInterviewGroup: async (
+      _parent: undefined,
+      { groupId }: { groupId: string },
+      context: ExpressContext,
+    ): Promise<boolean> => {
+      const userId = await getUserIdFromContext(context);
+      return canUserAccessInterviewGroup(userId, groupId);
+    },
     interviewGroup: async (
       _parent: undefined,
-      { id }: { id: string },
+      { groupId }: { groupId: string },
     ): Promise<InterviewGroupDTO> => {
-      return interviewGroupService.getInterviewGroupById(id);
+      return interviewGroupService.getInterviewGroupById(groupId);
     },
   },
 
@@ -30,18 +43,21 @@ const interviewGroupResolvers = {
     updateInterviewGroup: async (
       _parent: undefined,
       {
-        id,
+        groupId,
         interviewGroup,
-      }: { id: string; interviewGroup: UpdateInterviewGroupDTO },
+      }: { groupId: string; interviewGroup: UpdateInterviewGroupDTO },
     ): Promise<InterviewGroupDTO> => {
-      return interviewGroupService.updateInterviewGroup(id, interviewGroup);
+      return interviewGroupService.updateInterviewGroup(
+        groupId,
+        interviewGroup,
+      );
     },
 
     updateInterviewGroupSchedulingLink: async (
       _parent: undefined,
-      { id, schedulingLink }: { id: string; schedulingLink: string },
+      { groupId, schedulingLink }: { groupId: string; schedulingLink: string },
     ): Promise<InterviewGroupDTO> => {
-      return interviewGroupService.updateInterviewGroup(id, {
+      return interviewGroupService.updateInterviewGroup(groupId, {
         schedulingLink,
         status: InterviewGroupStatusEnum.READY_TO_INTERVIEW,
       });
@@ -49,9 +65,9 @@ const interviewGroupResolvers = {
 
     deleteInterviewGroupById: async (
       _parent: undefined,
-      { id }: { id: string },
+      { groupId }: { groupId: string },
     ): Promise<InterviewGroupDTO> => {
-      return interviewGroupService.deleteInterviewGroupById(id);
+      return interviewGroupService.deleteInterviewGroupById(groupId);
     },
 
     bulkCreateInterviewGroups: async (

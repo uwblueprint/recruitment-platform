@@ -54,7 +54,7 @@ const LoginPage: NextPage = () => {
             priority
           />
           <div className="flex flex-col items-center">
-            <h4 className="my-8 text-blue-900">Sign In</h4>
+            <h4 className="my-8 text-blue">Sign In</h4>
             <Button variant="secondary" onClick={signInWithGoogle}>
               <div className="flex space-around items-center gap-3">
                 <Image

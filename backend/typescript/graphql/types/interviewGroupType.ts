@@ -24,7 +24,8 @@ const interviewGroupTypes = gql`
   }
 
   extend type Query {
-    interviewGroup(id: ID!): InterviewGroupDTO!
+    canAccessInterviewGroup(groupId: ID!): Boolean!
+    interviewGroup(groupId: ID!): InterviewGroupDTO!
   }
 
   extend type Mutation {
@@ -33,16 +34,16 @@ const interviewGroupTypes = gql`
     ): InterviewGroupDTO!
 
     updateInterviewGroup(
-      id: ID!
+      groupId: ID!
       interviewGroup: UpdateInterviewGroupDTO!
     ): InterviewGroupDTO!
 
     updateInterviewGroupSchedulingLink(
-      id: ID!
+      groupId: ID!
       schedulingLink: String!
     ): InterviewGroupDTO!
 
-    deleteInterviewGroupById(id: ID!): InterviewGroupDTO!
+    deleteInterviewGroupById(groupId: ID!): InterviewGroupDTO!
 
     bulkCreateInterviewGroups(
       interviewGroups: [CreateInterviewGroupDTO]!
