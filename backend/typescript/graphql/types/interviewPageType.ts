@@ -21,6 +21,8 @@ const interviewPageType = gql`
   }
 
   extend type Query {
+    canAccessInterview(applicantRecordId: ID!): Boolean!
+    interviewApplication(applicantRecordId: ID!): ApplicationDTO!
     interviewedApplicantsByUserId(userId: ID!): [InterviewedApplicantsDTO!]!
     interviewedPairingsByUserId(userId: ID!): [InterviewPairingsDTO!]!
     interviewersByGroupId(groupId: ID!): [UserDTO!]!
@@ -32,7 +34,7 @@ const interviewPageType = gql`
 
   extend type Mutation {
     submitInterviewScores(
-      id: ID!
+      interviewedApplicantRecordId: ID!
       interviewJson: InterviewInput!
     ): InterviewedApplicantRecord!
 

@@ -9,6 +9,8 @@ import {
   isAuthorizedByUserId,
   isAuthorizedForApplicantReview,
   isAuthorizedForInterviewGroup,
+  isAuthorizedForInterview,
+  isAuthorizedForInterviewByApplicantRecord,
 } from "../middlewares/auth";
 import adminCommentResolvers from "./resolvers/adminCommentResolvers";
 import applicantRecordResolvers from "./resolvers/applicantRecordResolvers";
@@ -136,13 +138,17 @@ const graphQLMiddlewares = {
     ),
     reviewedApplicantsByUserId: isAuthorizedByUserId("userId"),
     application: isAuthorizedForApplicantReview({ allowAdminRead: true }),
-    interviewedApplicantRecord: authorizedByAllRoles(),
-    interviewDelegation: authorizedByAllRoles(),
+    interviewedApplicantRecord: isAuthorizedForInterview(),
+    interviewDelegation: isAuthorizedForInterview({
+      requireOwnInterviewer: true,
+    }),
     interviewGroup: isAuthorizedForInterviewGroup(),
-    interviewedApplicantsByUserId: authorizedByAllRoles(),
-    interviewedPairingsByUserId: authorizedByAllRoles(),
+    interviewedApplicantsByUserId: isAuthorizedByUserId("userId"),
+    interviewedPairingsByUserId: isAuthorizedByUserId("userId"),
     interviewersByGroupId: isAuthorizedForInterviewGroup(),
-    interviewNotes: authorizedByAllRoles(),
+    interviewNotes: isAuthorizedForInterview(),
+    interviewedApplicantRecordByApplicantRecordId: isAuthorizedForInterviewByApplicantRecord(),
+    interviewApplication: isAuthorizedForInterviewByApplicantRecord(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardCounts: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
@@ -189,9 +195,11 @@ const graphQLMiddlewares = {
     reportReviewConflict: isAuthorizedForApplicantReview({
       requireOwnReview: true,
     }),
-    reportInterviewConflict: authorizedByAllRoles(),
+    reportInterviewConflict: isAuthorizedForInterview({
+      requireOwnInterviewer: true,
+    }),
     createInterviewedApplicantRecord: authorizedByAdmin(),
-    updateInterviewedApplicantRecord: authorizedByAllRoles(),
+    updateInterviewedApplicantRecord: isAuthorizedForInterview(),
     deleteInterviewedApplicantRecordById: authorizedByAdmin(),
     createInterviewDelegation: authorizedByAdmin(),
     updateInterviewDelegation: authorizedByAdmin(),
@@ -205,8 +213,8 @@ const graphQLMiddlewares = {
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
     delegateInterviewers: authorizedBySuperAdmin(),
-    submitInterviewScores: authorizedByAllRoles(),
-    uploadInterviewNotes: authorizedByAllRoles(),
+    submitInterviewScores: isAuthorizedForInterview(),
+    uploadInterviewNotes: isAuthorizedForInterview(),
   },
 };
 

@@ -12,6 +12,7 @@ import IAuthService from "../services/interfaces/authService";
 import { Role } from "../types";
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
 import InterviewDelegation from "../models/interviewDelegation.model";
+import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
 
 const authService: IAuthService = new AuthService(new UserService());
 
@@ -180,6 +181,99 @@ export const isAuthorizedForInterviewGroup = () => {
       !(await canUserAccessInterviewGroup(userId, groupId))
     ) {
       throw new ForbiddenError("You are not assigned to this interview group.");
+    }
+    return resolve(parent, args, context, info);
+  };
+};
+
+type InterviewAccessTarget =
+  | { applicantRecordId: string; interviewedApplicantRecordId?: never }
+  | { interviewedApplicantRecordId: string; applicantRecordId?: never };
+
+/** Requires assignment to this applicant's interview, not just their group. */
+export const canUserAccessInterview = async (
+  userId: number,
+  target: InterviewAccessTarget,
+): Promise<boolean> => {
+  let recordId = target.interviewedApplicantRecordId;
+  if (!recordId) {
+    const record = await InterviewedApplicantRecord.findOne({
+      where: { applicant_record_id: target.applicantRecordId },
+      attributes: ["id"],
+    });
+    if (!record) return false;
+    recordId = record.id;
+  }
+  const delegation = await InterviewDelegation.findOne({
+    where: {
+      interviewed_applicant_record_id: recordId,
+      interviewer_id: userId,
+    },
+    attributes: ["interviewer_id"],
+  });
+  return !!delegation;
+};
+
+/**
+ * Requires interview assignment for every role, including admins.
+ * Uses args.interviewedApplicantRecordId to identify the interview record.
+ * @param options.requireOwnInterviewer Also requires args.interviewerId to
+ * match the authenticated user, for delegation reads and conflict reports.
+ */
+export const isAuthorizedForInterview = ({
+  requireOwnInterviewer = false,
+}: {
+  requireOwnInterviewer?: boolean;
+} = {}) => {
+  return async (
+    resolve: (
+      parent: any,
+      args: { [key: string]: any },
+      context: ExpressContext,
+      info: GraphQLResolveInfo,
+    ) => any,
+    parent: any,
+    args: { [key: string]: any },
+    context: ExpressContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    const userId = await getUserIdFromContext(context);
+    const recordId = args.interviewedApplicantRecordId;
+    if (
+      typeof recordId !== "string" ||
+      (requireOwnInterviewer &&
+        String(args.interviewerId) !== String(userId)) ||
+      !(await canUserAccessInterview(userId, {
+        interviewedApplicantRecordId: recordId,
+      }))
+    ) {
+      throw new ForbiddenError("You are not assigned to this interview.");
+    }
+    return resolve(parent, args, context, info);
+  };
+};
+
+/** Requires interview assignment using args.applicantRecordId (an application ID). */
+export const isAuthorizedForInterviewByApplicantRecord = () => {
+  return async (
+    resolve: (
+      parent: any,
+      args: { [key: string]: any },
+      context: ExpressContext,
+      info: GraphQLResolveInfo,
+    ) => any,
+    parent: any,
+    args: { [key: string]: any },
+    context: ExpressContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    const userId = await getUserIdFromContext(context);
+    const { applicantRecordId } = args;
+    if (
+      typeof applicantRecordId !== "string" ||
+      !(await canUserAccessInterview(userId, { applicantRecordId }))
+    ) {
+      throw new ForbiddenError("You are not assigned to this interview.");
     }
     return resolve(parent, args, context, info);
   };

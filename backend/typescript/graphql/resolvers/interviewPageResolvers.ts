@@ -1,5 +1,8 @@
 import { ExpressContext } from "apollo-server-express";
 import { FileUpload } from "graphql-upload";
+import ApplicantRecordService from "../../services/implementations/applicantRecordService";
+import ApplicantService from "../../services/implementations/applicantService";
+import { toApplicationDTO } from "../../utilities/dtoUtils";
 import { sequelize } from "../../models";
 
 import InterviewCompositeService from "../../services/implementations/interviewCompositeService";
@@ -8,6 +11,7 @@ import InterviewedApplicantRecordsService from "../../services/implementations/i
 import FirebaseFileService from "../../services/implementations/firebaseFileService";
 import FileStorageService from "../../services/implementations/fileStorageService";
 import {
+  ApplicationDTO,
   InterviewConflict,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -16,11 +20,16 @@ import {
   InterviewStatusEnum,
   UserDTO,
 } from "../../types";
-import { getUserIdFromContext } from "../../middlewares/auth";
+import {
+  canUserAccessInterview,
+  getUserIdFromContext,
+} from "../../middlewares/auth";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import { withUploadAsTempFile } from "../../utilities/graphqlUploadUtils";
 import { INTERVIEW_NOTES_TMP_DIR_PREFIX } from "../../constants/interviewNotes";
 
+const applicantRecordService = new ApplicantRecordService();
+const applicantService = new ApplicantService();
 const interviewNotesBucket = process.env.FIREBASE_STORAGE_DEFAULT_BUCKET || "";
 const firebaseFileService = new FirebaseFileService(
   new FileStorageService(interviewNotesBucket),
@@ -32,6 +41,26 @@ const interviewDelegationsService = new InterviewDelegationService();
 
 const interviewPageResolvers = {
   Query: {
+    canAccessInterview: async (
+      _parent: undefined,
+      { applicantRecordId }: { applicantRecordId: string },
+      context: ExpressContext,
+    ): Promise<boolean> => {
+      const userId = await getUserIdFromContext(context);
+      return canUserAccessInterview(userId, { applicantRecordId });
+    },
+    interviewApplication: async (
+      _parent: undefined,
+      { applicantRecordId }: { applicantRecordId: string },
+    ): Promise<ApplicationDTO> => {
+      const applicantRecord = await applicantRecordService.getApplicantRecordById(
+        applicantRecordId,
+      );
+      const applicant = await applicantService.getApplicantById(
+        applicantRecord.applicantId,
+      );
+      return toApplicationDTO(applicant, applicantRecord);
+    },
     interviewedApplicantsByUserId: async (
       _parent: undefined,
       { userId }: { userId: string },
