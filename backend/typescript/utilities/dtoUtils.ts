@@ -39,7 +39,11 @@ import User from "../models/user.model";
 import Project from "../models/project.model";
 import UserTermRecord from "../models/userTermRecord.model";
 import Position from "../models/position.model";
-import { MembersDashboardRowDTO } from "../types/membersDashboard";
+import {
+  MembersDashboardRowDTO,
+  MembersDashboardSidePanelDTO,
+} from "../types/membersDashboard";
+import { nodeModuleNameResolver } from "typescript";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -433,5 +437,24 @@ export function toMembersDashboardRowDTO(member: User): MembersDashboardRowDTO {
     team: currRecord?.project?.project_name ?? null,
     joined: firstRecord ? new Date(firstRecord.createdAt).toISOString() : null,
     isArchived: member.is_archived,
+  };
+}
+
+export function toMembersDashboardSidePanelDTO(
+  member: User,
+): MembersDashboardSidePanelDTO {
+  const termRecords = member.user_term_records ?? [];
+  const currRecord = termRecords[0];
+  const firstRecord = termRecords[termRecords.length - 1];
+
+  return {
+    id: member.id,
+    firstName: member.first_name,
+    lastName: member.last_name,
+    role: currRecord?.position_id ?? null,
+    team: currRecord?.project?.project_name ?? null,
+    joined: firstRecord ? new Date(firstRecord.createdAt).toISOString() : null,
+    isArchived: member.is_archived,
+    pastTeams: termRecords.slice(1),
   };
 }
