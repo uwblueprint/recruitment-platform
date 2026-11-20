@@ -715,6 +715,7 @@ export type Query = {
   adminCommentById: AdminCommentDto;
   adminCommentsByApplicantRecordId: Array<AdminCommentDto>;
   application: ApplicationDto;
+  canReviewApplicant: Scalars['Boolean']['output'];
   dashboardFilterOptions: DashboardFilterOptionsDto;
   entities: Array<EntityResponseDto>;
   entitiesCSV: Scalars['String']['output'];
@@ -770,6 +771,11 @@ export type QueryAdminCommentsByApplicantRecordIdArgs = {
 
 
 export type QueryApplicationArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
+export type QueryCanReviewApplicantArgs = {
   applicantRecordId: Scalars['ID']['input'];
 };
 

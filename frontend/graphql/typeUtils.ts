@@ -418,3 +418,5 @@ export type {
 export type MembersDashboardResult = ArrayElement<
   OperationField<Operations.MembersDashboardQuery, "membersDashboard">
 >;
+
+export { CanReviewApplicantDocument } from "./__generated__/graphql";
