@@ -1,3 +1,8 @@
+import { ExpressContext } from "apollo-server-express";
+import {
+  canUserReviewApplicant,
+  getUserIdFromContext,
+} from "../../middlewares/auth";
 import {
   ApplicantRecordWithReviewersDTO,
   ApplicationDTO,
@@ -17,6 +22,14 @@ const reviewedApplicantRecordService = new ReviewedApplicantRecordService();
 const reviewCompositeService = new ReviewCompositeService();
 const reviewPageResolvers = {
   Query: {
+    canReviewApplicant: async (
+      _parent: undefined,
+      { applicantRecordId }: { applicantRecordId: string },
+      context: ExpressContext,
+    ): Promise<boolean> => {
+      const userId = await getUserIdFromContext(context);
+      return canUserReviewApplicant(userId, applicantRecordId);
+    },
     application: async (
       _parent: undefined,
       { applicantRecordId }: { applicantRecordId: string },

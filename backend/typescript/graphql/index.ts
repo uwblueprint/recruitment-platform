@@ -125,10 +125,16 @@ const graphQLMiddlewares = {
     projects: authorizedByAdmin(),
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
-    reviewedApplicantRecord: authorizedByAdmin(),
-    reviewedApplicantRecordsByApplicantRecordId: isAuthorizedForApplicantReview(),
-    reviewedApplicantsByUserId: authorizedByAllRoles(),
-    application: authorizedByAllRoles(),
+    reviewedApplicantRecord: isAuthorizedForApplicantReview({
+      requireOwnReview: true,
+    }),
+    reviewedApplicantRecordsByApplicantRecordId: isAuthorizedForApplicantReview(
+      {
+        allowAdminRead: true,
+      },
+    ),
+    reviewedApplicantsByUserId: isAuthorizedByUserId("userId"),
+    application: isAuthorizedForApplicantReview({ allowAdminRead: true }),
     interviewedApplicantRecord: authorizedByAllRoles(),
     interviewDelegation: authorizedByAllRoles(),
     interviewGroup: authorizedByAllRoles(),
@@ -174,10 +180,14 @@ const graphQLMiddlewares = {
     updateApplicantRecordIsApplicantFlagged: authorizedByAdmin(),
     updateApplicantRecordShortlistedForInterview: authorizedByAdmin(),
     createReviewedApplicantRecord: authorizedByAdmin(),
-    updateReviewedApplicantRecord: authorizedByAllRoles(),
+    updateReviewedApplicantRecord: isAuthorizedForApplicantReview({
+      requireOwnReview: true,
+    }),
     deleteReviewedApplicantRecord: authorizedByAdmin(),
     bulkCreateReviewedApplicantRecord: authorizedByAdmin(),
-    reportReviewConflict: authorizedByAllRoles(),
+    reportReviewConflict: isAuthorizedForApplicantReview({
+      requireOwnReview: true,
+    }),
     reportInterviewConflict: authorizedByAllRoles(),
     createInterviewedApplicantRecord: authorizedByAdmin(),
     updateInterviewedApplicantRecord: authorizedByAllRoles(),
