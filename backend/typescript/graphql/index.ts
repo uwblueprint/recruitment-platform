@@ -148,6 +148,7 @@ const graphQLMiddlewares = {
     interviewersByGroupId: isAuthorizedForInterviewGroup(),
     interviewNotes: isAuthorizedForInterview(),
     interviewedApplicantRecordByApplicantRecordId: isAuthorizedForInterviewByApplicantRecord(),
+    interviewReviewDetails: isAuthorizedForInterviewByApplicantRecord(),
     interviewApplication: isAuthorizedForInterviewByApplicantRecord(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardCounts: authorizedByAdmin(),

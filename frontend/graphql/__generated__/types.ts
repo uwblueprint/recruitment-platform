@@ -732,6 +732,7 @@ export type Query = {
   interviewInvites: Array<InterviewInviteDto>;
   interviewInvitesCounts: InterviewInvitesCountsDto;
   interviewNotes?: Maybe<InterviewNotes>;
+  interviewReviewDetails: ApplicantRecordWithReviewersDto;
   interviewUnmatchedApplicants: Array<InterviewUnmatchedApplicantsByPositionDto>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
@@ -859,6 +860,11 @@ export type QueryInterviewInvitesCountsArgs = {
 
 export type QueryInterviewNotesArgs = {
   interviewedApplicantRecordId: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewReviewDetailsArgs = {
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 

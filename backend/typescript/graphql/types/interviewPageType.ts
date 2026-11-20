@@ -21,6 +21,9 @@ const interviewPageType = gql`
   }
 
   extend type Query {
+    interviewReviewDetails(
+      applicantRecordId: ID!
+    ): ApplicantRecordWithReviewersDTO!
     canAccessInterview(applicantRecordId: ID!): Boolean!
     interviewApplication(applicantRecordId: ID!): ApplicationDTO!
     interviewedApplicantsByUserId(userId: ID!): [InterviewedApplicantsDTO!]!

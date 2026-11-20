@@ -1,5 +1,6 @@
 import { ExpressContext } from "apollo-server-express";
 import { FileUpload } from "graphql-upload";
+import ReviewCompositeService from "../../services/implementations/reviewCompositeService";
 import ApplicantRecordService from "../../services/implementations/applicantRecordService";
 import ApplicantService from "../../services/implementations/applicantService";
 import { toApplicationDTO } from "../../utilities/dtoUtils";
@@ -12,6 +13,7 @@ import FirebaseFileService from "../../services/implementations/firebaseFileServ
 import FileStorageService from "../../services/implementations/fileStorageService";
 import {
   ApplicationDTO,
+  ApplicantRecordWithReviewersDTO,
   InterviewConflict,
   InterviewedApplicantRecordDTO,
   InterviewedApplicantsDTO,
@@ -35,12 +37,21 @@ const firebaseFileService = new FirebaseFileService(
   new FileStorageService(interviewNotesBucket),
 );
 
+const reviewCompositeService = new ReviewCompositeService();
 const interviewCompositeService = new InterviewCompositeService();
 const interviewedApplicantRecordsService = new InterviewedApplicantRecordsService();
 const interviewDelegationsService = new InterviewDelegationService();
 
 const interviewPageResolvers = {
   Query: {
+    interviewReviewDetails: async (
+      _parent: undefined,
+      { applicantRecordId }: { applicantRecordId: string },
+    ): Promise<ApplicantRecordWithReviewersDTO> => {
+      return reviewCompositeService.getReviewedApplicantRecordsByApplicantRecordId(
+        applicantRecordId,
+      );
+    },
     canAccessInterview: async (
       _parent: undefined,
       { applicantRecordId }: { applicantRecordId: string },

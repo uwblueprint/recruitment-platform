@@ -1,0 +1,3 @@
+query CanAccessInterview($applicantRecordId: ID!) {
+  canAccessInterview(applicantRecordId: $applicantRecordId)
+}

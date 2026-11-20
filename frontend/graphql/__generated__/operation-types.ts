@@ -26,6 +26,13 @@ export type BulkUpdateApplicantRecordsStatusMutationVariables = Exact<{
 
 export type BulkUpdateApplicantRecordsStatusMutation = { bulkUpdateApplicantRecordsStatus: Array<{ id: string, status: Types.ApplicationStatus }> };
 
+export type CanAccessInterviewQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type CanAccessInterviewQuery = { canAccessInterview: boolean };
+
 export type CanAccessInterviewGroupQueryVariables = Exact<{
   groupId: string | number;
 }>;
@@ -60,6 +67,13 @@ export type DeleteAdminCommentByIdMutationVariables = Exact<{
 
 
 export type DeleteAdminCommentByIdMutation = { deleteAdminCommentById: { id: string } };
+
+export type InterviewApplicationQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type InterviewApplicationQuery = { interviewApplication: { id: string, academicOrCoop: string, academicYear: string, email: string, firstName: string, lastName: string, heardFrom: string, locationPreference: string, program: string, pronouns: string, pronounsSpecified: string, resumeUrl: string, status: Types.ApplicationStatus, term: string, timesApplied: string, roleSpecificQuestions: Array<{ question: string, answer: string }>, shortAnswerQuestions: Array<{ question: string, answer: string }> } };
 
 export type InterviewDashboardQueryVariables = Exact<{
   pageNumber: number;
@@ -117,6 +131,13 @@ export type InterviewNotesQueryVariables = Exact<{
 
 
 export type InterviewNotesQuery = { interviewNotes: { fileId: string, fileName: string, signedUrl: string } | null };
+
+export type InterviewReviewDetailsQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type InterviewReviewDetailsQuery = { interviewReviewDetails: { applicantRecord: { id: string, position: string, combinedReviewScore: number | null }, reviewedApplicantRecords: Array<{ reviewer: { id: string, firstName: string, lastName: string, email: string, role: Types.Role, position: string | null, isArchived: boolean }, reviewedApplicantRecord: { status: string, score: number | null, reviewerHasConflict: boolean, review: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } }> } };
 
 export type InterviewUnmatchedApplicantsQueryVariables = Exact<{ [key: string]: never; }>;
 

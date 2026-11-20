@@ -422,3 +422,5 @@ export type MembersDashboardResult = ArrayElement<
 export { CanReviewApplicantDocument } from "./__generated__/graphql";
 
 export { CanAccessInterviewGroupDocument } from "./__generated__/graphql";
+
+export { CanAccessInterviewDocument, InterviewApplicationDocument, InterviewReviewDetailsDocument } from "./__generated__/graphql";

@@ -1,10 +1,10 @@
-import useApplication from "@/APIClients/queries/useApplication";
-import useReviewedApplicantRecordsByApplicantRecordId from "@/APIClients/queries/useReviewedApplicantRecordsByApplicantRecordId";
+import useInterviewApplication from "@/APIClients/queries/useInterviewApplication";
+import useInterviewReviewDetails from "@/APIClients/queries/useInterviewReviewDetails";
 
 export default function useInterviewProfile(applicantRecordId?: string) {
-  const applicationQuery = useApplication(applicantRecordId);
+  const applicationQuery = useInterviewApplication(applicantRecordId);
   const reviewersQuery =
-    useReviewedApplicantRecordsByApplicantRecordId(applicantRecordId);
+    useInterviewReviewDetails(applicantRecordId);
 
   const isLoading =
     !!applicantRecordId && (applicationQuery.loading || reviewersQuery.loading);
