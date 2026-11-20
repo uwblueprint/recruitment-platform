@@ -312,7 +312,7 @@ export type SendRejectionEmailsMutationVariables = Exact<{
 export type SendRejectionEmailsMutation = { sendRejectionEmails: { sent: Array<string>, failed: Array<{ to: string, error: string }> } };
 
 export type SubmitInterviewScoresMutationVariables = Exact<{
-  id: string | number;
+  interviewedApplicantRecordId: string | number;
   interviewJson: Types.InterviewInput;
 }>;
 
