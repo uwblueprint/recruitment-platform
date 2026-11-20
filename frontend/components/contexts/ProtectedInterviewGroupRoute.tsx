@@ -1,3 +1,4 @@
+import { StatusPage } from "@/components/layouts/StatusPage";
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import useCanAccessInterviewGroup from "@/APIClients/queries/useCanAccessInterviewGroup";
@@ -21,7 +22,15 @@ const InterviewGroupMembershipGuard = ({ children }: { children: ReactNode }) =>
 
   if (denied) return null;
   if (error) {
-    return <p role="alert" className="p-8">Unable to check interview group access. Please refresh and try again.</p>;
+    return (
+      <StatusPage
+        code={500}
+        role="alert"
+        title="Unable to check interview group access"
+        description="Please refresh and try again."
+        action={{ label: "Try again", onClick: () => router.reload() }}
+      />
+    );
   }
   if (!groupId || loading || data?.canAccessInterviewGroup !== true) {
     return <Loading />;

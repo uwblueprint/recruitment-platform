@@ -1,3 +1,4 @@
+import { StatusPage } from "@/components/layouts/StatusPage";
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/router";
 import useCanReviewApplicant from "@/APIClients/queries/useCanReviewApplicant";
@@ -21,7 +22,15 @@ const ReviewAssignmentGuard = ({ children }: { children: ReactNode }) => {
 
   if (denied) return null;
   if (error) {
-    return <p role="alert" className="p-8">Unable to check review access. Please refresh and try again.</p>;
+    return (
+      <StatusPage
+        code={500}
+        role="alert"
+        title="Unable to check review access"
+        description="Please refresh and try again."
+        action={{ label: "Try again", onClick: () => router.reload() }}
+      />
+    );
   }
   if (!applicantRecordId || loading || data?.canReviewApplicant !== true) {
     return <Loading />;
