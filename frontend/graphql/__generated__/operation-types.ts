@@ -26,6 +26,13 @@ export type BulkUpdateApplicantRecordsStatusMutationVariables = Exact<{
 
 export type BulkUpdateApplicantRecordsStatusMutation = { bulkUpdateApplicantRecordsStatus: Array<{ id: string, status: Types.ApplicationStatus }> };
 
+export type CanReviewApplicantQueryVariables = Exact<{
+  applicantRecordId: string | number;
+}>;
+
+
+export type CanReviewApplicantQuery = { canReviewApplicant: boolean };
+
 export type CreateAdminCommentMutationVariables = Exact<{
   adminComment: Types.CreateAdminCommentDto;
 }>;

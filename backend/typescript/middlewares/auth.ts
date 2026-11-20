@@ -1,5 +1,9 @@
 import { Request } from "express";
-import { AuthenticationError, ExpressContext } from "apollo-server-express";
+import {
+  AuthenticationError,
+  ForbiddenError,
+  ExpressContext,
+} from "apollo-server-express";
 import { GraphQLResolveInfo } from "graphql";
 
 import AuthService from "../services/implementations/authService";
@@ -76,8 +80,37 @@ export const isAuthorizedByRole = (roles: Set<Role>) => {
   };
 };
 
-/** Review details are available to admins and the applicant's assigned reviewers/interviewers. */
-export const isAuthorizedForApplicantReview = () => {
+/** Shared assignment rule for review middleware and the route-access query. */
+export const canUserReviewApplicant = async (
+  userId: number,
+  applicantRecordId: string,
+): Promise<boolean> => {
+  const review = await ReviewedApplicantRecord.findOne({
+    where: { applicant_record_id: applicantRecordId, reviewer_id: userId },
+    attributes: ["applicant_record_id"],
+  });
+  return !!review;
+};
+
+/**
+ * Requires the authenticated user to be assigned to the requested applicant.
+ * Assignment is required unless admin read access is explicitly enabled.
+ *
+ * @param options.requireOwnReview Enable for operations targeting a specific review
+ * (such as updates and conflict reports). In addition to assignment, requires
+ * args.reviewerId to match the authenticated user, preventing one assigned
+ * reviewer from modifying another reviewer's record. Leave false for shared
+ * review-page reads that only provide args.applicantRecordId.
+ * @param options.allowAdminRead Allow admins to read without an assignment. Never
+ * bypasses assignment or ownership for operations requiring their own review.
+ */
+export const isAuthorizedForApplicantReview = ({
+  requireOwnReview = false,
+  allowAdminRead = false,
+}: {
+  requireOwnReview?: boolean;
+  allowAdminRead?: boolean;
+} = {}) => {
   return async (
     resolve: (
       parent: any,
@@ -90,32 +123,26 @@ export const isAuthorizedForApplicantReview = () => {
     context: ExpressContext,
     info: GraphQLResolveInfo,
   ) => {
+    const userId = await getUserIdFromContext(context);
     const accessToken = getAccessToken(context.req);
-    if (accessToken) {
-      if (
-        await authService.isAuthorizedByRole(
-          accessToken,
-          new Set(["Admin", "SuperAdmin"]),
-        )
-      ) {
-        return resolve(parent, args, context, info);
-      }
-      if (
-        await authService.isAuthorizedByRole(accessToken, new Set(["User"]))
-      ) {
-        const userId = await authService.getUserIdByAccessToken(accessToken);
-        const review = await ReviewedApplicantRecord.findOne({
-          where: {
-            applicant_record_id: args.applicantRecordId,
-            reviewer_id: userId,
-          },
-        });
-        if (review) return resolve(parent, args, context, info);
-      }
+    if (
+      allowAdminRead &&
+      !requireOwnReview &&
+      accessToken &&
+      (await authService.isAuthorizedByRole(
+        accessToken,
+        new Set(["Admin", "SuperAdmin"]),
+      ))
+    ) {
+      return resolve(parent, args, context, info);
     }
-    throw new AuthenticationError(
-      "Failed authentication and/or authorization for applicant review",
-    );
+    if (
+      (requireOwnReview && String(args.reviewerId) !== String(userId)) ||
+      !(await canUserReviewApplicant(userId, args.applicantRecordId))
+    ) {
+      throw new ForbiddenError("You are not assigned to this review.");
+    }
+    return resolve(parent, args, context, info);
   };
 };
 
