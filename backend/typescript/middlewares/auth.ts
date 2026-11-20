@@ -11,6 +11,7 @@ import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import { Role } from "../types";
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
+import InterviewDelegation from "../models/interviewDelegation.model";
 
 const authService: IAuthService = new AuthService(new UserService());
 
@@ -141,6 +142,44 @@ export const isAuthorizedForApplicantReview = ({
       !(await canUserReviewApplicant(userId, args.applicantRecordId))
     ) {
       throw new ForbiddenError("You are not assigned to this review.");
+    }
+    return resolve(parent, args, context, info);
+  };
+};
+
+/** Shared membership rule for group middleware and the route-access query. */
+export const canUserAccessInterviewGroup = async (
+  userId: number,
+  groupId: string,
+): Promise<boolean> => {
+  const delegation = await InterviewDelegation.findOne({
+    where: { group_id: groupId, interviewer_id: userId },
+    attributes: ["interviewer_id"],
+  });
+  return !!delegation;
+};
+
+/** Requires membership in args.groupId for every role, including admins. */
+export const isAuthorizedForInterviewGroup = () => {
+  return async (
+    resolve: (
+      parent: any,
+      args: { [key: string]: any },
+      context: ExpressContext,
+      info: GraphQLResolveInfo,
+    ) => any,
+    parent: any,
+    args: { [key: string]: any },
+    context: ExpressContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    const userId = await getUserIdFromContext(context);
+    const { groupId } = args;
+    if (
+      typeof groupId !== "string" ||
+      !(await canUserAccessInterviewGroup(userId, groupId))
+    ) {
+      throw new ForbiddenError("You are not assigned to this interview group.");
     }
     return resolve(parent, args, context, info);
   };

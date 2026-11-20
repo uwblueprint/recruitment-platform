@@ -8,6 +8,7 @@ import {
   isAuthorizedByRole,
   isAuthorizedByUserId,
   isAuthorizedForApplicantReview,
+  isAuthorizedForInterviewGroup,
 } from "../middlewares/auth";
 import adminCommentResolvers from "./resolvers/adminCommentResolvers";
 import applicantRecordResolvers from "./resolvers/applicantRecordResolvers";
@@ -137,10 +138,10 @@ const graphQLMiddlewares = {
     application: isAuthorizedForApplicantReview({ allowAdminRead: true }),
     interviewedApplicantRecord: authorizedByAllRoles(),
     interviewDelegation: authorizedByAllRoles(),
-    interviewGroup: authorizedByAllRoles(),
+    interviewGroup: isAuthorizedForInterviewGroup(),
     interviewedApplicantsByUserId: authorizedByAllRoles(),
     interviewedPairingsByUserId: authorizedByAllRoles(),
-    interviewersByGroupId: authorizedByAllRoles(),
+    interviewersByGroupId: isAuthorizedForInterviewGroup(),
     interviewNotes: authorizedByAllRoles(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardCounts: authorizedByAdmin(),
@@ -198,7 +199,7 @@ const graphQLMiddlewares = {
     bulkCreateInterviewDelegations: authorizedByAdmin(),
     createInterviewGroup: authorizedByAdmin(),
     updateInterviewGroup: authorizedByAdmin(),
-    updateInterviewGroupSchedulingLink: authorizedByAllRoles(),
+    updateInterviewGroupSchedulingLink: isAuthorizedForInterviewGroup(),
     deleteInterviewGroupById: authorizedByAdmin(),
     bulkCreateInterviewGroups: authorizedByAdmin(),
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),

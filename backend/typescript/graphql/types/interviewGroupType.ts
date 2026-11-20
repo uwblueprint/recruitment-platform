@@ -24,6 +24,7 @@ const interviewGroupTypes = gql`
   }
 
   extend type Query {
+    canAccessInterviewGroup(groupId: ID!): Boolean!
     interviewGroup(id: ID!): InterviewGroupDTO!
   }
 

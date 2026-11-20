@@ -1,3 +1,8 @@
+import { ExpressContext } from "apollo-server-express";
+import {
+  canUserAccessInterviewGroup,
+  getUserIdFromContext,
+} from "../../middlewares/auth";
 import InterviewGroupService from "../../services/implementations/interviewGroupService";
 import IInterviewGroupService from "../../services/interfaces/IInterviewGroupService";
 import {
@@ -11,6 +16,14 @@ const interviewGroupService: IInterviewGroupService = new InterviewGroupService(
 
 const interviewGroupResolvers = {
   Query: {
+    canAccessInterviewGroup: async (
+      _parent: undefined,
+      { groupId }: { groupId: string },
+      context: ExpressContext,
+    ): Promise<boolean> => {
+      const userId = await getUserIdFromContext(context);
+      return canUserAccessInterviewGroup(userId, groupId);
+    },
     interviewGroup: async (
       _parent: undefined,
       { id }: { id: string },
