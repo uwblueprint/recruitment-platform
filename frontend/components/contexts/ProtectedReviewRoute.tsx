@@ -20,7 +20,6 @@ const ReviewAssignmentGuard = ({ children }: { children: ReactNode }) => {
     return (
       <StatusPage
         code={503}
-        role="alert"
         title="Review access denied"
         description="You’re not assigned to review this applicant. If you believe you should be assigned, please contact an administrator."
       />
@@ -30,7 +29,6 @@ const ReviewAssignmentGuard = ({ children }: { children: ReactNode }) => {
     return (
       <StatusPage
         code={500}
-        role="alert"
         title="Unable to check review access"
         description="Please refresh and try again."
         action={{ label: "Try again", onClick: () => router.reload() }}

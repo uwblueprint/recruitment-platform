@@ -20,7 +20,6 @@ const InterviewGroupMembershipGuard = ({ children }: { children: ReactNode }) =>
     return (
       <StatusPage
         code={503}
-        role="alert"
         title="Interview group access denied"
         description="You’re not a member of this interview group. If you believe you should be assigned to this group, please contact an administrator."
       />
@@ -30,7 +29,6 @@ const InterviewGroupMembershipGuard = ({ children }: { children: ReactNode }) =>
     return (
       <StatusPage
         code={500}
-        role="alert"
         title="Unable to check interview group access"
         description="Please refresh and try again."
         action={{ label: "Try again", onClick: () => router.reload() }}
