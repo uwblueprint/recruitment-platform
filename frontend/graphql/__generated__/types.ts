@@ -522,7 +522,7 @@ export type MutationDeleteInterviewGroupByIdArgs = {
 
 
 export type MutationDeleteInterviewedApplicantRecordByIdArgs = {
-  id: Scalars['ID']['input'];
+  interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -611,8 +611,8 @@ export type MutationSendRejectionEmailsArgs = {
 
 
 export type MutationSubmitInterviewScoresArgs = {
-  id: Scalars['ID']['input'];
   interviewJson: InterviewInput;
+  interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -667,8 +667,8 @@ export type MutationUpdateInterviewGroupSchedulingLinkArgs = {
 
 
 export type MutationUpdateInterviewedApplicantRecordArgs = {
-  id: Scalars['ID']['input'];
   interviewedApplicantRecord: UpdateInterviewedApplicantRecordDto;
+  interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -715,6 +715,7 @@ export type Query = {
   adminCommentById: AdminCommentDto;
   adminCommentsByApplicantRecordId: Array<AdminCommentDto>;
   application: ApplicationDto;
+  canAccessInterview: Scalars['Boolean']['output'];
   canAccessInterviewGroup: Scalars['Boolean']['output'];
   canReviewApplicant: Scalars['Boolean']['output'];
   dashboardFilterOptions: DashboardFilterOptionsDto;
@@ -722,6 +723,7 @@ export type Query = {
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
   file: Scalars['String']['output'];
+  interviewApplication: ApplicationDto;
   interviewDashboard: Array<InterviewDashboardRowDto>;
   interviewDashboardCounts: InterviewDashboardCountsDto;
   interviewDashboardSidePanel: InterviewDashboardSidePanelDto;
@@ -730,6 +732,7 @@ export type Query = {
   interviewInvites: Array<InterviewInviteDto>;
   interviewInvitesCounts: InterviewInvitesCountsDto;
   interviewNotes?: Maybe<InterviewNotes>;
+  interviewReviewDetails: ApplicantRecordWithReviewersDto;
   interviewUnmatchedApplicants: Array<InterviewUnmatchedApplicantsByPositionDto>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
@@ -776,6 +779,11 @@ export type QueryApplicationArgs = {
 };
 
 
+export type QueryCanAccessInterviewArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryCanAccessInterviewGroupArgs = {
   groupId: Scalars['ID']['input'];
 };
@@ -798,6 +806,11 @@ export type QueryEntityArgs = {
 
 export type QueryFileArgs = {
   fileUUID: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewApplicationArgs = {
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -850,8 +863,13 @@ export type QueryInterviewNotesArgs = {
 };
 
 
+export type QueryInterviewReviewDetailsArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryInterviewedApplicantRecordArgs = {
-  id: Scalars['ID']['input'];
+  interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
 

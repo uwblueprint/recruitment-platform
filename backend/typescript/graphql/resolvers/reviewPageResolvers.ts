@@ -10,9 +10,9 @@ import {
   ReviewedApplicantsDTO,
   ReviewStatusEnum,
 } from "../../types";
-import { toApplicationDTO } from "../../utilities/dtoUtils";
 import ApplicantRecordService from "../../services/implementations/applicantRecordService";
 import ApplicantService from "../../services/implementations/applicantService";
+import { toApplicationDTO } from "../../utilities/dtoUtils";
 import ReviewedApplicantRecordService from "../../services/implementations/reviewedApplicantRecordService";
 import ReviewCompositeService from "../../services/implementations/reviewCompositeService";
 

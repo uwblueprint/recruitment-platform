@@ -118,13 +118,10 @@ const InterviewAssessmentPage: NextPageWithLayout = () => {
 
 // Wrap the entire layout in AssessmentProvider so both the page body and the
 // footer (which sits outside the page slot in SplitPanelLayout) share state.
-InterviewAssessmentPage.getLayout = (page) => (
-  <AssessmentProvider>
-    {getInterviewLayout(
-      <InterviewHeader steps={ASSESSMENT_HEADER_STEPS} />,
-      <AssessmentFooter />
-    )(page)}
-  </AssessmentProvider>
+InterviewAssessmentPage.getLayout = getInterviewLayout(
+  <InterviewHeader steps={ASSESSMENT_HEADER_STEPS} />,
+  <AssessmentFooter />,
+  (layout) => <AssessmentProvider>{layout}</AssessmentProvider>,
 );
 
 export default InterviewAssessmentPage;

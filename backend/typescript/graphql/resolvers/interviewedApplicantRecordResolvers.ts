@@ -13,10 +13,12 @@ const interviewedApplicantRecordsResolvers = {
   Query: {
     interviewedApplicantRecord: async (
       _parent: undefined,
-      { id }: { id: string },
+      {
+        interviewedApplicantRecordId,
+      }: { interviewedApplicantRecordId: string },
     ): Promise<InterviewedApplicantRecordDTO> => {
       return interviewedApplicantRecordsService.getInterviewedApplicantRecordById(
-        id,
+        interviewedApplicantRecordId,
       );
     },
   },
@@ -35,34 +37,39 @@ const interviewedApplicantRecordsResolvers = {
     updateInterviewedApplicantRecord: async (
       _parent: undefined,
       {
-        id,
+        interviewedApplicantRecordId,
         interviewedApplicantRecord,
       }: {
-        id: string;
+        interviewedApplicantRecordId: string;
         interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO;
       },
     ): Promise<InterviewedApplicantRecordDTO> => {
       return interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
-        id,
+        interviewedApplicantRecordId,
         interviewedApplicantRecord,
       );
     },
 
     deleteInterviewedApplicantRecordById: async (
       _parent: undefined,
-      { id }: { id: string },
+      {
+        interviewedApplicantRecordId,
+      }: { interviewedApplicantRecordId: string },
     ): Promise<InterviewedApplicantRecordDTO> => {
       return interviewedApplicantRecordsService.deleteInterviewedApplicantRecordById(
-        id,
+        interviewedApplicantRecordId,
       );
     },
 
     submitInterviewScores: async (
       _parent: undefined,
-      { id, interviewJson }: { id: string; interviewJson: Interview },
+      {
+        interviewedApplicantRecordId,
+        interviewJson,
+      }: { interviewedApplicantRecordId: string; interviewJson: Interview },
     ): Promise<InterviewedApplicantRecordDTO> => {
       return interviewedApplicantRecordsService.updateInterviewedApplicantRecord(
-        id,
+        interviewedApplicantRecordId,
         { interviewJson },
       );
     },
