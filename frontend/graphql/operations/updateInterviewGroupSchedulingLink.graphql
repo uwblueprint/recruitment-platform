@@ -1,5 +1,5 @@
-mutation UpdateInterviewGroupSchedulingLink($id: ID!, $schedulingLink: String!) {
-  updateInterviewGroupSchedulingLink(id: $id, schedulingLink: $schedulingLink) {
+mutation UpdateInterviewGroupSchedulingLink($groupId: ID!, $schedulingLink: String!) {
+  updateInterviewGroupSchedulingLink(groupId: $groupId, schedulingLink: $schedulingLink) {
     id
     schedulingLink
     status

@@ -26,9 +26,9 @@ const interviewGroupResolvers = {
     },
     interviewGroup: async (
       _parent: undefined,
-      { id }: { id: string },
+      { groupId }: { groupId: string },
     ): Promise<InterviewGroupDTO> => {
-      return interviewGroupService.getInterviewGroupById(id);
+      return interviewGroupService.getInterviewGroupById(groupId);
     },
   },
 
@@ -43,18 +43,21 @@ const interviewGroupResolvers = {
     updateInterviewGroup: async (
       _parent: undefined,
       {
-        id,
+        groupId,
         interviewGroup,
-      }: { id: string; interviewGroup: UpdateInterviewGroupDTO },
+      }: { groupId: string; interviewGroup: UpdateInterviewGroupDTO },
     ): Promise<InterviewGroupDTO> => {
-      return interviewGroupService.updateInterviewGroup(id, interviewGroup);
+      return interviewGroupService.updateInterviewGroup(
+        groupId,
+        interviewGroup,
+      );
     },
 
     updateInterviewGroupSchedulingLink: async (
       _parent: undefined,
-      { id, schedulingLink }: { id: string; schedulingLink: string },
+      { groupId, schedulingLink }: { groupId: string; schedulingLink: string },
     ): Promise<InterviewGroupDTO> => {
-      return interviewGroupService.updateInterviewGroup(id, {
+      return interviewGroupService.updateInterviewGroup(groupId, {
         schedulingLink,
         status: InterviewGroupStatusEnum.READY_TO_INTERVIEW,
       });
@@ -62,9 +65,9 @@ const interviewGroupResolvers = {
 
     deleteInterviewGroupById: async (
       _parent: undefined,
-      { id }: { id: string },
+      { groupId }: { groupId: string },
     ): Promise<InterviewGroupDTO> => {
-      return interviewGroupService.deleteInterviewGroupById(id);
+      return interviewGroupService.deleteInterviewGroupById(groupId);
     },
 
     bulkCreateInterviewGroups: async (

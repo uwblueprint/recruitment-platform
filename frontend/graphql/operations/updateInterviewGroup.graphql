@@ -1,8 +1,8 @@
 mutation UpdateInterviewGroup(
-  $id: ID!
+  $groupId: ID!
   $interviewGroup: UpdateInterviewGroupDTO!
 ) {
-  updateInterviewGroup(id: $id, interviewGroup: $interviewGroup) {
+  updateInterviewGroup(groupId: $groupId, interviewGroup: $interviewGroup) {
     id
     schedulingLink
     status

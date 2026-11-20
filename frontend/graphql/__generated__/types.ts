@@ -517,7 +517,7 @@ export type MutationDeleteInterviewDelegationArgs = {
 
 
 export type MutationDeleteInterviewGroupByIdArgs = {
-  id: Scalars['ID']['input'];
+  groupId: Scalars['ID']['input'];
 };
 
 
@@ -655,13 +655,13 @@ export type MutationUpdateInterviewDelegationArgs = {
 
 
 export type MutationUpdateInterviewGroupArgs = {
-  id: Scalars['ID']['input'];
+  groupId: Scalars['ID']['input'];
   interviewGroup: UpdateInterviewGroupDto;
 };
 
 
 export type MutationUpdateInterviewGroupSchedulingLinkArgs = {
-  id: Scalars['ID']['input'];
+  groupId: Scalars['ID']['input'];
   schedulingLink: Scalars['String']['input'];
 };
 
@@ -715,6 +715,7 @@ export type Query = {
   adminCommentById: AdminCommentDto;
   adminCommentsByApplicantRecordId: Array<AdminCommentDto>;
   application: ApplicationDto;
+  canAccessInterviewGroup: Scalars['Boolean']['output'];
   canReviewApplicant: Scalars['Boolean']['output'];
   dashboardFilterOptions: DashboardFilterOptionsDto;
   entities: Array<EntityResponseDto>;
@@ -775,6 +776,11 @@ export type QueryApplicationArgs = {
 };
 
 
+export type QueryCanAccessInterviewGroupArgs = {
+  groupId: Scalars['ID']['input'];
+};
+
+
 export type QueryCanReviewApplicantArgs = {
   applicantRecordId: Scalars['ID']['input'];
 };
@@ -822,7 +828,7 @@ export type QueryInterviewDelegationArgs = {
 
 
 export type QueryInterviewGroupArgs = {
-  id: Scalars['ID']['input'];
+  groupId: Scalars['ID']['input'];
 };
 
 

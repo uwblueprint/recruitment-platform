@@ -5,22 +5,22 @@ import {
   type InterviewGroupQueryVariables,
 } from "@/graphql/typeUtils";
 
-export default function useInterviewGroup(id?: string) {
+export default function useInterviewGroup(groupId?: string) {
   const { data, loading, error, refetch } = useQuery<
     InterviewGroupQuery,
     InterviewGroupQueryVariables
   >(
     InterviewGroupDocument,
-    id
+    groupId
       ? {
-          variables: { id },
+          variables: { groupId },
           fetchPolicy: "network-only",
           context: { refreshAuth: true },
         }
       : skipToken
   );
 
-  if (!id) {
+  if (!groupId) {
     return { data: undefined, loading: false, error: undefined, refetch };
   }
   const result = data?.interviewGroup;
