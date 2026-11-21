@@ -215,6 +215,13 @@ export type MembersDashboardCountQueryVariables = Exact<{ [key: string]: never; 
 
 export type MembersDashboardCountQuery = { membersDashboardCount: number };
 
+export type MembersDashboardSidePanelQueryVariables = Exact<{
+  userId: string | number;
+}>;
+
+
+export type MembersDashboardSidePanelQuery = { membersDashboardSidePanel: { id: string, firstName: string, lastName: string, role: string | null, team: string | null, joined: string | null, isArchived: boolean, pastTeams: Array<{ team: string | null, role: string, term: string }> } };
+
 export type PositionsQueryVariables = Exact<{
   isArchived?: boolean | null | undefined;
 }>;

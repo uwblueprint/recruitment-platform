@@ -1,4 +1,5 @@
 import type { FilterOption } from "@/components/dashboard/filters";
+import { MembersDashboardRowDTO } from "../../backend/typescript/types/membersDashboard";
 
 /** Display-ready row; map the generated query result to this shape in the API hook. */
 export type Member = {
@@ -12,6 +13,16 @@ export type Member = {
 
 export type MemberSidePanelDetails = Member & {
   pastTeams: { team: string; role: string; term: string }[];
+};
+
+export type MemberPastTeamDTO = {
+  team: string | null;
+  role: string;
+  term: string;
+};
+
+export type MembersDashboardSidePanelDTO = MembersDashboardRowDTO & {
+  pastTeams: MemberPastTeamDTO[];
 };
 
 /** Temporary query types until the members GraphQL operation is generated. */

@@ -1,20 +1,36 @@
+import { useMemo } from "react";
+import { useQuery } from "@apollo/client/react";
+import {
+  MembersDashboardSidePanelDocument,
+  type MembersDashboardSidePanelResult,
+} from "@/graphql/typeUtils";
 import type { MemberSidePanelDetails } from "@/types/membersDashboard";
-import { MOCK_MEMBERS, refetchMockMembers } from "./mocks/membersDashboard";
+import { toMember } from "./useMembersDashboard";
 
-// Temporary fixture, keyed by member ID like the future member details query.
-const MOCK_PAST_TEAMS: MemberSidePanelDetails["pastTeams"] = [
-  { team: "Internal Tools", role: "Product Designer", term: "S25" },
-  { team: "Design Team", role: "VP of Design", term: "W25" },
-  { team: "LLSC", role: "Product Designer", term: "F24" },
-];
+const toSidePanelDetails = (
+  result: MembersDashboardSidePanelResult,
+): MemberSidePanelDetails => ({
+  ...toMember(result),
+  pastTeams: result.pastTeams.map(({ team, role, term }) => ({
+    team: team ?? "Unassigned",
+    role,
+    term,
+  })),
+});
 
-/** Replace with useQuery once the member details operation is available. */
 export default function useMembersDashboardSidePanel(memberId?: string) {
-  const member = MOCK_MEMBERS.find(({ id }) => id === memberId);
-  return {
-    data: member ? { ...member, pastTeams: MOCK_PAST_TEAMS } : undefined,
-    loading: false,
-    error: memberId && !member ? new Error("Member not found") : undefined,
-    refetch: refetchMockMembers,
-  };
+  const { data, loading, error, refetch } = useQuery(
+    MembersDashboardSidePanelDocument,
+    {
+      variables: { userId: memberId ?? "" },
+      skip: !memberId, // panel closed → no request
+      fetchPolicy: "network-only",
+      context: { refreshAuth: true },
+    },
+  );
+  const details = useMemo(
+    () => data && toSidePanelDetails(data.membersDashboardSidePanel),
+    [data],
+  );
+  return { data: details, loading, error, refetch };
 }
