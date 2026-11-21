@@ -1,5 +1,3 @@
-import UserTermRecord from "../models/userTermRecord.model";
-
 export type MembersDashboardRowDTO = {
   id: number;
   firstName: string;
@@ -10,13 +8,12 @@ export type MembersDashboardRowDTO = {
   isArchived: boolean;
 };
 
-export type MembersDashboardSidePanelDTO = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  role: string | null;
+export type MemberPastTeamDTO = {
   team: string | null;
-  joined: string | null;
-  isArchived: boolean;
-  pastTeams: UserTermRecord[];
+  role: string;
+  term: string;
+};
+
+export type MembersDashboardSidePanelDTO = MembersDashboardRowDTO & {
+  pastTeams: MemberPastTeamDTO[];
 };

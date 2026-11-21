@@ -443,18 +443,13 @@ export function toMembersDashboardSidePanelDTO(
   member: User,
 ): MembersDashboardSidePanelDTO {
   const termRecords = member.user_term_records ?? [];
-  const currRecord = termRecords.length > 0 ? termRecords[0] : null;
-  const firstRecord =
-    termRecords.length > 0 ? termRecords[termRecords.length - 1] : null;
 
   return {
-    id: member.id,
-    firstName: member.first_name,
-    lastName: member.last_name,
-    role: currRecord?.position_id ?? null,
-    team: currRecord?.project?.project_name ?? null,
-    joined: firstRecord ? new Date(firstRecord.createdAt).toISOString() : null,
-    isArchived: member.is_archived,
-    pastTeams: termRecords.slice(1),
+    ...toMembersDashboardRowDTO(member),
+    pastTeams: termRecords.slice(1).map((record) => ({
+      team: record.project?.project_name ?? null,
+      role: record.position_id,
+      term: record.term,
+    })),
   };
 }

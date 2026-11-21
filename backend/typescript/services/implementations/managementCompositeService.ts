@@ -87,7 +87,7 @@ class ManagementCompositeService implements IManagementCompositeService {
             as: "user_term_records",
             separate: true,
             required: false,
-            attributes: ["user_id", "position_id", "createdAt"],
+            attributes: ["user_id", "position_id", "term", "createdAt"],
             order: [["createdAt", "DESC"]],
             include: [
               {
