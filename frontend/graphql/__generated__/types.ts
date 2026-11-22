@@ -756,6 +756,7 @@ export type Query = {
   simpleEntities: Array<SimpleEntityResponseDto>;
   simpleEntitiesCSV: Scalars['String']['output'];
   simpleEntity: SimpleEntityResponseDto;
+  teamsDashboard: Array<TeamsDashboardTeamDto>;
   userByEmail: UserDto;
   userById: UserDto;
   users: Array<UserDto>;
@@ -969,6 +970,11 @@ export type QuerySimpleEntityArgs = {
 };
 
 
+export type QueryTeamsDashboardArgs = {
+  isArchived?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
 export type QueryUserByEmailArgs = {
   email: Scalars['String']['input'];
 };
@@ -1164,6 +1170,25 @@ export enum SkillCategory {
   Junior = 'JUNIOR',
   Senior = 'SENIOR'
 }
+
+export type TeamsDashboardMemberDto = {
+  __typename?: 'TeamsDashboardMemberDTO';
+  firstName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  joined?: Maybe<Scalars['String']['output']>;
+  lastName: Scalars['String']['output'];
+  role?: Maybe<Scalars['String']['output']>;
+  termsOnProject: Scalars['String']['output'];
+};
+
+export type TeamsDashboardTeamDto = {
+  __typename?: 'TeamsDashboardTeamDTO';
+  id: Scalars['ID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  members: Array<TeamsDashboardMemberDto>;
+  projectName: Scalars['String']['output'];
+};
 
 export type UnmatchedApplicantDto = {
   __typename?: 'UnmatchedApplicantDTO';

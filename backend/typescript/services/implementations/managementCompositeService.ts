@@ -2,7 +2,11 @@ import Project from "../../models/project.model";
 import User from "../../models/user.model";
 import UserTermRecord from "../../models/userTermRecord.model";
 import { MembersDashboardRowDTO } from "../../types/membersDashboard";
-import { toMembersDashboardRowDTO } from "../../utilities/dtoUtils";
+import { TeamsDashboardTeamDTO } from "../../types/teamsDashboard";
+import {
+  toMembersDashboardRowDTO,
+  toTeamsDashboardTeamDTO,
+} from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IManagementCompositeService from "../interfaces/IManagementCompositeService";
@@ -65,6 +69,40 @@ class ManagementCompositeService implements IManagementCompositeService {
         `Failed to get members dashboard count. Reason = ${getErrorMessage(
           error,
         )}`,
+      );
+      throw error;
+    }
+  }
+
+  async getTeamsDashboard(
+    isArchived: boolean | null,
+  ): Promise<TeamsDashboardTeamDTO[]> {
+    try {
+      const projects = await Project.findAll({
+        attributes: ["id", "project_name", "is_archived"],
+        where: isArchived === null ? undefined : { is_archived: isArchived },
+        include: [
+          {
+            model: UserTermRecord,
+            as: "user_term_records",
+            required: false,
+            attributes: ["user_id", "position_id", "createdAt"],
+            include: [
+              {
+                model: User,
+                as: "user",
+                required: false,
+                attributes: ["id", "first_name", "last_name", "is_archived"],
+              },
+            ],
+          },
+        ],
+        order: [["project_name", "ASC"]],
+      });
+      return projects.map(toTeamsDashboardTeamDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get teams dashboard. Reason = ${getErrorMessage(error)}`,
       );
       throw error;
     }

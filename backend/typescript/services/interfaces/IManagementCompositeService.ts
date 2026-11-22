@@ -1,4 +1,5 @@
 import { MembersDashboardRowDTO } from "../../types/membersDashboard";
+import { TeamsDashboardTeamDTO } from "../../types/teamsDashboard";
 
 interface IManagementCompositeService {
   /**
@@ -15,6 +16,14 @@ interface IManagementCompositeService {
    * Gets the total number of members shown on the members dashboard
    */
   getMembersDashboardCount(): Promise<number>;
+
+  /**
+   * Teams shown on the Active Teams and Archived Teams tabs.
+   * @param isArchived false for active teams, true for archived teams, null for both
+   */
+  getTeamsDashboard(
+    isArchived: boolean | null,
+  ): Promise<TeamsDashboardTeamDTO[]>;
 }
 
 export default IManagementCompositeService;

@@ -419,6 +419,12 @@ export type MembersDashboardResult = ArrayElement<
   OperationField<Operations.MembersDashboardQuery, "membersDashboard">
 >;
 
+export { TeamsDashboardDocument } from "./__generated__/graphql";
+export type {
+  TeamsDashboardQuery,
+  TeamsDashboardQueryVariables,
+} from "./__generated__/operation-types";
+
 export { CanReviewApplicantDocument } from "./__generated__/graphql";
 
 export { CanAccessInterviewGroupDocument } from "./__generated__/graphql";

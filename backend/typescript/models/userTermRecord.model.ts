@@ -7,6 +7,7 @@ import {
 } from "sequelize-typescript";
 // eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import User from "./user.model";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
 import Project from "./project.model";
 
 @Table({ tableName: "user_term_records" })
