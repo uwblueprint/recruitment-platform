@@ -9,17 +9,15 @@ import { useAuthUserContext, useAuthenticatedUser } from "@/components/contexts/
 import { UserIcon } from "@/components/icons/user.icon";
 import { LogoutIcon } from "@/components/icons/logout.icon";
 import { ArrowDownIcon } from "@/components/icons/arrow-down.icon";
+import useDepartments from "@/APIClients/queries/useDepartments";
+import {
+  DASHBOARD_ENUM,
+  getDashboardHref,
+} from "@/components/dashboard/common/DashboardSwitcher";
 
 interface NavbarButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
-
-const RECRUITMENT_DEPARTMENTS = [
-  "Community",
-  "Product",
-  "Design",
-  "Engineering",
-];
 
 const NavbarButton = ({ children, ...props }: NavbarButtonProps) => (
   <button
@@ -45,6 +43,15 @@ export const Navbar = () => {
     ? `${authenticatedUser.firstName} ${authenticatedUser.lastName.charAt(0)}`
     : "User";
   const router = useRouter();
+  const { data: departments } = useDepartments();
+  const currentDashboard = router.pathname.endsWith(`/${DASHBOARD_ENUM.INTERVIEW}`)
+    ? DASHBOARD_ENUM.INTERVIEW
+    : DASHBOARD_ENUM.REVIEW;
+  const selectedDepartment =
+    typeof router.query.department === "string"
+      ? router.query.department
+      : undefined;
+  const isAllRolesSelected = router.pathname === getDashboardHref(currentDashboard);
 
   useEffect(() => {
     const handleRouteChange = () => {
@@ -95,23 +102,23 @@ export const Navbar = () => {
             onClose={closeMenus}
           >
             <div className="py-1.5">
-              {RECRUITMENT_DEPARTMENTS.map((department) => {
-                const isSelected = router.query.department === department;
-
-                return (
-                  <NavbarPopoverItem
-                    key={department}
-                    href={{
-                      pathname: "/admin/review",
-                      query: { department },
-                    }}
-                    isSelected={isSelected}
-                    onClick={closeMenus}
-                  >
-                    {department}
-                  </NavbarPopoverItem>
-                );
-              })}
+              <NavbarPopoverItem
+                href={getDashboardHref(currentDashboard)}
+                isSelected={isAllRolesSelected}
+                onClick={closeMenus}
+              >
+                All roles
+              </NavbarPopoverItem>
+              {departments?.map(({ slug, name }) => (
+                <NavbarPopoverItem
+                  key={slug}
+                  href={getDashboardHref(currentDashboard, slug)}
+                  isSelected={selectedDepartment === slug}
+                  onClick={closeMenus}
+                >
+                  {name}
+                </NavbarPopoverItem>
+              ))}
             </div>
           </NavbarPopover>
         </div>

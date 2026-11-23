@@ -157,6 +157,7 @@ const graphQLMiddlewares = {
     interviewApplication: isAuthorizedForInterviewByApplicantRecord(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardCounts: authorizedByAdmin(),
+    reviewDashboardApplicantRecordIds: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
     dashboardFilterOptions: authorizedByAdmin(),
     reviewDashboardCSV: authorizedByAdmin(),

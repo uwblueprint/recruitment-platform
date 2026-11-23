@@ -17,6 +17,7 @@ import {
 } from "@tanstack/react-table";
 import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
 import { useRouter } from "next/router";
+import useDashboardDepartment from "@/hooks/useDashboardDepartment";
 import { useCallback, useMemo, useState } from "react";
 import { NextPageWithLayout } from "../../_app.page";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
@@ -47,7 +48,11 @@ type ReviewerReassignmentTarget = {
   reviewerName: string;
 };
 
-const AdminReviewPage: NextPageWithLayout = () => {
+interface ReviewDashboardProps {
+  department?: string;
+}
+
+const ReviewDashboard = ({ department }: ReviewDashboardProps) => {
   const router = useRouter();
   const position =
     typeof router.query.position === "string" ? router.query.position : null;
@@ -77,7 +82,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
 
   const [statusError, setStatusError] = useState(false);
 
-  const { data: filterOptions } = useDashboardFilterOptions({});
+  const { data: filterOptions } = useDashboardFilterOptions({ department });
   const { updateApplicantRecordStatus } = useUpdateApplicantRecordStatus();
 
   // build filter categories from backend options
@@ -114,6 +119,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
   // convert SelectedFilters to ReviewDashboardFilters for the backend
   const backendFilters = useMemo(
     (): ReviewDashboardFilters => ({
+      department,
       search: debouncedSearch.trim() ? debouncedSearch : undefined,
       positions: selectedFilters.position?.length
         ? selectedFilters.position
@@ -132,7 +138,7 @@ const AdminReviewPage: NextPageWithLayout = () => {
         ? true
         : undefined,
     }),
-    [selectedFilters, debouncedSearch]
+    [department, selectedFilters, debouncedSearch]
   );
 
   const { rows, isLoading, error, setRowStatus, refetch } = useReviewDashboard(
@@ -319,7 +325,10 @@ const AdminReviewPage: NextPageWithLayout = () => {
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
         <div className="flex shrink-0 items-center justify-between gap-4">
-          <DashboardSwitcher currentDashboard={DASHBOARD_ENUM.REVIEW} />
+          <DashboardSwitcher
+            currentDashboard={DASHBOARD_ENUM.REVIEW}
+            department={department}
+          />
           <ExportCSVButton isExporting={isExporting} onExport={exportCSV} />
         </div>
         {countsError ? (
@@ -430,6 +439,14 @@ const AdminReviewPage: NextPageWithLayout = () => {
       />
     </div>
   );
+};
+
+// Keyed on the department so switching departments starts from a clean slate;
+// a Role filter carried over from another department would match nothing.
+const AdminReviewPage: NextPageWithLayout = () => {
+  const { department, isReady } = useDashboardDepartment(DASHBOARD_ENUM.REVIEW);
+  if (!isReady) return null;
+  return <ReviewDashboard key={department ?? ""} department={department} />;
 };
 
 AdminReviewPage.getLayout = getAdminLayout;

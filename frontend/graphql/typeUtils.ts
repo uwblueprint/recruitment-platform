@@ -151,6 +151,7 @@ export {
   ReviewDashboardCsvDocument,
   ReviewDashboardSidePanelDocument,
   DashboardFilterOptionsDocument,
+  DepartmentsDocument,
   UpdateApplicantRecordStatusDocument,
   SubmitInterviewScoresDocument,
   UpdateInterviewGroupDocument,
@@ -232,6 +233,8 @@ export type {
   ReviewDashboardSidePanelQueryVariables,
   DashboardFilterOptionsQuery,
   DashboardFilterOptionsQueryVariables,
+  DepartmentsQuery,
+  DepartmentsQueryVariables,
   UpdateApplicantRecordStatusMutation,
   UpdateApplicantRecordStatusMutationVariables,
   SubmitInterviewScoresMutation,
@@ -362,6 +365,10 @@ export type ReviewDashboardSidePanelReviewDetail = ArrayElement<
 export type DashboardFilterOptionsResult = OperationField<
   Operations.DashboardFilterOptionsQuery,
   "dashboardFilterOptions"
+>;
+
+export type DepartmentResult = ArrayElement<
+  OperationField<Operations.DepartmentsQuery, "departments">
 >;
 
 export type ReviewedApplicantResult = ArrayElement<

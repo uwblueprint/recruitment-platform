@@ -137,6 +137,12 @@ export enum DashboardView {
   Shortlisted = 'SHORTLISTED'
 }
 
+export type DepartmentDto = {
+  __typename?: 'DepartmentDTO';
+  name: Scalars['String']['output'];
+  slug: Scalars['String']['output'];
+};
+
 export type EntityRequestDto = {
   boolField: Scalars['Boolean']['input'];
   contentType?: InputMaybe<Scalars['String']['input']>;
@@ -198,6 +204,7 @@ export type InterviewDashboardCountsDto = {
 export type InterviewDashboardFilters = {
   applicationStatuses?: InputMaybe<Array<ApplicationStatus>>;
   bookmarked?: InputMaybe<Scalars['Boolean']['input']>;
+  department?: InputMaybe<Scalars['String']['input']>;
   positions?: InputMaybe<Array<Scalars['String']['input']>>;
   scoreRanges?: InputMaybe<Array<Scalars['String']['input']>>;
   search?: InputMaybe<Scalars['String']['input']>;
@@ -719,6 +726,7 @@ export type Query = {
   canAccessInterviewGroup: Scalars['Boolean']['output'];
   canReviewApplicant: Scalars['Boolean']['output'];
   dashboardFilterOptions: DashboardFilterOptionsDto;
+  departments: Array<DepartmentDto>;
   entities: Array<EntityResponseDto>;
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
@@ -1022,6 +1030,7 @@ export type ReviewDashboardCountsDto = {
 export type ReviewDashboardFilters = {
   applicationStatuses?: InputMaybe<Array<ApplicationStatus>>;
   bookmarked?: InputMaybe<Scalars['Boolean']['input']>;
+  department?: InputMaybe<Scalars['String']['input']>;
   positions?: InputMaybe<Array<Scalars['String']['input']>>;
   scoreRanges?: InputMaybe<Array<Scalars['String']['input']>>;
   search?: InputMaybe<Scalars['String']['input']>;

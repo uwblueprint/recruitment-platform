@@ -22,6 +22,7 @@ import {
   type InterviewDashboardResult,
 } from "@/graphql/typeUtils";
 import useDebouncedValue from "@/hooks/useDebouncedValue";
+import useDashboardDepartment from "@/hooks/useDashboardDepartment";
 import {
   OnChangeFn,
   RowSelectionState,
@@ -69,7 +70,11 @@ const INTERVIEW_SCORE_RANGES = [
   { value: "lt_5", label: "< 5" },
 ];
 
-const InterviewDashboardPage: NextPageWithLayout = () => {
+interface InterviewDashboardProps {
+  department?: string;
+}
+
+const InterviewDashboard = ({ department }: InterviewDashboardProps) => {
   const [pageNumber, setPageNumber] = useState(1);
   const [resultsPerPage, setResultsPerPage] = useState(
     DEFAULT_RESULTS_PER_PAGE
@@ -108,7 +113,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const sortBy = activeSort ? COLUMN_ID_TO_SORT_BY[activeSort.id] : undefined;
   const sortAscending = activeSort ? !activeSort.desc : undefined;
 
-  const { data: filterOptions } = useDashboardFilterOptions({});
+  const { data: filterOptions } = useDashboardFilterOptions({ department });
 
   const filterCategories = useMemo(() => {
     if (!filterOptions) return [];
@@ -149,6 +154,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   // convert SelectedFilters to InterviewDashboardFilters for the backend
   const backendFilters = useMemo(
     (): InterviewDashboardFilters => ({
+      department,
       search: debouncedSearch.trim() ? debouncedSearch : undefined,
       positions: selectedFilters.position?.length
         ? selectedFilters.position
@@ -167,10 +173,11 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
         ? true
         : undefined,
     }),
-    [selectedFilters, debouncedSearch]
+    [department, selectedFilters, debouncedSearch]
   );
-  const hasActiveFilters = Object.values(backendFilters).some(
-    (value) => value !== undefined
+  // The department is the page's scope, not a filter the admin picked.
+  const hasActiveFilters = Object.entries(backendFilters).some(
+    ([key, value]) => key !== "department" && value !== undefined
   );
 
   const {
@@ -296,7 +303,10 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-white">
       <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden px-6 py-5">
-        <DashboardSwitcher currentDashboard={DASHBOARD_ENUM.INTERVIEW} />
+        <DashboardSwitcher
+          currentDashboard={DASHBOARD_ENUM.INTERVIEW}
+          department={department}
+        />
 
         {hasError ? (
           <div className="rounded border border-alert-errorBorder bg-red-50 px-4 py-3 text-sm text-alert-errorText">
@@ -402,6 +412,16 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
       ) : null}
     </div>
   );
+};
+
+// Keyed on the department so switching departments starts from a clean slate;
+// a Role filter carried over from another department would match nothing.
+const InterviewDashboardPage: NextPageWithLayout = () => {
+  const { department, isReady } = useDashboardDepartment(
+    DASHBOARD_ENUM.INTERVIEW
+  );
+  if (!isReady) return null;
+  return <InterviewDashboard key={department ?? ""} department={department} />;
 };
 
 InterviewDashboardPage.getLayout = getAdminLayout;
