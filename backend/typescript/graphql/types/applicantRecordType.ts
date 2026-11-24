@@ -39,7 +39,15 @@ const applicantRecordType = gql`
     failed: [RejectionEmailFailure!]!
   }
 
+  type PopulateApplicantRecordsResult {
+    term: String!
+    applicantsCreated: Int!
+    applicantRecordsCreated: Int!
+    skippedExistingEmails: [String!]!
+  }
+
   extend type Mutation {
+    populateApplicantRecords(term: String!): PopulateApplicantRecordsResult!
     sendRejectionEmails(ids: [ID!]!): RejectionEmailResult!
     updateApplicantRecordStatus(
       id: ID!

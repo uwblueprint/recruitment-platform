@@ -398,6 +398,7 @@ export type Mutation = {
   login: AuthDto;
   loginWithGoogle: AuthDto;
   logout?: Maybe<Scalars['ID']['output']>;
+  populateApplicantRecords: PopulateApplicantRecordsResult;
   reassignInterviewer: InterviewDelegationDto;
   reassignReviewer: ReviewedApplicantRecordDto;
   refresh: Scalars['String']['output'];
@@ -563,6 +564,11 @@ export type MutationLogoutArgs = {
 };
 
 
+export type MutationPopulateApplicantRecordsArgs = {
+  term: Scalars['String']['input'];
+};
+
+
 export type MutationReassignInterviewerArgs = {
   applicantRecordId: Scalars['ID']['input'];
   newInterviewerId: Scalars['ID']['input'];
@@ -694,6 +700,14 @@ export type MutationUpdateUserArgs = {
 export type MutationUploadInterviewNotesArgs = {
   file: Scalars['Upload']['input'];
   interviewedApplicantRecordId: Scalars['ID']['input'];
+};
+
+export type PopulateApplicantRecordsResult = {
+  __typename?: 'PopulateApplicantRecordsResult';
+  applicantRecordsCreated: Scalars['Int']['output'];
+  applicantsCreated: Scalars['Int']['output'];
+  skippedExistingEmails: Array<Scalars['String']['output']>;
+  term: Scalars['String']['output'];
 };
 
 export type PositionDto = {
