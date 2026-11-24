@@ -7,7 +7,7 @@ import {
 } from "@/components/dashboard/filters";
 import { Button } from "@/components/common/Button";
 import MailOutline from "@mui/icons-material/MailOutline";
-import MarkEmailReadOutlined from "@mui/icons-material/MarkEmailReadOutlined";
+import HowToRegOutlined from "@mui/icons-material/HowToRegOutlined";
 
 type InterviewDashboardToolbarProps = {
   search: {
@@ -68,7 +68,7 @@ export const InterviewDashboardToolbar = ({
         onClick={bulkActions.onOffer}
         className="flex items-center gap-2 !px-5"
       >
-        <MarkEmailReadOutlined fontSize="small" />
+        <HowToRegOutlined fontSize="small" />
         Send Offer
       </Button>
     </div>

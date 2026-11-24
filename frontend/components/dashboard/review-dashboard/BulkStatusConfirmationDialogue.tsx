@@ -15,8 +15,10 @@ export type BulkStatusConfirmationDialogueProps = Pick<
   DialogueProps,
   "open" | "onClose" | "errorText" | "header" | "text"
 > & {
-  applicants: BulkStatusApplicant[];
+  // Omit to show a plain confirmation step without the applicant list.
+  applicants?: BulkStatusApplicant[];
   confirmLabel: string;
+  cancelLabel?: string;
   isSubmitting: boolean;
   onConfirm: () => void;
 };
@@ -27,6 +29,7 @@ export const BulkStatusConfirmationDialogue = ({
   text,
   applicants,
   confirmLabel,
+  cancelLabel = "Cancel",
   isSubmitting,
   errorText,
   onClose,
@@ -36,7 +39,7 @@ export const BulkStatusConfirmationDialogue = ({
     open={open}
     onClose={() => !isSubmitting && onClose()}
     disableEscapeKeyDown={isSubmitting}
-    PaperProps={{ sx: { borderRadius: 1, width: 560, maxWidth: "calc(100% - 32px)" } }}
+    PaperProps={{ sx: { borderRadius: 1, width: applicants ? 560 : 466, maxWidth: "calc(100% - 32px)" } }}
     aria-labelledby="bulk-status-dialogue-title"
     aria-describedby="bulk-status-dialogue-description"
   >
@@ -47,6 +50,7 @@ export const BulkStatusConfirmationDialogue = ({
       <p id="bulk-status-dialogue-description" className="mt-2 text-center font-source text-sm text-neutral-800">
         {text}
       </p>
+      {applicants ? (
       <div className="mt-6 max-h-64 space-y-2 overflow-y-auto pr-1">
         {applicants.map((applicant) => (
           <div key={applicant.id} className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_4rem] gap-4 bg-neutral-50 px-3 py-4 font-source text-sm">
@@ -56,9 +60,10 @@ export const BulkStatusConfirmationDialogue = ({
           </div>
         ))}
       </div>
+      ) : null}
       {errorText ? <p className="mt-3 text-center text-sm text-alert-errorText">{errorText}</p> : null}
       <div className="mt-7 flex justify-center gap-4">
-        <Button type="button" variant="secondary" size="sm" disabled={isSubmitting} onClick={onClose}>Cancel</Button>
+        <Button type="button" variant="secondary" size="sm" disabled={isSubmitting} onClick={onClose}>{cancelLabel}</Button>
         <Button type="button" size="sm" disabled={isSubmitting} onClick={onConfirm}>
           {isSubmitting ? "Updating..." : confirmLabel}
         </Button>

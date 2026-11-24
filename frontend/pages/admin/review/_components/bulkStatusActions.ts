@@ -3,10 +3,12 @@ import { ApplicationStatus } from "@/graphql/typeUtils";
 export enum BulkAction {
   Reject = "reject",
   Interview = "interview",
+  // Interview dashboard actions; both ask for a second "Are you sure?" step.
+  InterviewReject = "interviewReject",
   Offer = "offer",
 }
 
-const pluralizeCandidates = (count: number) =>
+export const pluralizeCandidates = (count: number) =>
   `${count} ${count === 1 ? "candidate" : "candidates"}`;
 
 export const BULK_ACTIONS = {
@@ -22,15 +24,29 @@ export const BULK_ACTIONS = {
       description: "The selected application statuses have been updated.",
     }),
   },
+  [BulkAction.InterviewReject]: {
+    status: ApplicationStatus.Rejected,
+    title: "Select applicants for rejection",
+    description:
+      "This action will send a rejection email to the applicants listed below. Please confirm your selections.",
+    confirmLabel: "Confirm selection",
+    emailType: "rejection",
+    requiresFinalConfirmation: true,
+    toast: (count: number) => ({
+      title: `Rejection emails sent to ${pluralizeCandidates(count)}`,
+      description: "The selected application statuses have been updated.",
+    }),
+  },
   [BulkAction.Offer]: {
     status: ApplicationStatus.Offered,
-    title: "Send offer to candidates",
+    title: "Select applicants for offer",
     description:
-      "This action will mark the applicants listed below as offered and send them offer emails. Please confirm your selections.",
-    confirmLabel: "Confirm offer",
+      "This action will send an offer email to the applicants listed below. Please confirm your selections.",
+    confirmLabel: "Confirm selection",
     emailType: "offer",
+    requiresFinalConfirmation: true,
     toast: (count: number) => ({
-      title: `${pluralizeCandidates(count)} marked as offered`,
+      title: `Offer emails sent to ${pluralizeCandidates(count)}`,
       description: "The selected application statuses have been updated.",
     }),
   },
@@ -46,6 +62,13 @@ export const BULK_ACTIONS = {
     }),
   },
 } as const;
+
+// Second step shown before actions that send emails which cannot be undone.
+export const FINAL_CONFIRMATION = {
+  title: "Are you sure?",
+  confirmLabel: "Confirm and send",
+  cancelLabel: "Go back",
+};
 
 export const BULK_ACTION_SUBMIT_ERROR =
   "The statuses could not be updated. Please try again.";

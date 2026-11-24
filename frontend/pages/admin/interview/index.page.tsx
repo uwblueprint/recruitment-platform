@@ -360,7 +360,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
           }}
           bulkActions={{
             selectedCount: selectedRows.length,
-            onReject: () => handleBulkAction(BulkAction.Reject),
+            onReject: () => handleBulkAction(BulkAction.InterviewReject),
             onOffer: () => handleBulkAction(BulkAction.Offer),
           }}
         />
