@@ -68,6 +68,11 @@ export type DeleteAdminCommentByIdMutationVariables = Exact<{
 
 export type DeleteAdminCommentByIdMutation = { deleteAdminCommentById: { id: string } };
 
+export type DepartmentsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DepartmentsQuery = { departments: Array<{ slug: string, name: string }> };
+
 export type InterviewApplicationQueryVariables = Exact<{
   applicantRecordId: string | number;
 }>;

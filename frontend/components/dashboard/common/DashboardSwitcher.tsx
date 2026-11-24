@@ -10,17 +10,24 @@ export const DASHBOARD_ENUM = {
   INTERVIEW: "interview",
 } as const;
 
+export type Dashboard = (typeof DASHBOARD_ENUM)[keyof typeof DASHBOARD_ENUM];
+
 const DASHBOARDS = {
-  [DASHBOARD_ENUM.REVIEW]: { label: "Review Dashboard", href: "/admin/review" },
-  [DASHBOARD_ENUM.INTERVIEW]: { label: "Interview Dashboard", href: "/admin/interview" },
+  [DASHBOARD_ENUM.REVIEW]: { label: "Review Dashboard" },
+  [DASHBOARD_ENUM.INTERVIEW]: { label: "Interview Dashboard" },
 } as const;
 
+export const getDashboardHref = (dashboard: Dashboard, department?: string) =>
+  department ? `/admin/${department}/${dashboard}` : `/admin/${dashboard}`;
+
 interface DashboardSwitcherProps {
-  currentDashboard: keyof typeof DASHBOARDS;
+  currentDashboard: Dashboard;
+  department?: string;
 }
 
 export const DashboardSwitcher = ({
   currentDashboard,
+  department,
 }: DashboardSwitcherProps) => {
   const id = useId();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -54,7 +61,7 @@ export const DashboardSwitcher = ({
           <StyledMenuItem
             key={key}
             component={Link}
-            href={dashboard.href}
+            href={getDashboardHref(key as Dashboard, department)}
             selected={key === currentDashboard}
             aria-current={key === currentDashboard ? "page" : undefined}
             onClick={closeMenu}

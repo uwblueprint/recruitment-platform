@@ -54,6 +54,7 @@ import {
 } from "../../utilities/dtoUtils";
 import {
   buildApplicantRecordWhere,
+  buildDepartmentPositionInclude,
   buildApplicantWhere,
 } from "../../utilities/dashboardFilterUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
@@ -381,6 +382,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
         attributes: ["id", "position", "status", "is_applicant_flagged"],
         where: await buildInterviewDashboardWhere(view, filters),
         include: [
+          ...buildDepartmentPositionInclude(filters),
           {
             attributes: ["first_name", "last_name"],
             model: Applicant,
@@ -456,6 +458,7 @@ class InterviewCompositeService implements IInterviewCompositeService {
       ApplicantRecord.count({
         where: await buildInterviewDashboardWhere(view, filters),
         include: [
+          ...buildDepartmentPositionInclude(filters),
           {
             model: Applicant,
             required: true,
