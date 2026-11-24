@@ -25,7 +25,13 @@ export const UserAvatar = ({
       role="img"
       aria-label={name}
       className="!bg-surface-highlight !text-neutral-800"
-      imgProps={{ loading: "lazy", decoding: "async", alt: "" }}
+      // googleusercontent URLs can 403 when a referrer is sent
+      imgProps={{
+        loading: "lazy",
+        decoding: "async",
+        alt: "",
+        referrerPolicy: "no-referrer",
+      }}
       sx={{
         width: size,
         height: size,
