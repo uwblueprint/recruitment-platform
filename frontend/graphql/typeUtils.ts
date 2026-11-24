@@ -139,6 +139,7 @@ export {
   InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
+  ReassignInterviewerDocument,
   ReassignReviewerDocument,
   RefreshDocument,
   ReportInterviewConflictDocument,
@@ -207,6 +208,8 @@ export type {
   LoginWithGoogleMutationVariables,
   LogoutMutation,
   LogoutMutationVariables,
+  ReassignInterviewerMutation,
+  ReassignInterviewerMutationVariables,
   ReassignReviewerMutation,
   ReassignReviewerMutationVariables,
   RefreshMutation,
@@ -402,3 +405,22 @@ export type {
 export { InterviewInvitesCountsDocument } from "./__generated__/graphql";
 
 export type { InterviewInvitesCountsQueryVariables } from "./__generated__/operation-types";
+
+export {
+  MembersDashboardDocument,
+  MembersDashboardCountDocument,
+} from "./__generated__/graphql";
+export type {
+  MembersDashboardQuery,
+  MembersDashboardQueryVariables,
+  MembersDashboardCountQuery,
+} from "./__generated__/operation-types";
+export type MembersDashboardResult = ArrayElement<
+  OperationField<Operations.MembersDashboardQuery, "membersDashboard">
+>;
+
+export { CanReviewApplicantDocument } from "./__generated__/graphql";
+
+export { CanAccessInterviewGroupDocument } from "./__generated__/graphql";
+
+export { CanAccessInterviewDocument, InterviewApplicationDocument, InterviewReviewDetailsDocument } from "./__generated__/graphql";

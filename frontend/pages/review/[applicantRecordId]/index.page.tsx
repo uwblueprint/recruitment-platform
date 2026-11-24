@@ -1,12 +1,11 @@
+import { ProtectedReviewRoute } from "@/components/contexts/ProtectedReviewRoute";
 import { Toast } from "@/components/common/Toast";
-import { ReviewStatus, Role, SkillCategory } from "@/graphql/typeUtils";
+import { ReviewStatus, SkillCategory } from "@/graphql/typeUtils";
 import type { Dispatch, SetStateAction } from "react";
 import useUpdateReviewedApplicantRecord from "@/APIClients/mutations/useUpdateReviewedApplicantRecord";
 import useReviewApplication from "../_components/hooks/useReviewApplication";
 import useReportReviewConflict from "@/APIClients/mutations/useReportReviewConflict";
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
-import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
-import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -344,11 +343,9 @@ const ReviewsPages: NextPage = () => {
 
 const Reviews: NextPage = () => {
   return (
-    <ProtectedRoute allowedRoles={[Role.Admin, Role.User]}>
-      <ProtectedApplication>
-        <ReviewsPages />
-      </ProtectedApplication>
-    </ProtectedRoute>
+    <ProtectedReviewRoute>
+      <ReviewsPages />
+    </ProtectedReviewRoute>
   );
 };
 

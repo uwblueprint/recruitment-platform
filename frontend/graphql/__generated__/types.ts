@@ -205,13 +205,19 @@ export type InterviewDashboardFilters = {
   years?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+export type InterviewDashboardInterviewerDto = {
+  __typename?: 'InterviewDashboardInterviewerDTO';
+  interviewHasConflict?: Maybe<InterviewConflict>;
+  userInfo: UserDto;
+};
+
 export type InterviewDashboardRowDto = {
   __typename?: 'InterviewDashboardRowDTO';
   applicantRecordId: Scalars['ID']['output'];
   applicationStatus: ApplicationStatus;
   firstName: Scalars['String']['output'];
   interviewScore?: Maybe<Scalars['Int']['output']>;
-  interviewers: Array<UserDto>;
+  interviewers: Array<InterviewDashboardInterviewerDto>;
   isApplicantFlagged: Scalars['Boolean']['output'];
   lastName: Scalars['String']['output'];
   position: Scalars['String']['output'];
@@ -351,6 +357,17 @@ export type InterviewedApplicantsDto = {
   interviewStatus: InterviewStatus;
 };
 
+export type MembersDashboardRowDto = {
+  __typename?: 'MembersDashboardRowDTO';
+  firstName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  joined?: Maybe<Scalars['String']['output']>;
+  lastName: Scalars['String']['output'];
+  role?: Maybe<Scalars['String']['output']>;
+  team?: Maybe<Scalars['String']['output']>;
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
@@ -382,6 +399,7 @@ export type Mutation = {
   loginWithGoogle: AuthDto;
   logout?: Maybe<Scalars['ID']['output']>;
   populateApplicantRecords: PopulateApplicantRecordsResult;
+  reassignInterviewer: InterviewDelegationDto;
   reassignReviewer: ReviewedApplicantRecordDto;
   refresh: Scalars['String']['output'];
   register: AuthDto;
@@ -500,12 +518,12 @@ export type MutationDeleteInterviewDelegationArgs = {
 
 
 export type MutationDeleteInterviewGroupByIdArgs = {
-  id: Scalars['ID']['input'];
+  groupId: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteInterviewedApplicantRecordByIdArgs = {
-  id: Scalars['ID']['input'];
+  interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -551,6 +569,13 @@ export type MutationPopulateApplicantRecordsArgs = {
 };
 
 
+export type MutationReassignInterviewerArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+  newInterviewerId: Scalars['ID']['input'];
+  oldInterviewerId: Scalars['ID']['input'];
+};
+
+
 export type MutationReassignReviewerArgs = {
   applicantRecordId: Scalars['ID']['input'];
   newReviewerId: Scalars['ID']['input'];
@@ -592,8 +617,8 @@ export type MutationSendRejectionEmailsArgs = {
 
 
 export type MutationSubmitInterviewScoresArgs = {
-  id: Scalars['ID']['input'];
   interviewJson: InterviewInput;
+  interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -636,20 +661,20 @@ export type MutationUpdateInterviewDelegationArgs = {
 
 
 export type MutationUpdateInterviewGroupArgs = {
-  id: Scalars['ID']['input'];
+  groupId: Scalars['ID']['input'];
   interviewGroup: UpdateInterviewGroupDto;
 };
 
 
 export type MutationUpdateInterviewGroupSchedulingLinkArgs = {
-  id: Scalars['ID']['input'];
+  groupId: Scalars['ID']['input'];
   schedulingLink: Scalars['String']['input'];
 };
 
 
 export type MutationUpdateInterviewedApplicantRecordArgs = {
-  id: Scalars['ID']['input'];
   interviewedApplicantRecord: UpdateInterviewedApplicantRecordDto;
+  interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -704,11 +729,15 @@ export type Query = {
   adminCommentById: AdminCommentDto;
   adminCommentsByApplicantRecordId: Array<AdminCommentDto>;
   application: ApplicationDto;
+  canAccessInterview: Scalars['Boolean']['output'];
+  canAccessInterviewGroup: Scalars['Boolean']['output'];
+  canReviewApplicant: Scalars['Boolean']['output'];
   dashboardFilterOptions: DashboardFilterOptionsDto;
   entities: Array<EntityResponseDto>;
   entitiesCSV: Scalars['String']['output'];
   entity: EntityResponseDto;
   file: Scalars['String']['output'];
+  interviewApplication: ApplicationDto;
   interviewDashboard: Array<InterviewDashboardRowDto>;
   interviewDashboardCounts: InterviewDashboardCountsDto;
   interviewDashboardSidePanel: InterviewDashboardSidePanelDto;
@@ -717,6 +746,7 @@ export type Query = {
   interviewInvites: Array<InterviewInviteDto>;
   interviewInvitesCounts: InterviewInvitesCountsDto;
   interviewNotes?: Maybe<InterviewNotes>;
+  interviewReviewDetails: ApplicantRecordWithReviewersDto;
   interviewUnmatchedApplicants: Array<InterviewUnmatchedApplicantsByPositionDto>;
   interviewedApplicantRecord: InterviewedApplicantRecord;
   interviewedApplicantRecordByApplicantRecordId: InterviewedApplicantRecord;
@@ -725,6 +755,8 @@ export type Query = {
   interviewersByGroupId: Array<UserDto>;
   isAuthorizedByRole: Scalars['Boolean']['output'];
   isAuthorizedToReview: Scalars['Boolean']['output'];
+  membersDashboard: Array<MembersDashboardRowDto>;
+  membersDashboardCount: Scalars['Int']['output'];
   positions: Array<PositionDto>;
   projects: Array<ProjectDto>;
   reviewDashboard: Array<ReviewDashboardRowDto>;
@@ -761,6 +793,21 @@ export type QueryApplicationArgs = {
 };
 
 
+export type QueryCanAccessInterviewArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
+export type QueryCanAccessInterviewGroupArgs = {
+  groupId: Scalars['ID']['input'];
+};
+
+
+export type QueryCanReviewApplicantArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryDashboardFilterOptionsArgs = {
   department?: InputMaybe<Scalars['String']['input']>;
 };
@@ -773,6 +820,11 @@ export type QueryEntityArgs = {
 
 export type QueryFileArgs = {
   fileUUID: Scalars['ID']['input'];
+};
+
+
+export type QueryInterviewApplicationArgs = {
+  applicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -803,7 +855,7 @@ export type QueryInterviewDelegationArgs = {
 
 
 export type QueryInterviewGroupArgs = {
-  id: Scalars['ID']['input'];
+  groupId: Scalars['ID']['input'];
 };
 
 
@@ -825,8 +877,13 @@ export type QueryInterviewNotesArgs = {
 };
 
 
+export type QueryInterviewReviewDetailsArgs = {
+  applicantRecordId: Scalars['ID']['input'];
+};
+
+
 export type QueryInterviewedApplicantRecordArgs = {
-  id: Scalars['ID']['input'];
+  interviewedApplicantRecordId: Scalars['ID']['input'];
 };
 
 
@@ -859,6 +916,12 @@ export type QueryIsAuthorizedByRoleArgs = {
 export type QueryIsAuthorizedToReviewArgs = {
   applicationId: Scalars['Int']['input'];
   reviewerUserId: Scalars['String']['input'];
+};
+
+
+export type QueryMembersDashboardArgs = {
+  pageNumber: Scalars['Int']['input'];
+  resultsPerPage: Scalars['Int']['input'];
 };
 
 

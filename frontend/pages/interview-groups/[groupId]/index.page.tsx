@@ -1,5 +1,5 @@
 import { useAuthenticatedUser } from "@/components/contexts/AuthUserContext";
-import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
+import { ProtectedInterviewGroupRoute } from "@/components/contexts/ProtectedInterviewGroupRoute";
 import { PanelLayout } from "@/components/layouts/PanelLayout";
 import {
   SPLIT_PANEL_WIDTHS,
@@ -10,14 +10,13 @@ import { useRouter } from "next/router";
 import { ReactElement } from "react";
 import useInterviewGroupDetails from "../_components/hooks/useInterviewGroupDetails";
 import useSchedulingLinkEditor from "../_components/hooks/useSchedulingLinkEditor";
-import { NextPageWithLayout } from "../../_app";
+import { NextPageWithLayout } from "../../_app.page";
 import CalendlyLinkForm from "../_components/CalendlyLinkForm";
 import CalendlyLinkSubmitted from "../_components/CalendlyLinkSubmitted";
 import CalendlySection from "../_components/CalendlySection";
 import InterviewGroupIllustrationPanel from "../_components/InterviewGroupIllustrationPanel";
 import InterviewPageHeader from "../_components/InterviewPageHeader";
 import PartnerSection from "../_components/PartnerSection";
-import { Role } from "@/graphql/__generated__/types";
 
 const InterviewGroupContent = ({
   interviewGroupId,
@@ -126,7 +125,7 @@ const InterviewGroupPage: NextPageWithLayout = () => {
 };
 
 InterviewGroupPage.getLayout = (page: ReactElement) => (
-  <ProtectedRoute allowedRoles={[Role.Admin, Role.User]}>
+  <ProtectedInterviewGroupRoute>
     <SplitPanelLayout
       leftWidth={SPLIT_PANEL_WIDTHS.interview.left}
       header={<InterviewHeader steps={[]} />}
@@ -134,7 +133,7 @@ InterviewGroupPage.getLayout = (page: ReactElement) => (
       <InterviewGroupIllustrationPanel />
       {page}
     </SplitPanelLayout>
-  </ProtectedRoute>
+  </ProtectedInterviewGroupRoute>
 );
 
 export default InterviewGroupPage;

@@ -8,6 +8,9 @@ import {
   isAuthorizedByRole,
   isAuthorizedByUserId,
   isAuthorizedForApplicantReview,
+  isAuthorizedForInterviewGroup,
+  isAuthorizedForInterview,
+  isAuthorizedForInterviewByApplicantRecord,
 } from "../middlewares/auth";
 import adminCommentResolvers from "./resolvers/adminCommentResolvers";
 import applicantRecordResolvers from "./resolvers/applicantRecordResolvers";
@@ -43,6 +46,8 @@ import interviewGroupResolvers from "./resolvers/interviewGroupResolvers";
 import interviewPageResolvers from "./resolvers/interviewPageResolvers";
 import interviewDashboardResolvers from "./resolvers/interviewDashboardResolvers";
 import interviewInvitesDashboardResolvers from "./resolvers/interviewInvitesDashboardResolvers";
+import membersDashboardType from "./types/membersDashboardType";
+import managementCompositeResolvers from "./resolvers/managementCompositeResolvers";
 
 const query = gql`
   type Query {
@@ -77,6 +82,7 @@ const executableSchema = makeExecutableSchema({
     userType,
     positionType,
     projectType,
+    membersDashboardType,
   ],
   resolvers: merge(
     { Upload: GraphQLUpload },
@@ -97,6 +103,7 @@ const executableSchema = makeExecutableSchema({
     interviewPageResolvers,
     interviewDashboardResolvers,
     interviewInvitesDashboardResolvers,
+    managementCompositeResolvers,
   ),
 });
 
@@ -121,17 +128,28 @@ const graphQLMiddlewares = {
     projects: authorizedByAdmin(),
     adminCommentsByApplicantRecordId: authorizedByAdmin(),
     adminCommentById: authorizedByAdmin(),
-    reviewedApplicantRecord: authorizedByAdmin(),
-    reviewedApplicantRecordsByApplicantRecordId: isAuthorizedForApplicantReview(),
-    reviewedApplicantsByUserId: authorizedByAllRoles(),
-    application: authorizedByAllRoles(),
-    interviewedApplicantRecord: authorizedByAllRoles(),
-    interviewDelegation: authorizedByAllRoles(),
-    interviewGroup: authorizedByAllRoles(),
-    interviewedApplicantsByUserId: authorizedByAllRoles(),
-    interviewedPairingsByUserId: authorizedByAllRoles(),
-    interviewersByGroupId: authorizedByAllRoles(),
-    interviewNotes: authorizedByAllRoles(),
+    reviewedApplicantRecord: isAuthorizedForApplicantReview({
+      requireOwnReview: true,
+    }),
+    reviewedApplicantRecordsByApplicantRecordId: isAuthorizedForApplicantReview(
+      {
+        allowAdminRead: true,
+      },
+    ),
+    reviewedApplicantsByUserId: isAuthorizedByUserId("userId"),
+    application: isAuthorizedForApplicantReview({ allowAdminRead: true }),
+    interviewedApplicantRecord: isAuthorizedForInterview(),
+    interviewDelegation: isAuthorizedForInterview({
+      requireOwnInterviewer: true,
+    }),
+    interviewGroup: isAuthorizedForInterviewGroup(),
+    interviewedApplicantsByUserId: isAuthorizedByUserId("userId"),
+    interviewedPairingsByUserId: isAuthorizedByUserId("userId"),
+    interviewersByGroupId: isAuthorizedForInterviewGroup(),
+    interviewNotes: isAuthorizedForInterview(),
+    interviewedApplicantRecordByApplicantRecordId: isAuthorizedForInterviewByApplicantRecord(),
+    interviewReviewDetails: isAuthorizedForInterviewByApplicantRecord(),
+    interviewApplication: isAuthorizedForInterviewByApplicantRecord(),
     reviewDashboard: authorizedByAdmin(),
     reviewDashboardCounts: authorizedByAdmin(),
     reviewDashboardSidePanel: authorizedByAdmin(),
@@ -143,6 +161,8 @@ const graphQLMiddlewares = {
     interviewInvites: authorizedByAdmin(),
     interviewInvitesCounts: authorizedByAdmin(),
     interviewUnmatchedApplicants: authorizedByAdmin(),
+    membersDashboard: authorizedByAdmin(),
+    membersDashboardCount: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),
@@ -162,19 +182,26 @@ const graphQLMiddlewares = {
     deleteAdminCommentById: authorizedByAdmin(),
     updateApplicantRecordStatus: authorizedByAllRoles(),
     reassignReviewer: authorizedByAdmin(),
+    reassignInterviewer: authorizedByAdmin(),
     bulkUpdateApplicantRecordsStatus: authorizedByAdmin(),
     populateApplicantRecords: authorizedByAdmin(),
     sendRejectionEmails: authorizedByAdmin(),
     updateApplicantRecordIsApplicantFlagged: authorizedByAdmin(),
     updateApplicantRecordShortlistedForInterview: authorizedByAdmin(),
     createReviewedApplicantRecord: authorizedByAdmin(),
-    updateReviewedApplicantRecord: authorizedByAllRoles(),
+    updateReviewedApplicantRecord: isAuthorizedForApplicantReview({
+      requireOwnReview: true,
+    }),
     deleteReviewedApplicantRecord: authorizedByAdmin(),
     bulkCreateReviewedApplicantRecord: authorizedByAdmin(),
-    reportReviewConflict: authorizedByAllRoles(),
-    reportInterviewConflict: authorizedByAllRoles(),
+    reportReviewConflict: isAuthorizedForApplicantReview({
+      requireOwnReview: true,
+    }),
+    reportInterviewConflict: isAuthorizedForInterview({
+      requireOwnInterviewer: true,
+    }),
     createInterviewedApplicantRecord: authorizedByAdmin(),
-    updateInterviewedApplicantRecord: authorizedByAllRoles(),
+    updateInterviewedApplicantRecord: isAuthorizedForInterview(),
     deleteInterviewedApplicantRecordById: authorizedByAdmin(),
     createInterviewDelegation: authorizedByAdmin(),
     updateInterviewDelegation: authorizedByAdmin(),
@@ -182,14 +209,14 @@ const graphQLMiddlewares = {
     bulkCreateInterviewDelegations: authorizedByAdmin(),
     createInterviewGroup: authorizedByAdmin(),
     updateInterviewGroup: authorizedByAdmin(),
-    updateInterviewGroupSchedulingLink: authorizedByAllRoles(),
+    updateInterviewGroupSchedulingLink: isAuthorizedForInterviewGroup(),
     deleteInterviewGroupById: authorizedByAdmin(),
     bulkCreateInterviewGroups: authorizedByAdmin(),
     bulkDeleteInterviewGroupsByIds: authorizedByAdmin(),
     delegateReviewers: authorizedBySuperAdmin(),
     delegateInterviewers: authorizedBySuperAdmin(),
-    submitInterviewScores: authorizedByAllRoles(),
-    uploadInterviewNotes: authorizedByAllRoles(),
+    submitInterviewScores: isAuthorizedForInterview(),
+    uploadInterviewNotes: isAuthorizedForInterview(),
   },
 };
 

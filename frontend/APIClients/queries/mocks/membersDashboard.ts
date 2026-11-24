@@ -105,11 +105,11 @@ export const filterMockMembers = (filters?: MembersDashboardFilters) => {
   return MOCK_MEMBERS.filter(
     (member) =>
       [member.name, member.role, member.team].some((value) =>
-        value.toLowerCase().includes(search)
+        value.toLowerCase().includes(search),
       ) &&
       (!filters?.roles?.length || filters.roles.includes(member.role)) &&
       (!filters?.teams?.length || filters.teams.includes(member.team)) &&
-      (!filters?.statuses?.length || filters.statuses.includes(member.status))
+      (!filters?.statuses?.length || filters.statuses.includes(member.status)),
   );
 };
 export const refetchMockMembers = async () => undefined;

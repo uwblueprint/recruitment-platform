@@ -1,5 +1,5 @@
-mutation SubmitInterviewScores($id: ID!, $interviewJson: InterviewInput!) {
-  submitInterviewScores(id: $id, interviewJson: $interviewJson) {
+mutation SubmitInterviewScores($interviewedApplicantRecordId: ID!, $interviewJson: InterviewInput!) {
+  submitInterviewScores(interviewedApplicantRecordId: $interviewedApplicantRecordId, interviewJson: $interviewJson) {
     id
     score
     status

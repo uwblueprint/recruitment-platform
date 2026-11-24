@@ -10,7 +10,7 @@ import {
   InterviewFooter,
 } from "../../_components/layout";
 import { Button } from "@/components/common/Button";
-import { NextPageWithLayout } from "../../../_app";
+import { NextPageWithLayout } from "../../../_app.page";
 import { ScoresPanel } from "../../_components/assessment/ScoresPanel";
 import NotesUploader from "../../_components/assessment/NotesUploader";
 import {
@@ -99,7 +99,7 @@ const InterviewAssessmentPage: NextPageWithLayout = () => {
       return (
         <PanelLayout>
           <NotesUploader
-            interviewedApplicantRecordId={recordId}
+            interviewedApplicantRecordId={recordId ?? null}
             {...interviewNotes}
           />
         </PanelLayout>
@@ -118,13 +118,10 @@ const InterviewAssessmentPage: NextPageWithLayout = () => {
 
 // Wrap the entire layout in AssessmentProvider so both the page body and the
 // footer (which sits outside the page slot in SplitPanelLayout) share state.
-InterviewAssessmentPage.getLayout = (page) => (
-  <AssessmentProvider>
-    {getInterviewLayout(
-      <InterviewHeader steps={ASSESSMENT_HEADER_STEPS} />,
-      <AssessmentFooter />
-    )(page)}
-  </AssessmentProvider>
+InterviewAssessmentPage.getLayout = getInterviewLayout(
+  <InterviewHeader steps={ASSESSMENT_HEADER_STEPS} />,
+  <AssessmentFooter />,
+  (layout) => <AssessmentProvider>{layout}</AssessmentProvider>,
 );
 
 export default InterviewAssessmentPage;

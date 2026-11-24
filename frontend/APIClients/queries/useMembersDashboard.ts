@@ -1,36 +1,60 @@
+import { useMemo } from "react";
+import { useQuery } from "@apollo/client/react";
+import {
+  MembersDashboardDocument,
+  type MembersDashboardResult,
+} from "@/graphql/typeUtils";
 import type {
   Member,
   MembersDashboardVariables,
 } from "@/types/membersDashboard";
-import {
-  filterMockMembers,
-  refetchMockMembers,
-} from "./mocks/membersDashboard";
 
-/**
- * Temporary mock implementation. Add the operation under graphql/operations,
- * run npm run generate, and export its document/types from graphql/typeUtils.
- * Replace this body with useQuery from @apollo/client/react, following
- * useReviewDashboard: fetchPolicy: "network-only", context: { refreshAuth: true }.
- * Return the result array as data/previousData and forward loading/error/refetch.
- * Replace the temporary MembersDashboardVariables/Member types with generated aliases.
- */
-export default function useMembersDashboard(
-  variables: MembersDashboardVariables
-): {
-  data: Member[] | undefined;
-  previousData: Member[] | undefined;
-  loading: boolean;
-  error: Error | undefined;
-  refetch: () => Promise<unknown>;
-} {
-  const rows = filterMockMembers(variables.filters);
-  const startIndex = (variables.pageNumber - 1) * variables.resultsPerPage;
+// school terms
+const formatJoinedTerm = (iso: string) => {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  const month = date.getMonth();
+  const season = month <= 3 ? "Winter" : month <= 7 ? "Spring" : "Fall";
+  return `${season} ${date.getFullYear()}`;
+};
+
+const toMember = (row: MembersDashboardResult): Member => ({
+  id: row.id,
+  name: `${row.firstName} ${row.lastName}`,
+  role: row.role ?? "—",
+  team: row.team ?? "Unassigned",
+  joined: row.joined ? formatJoinedTerm(row.joined) : "—",
+  status: row.isArchived ? "Not Active" : "Active",
+});
+
+export default function useMembersDashboard({
+  pageNumber,
+  resultsPerPage,
+}: MembersDashboardVariables) {
+  const { data, previousData, loading, error, refetch } = useQuery(
+    MembersDashboardDocument,
+    {
+      variables: { pageNumber, resultsPerPage },
+      fetchPolicy: "network-only",
+      context: { refreshAuth: true },
+    },
+  );
+  const rows = useMemo(() => data?.membersDashboard.map(toMember), [data]);
+  const previousRows = useMemo(
+    () => previousData?.membersDashboard.map(toMember),
+    [previousData],
+  );
+  const queryError =
+    error ??
+    (!loading && !rows
+      ? new Error("No membersDashboard data returned")
+      : undefined);
+
   return {
-    data: rows.slice(startIndex, startIndex + variables.resultsPerPage),
-    previousData: undefined,
-    loading: false,
-    error: undefined,
-    refetch: refetchMockMembers,
+    data: queryError ? undefined : rows,
+    previousData: previousRows,
+    loading,
+    error: queryError,
+    refetch,
   };
 }

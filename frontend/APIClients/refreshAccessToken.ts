@@ -9,23 +9,30 @@ export async function refreshAccessToken(refresh: RefreshToken): Promise<void> {
 
   const accessToken = localStorage.getItem("accessToken");
   const refreshToken = localStorage.getItem("refreshToken");
-  if (!accessToken || !refreshToken) {
-    throw new Error("No access or refresh token provided");
-  }
-
-  const { exp } = jwt_decode<{ exp: number }>(accessToken);
-  if (exp > Math.round(Date.now() / 1000)) return;
-
   pendingRefresh = (async () => {
     try {
+      if (!accessToken || !refreshToken) {
+        throw new Error("No access or refresh token provided");
+      }
+      const { exp } = jwt_decode<{ exp: number }>(accessToken);
+      if (exp > Math.floor(Date.now() / 1000)) return;
+
       const token = await refresh(refreshToken);
       if (typeof token !== "string" || !token) {
         throw new Error("No access token returned");
       }
+      // A refresh must not restore a session after logout or overwrite a new login.
+      if (localStorage.getItem("refreshToken") !== refreshToken) {
+        throw new Error("Session changed during token refresh");
+      }
       localStorage.setItem("accessToken", token);
     } catch (error) {
-      localStorage.clear();
-      window.location.reload();
+      if (localStorage.getItem("refreshToken") === refreshToken) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("authenticatedUser");
+        window.location.reload();
+      }
       const message = error instanceof Error ? error.message : String(error);
       throw new Error(`Failed to refresh accessToken token. Cause: ${message}`);
     }

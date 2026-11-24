@@ -1,5 +1,4 @@
 import useReviewApplication from "../_components/hooks/useReviewApplication";
-import { ProtectedApplication } from "@/components/contexts/ProtectedApplication";
 import { ProtectedRoute } from "@/components/contexts/ProtectedRoute";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -147,10 +146,8 @@ const ReviewViewPage: NextPage = () => {
 
 const ReviewView: NextPage = () => {
   return (
-    <ProtectedRoute allowedRoles={[Role.Admin, Role.User]}>
-      <ProtectedApplication>
-        <ReviewViewPage />
-      </ProtectedApplication>
+    <ProtectedRoute allowedRoles={[Role.Admin, Role.SuperAdmin]}>
+      <ReviewViewPage />
     </ProtectedRoute>
   );
 };

@@ -49,7 +49,9 @@ const interviewedApplicantRecordsTypes = gql`
   }
 
   extend type Query {
-    interviewedApplicantRecord(id: ID!): InterviewedApplicantRecord!
+    interviewedApplicantRecord(
+      interviewedApplicantRecordId: ID!
+    ): InterviewedApplicantRecord!
   }
 
   extend type Mutation {
@@ -58,11 +60,13 @@ const interviewedApplicantRecordsTypes = gql`
     ): InterviewedApplicantRecord!
 
     updateInterviewedApplicantRecord(
-      id: ID!
+      interviewedApplicantRecordId: ID!
       interviewedApplicantRecord: UpdateInterviewedApplicantRecordDTO!
     ): InterviewedApplicantRecord!
 
-    deleteInterviewedApplicantRecordById(id: ID!): InterviewedApplicantRecord!
+    deleteInterviewedApplicantRecordById(
+      interviewedApplicantRecordId: ID!
+    ): InterviewedApplicantRecord!
   }
 `;
 

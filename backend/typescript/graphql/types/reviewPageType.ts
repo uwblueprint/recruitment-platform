@@ -41,6 +41,7 @@ const reviewPageType = gql`
   }
 
   extend type Query {
+    canReviewApplicant(applicantRecordId: ID!): Boolean!
     application(applicantRecordId: ID!): ApplicationDTO!
     reviewedApplicantsByUserId(userId: ID!): [ReviewedApplicantsDTO!]!
     reviewedApplicantRecordsByApplicantRecordId(
