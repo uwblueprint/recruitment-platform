@@ -1,5 +1,9 @@
 import ManagementCompositeService from "../../services/implementations/managementCompositeService";
-import { MembersDashboardRowDTO, TeamsDashboardTeamDTO } from "../../types";
+import {
+  MembersDashboardRowDTO,
+  MembersDashboardSidePanelDTO,
+  TeamsDashboardTeamDTO,
+} from "../../types";
 
 const managementCompositeService = new ManagementCompositeService();
 
@@ -23,6 +27,12 @@ const managementCompositeResolvers = {
       { isArchived }: { isArchived: boolean | null },
     ): Promise<TeamsDashboardTeamDTO[]> =>
       managementCompositeService.getTeamsDashboard(isArchived ?? null),
+    membersDashboardSidePanel: (
+      _parent: undefined,
+      { userId }: { userId: number },
+    ): Promise<MembersDashboardSidePanelDTO> => {
+      return managementCompositeService.getMembersDashboardSidePanel(userId);
+    },
   },
 };
 

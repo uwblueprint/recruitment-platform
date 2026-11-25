@@ -39,7 +39,10 @@ import User from "../models/user.model";
 import Project from "../models/project.model";
 import UserTermRecord from "../models/userTermRecord.model";
 import Position from "../models/position.model";
-import { MembersDashboardRowDTO } from "../types/membersDashboard";
+import {
+  MembersDashboardRowDTO,
+  MembersDashboardSidePanelDTO,
+} from "../types/membersDashboard";
 import { TeamsDashboardTeamDTO } from "../types/teamsDashboard";
 
 export function toUserDTO(model: User): UserDTO {
@@ -517,5 +520,20 @@ export function toTeamsDashboardTeamDTO(
     projectName: project.project_name,
     isArchived: project.is_archived,
     members,
+  };
+}
+
+export function toMembersDashboardSidePanelDTO(
+  member: User,
+): MembersDashboardSidePanelDTO {
+  const termRecords = member.user_term_records ?? [];
+
+  return {
+    ...toMembersDashboardRowDTO(member),
+    pastTeams: termRecords.slice(1).map((record) => ({
+      team: record.project?.project_name ?? null,
+      role: record.position_id,
+      term: record.term,
+    })),
   };
 }

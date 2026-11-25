@@ -1,4 +1,7 @@
-import { MembersDashboardRowDTO } from "../../types/membersDashboard";
+import {
+  MembersDashboardRowDTO,
+  MembersDashboardSidePanelDTO,
+} from "../../types/membersDashboard";
 import { TeamsDashboardTeamDTO } from "../../types/teamsDashboard";
 
 interface IManagementCompositeService {
@@ -24,6 +27,13 @@ interface IManagementCompositeService {
   getTeamsDashboard(
     isArchived: boolean | null,
   ): Promise<TeamsDashboardTeamDTO[]>;
+
+  /**
+   * Gets the members management side panel showing member information
+   */
+  getMembersDashboardSidePanel(
+    userId: number,
+  ): Promise<MembersDashboardSidePanelDTO>;
 }
 
 export default IManagementCompositeService;

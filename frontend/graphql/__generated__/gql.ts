@@ -43,6 +43,7 @@ type Documents = {
     "mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}": typeof types.LogoutDocument,
     "query MembersDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  membersDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n  }\n}": typeof types.MembersDashboardDocument,
     "query MembersDashboardCount {\n  membersDashboardCount\n}": typeof types.MembersDashboardCountDocument,
+    "query MembersDashboardSidePanel($userId: ID!) {\n  membersDashboardSidePanel(userId: $userId) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n    pastTeams {\n      team\n      role\n      term\n    }\n  }\n}": typeof types.MembersDashboardSidePanelDocument,
     "query Positions($isArchived: Boolean) {\n  positions(isArchived: $isArchived) {\n    title\n    isArchived\n  }\n}": typeof types.PositionsDocument,
     "query Projects($isArchived: Boolean) {\n  projects(isArchived: $isArchived) {\n    id\n    projectName\n    isArchived\n  }\n}": typeof types.ProjectsDocument,
     "mutation ReassignInterviewer($applicantRecordId: ID!, $oldInterviewerId: ID!, $newInterviewerId: ID!) {\n  reassignInterviewer(\n    applicantRecordId: $applicantRecordId\n    oldInterviewerId: $oldInterviewerId\n    newInterviewerId: $newInterviewerId\n  ) {\n    interviewedApplicantRecordId\n    interviewerId\n    groupId\n  }\n}": typeof types.ReassignInterviewerDocument,
@@ -100,6 +101,7 @@ const documents: Documents = {
     "mutation Logout($userId: ID!) {\n  logout(userId: $userId)\n}": types.LogoutDocument,
     "query MembersDashboard($pageNumber: Int!, $resultsPerPage: Int!) {\n  membersDashboard(pageNumber: $pageNumber, resultsPerPage: $resultsPerPage) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n  }\n}": types.MembersDashboardDocument,
     "query MembersDashboardCount {\n  membersDashboardCount\n}": types.MembersDashboardCountDocument,
+    "query MembersDashboardSidePanel($userId: ID!) {\n  membersDashboardSidePanel(userId: $userId) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n    pastTeams {\n      team\n      role\n      term\n    }\n  }\n}": types.MembersDashboardSidePanelDocument,
     "query Positions($isArchived: Boolean) {\n  positions(isArchived: $isArchived) {\n    title\n    isArchived\n  }\n}": types.PositionsDocument,
     "query Projects($isArchived: Boolean) {\n  projects(isArchived: $isArchived) {\n    id\n    projectName\n    isArchived\n  }\n}": types.ProjectsDocument,
     "mutation ReassignInterviewer($applicantRecordId: ID!, $oldInterviewerId: ID!, $newInterviewerId: ID!) {\n  reassignInterviewer(\n    applicantRecordId: $applicantRecordId\n    oldInterviewerId: $oldInterviewerId\n    newInterviewerId: $newInterviewerId\n  ) {\n    interviewedApplicantRecordId\n    interviewerId\n    groupId\n  }\n}": types.ReassignInterviewerDocument,
@@ -258,6 +260,10 @@ export function gql(source: "query MembersDashboard($pageNumber: Int!, $resultsP
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "query MembersDashboardCount {\n  membersDashboardCount\n}"): (typeof documents)["query MembersDashboardCount {\n  membersDashboardCount\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query MembersDashboardSidePanel($userId: ID!) {\n  membersDashboardSidePanel(userId: $userId) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n    pastTeams {\n      team\n      role\n      term\n    }\n  }\n}"): (typeof documents)["query MembersDashboardSidePanel($userId: ID!) {\n  membersDashboardSidePanel(userId: $userId) {\n    id\n    firstName\n    lastName\n    role\n    team\n    joined\n    isArchived\n    pastTeams {\n      team\n      role\n      term\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

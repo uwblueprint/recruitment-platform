@@ -7,3 +7,13 @@ export type MembersDashboardRowDTO = {
   joined: string | null;
   isArchived: boolean;
 };
+
+export type MemberPastTeamDTO = {
+  team: string | null;
+  role: string;
+  term: string;
+};
+
+export type MembersDashboardSidePanelDTO = MembersDashboardRowDTO & {
+  pastTeams: MemberPastTeamDTO[];
+};

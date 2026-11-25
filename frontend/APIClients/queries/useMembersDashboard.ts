@@ -10,7 +10,7 @@ import type {
 } from "@/types/membersDashboard";
 import formatJoinedTerm from "@/utils/formatJoinedTerm";
 
-const toMember = (row: MembersDashboardResult): Member => ({
+export const toMember = (row: MembersDashboardResult): Member => ({
   id: row.id,
   name: `${row.firstName} ${row.lastName}`,
   role: row.role ?? "—",

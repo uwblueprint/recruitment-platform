@@ -166,6 +166,7 @@ const graphQLMiddlewares = {
     membersDashboard: authorizedByAdmin(),
     membersDashboardCount: authorizedByAdmin(),
     teamsDashboard: authorizedByAdmin(),
+    membersDashboardSidePanel: authorizedByAdmin(),
   },
   Mutation: {
     createEntity: authorizedByAllRoles(),
