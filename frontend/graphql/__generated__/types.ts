@@ -357,6 +357,13 @@ export type InterviewedApplicantsDto = {
   interviewStatus: InterviewStatus;
 };
 
+export type MemberPastTeamDto = {
+  __typename?: 'MemberPastTeamDTO';
+  role: Scalars['String']['output'];
+  team?: Maybe<Scalars['String']['output']>;
+  term: Scalars['String']['output'];
+};
+
 export type MembersDashboardRowDto = {
   __typename?: 'MembersDashboardRowDTO';
   firstName: Scalars['String']['output'];
@@ -364,6 +371,18 @@ export type MembersDashboardRowDto = {
   isArchived: Scalars['Boolean']['output'];
   joined?: Maybe<Scalars['String']['output']>;
   lastName: Scalars['String']['output'];
+  role?: Maybe<Scalars['String']['output']>;
+  team?: Maybe<Scalars['String']['output']>;
+};
+
+export type MembersDashboardSidePanelDto = {
+  __typename?: 'MembersDashboardSidePanelDTO';
+  firstName: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  isArchived: Scalars['Boolean']['output'];
+  joined?: Maybe<Scalars['String']['output']>;
+  lastName: Scalars['String']['output'];
+  pastTeams: Array<MemberPastTeamDto>;
   role?: Maybe<Scalars['String']['output']>;
   team?: Maybe<Scalars['String']['output']>;
 };
@@ -743,6 +762,7 @@ export type Query = {
   isAuthorizedToReview: Scalars['Boolean']['output'];
   membersDashboard: Array<MembersDashboardRowDto>;
   membersDashboardCount: Scalars['Int']['output'];
+  membersDashboardSidePanel: MembersDashboardSidePanelDto;
   positions: Array<PositionDto>;
   projects: Array<ProjectDto>;
   reviewDashboard: Array<ReviewDashboardRowDto>;
@@ -908,6 +928,11 @@ export type QueryIsAuthorizedToReviewArgs = {
 export type QueryMembersDashboardArgs = {
   pageNumber: Scalars['Int']['input'];
   resultsPerPage: Scalars['Int']['input'];
+};
+
+
+export type QueryMembersDashboardSidePanelArgs = {
+  userId: Scalars['ID']['input'];
 };
 
 

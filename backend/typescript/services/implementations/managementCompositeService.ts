@@ -1,8 +1,14 @@
 import Project from "../../models/project.model";
 import User from "../../models/user.model";
 import UserTermRecord from "../../models/userTermRecord.model";
-import { MembersDashboardRowDTO } from "../../types/membersDashboard";
-import { toMembersDashboardRowDTO } from "../../utilities/dtoUtils";
+import {
+  MembersDashboardRowDTO,
+  MembersDashboardSidePanelDTO,
+} from "../../types/membersDashboard";
+import {
+  toMembersDashboardRowDTO,
+  toMembersDashboardSidePanelDTO,
+} from "../../utilities/dtoUtils";
 import { getErrorMessage } from "../../utilities/errorUtils";
 import logger from "../../utilities/logger";
 import IManagementCompositeService from "../interfaces/IManagementCompositeService";
@@ -63,6 +69,46 @@ class ManagementCompositeService implements IManagementCompositeService {
     } catch (error: unknown) {
       Logger.error(
         `Failed to get members dashboard count. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async getMembersDashboardSidePanel(
+    userId: number,
+  ): Promise<MembersDashboardSidePanelDTO> {
+    try {
+      const member = await User.findByPk(userId, {
+        include: [
+          {
+            model: UserTermRecord,
+            as: "user_term_records",
+            separate: true,
+            required: false,
+            attributes: ["user_id", "position_id", "term", "createdAt"],
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: Project,
+                as: "project",
+                required: false,
+                attributes: ["project_name"],
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!member) {
+        throw new Error(`User with id ${userId} not found`);
+      }
+
+      return toMembersDashboardSidePanelDTO(member);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get management dashboard side panel for member ${userId}. Reason = ${getErrorMessage(
           error,
         )}`,
       );

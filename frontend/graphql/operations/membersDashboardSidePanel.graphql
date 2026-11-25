@@ -1,0 +1,16 @@
+query MembersDashboardSidePanel($userId: ID!) {
+  membersDashboardSidePanel(userId: $userId) {
+    id
+    firstName
+    lastName
+    role
+    team
+    joined
+    isArchived
+    pastTeams {
+      team
+      role
+      term
+    }
+  }
+}

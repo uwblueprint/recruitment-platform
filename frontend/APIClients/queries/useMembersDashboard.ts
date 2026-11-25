@@ -18,7 +18,7 @@ const formatJoinedTerm = (iso: string) => {
   return `${season} ${date.getFullYear()}`;
 };
 
-const toMember = (row: MembersDashboardResult): Member => ({
+export const toMember = (row: MembersDashboardResult): Member => ({
   id: row.id,
   name: `${row.firstName} ${row.lastName}`,
   role: row.role ?? "—",

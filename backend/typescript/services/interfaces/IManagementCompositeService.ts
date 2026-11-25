@@ -1,4 +1,7 @@
-import { MembersDashboardRowDTO } from "../../types/membersDashboard";
+import {
+  MembersDashboardRowDTO,
+  MembersDashboardSidePanelDTO,
+} from "../../types/membersDashboard";
 
 interface IManagementCompositeService {
   /**
@@ -15,6 +18,13 @@ interface IManagementCompositeService {
    * Gets the total number of members shown on the members dashboard
    */
   getMembersDashboardCount(): Promise<number>;
+
+  /**
+   * Gets the members management side panel showing member information
+   */
+  getMembersDashboardSidePanel(
+    userId: number,
+  ): Promise<MembersDashboardSidePanelDTO>;
 }
 
 export default IManagementCompositeService;
