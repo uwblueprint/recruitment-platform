@@ -24,6 +24,27 @@ class ProjectService implements IProjectService {
       throw error;
     }
   }
+
+  async archiveProject(id: string): Promise<ProjectDTO> {
+    try {
+      const updateResult = await Project.update(
+        { is_archived: true },
+        { where: { id }, returning: true },
+      );
+
+      if (!updateResult[0]) {
+        throw new Error(`Project id ${id} not found`);
+      }
+
+      const [, [project]] = updateResult;
+      return toProjectDTO(project);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to archive project. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
 }
 
 export default ProjectService;

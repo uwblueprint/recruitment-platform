@@ -221,6 +221,7 @@ const graphQLMiddlewares = {
     delegateInterviewers: authorizedBySuperAdmin(),
     submitInterviewScores: isAuthorizedForInterview(),
     uploadInterviewNotes: isAuthorizedForInterview(),
+    archiveProject: authorizedByAdmin(),
   },
 };
 

@@ -13,6 +13,12 @@ const projectResolvers = {
       return projectService.getAllProjects(isArchived ?? undefined);
     },
   },
+  Mutation: {
+    archiveProject: (
+      _parent: unknown,
+      { id }: { id: string },
+    ): Promise<ProjectDTO> => projectService.archiveProject(id),
+  },
 };
 
 export default projectResolvers;

@@ -10,6 +10,10 @@ const projectType = gql`
   extend type Query {
     projects(isArchived: Boolean): [ProjectDTO!]!
   }
+
+  extend type Mutation {
+    archiveProject(id: ID!): ProjectDTO!
+  }
 `;
 
 export default projectType;

@@ -16,6 +16,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 type Documents = {
     "query AdminCommentsByApplicantRecordId($applicantRecordId: ID!) {\n  adminCommentsByApplicantRecordId(applicantRecordId: $applicantRecordId) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": typeof types.AdminCommentsByApplicantRecordIdDocument,
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": typeof types.ApplicationDocument,
+    "mutation ArchiveProject($id: ID!) {\n  archiveProject(id: $id) {\n    id\n    projectName\n    isArchived\n  }\n}": typeof types.ArchiveProjectDocument,
     "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}": typeof types.BulkUpdateApplicantRecordsStatusDocument,
     "query CanAccessInterview($applicantRecordId: ID!) {\n  canAccessInterview(applicantRecordId: $applicantRecordId)\n}": typeof types.CanAccessInterviewDocument,
     "query CanAccessInterviewGroup($groupId: ID!) {\n  canAccessInterviewGroup(groupId: $groupId)\n}": typeof types.CanAccessInterviewGroupDocument,
@@ -75,6 +76,7 @@ type Documents = {
 const documents: Documents = {
     "query AdminCommentsByApplicantRecordId($applicantRecordId: ID!) {\n  adminCommentsByApplicantRecordId(applicantRecordId: $applicantRecordId) {\n    id\n    userId\n    applicantRecordId\n    comment\n    createdAt\n    updatedAt\n  }\n}": types.AdminCommentsByApplicantRecordIdDocument,
     "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}": types.ApplicationDocument,
+    "mutation ArchiveProject($id: ID!) {\n  archiveProject(id: $id) {\n    id\n    projectName\n    isArchived\n  }\n}": types.ArchiveProjectDocument,
     "mutation BulkUpdateApplicantRecordsStatus($ids: [ID!]!, $status: ApplicationStatus!) {\n  bulkUpdateApplicantRecordsStatus(ids: $ids, status: $status) {\n    id\n    status\n  }\n}": types.BulkUpdateApplicantRecordsStatusDocument,
     "query CanAccessInterview($applicantRecordId: ID!) {\n  canAccessInterview(applicantRecordId: $applicantRecordId)\n}": types.CanAccessInterviewDocument,
     "query CanAccessInterviewGroup($groupId: ID!) {\n  canAccessInterviewGroup(groupId: $groupId)\n}": types.CanAccessInterviewGroupDocument,
@@ -154,6 +156,10 @@ export function gql(source: "query AdminCommentsByApplicantRecordId($applicantRe
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}"): (typeof documents)["query Application($applicantRecordId: ID!) {\n  application(applicantRecordId: $applicantRecordId) {\n    id\n    academicOrCoop\n    academicYear\n    email\n    firstName\n    lastName\n    heardFrom\n    locationPreference\n    program\n    pronouns\n    pronounsSpecified\n    resumeUrl\n    roleSpecificQuestions {\n      question\n      answer\n    }\n    shortAnswerQuestions {\n      question\n      answer\n    }\n    status\n    term\n    timesApplied\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation ArchiveProject($id: ID!) {\n  archiveProject(id: $id) {\n    id\n    projectName\n    isArchived\n  }\n}"): (typeof documents)["mutation ArchiveProject($id: ID!) {\n  archiveProject(id: $id) {\n    id\n    projectName\n    isArchived\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

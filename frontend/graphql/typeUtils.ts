@@ -428,6 +428,12 @@ export type {
   TeamsDashboardQueryVariables,
 } from "./__generated__/operation-types";
 
+export { ArchiveProjectDocument } from "./__generated__/graphql";
+export type {
+  ArchiveProjectMutation,
+  ArchiveProjectMutationVariables,
+} from "./__generated__/operation-types";
+
 export { CanReviewApplicantDocument } from "./__generated__/graphql";
 
 export { CanAccessInterviewGroupDocument } from "./__generated__/graphql";

@@ -8,6 +8,14 @@ interface IProjectService {
    * @throws Error if projects retrieval fails
    */
   getAllProjects(isArchived?: boolean): Promise<ProjectDTO[]>;
+
+  /**
+   * Mark a project as archived.
+   * @param id the project id
+   * @returns the updated ProjectDTO
+   * @throws Error if the project does not exist or the update fails
+   */
+  archiveProject(id: string): Promise<ProjectDTO>;
 }
 
 export default IProjectService;
