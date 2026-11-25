@@ -18,6 +18,13 @@ export type ApplicationQueryVariables = Exact<{
 
 export type ApplicationQuery = { application: { id: string, academicOrCoop: string, academicYear: string, email: string, firstName: string, lastName: string, heardFrom: string, locationPreference: string, program: string, pronouns: string, pronounsSpecified: string, resumeUrl: string, status: Types.ApplicationStatus, term: string, timesApplied: string, roleSpecificQuestions: Array<{ question: string, answer: string }>, shortAnswerQuestions: Array<{ question: string, answer: string }> } };
 
+export type ArchiveProjectMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type ArchiveProjectMutation = { archiveProject: { id: string, projectName: string, isArchived: boolean } };
+
 export type BulkUpdateApplicantRecordsStatusMutationVariables = Exact<{
   ids: Array<string | number> | string | number;
   status: Types.ApplicationStatus;

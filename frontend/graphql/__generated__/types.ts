@@ -390,6 +390,7 @@ export type MembersDashboardSidePanelDto = {
 export type Mutation = {
   __typename?: 'Mutation';
   _empty?: Maybe<Scalars['String']['output']>;
+  archiveProject: ProjectDto;
   bulkCreateInterviewDelegations: Array<InterviewDelegationDto>;
   bulkCreateInterviewGroups: Array<Maybe<InterviewGroupDto>>;
   bulkCreateReviewedApplicantRecord: Array<ReviewedApplicantRecordDto>;
@@ -439,6 +440,11 @@ export type Mutation = {
   updateSimpleEntity: SimpleEntityResponseDto;
   updateUser: UserDto;
   uploadInterviewNotes: InterviewNotes;
+};
+
+
+export type MutationArchiveProjectArgs = {
+  id: Scalars['ID']['input'];
 };
 
 

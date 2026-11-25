@@ -2,6 +2,7 @@ import { useState } from "react";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { NextPageWithLayout } from "../../_app.page";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
+import useArchiveProject from "@/APIClients/mutations/useArchiveProject";
 import useMembersDashboardCount from "@/APIClients/queries/useMembersDashboardCount";
 import useTeamsDashboard from "@/APIClients/queries/useTeamsDashboard";
 import { TeamsDashboard } from "./_components/TeamsDashboard";
@@ -17,6 +18,7 @@ const ManagementPage: NextPageWithLayout = () => {
   const { count: memberCount, error: countsError } = useMembersDashboardCount();
   const { count: activeTeamCount } = useTeamsDashboard("Active");
   const { count: archivedTeamCount } = useTeamsDashboard("Archived");
+  const { archiveProject, error: archiveError } = useArchiveProject();
   const [activeView, setActiveView] = useState<ManagementView>(
     ManagementView.MEMBERS
   );
@@ -61,6 +63,11 @@ const ManagementPage: NextPageWithLayout = () => {
             Failed to load member count.
           </p>
         ) : null}
+        {archiveError ? (
+          <p role="alert" className="text-sm text-alert-errorText">
+            Failed to archive team.
+          </p>
+        ) : null}
         <Tabs
           activeView={activeView}
           onViewChange={handleViewChange}
@@ -68,7 +75,13 @@ const ManagementPage: NextPageWithLayout = () => {
         />
         {activeView === ManagementView.MEMBERS && <MembersDashboard />}
         {activeView === ManagementView.ACTIVE_TEAMS && (
-          <TeamsDashboard key="active" status="Active" />
+          <TeamsDashboard
+            key="active"
+            status="Active"
+            onArchiveTeam={(team) => {
+              void archiveProject(team.id);
+            }}
+          />
         )}
         {activeView === ManagementView.ARCHIVED_TEAMS && (
           <TeamsDashboard key="archived" status="Archived" />

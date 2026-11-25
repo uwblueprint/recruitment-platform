@@ -1,0 +1,7 @@
+mutation ArchiveProject($id: ID!) {
+  archiveProject(id: $id) {
+    id
+    projectName
+    isArchived
+  }
+}
