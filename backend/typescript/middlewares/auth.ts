@@ -1,5 +1,9 @@
 import { Request } from "express";
-import { AuthenticationError, ExpressContext } from "apollo-server-express";
+import {
+  AuthenticationError,
+  ForbiddenError,
+  ExpressContext,
+} from "apollo-server-express";
 import { GraphQLResolveInfo } from "graphql";
 
 import AuthService from "../services/implementations/authService";
@@ -7,6 +11,8 @@ import UserService from "../services/implementations/userService";
 import IAuthService from "../services/interfaces/authService";
 import { Role } from "../types";
 import ReviewedApplicantRecord from "../models/reviewedApplicantRecord.model";
+import InterviewDelegation from "../models/interviewDelegation.model";
+import InterviewedApplicantRecord from "../models/interviewedApplicantRecord.model";
 
 const authService: IAuthService = new AuthService(new UserService());
 
@@ -76,8 +82,37 @@ export const isAuthorizedByRole = (roles: Set<Role>) => {
   };
 };
 
-/** Review details are available to admins and the applicant's assigned reviewers/interviewers. */
-export const isAuthorizedForApplicantReview = () => {
+/** Shared assignment rule for review middleware and the route-access query. */
+export const canUserReviewApplicant = async (
+  userId: number,
+  applicantRecordId: string,
+): Promise<boolean> => {
+  const review = await ReviewedApplicantRecord.findOne({
+    where: { applicant_record_id: applicantRecordId, reviewer_id: userId },
+    attributes: ["applicant_record_id"],
+  });
+  return !!review;
+};
+
+/**
+ * Requires the authenticated user to be assigned to the requested applicant.
+ * Assignment is required unless admin read access is explicitly enabled.
+ *
+ * @param options.requireOwnReview Enable for operations targeting a specific review
+ * (such as updates and conflict reports). In addition to assignment, requires
+ * args.reviewerId to match the authenticated user, preventing one assigned
+ * reviewer from modifying another reviewer's record. Leave false for shared
+ * review-page reads that only provide args.applicantRecordId.
+ * @param options.allowAdminRead Allow admins to read without an assignment. Never
+ * bypasses assignment or ownership for operations requiring their own review.
+ */
+export const isAuthorizedForApplicantReview = ({
+  requireOwnReview = false,
+  allowAdminRead = false,
+}: {
+  requireOwnReview?: boolean;
+  allowAdminRead?: boolean;
+} = {}) => {
   return async (
     resolve: (
       parent: any,
@@ -90,32 +125,157 @@ export const isAuthorizedForApplicantReview = () => {
     context: ExpressContext,
     info: GraphQLResolveInfo,
   ) => {
+    const userId = await getUserIdFromContext(context);
     const accessToken = getAccessToken(context.req);
-    if (accessToken) {
-      if (
-        await authService.isAuthorizedByRole(
-          accessToken,
-          new Set(["Admin", "SuperAdmin"]),
-        )
-      ) {
-        return resolve(parent, args, context, info);
-      }
-      if (
-        await authService.isAuthorizedByRole(accessToken, new Set(["User"]))
-      ) {
-        const userId = await authService.getUserIdByAccessToken(accessToken);
-        const review = await ReviewedApplicantRecord.findOne({
-          where: {
-            applicant_record_id: args.applicantRecordId,
-            reviewer_id: userId,
-          },
-        });
-        if (review) return resolve(parent, args, context, info);
-      }
+    if (
+      allowAdminRead &&
+      !requireOwnReview &&
+      accessToken &&
+      (await authService.isAuthorizedByRole(
+        accessToken,
+        new Set(["Admin", "SuperAdmin"]),
+      ))
+    ) {
+      return resolve(parent, args, context, info);
     }
-    throw new AuthenticationError(
-      "Failed authentication and/or authorization for applicant review",
-    );
+    if (
+      (requireOwnReview && String(args.reviewerId) !== String(userId)) ||
+      !(await canUserReviewApplicant(userId, args.applicantRecordId))
+    ) {
+      throw new ForbiddenError("You are not assigned to this review.");
+    }
+    return resolve(parent, args, context, info);
+  };
+};
+
+/** Shared membership rule for group middleware and the route-access query. */
+export const canUserAccessInterviewGroup = async (
+  userId: number,
+  groupId: string,
+): Promise<boolean> => {
+  const delegation = await InterviewDelegation.findOne({
+    where: { group_id: groupId, interviewer_id: userId },
+    attributes: ["interviewer_id"],
+  });
+  return !!delegation;
+};
+
+/** Requires membership in args.groupId for every role, including admins. */
+export const isAuthorizedForInterviewGroup = () => {
+  return async (
+    resolve: (
+      parent: any,
+      args: { [key: string]: any },
+      context: ExpressContext,
+      info: GraphQLResolveInfo,
+    ) => any,
+    parent: any,
+    args: { [key: string]: any },
+    context: ExpressContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    const userId = await getUserIdFromContext(context);
+    const { groupId } = args;
+    if (
+      typeof groupId !== "string" ||
+      !(await canUserAccessInterviewGroup(userId, groupId))
+    ) {
+      throw new ForbiddenError("You are not assigned to this interview group.");
+    }
+    return resolve(parent, args, context, info);
+  };
+};
+
+type InterviewAccessTarget =
+  | { applicantRecordId: string; interviewedApplicantRecordId?: never }
+  | { interviewedApplicantRecordId: string; applicantRecordId?: never };
+
+/** Requires assignment to this applicant's interview, not just their group. */
+export const canUserAccessInterview = async (
+  userId: number,
+  target: InterviewAccessTarget,
+): Promise<boolean> => {
+  let recordId = target.interviewedApplicantRecordId;
+  if (!recordId) {
+    const record = await InterviewedApplicantRecord.findOne({
+      where: { applicant_record_id: target.applicantRecordId },
+      attributes: ["id"],
+    });
+    if (!record) return false;
+    recordId = record.id;
+  }
+  const delegation = await InterviewDelegation.findOne({
+    where: {
+      interviewed_applicant_record_id: recordId,
+      interviewer_id: userId,
+    },
+    attributes: ["interviewer_id"],
+  });
+  return !!delegation;
+};
+
+/**
+ * Requires interview assignment for every role, including admins.
+ * Uses args.interviewedApplicantRecordId to identify the interview record.
+ * @param options.requireOwnInterviewer Also requires args.interviewerId to
+ * match the authenticated user, for delegation reads and conflict reports.
+ */
+export const isAuthorizedForInterview = ({
+  requireOwnInterviewer = false,
+}: {
+  requireOwnInterviewer?: boolean;
+} = {}) => {
+  return async (
+    resolve: (
+      parent: any,
+      args: { [key: string]: any },
+      context: ExpressContext,
+      info: GraphQLResolveInfo,
+    ) => any,
+    parent: any,
+    args: { [key: string]: any },
+    context: ExpressContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    const userId = await getUserIdFromContext(context);
+    const recordId = args.interviewedApplicantRecordId;
+    if (
+      typeof recordId !== "string" ||
+      (requireOwnInterviewer &&
+        String(args.interviewerId) !== String(userId)) ||
+      !(await canUserAccessInterview(userId, {
+        interviewedApplicantRecordId: recordId,
+      }))
+    ) {
+      throw new ForbiddenError("You are not assigned to this interview.");
+    }
+    return resolve(parent, args, context, info);
+  };
+};
+
+/** Requires interview assignment using args.applicantRecordId (an application ID). */
+export const isAuthorizedForInterviewByApplicantRecord = () => {
+  return async (
+    resolve: (
+      parent: any,
+      args: { [key: string]: any },
+      context: ExpressContext,
+      info: GraphQLResolveInfo,
+    ) => any,
+    parent: any,
+    args: { [key: string]: any },
+    context: ExpressContext,
+    info: GraphQLResolveInfo,
+  ) => {
+    const userId = await getUserIdFromContext(context);
+    const { applicantRecordId } = args;
+    if (
+      typeof applicantRecordId !== "string" ||
+      !(await canUserAccessInterview(userId, { applicantRecordId }))
+    ) {
+      throw new ForbiddenError("You are not assigned to this interview.");
+    }
+    return resolve(parent, args, context, info);
   };
 };
 

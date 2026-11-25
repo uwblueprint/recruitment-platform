@@ -1,10 +1,13 @@
 import { InterviewDashboardSidePanel } from "./_components/side-panel/InterviewDashboardSidePanel";
 import { InterviewDashboardToolbar } from "./_components/InterviewDashboardToolbar";
+import { InterviewConflictInfoDialogue } from "./_components/dialogues/InterviewConflictInfoDialogue";
+import { ReassignInterviewerDialogue } from "./_components/dialogues/ReassignInterviewerDialogue";
 import { DashboardTable } from "@/components/dashboard/table";
 import { DASHBOARD_ENUM, DashboardSwitcher } from "@/components/dashboard/common/DashboardSwitcher";
 import {
   COLUMN_ID_TO_SORT_BY,
-  INTERVIEW_DASHBOARD_COLUMNS,
+  createInterviewDashboardColumns,
+  wasReportedAsUnresponsivePartner,
 } from "@/components/dashboard/interview-dashboard/columns";
 import {
   FilterCategoryVariant,
@@ -29,6 +32,28 @@ import { NextPageWithLayout } from "../../_app.page";
 import { getAdminLayout } from "@/components/layouts/AdminLayout";
 import { Tab, Tabs } from "@/components/dashboard/common/Tabs";
 import useInterviewDashboardCounts from "@/APIClients/queries/useInterviewDashboardCounts";
+import { Toast } from "@/components/common/Toast";
+import { BulkStatusConfirmationDialogue } from "@/components/dashboard/review-dashboard/BulkStatusConfirmationDialogue";
+import { BulkAction } from "../review/_components/bulkStatusActions";
+import useBulkStatusAction from "../review/_components/hooks/useBulkStatusAction";
+
+type InterviewerReassignmentTarget = {
+  applicantRecordId: string;
+  position: string;
+  interviewerId: string;
+  interviewerName: string;
+  assignedInterviewerIds: string[];
+  acknowledgesNoResponse: boolean;
+};
+
+const personName = (firstName: string, lastName: string) =>
+  `${firstName} ${lastName}`;
+
+const applicantNoResponseText = (row: InterviewDashboardResult) =>
+  `The interviewee, ${personName(
+    row.firstName,
+    row.lastName,
+  )}, has not responded to interview invite.`;
 
 const DEFAULT_RESULTS_PER_PAGE = 25;
 const SEARCH_DEBOUNCE_MS = 500;
@@ -60,6 +85,9 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [selectedFilters, setSelectedFilters] = useState<SelectedFilters>({});
   const [search, setSearch] = useState("");
+  const [interviewerReassignmentTarget, setInterviewerReassignmentTarget] =
+    useState<InterviewerReassignmentTarget | null>(null);
+  const [conflictInfoText, setConflictInfoText] = useState<string | null>(null);
 
   // The query fires on the settled text; the input keeps the raw value.
   const debouncedSearch = useDebouncedValue(search, SEARCH_DEBOUNCE_MS);
@@ -154,6 +182,7 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     previousData,
     loading: isLoading,
     error,
+    refetch,
   } = useInterviewDashboard({
     pageNumber,
     resultsPerPage,
@@ -225,8 +254,69 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
     resetForNewResults();
   };
 
-  const { counts: tabCounts, error: countsError } =
-    useInterviewDashboardCounts(backendFilters);
+  const {
+    counts: tabCounts,
+    error: countsError,
+    refetch: refetchCounts,
+  } = useInterviewDashboardCounts(backendFilters);
+
+  const columns = useMemo(
+    () =>
+      createInterviewDashboardColumns({
+        onApplicantClick: (row) => {
+          setConflictInfoText(applicantNoResponseText(row));
+        },
+        onInterviewerClick: (row, interviewer) => {
+          setInterviewerReassignmentTarget({
+            applicantRecordId: row.applicantRecordId,
+            position: row.position,
+            interviewerId: interviewer.userInfo.id,
+            interviewerName: `${interviewer.userInfo.firstName} ${interviewer.userInfo.lastName}`,
+            assignedInterviewerIds: row.interviewers.map(
+              (item) => item.userInfo.id,
+            ),
+            acknowledgesNoResponse: wasReportedAsUnresponsivePartner(
+              row,
+              interviewer,
+            ),
+          });
+        },
+      }),
+    [],
+  );
+
+  const refreshDashboard = () => {
+    void refetch().catch(() => {});
+    void refetchCounts().catch(() => {});
+  };
+
+  const selectedRows = rows.filter(
+    (row) => rowSelection[row.applicantRecordId]
+  );
+
+  const {
+    dialogue: bulkActionDialogue,
+    openBulkAction,
+    toast: bulkActionToast,
+    dismissToast: dismissBulkActionToast,
+  } = useBulkStatusAction({
+    onSuccess: () => {
+      setRowSelection({});
+      refreshDashboard();
+    },
+  });
+
+  const handleBulkAction = (action: BulkAction) =>
+    openBulkAction(
+      action,
+      selectedRows.map((row) => ({
+        id: row.applicantRecordId,
+        name: `${row.firstName} ${row.lastName}`,
+        position: row.position,
+        totalScore: row.interviewScore ?? null,
+        maxScore: 20,
+      }))
+    );
 
   const INTERVIEW_DASHBOARD_TABS_UNIT = { singular: "Entry", plural: "Entries" };
   const tabs: Tab[] = [
@@ -268,11 +358,16 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             onChange: handleFilterCategoryChange,
             onRemove: handleRemoveFilter,
           }}
+          bulkActions={{
+            selectedCount: selectedRows.length,
+            onReject: () => handleBulkAction(BulkAction.InterviewReject),
+            onOffer: () => handleBulkAction(BulkAction.Offer),
+          }}
         />
 
         <DashboardTable
           data={rows}
-          columns={INTERVIEW_DASHBOARD_COLUMNS}
+          columns={columns}
           getRowId={(row) => row.applicantRecordId}
           rowSelection={rowSelection}
           onRowSelectionChange={setRowSelection}
@@ -313,6 +408,40 @@ const InterviewDashboardPage: NextPageWithLayout = () => {
             : undefined
         }
       />
+
+      {conflictInfoText != null ? (
+        <InterviewConflictInfoDialogue
+          open
+          text={conflictInfoText}
+          onClose={() => setConflictInfoText(null)}
+        />
+      ) : null}
+
+      {interviewerReassignmentTarget ? (
+        <ReassignInterviewerDialogue
+          open={!!interviewerReassignmentTarget}
+          applicantRecordId={interviewerReassignmentTarget.applicantRecordId}
+          position={interviewerReassignmentTarget.position}
+          currentInterviewerId={interviewerReassignmentTarget.interviewerId}
+          currentInterviewerName={interviewerReassignmentTarget.interviewerName}
+          assignedInterviewerIds={
+            interviewerReassignmentTarget.assignedInterviewerIds
+          }
+          acknowledgesNoResponse={
+            interviewerReassignmentTarget.acknowledgesNoResponse
+          }
+          onClose={() => setInterviewerReassignmentTarget(null)}
+          onUpdated={() => {
+            setInterviewerReassignmentTarget(null);
+            refreshDashboard();
+          }}
+        />
+      ) : null}
+
+      {bulkActionDialogue ? (
+        <BulkStatusConfirmationDialogue {...bulkActionDialogue} />
+      ) : null}
+      <Toast {...bulkActionToast} onClose={dismissBulkActionToast} />
     </div>
   );
 };

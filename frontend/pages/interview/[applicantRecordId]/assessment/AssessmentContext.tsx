@@ -110,7 +110,7 @@ export const AssessmentProvider = ({ children }: { children: ReactNode }) => {
     if (!canSubmit) throw new Error("Assessment is not ready to submit");
     const { data } = await mutate({
       variables: {
-        id: recordId,
+        interviewedApplicantRecordId: recordId,
         interviewJson: {
           passionFSG: form.passionFSG === "" ? undefined : form.passionFSG,
           teamPlayer: form.teamPlayer === "" ? undefined : form.teamPlayer,

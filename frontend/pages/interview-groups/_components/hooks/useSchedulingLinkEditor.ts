@@ -11,7 +11,7 @@ export default function useSchedulingLinkEditor(group?: InterviewGroupResult) {
   const submitLink = () => {
     if (!group || !linkInput || update.loading) return;
     void update.mutate({
-      variables: { id: group.id, schedulingLink: linkInput },
+      variables: { groupId: group.id, schedulingLink: linkInput },
       onCompleted: (result) => {
         if (!result.updateInterviewGroupSchedulingLink) return;
         // The mutation updates the cached group; return to its saved values.

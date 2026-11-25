@@ -1,0 +1,3 @@
+query CanAccessInterviewGroup($groupId: ID!) {
+  canAccessInterviewGroup(groupId: $groupId)
+}

@@ -1,5 +1,5 @@
-query InterviewGroup($id: ID!) {
-  interviewGroup(id: $id) {
+query InterviewGroup($groupId: ID!) {
+  interviewGroup(groupId: $groupId) {
     id
     schedulingLink
     status

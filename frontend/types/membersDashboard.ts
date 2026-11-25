@@ -1,4 +1,5 @@
 import type { FilterOption } from "@/components/dashboard/filters";
+import { MembersDashboardRowDTO } from "../../backend/typescript/types/membersDashboard";
 
 /** Display-ready row; map the generated query result to this shape in the API hook. */
 export type Member = {

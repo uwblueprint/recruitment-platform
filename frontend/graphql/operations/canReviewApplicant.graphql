@@ -1,0 +1,3 @@
+query CanReviewApplicant($applicantRecordId: ID!) {
+  canReviewApplicant(applicantRecordId: $applicantRecordId)
+}

@@ -1,0 +1,156 @@
+import Project from "../../models/project.model";
+import User from "../../models/user.model";
+import UserTermRecord from "../../models/userTermRecord.model";
+import {
+  MembersDashboardRowDTO,
+  MembersDashboardSidePanelDTO,
+} from "../../types/membersDashboard";
+import { TeamsDashboardTeamDTO } from "../../types/teamsDashboard";
+import {
+  toMembersDashboardRowDTO,
+  toMembersDashboardSidePanelDTO,
+  toTeamsDashboardTeamDTO,
+} from "../../utilities/dtoUtils";
+import { getErrorMessage } from "../../utilities/errorUtils";
+import logger from "../../utilities/logger";
+import IManagementCompositeService from "../interfaces/IManagementCompositeService";
+
+const Logger = logger(__filename);
+
+class ManagementCompositeService implements IManagementCompositeService {
+  /* eslint-disable class-methods-use-this */
+  async getMembersDashboard(
+    pageNumber: number,
+    resultsPerPage: number,
+  ): Promise<MembersDashboardRowDTO[]> {
+    try {
+      const perPage = Number.isFinite(Number(resultsPerPage))
+        ? Number(resultsPerPage)
+        : 1;
+      const currentPage = Number.isFinite(Number(pageNumber))
+        ? Number(pageNumber)
+        : 1;
+      const offsetRow = (currentPage - 1) * perPage;
+
+      const members = await User.findAll({
+        attributes: ["id", "first_name", "last_name", "is_archived"],
+        include: [
+          {
+            model: UserTermRecord,
+            as: "user_term_records",
+            separate: true,
+            required: false,
+            attributes: ["user_id", "position_id", "createdAt"],
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: Project,
+                as: "project",
+                required: false,
+                attributes: ["project_name"],
+              },
+            ],
+          },
+        ],
+        order: [["id", "ASC"]],
+        limit: perPage,
+        offset: offsetRow,
+      });
+      return members.map(toMembersDashboardRowDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `failed to get members dashboard. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getMembersDashboardCount(): Promise<number> {
+    try {
+      return await User.count();
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get members dashboard count. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+
+  async getTeamsDashboard(
+    isArchived: boolean | null,
+  ): Promise<TeamsDashboardTeamDTO[]> {
+    try {
+      const projects = await Project.findAll({
+        attributes: ["id", "project_name", "is_archived"],
+        where: isArchived === null ? undefined : { is_archived: isArchived },
+        include: [
+          {
+            model: UserTermRecord,
+            as: "user_term_records",
+            required: false,
+            attributes: ["user_id", "position_id", "createdAt"],
+            include: [
+              {
+                model: User,
+                as: "user",
+                required: false,
+                attributes: ["id", "first_name", "last_name", "is_archived"],
+              },
+            ],
+          },
+        ],
+        order: [["project_name", "ASC"]],
+      });
+      return projects.map(toTeamsDashboardTeamDTO);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get teams dashboard. Reason = ${getErrorMessage(error)}`,
+      );
+      throw error;
+    }
+  }
+
+  async getMembersDashboardSidePanel(
+    userId: number,
+  ): Promise<MembersDashboardSidePanelDTO> {
+    try {
+      const member = await User.findByPk(userId, {
+        include: [
+          {
+            model: UserTermRecord,
+            as: "user_term_records",
+            separate: true,
+            required: false,
+            attributes: ["user_id", "position_id", "term", "createdAt"],
+            order: [["createdAt", "DESC"]],
+            include: [
+              {
+                model: Project,
+                as: "project",
+                required: false,
+                attributes: ["project_name"],
+              },
+            ],
+          },
+        ],
+      });
+
+      if (!member) {
+        throw new Error(`User with id ${userId} not found`);
+      }
+
+      return toMembersDashboardSidePanelDTO(member);
+    } catch (error: unknown) {
+      Logger.error(
+        `Failed to get management dashboard side panel for member ${userId}. Reason = ${getErrorMessage(
+          error,
+        )}`,
+      );
+      throw error;
+    }
+  }
+}
+
+export default ManagementCompositeService;

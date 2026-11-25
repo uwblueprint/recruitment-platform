@@ -127,6 +127,7 @@ export {
   ApplicationDocument,
   InterviewDashboardSidePanelDocument,
   BulkUpdateApplicantRecordsStatusDocument,
+  SendOfferEmailsDocument,
   SendRejectionEmailsDocument,
   InterviewedApplicantsByUserIdDocument,
   InterviewedPairingsByUserIdDocument,
@@ -139,6 +140,7 @@ export {
   InterviewNotesDocument,
   IsAuthorizedByRoleDocument,
   LoginWithGoogleDocument,
+  ReassignInterviewerDocument,
   ReassignReviewerDocument,
   RefreshDocument,
   ReportInterviewConflictDocument,
@@ -176,6 +178,8 @@ export type {
   ApplicationQuery,
   ApplicationQueryVariables,
   BulkUpdateApplicantRecordsStatusMutation,
+  SendOfferEmailsMutation,
+  SendOfferEmailsMutationVariables,
   SendRejectionEmailsMutation,
   SendRejectionEmailsMutationVariables,
   BulkUpdateApplicantRecordsStatusMutationVariables,
@@ -207,6 +211,8 @@ export type {
   LoginWithGoogleMutationVariables,
   LogoutMutation,
   LogoutMutationVariables,
+  ReassignInterviewerMutation,
+  ReassignInterviewerMutationVariables,
   ReassignReviewerMutation,
   ReassignReviewerMutationVariables,
   RefreshMutation,
@@ -402,3 +408,38 @@ export type {
 export { InterviewInvitesCountsDocument } from "./__generated__/graphql";
 
 export type { InterviewInvitesCountsQueryVariables } from "./__generated__/operation-types";
+
+export {
+  MembersDashboardDocument,
+  MembersDashboardCountDocument,
+} from "./__generated__/graphql";
+export type {
+  MembersDashboardQuery,
+  MembersDashboardQueryVariables,
+  MembersDashboardCountQuery,
+} from "./__generated__/operation-types";
+export type MembersDashboardResult = ArrayElement<
+  OperationField<Operations.MembersDashboardQuery, "membersDashboard">
+>;
+
+export { TeamsDashboardDocument } from "./__generated__/graphql";
+export type {
+  TeamsDashboardQuery,
+  TeamsDashboardQueryVariables,
+} from "./__generated__/operation-types";
+
+export { CanReviewApplicantDocument } from "./__generated__/graphql";
+
+export { CanAccessInterviewGroupDocument } from "./__generated__/graphql";
+
+export { CanAccessInterviewDocument, InterviewApplicationDocument, InterviewReviewDetailsDocument } from "./__generated__/graphql";
+
+export { MembersDashboardSidePanelDocument } from "./__generated__/graphql";
+export type {
+  MembersDashboardSidePanelQuery,
+  MembersDashboardSidePanelQueryVariables,
+} from "./__generated__/operation-types";
+export type MembersDashboardSidePanelResult = OperationField<
+  Operations.MembersDashboardSidePanelQuery,
+  "membersDashboardSidePanel"
+>;

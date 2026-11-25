@@ -39,6 +39,11 @@ import User from "../models/user.model";
 import Project from "../models/project.model";
 import UserTermRecord from "../models/userTermRecord.model";
 import Position from "../models/position.model";
+import {
+  MembersDashboardRowDTO,
+  MembersDashboardSidePanelDTO,
+} from "../types/membersDashboard";
+import { TeamsDashboardTeamDTO } from "../types/teamsDashboard";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -270,9 +275,13 @@ export function toInterviewDashboardRowDTO(
     position: applicantRecord.position,
     applicationStatus: applicantRecord.status,
     isApplicantFlagged: applicantRecord.is_applicant_flagged,
-    interviewers: (
-      interviewedApplicantRecord?.interview_delegations ?? []
-    ).map((interviewDelegation) => toUserDTO(interviewDelegation.interviewer)),
+    interviewers: (interviewedApplicantRecord?.interview_delegations ?? []).map(
+      (interviewDelegation) => ({
+        userInfo: toUserDTO(interviewDelegation.interviewer),
+        interviewHasConflict:
+          interviewDelegation.interview_has_conflict ?? null,
+      }),
+    ),
     interviewScore: interviewedApplicantRecord?.score ?? null,
   };
 }
@@ -410,6 +419,121 @@ export function toInterviewUnmatchedApplicantsByPositionDTO(
       interviewedApplicantRecordId: record.interviewed_applicant_record!.id,
       firstName: record.applicant.first_name,
       lastName: record.applicant.last_name,
+    })),
+  };
+}
+
+export function toMembersDashboardRowDTO(member: User): MembersDashboardRowDTO {
+  const termRecords = member.user_term_records ?? [];
+  const currRecord = termRecords.length > 0 ? termRecords[0] : null;
+  const firstRecord =
+    termRecords.length > 0 ? termRecords[termRecords.length - 1] : null;
+
+  return {
+    id: member.id,
+    firstName: member.first_name,
+    lastName: member.last_name,
+    role: currRecord?.position_id ?? null,
+    team: currRecord?.project?.project_name ?? null,
+    joined: firstRecord ? new Date(firstRecord.createdAt).toISOString() : null,
+    isArchived: member.is_archived,
+  };
+}
+
+export function toTeamsDashboardTeamDTO(
+  project: Project,
+): TeamsDashboardTeamDTO {
+  const membersByUser = new Map<
+    number,
+    {
+      id: number;
+      firstName: string;
+      lastName: string;
+      role: string | null;
+      joinedAt: number | null;
+      latestJoinedAt: number | null;
+      termCount: number;
+      isArchived: boolean;
+    }
+  >();
+
+  (project.user_term_records ?? []).forEach((record) => {
+    const { user } = record;
+    if (!user) return;
+
+    const joinedAt = record.createdAt
+      ? new Date(record.createdAt).getTime()
+      : null;
+    const existing = membersByUser.get(user.id);
+
+    if (!existing) {
+      membersByUser.set(user.id, {
+        id: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        role: record.position_id,
+        joinedAt,
+        latestJoinedAt: joinedAt,
+        termCount: 1,
+        isArchived: user.is_archived,
+      });
+      return;
+    }
+
+    existing.termCount += 1;
+    if (
+      joinedAt !== null &&
+      (existing.joinedAt === null || joinedAt < existing.joinedAt)
+    ) {
+      existing.joinedAt = joinedAt;
+    }
+    if (
+      joinedAt !== null &&
+      (existing.latestJoinedAt === null || joinedAt >= existing.latestJoinedAt)
+    ) {
+      existing.latestJoinedAt = joinedAt;
+      existing.role = record.position_id;
+    }
+  });
+
+  const members = [...membersByUser.values()]
+    .map((member) => ({
+      id: member.id,
+      firstName: member.firstName,
+      lastName: member.lastName,
+      role: member.role,
+      joined:
+        member.joinedAt === null
+          ? null
+          : new Date(member.joinedAt).toISOString(),
+      termsOnProject: String(member.termCount),
+      isArchived: member.isArchived,
+    }))
+    .sort(
+      (left, right) =>
+        left.lastName.localeCompare(right.lastName) ||
+        left.firstName.localeCompare(right.firstName),
+    );
+
+  return {
+    id: project.id,
+    projectName: project.project_name,
+    isArchived: project.is_archived,
+    members,
+  };
+}
+
+export function toMembersDashboardSidePanelDTO(
+  member: User,
+): MembersDashboardSidePanelDTO {
+  const termRecords = member.user_term_records ?? [];
+
+  return {
+    ...toMembersDashboardRowDTO(member),
+    pastTeams: termRecords.slice(1).map((record) => ({
+      team: record.project?.project_name ?? null,
+      role: record.position_id,
+      term: record.term,
     })),
   };
 }
