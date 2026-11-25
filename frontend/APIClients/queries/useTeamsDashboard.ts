@@ -11,20 +11,10 @@ import type {
   TeamStatus,
   TeamsDashboardFilters,
 } from "@/types/teamsDashboard";
+import formatJoinedTerm from "@/utils/formatJoinedTerm";
 
 type TeamsDashboardTeam = TeamsDashboardQuery["teamsDashboard"][number];
 type TeamsDashboardMember = TeamsDashboardTeam["members"][number];
-
-const formatJoined = (iso: string | null) => {
-  if (!iso) return "—";
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat("en-US", {
-    month: "short",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(date);
-};
 
 const toMember = (
   member: TeamsDashboardMember,
@@ -36,7 +26,7 @@ const toMember = (
   lastName: member.lastName,
   role: member.role ?? "—",
   team: teamName,
-  joined: formatJoined(member.joined),
+  joined: member.joined ? formatJoinedTerm(member.joined) : "—",
   status: member.isArchived ? "Not Active" : "Active",
   termsOnProject: member.termsOnProject,
 });

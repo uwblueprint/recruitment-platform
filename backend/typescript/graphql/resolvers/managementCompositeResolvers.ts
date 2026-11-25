@@ -20,7 +20,7 @@ const managementCompositeResolvers = {
       managementCompositeService.getMembersDashboardCount(),
     teamsDashboard: (
       _parent: undefined,
-      { isArchived }: { isArchived?: boolean | null },
+      { isArchived }: { isArchived: boolean | null },
     ): Promise<TeamsDashboardTeamDTO[]> =>
       managementCompositeService.getTeamsDashboard(isArchived ?? null),
   },
