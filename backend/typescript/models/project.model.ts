@@ -1,4 +1,6 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import { Column, DataType, HasMany, Model, Table } from "sequelize-typescript";
+// eslint-disable-next-line import/no-cycle -- Sequelize bidirectional association
+import UserTermRecord from "./userTermRecord.model";
 
 @Table({ tableName: "projects" })
 export default class Project extends Model {
@@ -22,4 +24,7 @@ export default class Project extends Model {
     defaultValue: false,
   })
   is_archived!: boolean;
+
+  @HasMany(() => UserTermRecord, { foreignKey: "project_id" })
+  user_term_records?: UserTermRecord[];
 }

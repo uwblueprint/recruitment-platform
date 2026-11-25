@@ -347,6 +347,13 @@ export type SubmitInterviewScoresMutationVariables = Exact<{
 
 export type SubmitInterviewScoresMutation = { submitInterviewScores: { id: string, score: number | null, status: Types.InterviewStatus, interviewJson: { passionFSG: number | null, teamPlayer: number | null, desireToLearn: number | null, skill: number | null, skillCategory: Types.SkillCategory | null, comments: string | null } | null } };
 
+export type TeamsDashboardQueryVariables = Exact<{
+  isArchived?: boolean | null | undefined;
+}>;
+
+
+export type TeamsDashboardQuery = { teamsDashboard: Array<{ id: string, projectName: string, isArchived: boolean, members: Array<{ id: string, firstName: string, lastName: string, role: string | null, joined: string | null, termsOnProject: string, isArchived: boolean }> }> };
+
 export type UpdateAdminCommentMutationVariables = Exact<{
   id: string | number;
   adminComment: Types.UpdateAdminCommentDto;

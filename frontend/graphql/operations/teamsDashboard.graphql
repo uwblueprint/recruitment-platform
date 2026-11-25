@@ -1,0 +1,16 @@
+query TeamsDashboard($isArchived: Boolean) {
+  teamsDashboard(isArchived: $isArchived) {
+    id
+    projectName
+    isArchived
+    members {
+      id
+      firstName
+      lastName
+      role
+      joined
+      termsOnProject
+      isArchived
+    }
+  }
+}

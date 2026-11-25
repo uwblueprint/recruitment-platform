@@ -43,6 +43,7 @@ import {
   MembersDashboardRowDTO,
   MembersDashboardSidePanelDTO,
 } from "../types/membersDashboard";
+import { TeamsDashboardTeamDTO } from "../types/teamsDashboard";
 
 export function toUserDTO(model: User): UserDTO {
   return {
@@ -436,6 +437,89 @@ export function toMembersDashboardRowDTO(member: User): MembersDashboardRowDTO {
     team: currRecord?.project?.project_name ?? null,
     joined: firstRecord ? new Date(firstRecord.createdAt).toISOString() : null,
     isArchived: member.is_archived,
+  };
+}
+
+export function toTeamsDashboardTeamDTO(
+  project: Project,
+): TeamsDashboardTeamDTO {
+  const membersByUser = new Map<
+    number,
+    {
+      id: number;
+      firstName: string;
+      lastName: string;
+      role: string | null;
+      joinedAt: number | null;
+      latestJoinedAt: number | null;
+      termCount: number;
+      isArchived: boolean;
+    }
+  >();
+
+  (project.user_term_records ?? []).forEach((record) => {
+    const { user } = record;
+    if (!user) return;
+
+    const joinedAt = record.createdAt
+      ? new Date(record.createdAt).getTime()
+      : null;
+    const existing = membersByUser.get(user.id);
+
+    if (!existing) {
+      membersByUser.set(user.id, {
+        id: user.id,
+        firstName: user.first_name,
+        lastName: user.last_name,
+        role: record.position_id,
+        joinedAt,
+        latestJoinedAt: joinedAt,
+        termCount: 1,
+        isArchived: user.is_archived,
+      });
+      return;
+    }
+
+    existing.termCount += 1;
+    if (
+      joinedAt !== null &&
+      (existing.joinedAt === null || joinedAt < existing.joinedAt)
+    ) {
+      existing.joinedAt = joinedAt;
+    }
+    if (
+      joinedAt !== null &&
+      (existing.latestJoinedAt === null || joinedAt >= existing.latestJoinedAt)
+    ) {
+      existing.latestJoinedAt = joinedAt;
+      existing.role = record.position_id;
+    }
+  });
+
+  const members = [...membersByUser.values()]
+    .map((member) => ({
+      id: member.id,
+      firstName: member.firstName,
+      lastName: member.lastName,
+      role: member.role,
+      joined:
+        member.joinedAt === null
+          ? null
+          : new Date(member.joinedAt).toISOString(),
+      termsOnProject: String(member.termCount),
+      isArchived: member.isArchived,
+    }))
+    .sort(
+      (left, right) =>
+        left.lastName.localeCompare(right.lastName) ||
+        left.firstName.localeCompare(right.firstName),
+    );
+
+  return {
+    id: project.id,
+    projectName: project.project_name,
+    isArchived: project.is_archived,
+    members,
   };
 }
 
