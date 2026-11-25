@@ -15,16 +15,6 @@ export type MemberSidePanelDetails = Member & {
   pastTeams: { team: string; role: string; term: string }[];
 };
 
-export type MemberPastTeamDTO = {
-  team: string | null;
-  role: string;
-  term: string;
-};
-
-export type MembersDashboardSidePanelDTO = MembersDashboardRowDTO & {
-  pastTeams: MemberPastTeamDTO[];
-};
-
 /** Temporary query types until the members GraphQL operation is generated. */
 export type MembersDashboardFilters = {
   search?: string;
