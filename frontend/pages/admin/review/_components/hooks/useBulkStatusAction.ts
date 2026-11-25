@@ -1,6 +1,7 @@
 import { useReducer, useRef, useState } from "react";
 
 import useSendRejectionEmails from "@/APIClients/mutations/useSendRejectionEmails";
+import useSendOfferEmails from "@/APIClients/mutations/useSendOfferEmails";
 import useBulkUpdateApplicantRecordsStatus from "@/APIClients/mutations/useBulkUpdateApplicantRecordsStatus";
 import type {
   BulkStatusApplicant,
@@ -11,35 +12,40 @@ import {
   BULK_ACTIONS,
   BULK_ACTION_SUBMIT_ERROR,
   BulkAction,
+  FINAL_CONFIRMATION,
+  pluralizeCandidates,
 } from "../bulkStatusActions";
 
 enum DialogueStatus {
   Closed = "closed",
   Confirming = "confirming",
+  // "Are you sure?" step for actions that send emails.
+  FinalConfirming = "finalConfirming",
   Submitting = "submitting",
 }
 
 enum DialogueEventType {
   Open = "open",
   Cancel = "cancel",
+  Proceed = "proceed",
+  Back = "back",
   Submit = "submit",
   Success = "success",
   Error = "error",
 }
 
+type OpenDialogueState = {
+  action: BulkAction;
+  applicants: BulkStatusApplicant[];
+};
+
 type DialogueState =
   | { status: DialogueStatus.Closed }
-  | {
-      status: DialogueStatus.Confirming;
-      action: BulkAction;
-      applicants: BulkStatusApplicant[];
+  | (OpenDialogueState & {
+      status: DialogueStatus.Confirming | DialogueStatus.FinalConfirming;
       error?: string;
-    }
-  | {
-      status: DialogueStatus.Submitting;
-      action: BulkAction;
-      applicants: BulkStatusApplicant[];
-    };
+    })
+  | (OpenDialogueState & { status: DialogueStatus.Submitting });
 
 type DialogueEvent =
   | {
@@ -48,9 +54,18 @@ type DialogueEvent =
       applicants: BulkStatusApplicant[];
     }
   | { type: DialogueEventType.Cancel }
+  | { type: DialogueEventType.Proceed }
+  | { type: DialogueEventType.Back }
   | { type: DialogueEventType.Submit }
   | { type: DialogueEventType.Success }
   | { type: DialogueEventType.Error; message: string };
+
+const requiresFinalConfirmation = (action: BulkAction) => {
+  const config = BULK_ACTIONS[action];
+  return (
+    "requiresFinalConfirmation" in config && config.requiresFinalConfirmation
+  );
+};
 
 const dialogueReducer = (
   state: DialogueState,
@@ -63,8 +78,25 @@ const dialogueReducer = (
         action: event.action,
         applicants: event.applicants,
       };
-    case DialogueEventType.Submit:
+    case DialogueEventType.Proceed:
       return state.status === DialogueStatus.Confirming
+        ? {
+            status: DialogueStatus.FinalConfirming,
+            action: state.action,
+            applicants: state.applicants,
+          }
+        : state;
+    case DialogueEventType.Back:
+      return state.status === DialogueStatus.FinalConfirming
+        ? {
+            status: DialogueStatus.Confirming,
+            action: state.action,
+            applicants: state.applicants,
+          }
+        : state;
+    case DialogueEventType.Submit:
+      return state.status === DialogueStatus.Confirming ||
+        state.status === DialogueStatus.FinalConfirming
         ? {
             status: DialogueStatus.Submitting,
             action: state.action,
@@ -74,7 +106,9 @@ const dialogueReducer = (
     case DialogueEventType.Error:
       return state.status === DialogueStatus.Submitting
         ? {
-            status: DialogueStatus.Confirming,
+            status: requiresFinalConfirmation(state.action)
+              ? DialogueStatus.FinalConfirming
+              : DialogueStatus.Confirming,
             action: state.action,
             applicants: state.applicants,
             error: event.message,
@@ -91,9 +125,19 @@ const dialogueReducer = (
   }
 };
 
-type ToastState = { open: boolean; title: string; description: string };
+type ToastState = {
+  open: boolean;
+  title: string;
+  description: string;
+  severity?: "success" | "error";
+};
 
 const CLOSED_TOAST: ToastState = { open: false, title: "", description: "" };
+
+const finalConfirmationText = (count: number) =>
+  `You will not be able to undo this action once the emails are sent. Please confirm you want to select ${
+    count === 1 ? "this applicant" : `these ${count} applicants`
+  }.`;
 
 export type BulkStatusDialogueProps = BulkStatusConfirmationDialogueProps & {
   open: true;
@@ -119,11 +163,17 @@ const useBulkStatusAction = ({
   const { bulkUpdateApplicantRecordsStatus } =
     useBulkUpdateApplicantRecordsStatus();
   const { sendRejectionEmails } = useSendRejectionEmails();
+  const { sendOfferEmails } = useSendOfferEmails();
   const [state, dispatch] = useReducer(dialogueReducer, {
     status: DialogueStatus.Closed,
   });
   const [toast, setToast] = useState<ToastState>(CLOSED_TOAST);
   const submitting = useRef(false);
+
+  const emailSenders = {
+    rejection: sendRejectionEmails,
+    offer: sendOfferEmails,
+  };
 
   const openBulkAction = (
     action: BulkAction,
@@ -133,41 +183,44 @@ const useBulkStatusAction = ({
     dispatch({ type: DialogueEventType.Open, action, applicants });
   };
 
-  const confirm = async () => {
-    if (state.status !== DialogueStatus.Confirming || submitting.current)
+  const submit = async () => {
+    if (
+      (state.status !== DialogueStatus.Confirming &&
+        state.status !== DialogueStatus.FinalConfirming) ||
+      submitting.current
+    )
       return;
     submitting.current = true;
     const { action, applicants } = state;
     const config = BULK_ACTIONS[action];
+    const emailType = "emailType" in config ? config.emailType : undefined;
+    const ids = applicants.map((applicant) => applicant.id);
 
     dispatch({ type: DialogueEventType.Submit });
     try {
-      await bulkUpdateApplicantRecordsStatus(
-        applicants.map((applicant) => applicant.id),
-        config.status
-      );
+      await bulkUpdateApplicantRecordsStatus(ids, config.status);
       let emailFailed = false;
-      if (action === BulkAction.Reject) {
+      if (emailType) {
         try {
-          await sendRejectionEmails(
-            applicants.map((applicant) => applicant.id)
-          );
+          await emailSenders[emailType](ids);
         } catch {
           emailFailed = true;
         }
       }
       dispatch({ type: DialogueEventType.Success });
       onSuccess();
-      setToast({
-        open: true,
-        ...config.toast(applicants.length),
-        ...(emailFailed
+      setToast(
+        emailFailed
           ? {
-              description:
-                "Statuses were updated, but some or all rejection emails could not be confirmed. Contact an administrator before resending.",
+              open: true,
+              severity: "error",
+              title: `Statuses updated for ${pluralizeCandidates(
+                applicants.length
+              )}`,
+              description: `Some or all ${emailType} emails could not be confirmed. Contact an administrator before resending.`,
             }
-          : {}),
-      });
+          : { open: true, ...config.toast(applicants.length) }
+      );
     } catch {
       dispatch({
         type: DialogueEventType.Error,
@@ -178,23 +231,54 @@ const useBulkStatusAction = ({
     }
   };
 
-  const dialogue: BulkStatusDialogueProps | null =
-    state.status === DialogueStatus.Closed
-      ? null
-      : {
-          open: true,
-          header: BULK_ACTIONS[state.action].title,
-          text: BULK_ACTIONS[state.action].description,
-          confirmLabel: BULK_ACTIONS[state.action].confirmLabel,
-          applicants: state.applicants,
-          isSubmitting: state.status === DialogueStatus.Submitting,
-          errorText:
-            state.status === DialogueStatus.Confirming
-              ? state.error
-              : undefined,
-          onClose: () => dispatch({ type: DialogueEventType.Cancel }),
-          onConfirm: confirm,
-        };
+  const confirm = () => {
+    if (
+      state.status === DialogueStatus.Confirming &&
+      requiresFinalConfirmation(state.action)
+    ) {
+      dispatch({ type: DialogueEventType.Proceed });
+      return;
+    }
+    void submit();
+  };
+
+  const isSubmitting = state.status === DialogueStatus.Submitting;
+  const isFinalStep =
+    state.status === DialogueStatus.FinalConfirming ||
+    (isSubmitting && requiresFinalConfirmation(state.action));
+  const errorText =
+    state.status === DialogueStatus.Confirming ||
+    state.status === DialogueStatus.FinalConfirming
+      ? state.error
+      : undefined;
+
+  let dialogue: BulkStatusDialogueProps | null = null;
+  if (state.status !== DialogueStatus.Closed && isFinalStep) {
+    dialogue = {
+      open: true,
+      header: FINAL_CONFIRMATION.title,
+      text: finalConfirmationText(state.applicants.length),
+      confirmLabel: FINAL_CONFIRMATION.confirmLabel,
+      cancelLabel: FINAL_CONFIRMATION.cancelLabel,
+      isSubmitting,
+      errorText,
+      onClose: () => dispatch({ type: DialogueEventType.Back }),
+      onConfirm: confirm,
+    };
+  } else if (state.status !== DialogueStatus.Closed) {
+    const config = BULK_ACTIONS[state.action];
+    dialogue = {
+      open: true,
+      header: config.title,
+      text: config.description,
+      confirmLabel: config.confirmLabel,
+      applicants: state.applicants,
+      isSubmitting,
+      errorText,
+      onClose: () => dispatch({ type: DialogueEventType.Cancel }),
+      onConfirm: confirm,
+    };
+  }
 
   return {
     dialogue,
